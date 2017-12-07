@@ -5,7 +5,7 @@ python:
 env:
   global:
     - OFFICIAL_REPO="slaclab/pytpy"
-    - secure: "kK4Cej4IHdqHrNmdlseLxyqsWprtHzEY67YpkCZWaNdSDT7PBuCyTCQgOsSzfJnsVGAeC12S3IaGbntcVoBKKgt4YyP+JdV1aL74/1fpY7yiEUN1AhvoDq4OuODAyBfALm5IuisYQLm7fhsgFoqGM5BanFOUPGYZMf6QQmvJsK4OMmg4eX1go8XqttA6YlI3A7Cu8CDSQ5EwjKWb1A/BvNSiuq3Ur407Oc3ONgFzvXXRcJONAkOS/HBdg0AROz2AwjFzQ4TQeYNCdRLdVkOLy6Hb+ZICJKzyytDynfg8RqAzxz+hP3RZLJU1L9grzoIQ8kPNPmBJyuehZTKatvcVZmrbaItzsx0PTWiWN/YkjoWqJNN5iG4vFF/vT6jy1oSWk4xOgsDjs0Av0L7MvKZ4kq9CMxXcs4LEk3XgaO+wg01ei84ahf9Galatx/w01n1BadurWHsc2nip7hrIetaw0B08kK/MnVUtNffd7Y65at63qNTD+wLVXWt8H9kHGCTd+8BRZ/+KOxjYwbfwNv8y9RD+RBhdF/NCTmg7BD285WCHrGRn4Dw4PgywwHy40xF+AxCFIAljrcfQzTg2XV8UgJvo+MPpeYfIBvKe1MiKrZ7mic7lGOlC0/vkOrXzwo0rvQ/8GC5KjzKBqJAHCer1c2wRZeXIKBOp3WyeiTjngtk=" 
+    - secure: "haLhEWzmlsYROvRhjcdxNY7EZur5q0g+fKmh49bgL0y3Z6Xz8wQiMpfzxKtCnK5xBi8fTtqoB416w5d7O50Q3dzLmomslMBxT2xFZ8CVi9O5XzGFtWo8wCmy4xiOyn+hAMwpghSN/N0fu1baK3T3R81+XMUtOjmQtADX+aEpMbTxnMiPdsEF3eGwBu4jH3PQ0ii0kQ88iTb+aLH0CxzEw7E7SLnSGToxpAZGXAV0Fiq3QktlcFKMh5S4odQWrxej84W91fgRn8r0iHEsnJ9XwOs77ZP5ls/RpKltFGF4/8QAiPYxWWp7HTRNM2jS0bTUAoEmVcibqD+uc44ZItk7AgESY0CKFpgcGY8Mja9FZbxkBz5T6BCAYuhCkCeq46QhyWwAYGakdyIsyL/4xRL/w9Xrt9Ge0WrtG/5JZ2YNimXFDqh3DY2hxLqMkssKuN7fz8x30KneuReLWh8m6BI8KPOoZjkOtgmeZ+v+6gr2rg1N8jzhnXP0HHVgxTQ81KR/pEYG0Jje19SC43+ZadI7asg314X4jZWbtQSxDfwsUrQ5RzxNQ3vKZwZF1JmY1qodDaXE1Qjb0u92wAGAD3kNfTowadXHmPefu3D9bNMBFXLCYxM8LR8C72XLdfyHcUMwIRstLkpiu65uUalVlxlSA+Mp++np9Vdp5MGS0OknTgc="
 
 sudo: false
 
@@ -27,17 +27,19 @@ install:
   - conda create -n pytpy-env pip
   - source activate pytpy-env 
   - pip install -r requirements.txt
-  - pip install coverage codecov doctr
+  - pip install coverage codecov
 
 script:
   - coverage run run_tests.py
   - coverage report -m 
   - |
     if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO ]]; then
+      ls
       set -e
       pip install doctr
       cd docs
       make html
+      ls
       cd ../
       #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
       doctr deploy . --built-docs docs/_build/html
