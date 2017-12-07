@@ -32,23 +32,16 @@ install:
 script:
   - coverage run run_tests.py
   - coverage report -m 
-  #- |
-  #  if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO ]]; then
-  #    set -e
-  #    pip install doctr
-  #    cd docs
-  #    make html
-  #    cd ../
-  #    #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
-  #    doctr deploy . --built-docs docs/_build/html
-  #  fi
-  - set -e
-  - pip install doctr
-  - cd docs
-  - make html
-  - cd ../
-  - #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
-  - doctr deploy . --built-docs docs/_build/html
+  - |
+    if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO ]]; then
+      set -e
+      pip install doctr
+      cd docs
+      make html
+      cd ../
+      #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
+      doctr deploy . --built-docs docs/_build/html
+    fi
 
 after_success:
   - codecov
