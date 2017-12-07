@@ -5,6 +5,8 @@ python:
 env:
   global:
     - OFFICIAL_REPO="slaclab/pytpy"
+    - secure: "LCzjAPgsSjYA78c65oKk4jO3Sgpnzcyqg0QKvGKysXE/3rePjMhlZoLlkwVcpphjPqyM8BOB/K8EhuoNqdSXHbVjYKuMgRFQVWMDttN6ZVE5aljpOGmLvfKkwGM+EfZOu+X5q4VTmnb/2JqRnES07tX/pFLokptEFGusrejxtQLgLULBRd/3QaKGfc1LQ137e8/Txbkgw7MqW8dfkYT/oZ/N3h68pOvk6oVyqawfBzQUnW7oFcHZ49fvzo/VG8hZidkp2wOcbawfLjQf0m025JasaLpiLhPiQSNnxbKF1NjhxCWo3wFiQrj1AVwpzq3kMpLEmvDiAP5pLzxqXBIp31tfMpRvfkY3qxN5CB5d/s4EzuQ9ygOQIhaquFjqwj5JElruddNYD5hPmEFSSVG9GtYiNluMq/X4PZeyD6QN1RKJAcN5EjAq5ZEaTukoKlVWCP13GOf0BWeojsEysyKXwli3TYW5bZI+ncmIm44WQjpx4pqI15hogxgVs/Jiye7mJxHpdukiOlDI4oCwS2eqpFvB/GIM5snCfGp+lW/ayfbckFqFxLMui+O14cwLwswLJqtNfoFL+1j83mJYWFF8sbpSK6Yc2tVce5eRi9bK45lwU0oCMSsnqM0OOl2apug7R5ya023qWtq4sWoreyD2by8Fph30DCrH0w0I4RM02FM="
+    
 
 sudo: false
 
@@ -31,15 +33,16 @@ install:
 script:
   - coverage run run_tests.py
   - coverage report -m 
-  #- |
-  #  if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO ]]; then
-  #    set -e
-  #    pip install doctr
-  #    cd docs
-  #    make html
-  #    cd ../
-  #    doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
-  #  fi
+  - |
+    if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO ]]; then
+      set -e
+      pip install doctr
+      cd docs
+      make html
+      cd ../
+      #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
+      doctr deploy . --built-docs docs/_build/html
+    fi
 
 after_success:
   - codecov
