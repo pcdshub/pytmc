@@ -1,0 +1,14 @@
+doc-warnings: true
+test-warnings: false
+pylint:
+ disable:
+   - protected-access
+   - too-many-arguments
+strictness: medium
+max-line-length: 80
+autodetect: true
+ignore-paths:
+  - docs
+  - __init__.py
+python-targets:
+- 3
