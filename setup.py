@@ -9,5 +9,6 @@ setup(name     = 'pytpy',
 
       packages    = find_packages(),
       description = 'Generate Epics DB records from TwinCAT .tpy files',
+      scripts = ['bin/xmltranslate'],
       include_package_data = True,
 )
