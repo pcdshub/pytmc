@@ -11,6 +11,6 @@ PYTPY
    :target: https://landscape.io/github/slaclab/pytpy/master
    :alt: Code Health
 
-Generate Epics DB records from TwinCAT .tpy files.
+Generate Epics DB records from TwinCAT .tmc files.
 
 See the `docs <https://slaclab.github.io/pytpy/>`_ for more information.

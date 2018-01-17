@@ -8,7 +8,7 @@ setup(name     = 'pytpy',
       author   = 'SLAC National Accelerator Laboratory',
 
       packages    = find_packages(),
-      description = 'Generate Epics DB records from TwinCAT .tpy files',
+      description = 'Generate Epics DB records from TwinCAT .tmc files',
       scripts = ['bin/xmltranslate'],
       include_package_data = True,
 )
