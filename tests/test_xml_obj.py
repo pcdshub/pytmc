@@ -1,7 +1,8 @@
 import pytest
 import logging
 
-from pytpy.xml_obj import Symbol, DataType
+#from pytpy.xml_obj import Symbol, DataType
+from pytpy import Symbol, DataType
 
 
 logger = logging.getLogger(__name__)
