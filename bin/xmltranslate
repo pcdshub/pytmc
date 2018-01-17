@@ -3,14 +3,16 @@ import textwrap
 import sys
 import argparse
 
-description = """Tool for making XML-formatted .tpy files human-readable
+description = """Tool for making XML-formatted files human-readable
 
 Output uses the following rules:
 For a line of xml that appears as the following:
-<tag attr=qual...> text </tag>
+<tag attr=qual...> text </tag> tail
+
+Note that tail takes precedence over text. 
 
 This program will output the following:
-{attrs:qual...} tag text
+{attrs:qual...} tag text tail
 
 Tags contained by other tags are indented and printed on the following line.
 
@@ -53,7 +55,8 @@ def recursive(branch, level=1, indent_size=4, indent=0):
                 " ".join([
                     str(limb.attrib),
                     str(limb.tag),
-                    str(limb.text)
+                    str(limb.text),
+                    str(limb.tail)
                 ]),
                 "".join([" "]*indent_size*indent)
             )
