@@ -25,7 +25,7 @@ def test_BaseElement_type_rejection(generic_tmc_root):
     with pytest.raises(TypeError, message="TypeError expected"):
         s = BaseElement("string")
 
-def test_BaseElement_propery(generic_tmc_root):
+def test_BaseElement_get_raw_properties(generic_tmc_root):
     #Read properties of MAIN variable w/ pragma
     root = generic_tmc_root
     sym = root.find(
@@ -33,7 +33,7 @@ def test_BaseElement_propery(generic_tmc_root):
     )
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
-    prop_out = s.properties
+    prop_out = s._get_raw_properties()
     prop_actual = root.findall(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
         + "/Properties/Property"
@@ -48,7 +48,7 @@ def test_BaseElement_propery(generic_tmc_root):
     )
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
-    prop_out = s.properties
+    prop_out = s._get_raw_properties()
     assert prop_out == [], "Reported Properties lists don't match"
     
     #Read properties of DataType w/ pragma
@@ -58,7 +58,7 @@ def test_BaseElement_propery(generic_tmc_root):
     )
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
-    prop_out = s.properties
+    prop_out = s._get_raw_properties()
     prop_actual = root.findall(
         "./DataTypes/DataType/[Name='iterator']/Properties/Property"
     )
@@ -71,13 +71,26 @@ def test_BaseElement_propery(generic_tmc_root):
     )
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
-    prop_out = s.properties
+    prop_out = s._get_raw_properties()
     prop_actual = root.findall(
         "./DataTypes/DataType/SubItem/[Name='lim']/Properties/Property"
     )
     assert prop_out == prop_actual, "Reported Properties lists don't match"
 
-
+def test_BaseElement_properties(generic_tmc_root)
+    root = generic_tmc_root
+    sym = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    )
+    logging.debug(str(sym.find("./Name").text))    
+    s = BaseElement(sym)
+    prop_out = s.properties
+    prop_actual = root.findall(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+        + "/Properties/Property"
+    )
+    print(prop_out)
+    
 
 def test_Symbol_detect_pragma(generic_tmc_root):
     root = generic_tmc_root
@@ -87,7 +100,6 @@ def test_Symbol_detect_pragma(generic_tmc_root):
     logging.debug(str(sym))
     logging.debug(str(sym.find("./Name").text))
     s = Symbol(sym)
-
 
 
 def test_Symbol_instantiation(generic_tmc_root):

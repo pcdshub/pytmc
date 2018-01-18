@@ -14,9 +14,14 @@ class BaseElement:
             raise TypeError("ElementTree.Element required")
         self.element = element
 
+    def _get_raw_properties(self):
+        return self.element.findall("./Properties/*")
+
     @property
     def properties(self):
-        return self.element.findall("./Properties/*")
+        raw = self._get_raw_properties()
+
+
 
 class Symbol(BaseElement):
     pass
