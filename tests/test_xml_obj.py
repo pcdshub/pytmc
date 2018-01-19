@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 #from pytpy.xml_obj import Symbol, DataType
 from pytpy import Symbol, DataType
 from pytpy.xml_obj import BaseElement
-
+from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -77,29 +77,76 @@ def test_BaseElement_get_raw_properties(generic_tmc_root):
     )
     assert prop_out == prop_actual, "Reported Properties lists don't match"
 
-def test_BaseElement_properties(generic_tmc_root)
+
+@pytest.mark.parametrize(
+    "path,result",
+    [
+        (
+            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']",
+            defaultdict(list,{'NEW_VAR attr':['17']})
+        ),
+        (
+            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']",
+            defaultdict(list,{})
+        ),
+        (
+            "./DataTypes/DataType/[Name='iterator']",
+            defaultdict(list,{
+                'PouType':['FunctionBlock'],
+                'iterator attr':['42'],
+            })
+        ),
+        (
+            "./DataTypes/DataType/SubItem/[Name='lim']",
+            defaultdict(list,{'lim attr':[None]})
+        ),
+    ]
+)
+def test_BaseElement_properties(generic_tmc_root, path, result):
     root = generic_tmc_root
-    sym = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    )
+    sym = root.find(path)
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
     prop_out = s.properties
-    prop_actual = root.findall(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-        + "/Properties/Property"
-    )
-    print(prop_out)
     
-
-def test_Symbol_detect_pragma(generic_tmc_root):
+    assert prop_out == result, "Incorrect properties found"
+    
+@pytest.mark.parametrize(
+    "path,result",
+    [
+        (
+            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']",
+            defaultdict(list,{'NEW_VAR attr':['17']})
+        ),
+        (
+            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']",
+            defaultdict(list,{})
+        ),
+        (
+            "./DataTypes/DataType/[Name='iterator']",
+            defaultdict(list,{
+                'iterator attr':['42'],
+            })
+        ),
+        (
+            "./DataTypes/DataType/SubItem/[Name='lim']",
+            defaultdict(list,{'lim attr':[None]})
+        ),
+    ]
+)
+def test_Symbol_pragmas(generic_tmc_root, path, result):
     root = generic_tmc_root
-    sym = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    )
-    logging.debug(str(sym))
-    logging.debug(str(sym.find("./Name").text))
-    s = Symbol(sym)
+    sym = root.find(path)
+    logging.debug(str(sym.find("./Name").text))    
+    s = BaseElement(sym)
+    s.registered_pragmas = [
+        'NEW_VAR attr',
+        'iterator attr',
+        'lim attr',
+    ]
+    pragma_out = s.pragmas
+    print(pragma_out)
+    assert pragma_out == result, "Incorrect pragmas found"
 
 
 def test_Symbol_instantiation(generic_tmc_root):
