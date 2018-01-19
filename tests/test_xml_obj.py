@@ -184,16 +184,31 @@ def test_SubItem_instantiation(generic_tmc_root):
         pytest.fail("Instantiation of DataType not completed")
 
 
-def test_BaseElement_get_raw_parent(generic_tmc_root):
+def test_Symbol_tc_type(generic_tmc_root):
+    root = generic_tmc_root
+    sym = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    )
+    logging.debug(str(sym.find("./Name").text))
+    s = SubItem(sym)
+    
+    assert s.tc_type == "DINT"
+
+def test_DataType_tc_type(generic_tmc_root):
+    root = generic_tmc_root
+    sym = root.find("./DataTypes/DataType/[Name='iterator']")
+    logging.debug(str(sym.find("./Name").text))
+    s = DataType(sym)
+    
+    assert s.tc_type == "FunctionBlock"
+
+
+def test_SubItem_tc_type(generic_tmc_root):
     root = generic_tmc_root
     sym = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
     ) 
     logging.debug(str(sym.find("./Name").text))
-    s = BaseElement(sym)
-    parent = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    )
-    #pytest.fail("!!!!")
-
-
+    s = SubItem(sym)
+    
+    assert s.tc_type == "DINT"

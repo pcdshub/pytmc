@@ -56,6 +56,13 @@ class BaseElement:
                 pragmas[entry] = props.get(entry)
 
         return pragmas
+
+    def _get_raw_parent(self):
+        return self.element.find('.')
+
+    @property
+    def tc_type(self):
+        raise NotImplementedError
                 
                     
 class Symbol(BaseElement):
@@ -78,6 +85,7 @@ class DataType(BaseElement):
         if element.tag != 'DataType':
             logger.warning("DataType instance not matched to xml DataType")
 
+
 class SubItem(BaseElement):
     def __init__(self, element, parent=None, base='pytpy'):
         super().__init__(element, base)
@@ -85,6 +93,12 @@ class SubItem(BaseElement):
             self.com_base + '_field', 
             self.com_base + '_pv', 
         ]
+
+        self.parent = parent
+
+        if self.parent ==None:
+            logger.warning("SubItem has no parent")
+
         if element.tag != 'SubItem':
             logger.warning("SubItem not matched to xml SubItem")
     
