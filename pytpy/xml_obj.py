@@ -8,13 +8,15 @@ import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-class BaseElement:
-    registered_pragmas = []
 
-    def __init__(self, element):
+class BaseElement:
+
+    def __init__(self, element, base='pytpy'):
         if type(element) != ET.Element:
             raise TypeError("ElementTree.Element required")
         self.element = element
+        self.registered_pragmas = []
+        self.com_base = base
 
     def _get_raw_properties(self):
         return self.element.findall("./Properties/*")
@@ -56,11 +58,34 @@ class BaseElement:
         return pragmas
                 
                     
-            
-
 class Symbol(BaseElement):
-    pass
+    def __init__(self, element, base='pytpy'):
+        super().__init__(element, base)
+        registered_pragmas = [
+            self.com_base + '_field', 
+            self.com_base + '_pv', 
+        ]
+        if element.tag != 'Symbol':
+            logger.warning("Symbol instance not matched to xml Symbol")
+
 
 class DataType(BaseElement):
-    pass
+    def __init__(self, element, base='pytpy'):
+        super().__init__(element, base)
+        self.registered_pragmas = [
+            self.com_base + '_ds_name',
+        ]
+        if element.tag != 'DataType':
+            logger.warning("DataType instance not matched to xml DataType")
 
+class SubItem(BaseElement):
+    def __init__(self, element, parent=None, base='pytpy'):
+        super().__init__(element, base)
+        registered_pragmas = [
+            self.com_base + '_field', 
+            self.com_base + '_pv', 
+        ]
+        if element.tag != 'SubItem':
+            logger.warning("SubItem not matched to xml SubItem")
+    
+    

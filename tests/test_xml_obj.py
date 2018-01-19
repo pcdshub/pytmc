@@ -4,7 +4,7 @@ import logging
 import xml.etree.ElementTree as ET
 
 #from pytpy.xml_obj import Symbol, DataType
-from pytpy import Symbol, DataType
+from pytpy import Symbol, DataType, SubItem
 from pytpy.xml_obj import BaseElement
 from collections import defaultdict
 
@@ -24,6 +24,7 @@ def test_BaseElement_type_rejection(generic_tmc_root):
 
     with pytest.raises(TypeError, message="TypeError expected"):
         s = BaseElement("string")
+
 
 def test_BaseElement_get_raw_properties(generic_tmc_root):
     #Read properties of MAIN variable w/ pragma
@@ -107,10 +108,10 @@ def test_BaseElement_properties(generic_tmc_root, path, result):
     sym = root.find(path)
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
-    prop_out = s.properties
-    
+    prop_out = s.properties 
     assert prop_out == result, "Incorrect properties found"
     
+
 @pytest.mark.parametrize(
     "path,result",
     [
@@ -161,8 +162,6 @@ def test_Symbol_instantiation(generic_tmc_root):
         pytest.fail("Instantiation of Symbol not completed")
 
 
-
-
 def test_DataType_instantiation(generic_tmc_root):
     root = generic_tmc_root
     sym = root.find("./DataTypes/DataType/[Name='iterator']")
@@ -172,3 +171,29 @@ def test_DataType_instantiation(generic_tmc_root):
     except:
         pytest.fail("Instantiation of DataType not completed")
     
+
+def test_SubItem_instantiation(generic_tmc_root):
+    root = generic_tmc_root
+    sym = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    logging.debug(str(sym.find("./Name").text))
+    try:
+        s = SubItem(sym)
+    except:
+        pytest.fail("Instantiation of DataType not completed")
+
+
+def test_BaseElement_get_raw_parent(generic_tmc_root):
+    root = generic_tmc_root
+    sym = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    logging.debug(str(sym.find("./Name").text))
+    s = BaseElement(sym)
+    parent = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    )
+    #pytest.fail("!!!!")
+
+
