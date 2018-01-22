@@ -58,7 +58,18 @@ class BaseElement:
         return pragmas
 
     def _get_raw_parent(self):
+        '''
+        slated for removal
+        '''
         return self.element.find('.')
+
+    def get_subfield(self, field_target, get_all=False):
+        if get_all:
+            target_element = self.element.findall("./"+field_target)
+        else:
+            target_element = self.element.find("./"+field_target)
+
+        return target_element 
 
     @property
     def tc_type(self):
@@ -75,6 +86,10 @@ class Symbol(BaseElement):
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
 
+    @property
+    def tc_type(self):
+        name_field = self.get_subfield("BaseType")
+        return name_field.text
 
 class DataType(BaseElement):
     def __init__(self, element, base='pytpy'):
@@ -84,6 +99,36 @@ class DataType(BaseElement):
         ]
         if element.tag != 'DataType':
             logger.warning("DataType instance not matched to xml DataType")
+    
+    
+    @property
+    def tc_type(self):
+        
+        has_EnumInfo = False
+        has_SubItem = False
+        has_Properties = False
+
+        if None != self.get_subfield("EnumInfo"):
+            has_EnumInfo = True
+            
+        if None != self.get_subfield("SubItem"):
+            has_SubItem = True
+        
+        if None != self.get_subfield("Properties"):
+            has_Properties = True
+        
+        result = None
+
+        if has_Properties:
+            result = "FunctionBlock"
+        
+        if has_SubItem and not has_Properties:
+            result = "Struct"
+
+        if has_EnumInfo:
+            result = "Enum"
+
+        return result
 
 
 class SubItem(BaseElement):
@@ -96,10 +141,15 @@ class SubItem(BaseElement):
 
         self.parent = parent
 
-        if self.parent ==None:
+        if self.parent == None:
             logger.warning("SubItem has no parent")
 
         if element.tag != 'SubItem':
             logger.warning("SubItem not matched to xml SubItem")
+    
+    @property
+    def tc_type(self):
+        name_field = self.get_subfield("Type")
+        return name_field.text
     
     

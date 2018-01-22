@@ -190,9 +190,17 @@ def test_Symbol_tc_type(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
     )
     logging.debug(str(sym.find("./Name").text))
-    s = SubItem(sym)
+    s = Symbol(sym)
     
     assert s.tc_type == "DINT"
+    
+    sym = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.test_iterator']"
+    )
+    logging.debug(str(sym.find("./Name").text))
+    s = Symbol(sym)
+    
+    assert s.tc_type == "iterator"
 
 def test_DataType_tc_type(generic_tmc_root):
     root = generic_tmc_root
@@ -201,12 +209,32 @@ def test_DataType_tc_type(generic_tmc_root):
     s = DataType(sym)
     
     assert s.tc_type == "FunctionBlock"
+    
+    sym = root.find("./DataTypes/DataType/[Name='VERSION']")
+    logging.debug(str(sym.find("./Name").text))
+    s = DataType(sym)
+    
+    assert s.tc_type == "Struct"
+    
+    sym = root.find("./DataTypes/DataType/[Name='_Implicit_KindOfTask']")
+    logging.debug(str(sym.find("./Name").text))
+    s = DataType(sym)
+    
+    assert s.tc_type == "Enum"
 
 
 def test_SubItem_tc_type(generic_tmc_root):
     root = generic_tmc_root
     sym = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    logging.debug(str(sym.find("./Name").text))
+    s = SubItem(sym)
+    
+    assert s.tc_type == "DINT"
+    
+    sym = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='out']"
     ) 
     logging.debug(str(sym.find("./Name").text))
     s = SubItem(sym)
