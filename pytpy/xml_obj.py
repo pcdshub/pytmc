@@ -137,9 +137,29 @@ class BaseElement:
 
         return target_element 
 
-    @property
-    def tc_type(self):
-        raise NotImplementedError
+    def __eq__(self,other):
+        if (type(other) != BaseElement
+                and type(other) != Symbol
+                and type(other) != DataType
+                and type(other) != SubItem):
+            print("type trigger",type(other))
+            return False
+        if self.element == other.element:
+            return True
+        else:
+            return False
+
+    def __repr__(self):
+        if self.element == None:
+            name = "None"
+        else:
+            name = "<xml(" + self.element.find("./Name").text + ")>"
+            #name = "<xml(" + self.element.tag + ")>"
+            
+        return "{}(element={})".format(
+            self.__class__.__name__,
+            name 
+        )
 
 
 class Symbol(BaseElement):
@@ -200,8 +220,12 @@ class DataType(BaseElement):
         self.registered_pragmas = [
             self.com_base + '_ds_name',
         ]
+        
+        self.children = []
+
         if element.tag != 'DataType':
             logger.warning("DataType instance not matched to xml DataType")
+
     
     @property
     def tc_type(self):
@@ -254,6 +278,8 @@ class DataType(BaseElement):
         '''
         extension_element = self.get_subfield("ExtendsType")
         return extension_element.text
+    
+
 
 
 class SubItem(BaseElement):
@@ -280,8 +306,7 @@ class SubItem(BaseElement):
             self.com_base + '_field', 
             self.com_base + '_pv', 
         ]
-
-        self.parent = parent
+        self.__parent = None
 
         if self.parent == None:
             logger.warning("SubItem has no parent")
@@ -302,5 +327,33 @@ class SubItem(BaseElement):
         '''
         name_field = self.get_subfield("Type")
         return name_field.text
+
+    @property
+    def parent(self):
+        return self.__parent
+
+    @parent.setter
+    def parent(self,other):
+        del self.parent
+
+        self.__parent = other
+        if other == None:
+            return
+        # add self to parent's list of children 
+        if self not in self.__parent.children:
+            self.__parent.children.append(self)
+
+    
+    @parent.deleter
+    def parent(self):
+        if self.__parent != None:
+            new_list = list(filter(
+                lambda g : g != self,
+                self.__parent.children
+            ))
+            print("NEW_LIST",new_list)
+            self.__parent.children = new_list
+            self.__parent = None 
+
     
     

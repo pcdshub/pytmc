@@ -240,3 +240,88 @@ def test_SubItem_tc_type(generic_tmc_root):
     s = SubItem(sym)
     
     assert s.tc_type == "DINT"
+
+
+def test_eq(generic_tmc_root):
+    root = generic_tmc_root
+    
+    par_element= root.find(
+        "./DataTypes/DataType/[Name='iterator']"
+    )
+    par = DataType(par_element)
+    c0_element = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='increment']"
+    ) 
+    c0 = SubItem(c0_element)
+    c1_element = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='out']"
+    ) 
+    c1 = SubItem(c1_element)
+    c2_element = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='out']"
+    )
+    c2 = SubItem(c2_element)
+   
+    assert c0 != par
+    assert c0 != c1
+    assert c1 == c2
+ 
+
+def test_parent_relation(generic_tmc_root):
+    root = generic_tmc_root
+    
+    par_element= root.find(
+        "./DataTypes/DataType/[Name='iterator']"
+    )
+    par = DataType(par_element)
+    c0_element = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='increment']"
+    ) 
+    c0 = SubItem(c0_element)
+    c1_element = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='out']"
+    ) 
+    c1 = SubItem(c1_element)
+    c2_element = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='value']"
+    )
+    c2 = SubItem(c2_element)
+
+
+    c0.parent = par
+    c1.parent = par
+    c2.parent = par
+    
+
+    assert c0 in par.children
+    assert c1 in par.children
+    assert c2 in par.children
+    assert c0.parent == par
+    assert c1.parent == par
+    assert c2.parent == par
+
+    print(par.children)
+    print(c1.parent)
+    del c1.parent 
+
+    assert c0 in par.children
+    assert c1 not in par.children
+    assert c2 in par.children
+    assert c0.parent == par
+    assert c1.parent == None
+    assert c2.parent == par
+
+    c0.parent = None
+
+    assert c0 not in par.children
+    assert c1 not in par.children
+    assert c2 in par.children
+    assert c0.parent == None
+    assert c1.parent == None
+    assert c2.parent == par
+
+
+
+
+
+
