@@ -7,9 +7,11 @@ Welcome to pytpy's documentation!
 =================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
-
+   
+   source_docs.rst
+   dev_notes.rst
 
 
 Indices and tables
