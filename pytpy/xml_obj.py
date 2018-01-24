@@ -205,7 +205,16 @@ class DataType(BaseElement):
     Inherits from :class:`~pytpy.xml_obj.BaseElement`
 
     DataType instances represents the templates for uninstantiated 
-    FunctionBlocks, Enums, Structs, Unions, and Aliases. 
+    FunctionBlocks, Enums, Structs, Unions, and Aliases.
+
+    Attributes
+    ----------
+    children : list
+        This list contains the :class:`~pytpy.SubItem` instances that this
+        DataType contains. It is not recommended to set this attribute
+        directly. Instead, set :py:attr:`~pytpy.SubItem.parent`, which
+        automates the setup of :py:attr:`~pytpy.DataType.children` for
+        bi-directional look-up. 
 
     Parameters
     ----------
@@ -215,6 +224,8 @@ class DataType(BaseElement):
     base : str
         The prefix that will mark pragmas intended for pytpy's consumption. 
     '''
+    children = []
+    
     def __init__(self, element, base='pytpy'):
         super().__init__(element, base)
         self.registered_pragmas = [
@@ -225,8 +236,7 @@ class DataType(BaseElement):
 
         if element.tag != 'DataType':
             logger.warning("DataType instance not matched to xml DataType")
-
-    
+ 
     @property
     def tc_type(self):
         '''
@@ -289,6 +299,19 @@ class SubItem(BaseElement):
     SubItem instances represent variables and DataTypes instantiated within
     DataTypes.
 
+    Attributes
+    ----------
+    parent : str or None
+        This is a reference to the :class:`~pytpy.DataType` that contains this
+        :class:`~pytpy.SubItem`.  We reccommend setting this attribute directly
+        instead of setting :attr:`~pytpy.DataType.children`. This property
+        automates settting :attr:`~pytpy.DataType.children` for bi-directional
+        look-up.  The relationship can be deleted using `del
+        SubItem_instance.parent` or by setting :attr:`~pytpy.SubItem.parent`
+        equal to None. To create a relationship, simply set
+        :attr:`~pytpy.SubItem.parent` equal to the intended parent.
+
+
     Parameters
     ----------
     element : xml.etree.ElementTree.Element
@@ -307,6 +330,7 @@ class SubItem(BaseElement):
             self.com_base + '_pv', 
         ]
         self.__parent = None
+        self.parent = parent
 
         if self.parent == None:
             logger.warning("SubItem has no parent")
