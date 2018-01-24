@@ -10,3 +10,5 @@
 docs/_build/*
 .coverage
 .cache
+*.egg
+*.egg-info/
