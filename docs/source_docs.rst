@@ -6,3 +6,4 @@ Source code documentation
    :caption: Contents
 
    xml_obj.rst
+   xml_collector.rst
