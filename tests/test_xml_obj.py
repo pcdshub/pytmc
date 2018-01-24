@@ -320,7 +320,15 @@ def test_parent_relation(generic_tmc_root):
     assert c1.parent == None
     assert c2.parent == par
 
-
+def test_BaseElement_name(generic_tmc_root):
+    root = generic_tmc_root
+    
+    element= root.find(
+        "./DataTypes/DataType/[Name='iterator']"
+    )
+    el = DataType(element)
+    assert el.name == 'iterator'
+    
 
 
 

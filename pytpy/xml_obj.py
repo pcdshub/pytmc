@@ -161,6 +161,18 @@ class BaseElement:
             name 
         )
 
+    @property
+    def name(self):
+        '''
+        Return the TwinCAT name for this Symbol/DataType/SubItem. This info is
+        taken from the text of the name field sub-element.
+
+        Returns
+        -------
+        str
+            The name of the variable
+        '''
+        return self.get_subfield("Name").text
 
 class Symbol(BaseElement):
     '''
@@ -290,8 +302,6 @@ class DataType(BaseElement):
         return extension_element.text
     
 
-
-
 class SubItem(BaseElement):
     '''
     Inherits from :class:`~pytpy.xml_obj.baseElement`
@@ -378,6 +388,4 @@ class SubItem(BaseElement):
             print("NEW_LIST",new_list)
             self.__parent.children = new_list
             self.__parent = None 
-
-    
     
