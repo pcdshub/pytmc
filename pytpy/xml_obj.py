@@ -92,6 +92,7 @@ class BaseElement:
         dict()
             Dictionary. The key is the property name and the value is a list of
             values found in the xml
+
         """
         props = self.properties
         pragmas = defaultdict(list)
@@ -100,6 +101,19 @@ class BaseElement:
                 pragmas[entry] = props.get(entry)
 
         return pragmas
+
+    @property
+    def has_pragma(self):
+        '''
+        Returns
+        -------
+        bool
+            True if there are regestered pragmas attached to this xml element
+        '''
+        if len(self.pragmas) > 0:
+            return True
+
+        return False
 
     def _get_raw_parent(self):
         '''
@@ -142,7 +156,6 @@ class BaseElement:
                 and type(other) != Symbol
                 and type(other) != DataType
                 and type(other) != SubItem):
-            print("type trigger",type(other))
             return False
         if self.element == other.element:
             return True
@@ -173,6 +186,7 @@ class BaseElement:
             The name of the variable
         '''
         return self.get_subfield("Name").text
+
 
 class Symbol(BaseElement):
     '''
