@@ -1,4 +1,7 @@
+./_sources/dev_notes.rst.txt
 ./_sources/index.rst.txt
+./_sources/source_docs.rst.txt
+./_sources/xml_obj.rst.txt
 ./_static/ajax-loader.gif
 ./_static/basic.css
 ./_static/comment-bright.png
@@ -33,8 +36,12 @@
 ./_static/up-pressed.png
 ./_static/up.png
 ./_static/websupport.js
+./dev_notes.html
 ./genindex.html
 ./index.html
 ./objects.inv
+./py-modindex.html
 ./search.html
 ./searchindex.js
+./source_docs.html
+./xml_obj.html
