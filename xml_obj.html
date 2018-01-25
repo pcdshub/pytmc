@@ -37,7 +37,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="pytpy  documentation" href="index.html"/>
         <link rel="up" title="Source code documentation" href="source_docs.html"/>
-        <link rel="next" title="Developer’s Notes" href="dev_notes.html"/>
+        <link rel="next" title="xml_collector.py" href="xml_collector.html"/>
         <link rel="prev" title="Source code documentation" href="source_docs.html"/> 
 
   
@@ -97,6 +97,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#baseelement">BaseElement</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="xml_collector.html">xml_collector.py</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dev_notes.html">Developer’s Notes</a></li>
@@ -374,6 +375,13 @@ find-all respectively.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="pytpy.xml_obj.BaseElement.has_pragma">
+<code class="descname">has_pragma</code><a class="headerlink" href="#pytpy.xml_obj.BaseElement.has_pragma" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns: True if there are regestered pragmas attached to this xml element
+:rtype: bool</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="pytpy.xml_obj.BaseElement.name">
 <code class="descname">name</code><a class="headerlink" href="#pytpy.xml_obj.BaseElement.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the TwinCAT name for this Symbol/DataType/SubItem. This info is
@@ -442,7 +450,7 @@ values found in the xml</td>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="dev_notes.html" class="btn btn-neutral float-right" title="Developer’s Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="xml_collector.html" class="btn btn-neutral float-right" title="xml_collector.py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="source_docs.html" class="btn btn-neutral" title="Source code documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

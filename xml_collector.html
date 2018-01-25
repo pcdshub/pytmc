@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xml_collector.py &mdash; pytpy  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pytpy  documentation" href="index.html"/>
+        <link rel="up" title="Source code documentation" href="source_docs.html"/>
+        <link rel="next" title="Developer’s Notes" href="dev_notes.html"/>
+        <link rel="prev" title="xml_obj.py" href="xml_obj.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pytpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="source_docs.html">Source code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="xml_obj.html">xml_obj.py</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">xml_collector.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tmcfile">TmcFile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#elementcollector">ElementCollector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dev_notes.html">Developer’s Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytpy</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="source_docs.html">Source code documentation</a> &raquo;</li>
+        
+      <li>xml_collector.py</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/xml_collector.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pytpy.xml_collector">
+<span id="xml-collector-py"></span><h1>xml_collector.py<a class="headerlink" href="#module-pytpy.xml_collector" title="Permalink to this headline">¶</a></h1>
+<p>xml_collector.py</p>
+<p>This file contains the objects for intaking TMC files and generating python
+interpretations. Db Files can be produced from the interpretation</p>
+<div class="section" id="tmcfile">
+<h2>TmcFile<a class="headerlink" href="#tmcfile" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytpy.TmcFile">
+<em class="property">class </em><code class="descclassname">pytpy.</code><code class="descname">TmcFile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object for handling the reading comprehension comprehension of .tmc files.</p>
+<dl class="attribute">
+<dt id="pytpy.TmcFile.all_Symbols">
+<code class="descname">all_Symbols</code><a class="headerlink" href="#pytpy.TmcFile.all_Symbols" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pytpy.xml_collector.ElementCollector" title="pytpy.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all Symbols in the document. Must be initialized with
+<a class="reference internal" href="#pytpy.TmcFile.isolate_Symbols" title="pytpy.TmcFile.isolate_Symbols"><code class="xref py py-func docutils literal"><span class="pre">isolate_Symbols()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytpy.TmcFile.all_DataTypes">
+<code class="descname">all_DataTypes</code><a class="headerlink" href="#pytpy.TmcFile.all_DataTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pytpy.xml_collector.ElementCollector" title="pytpy.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all DataTypes in the document. Must be initialized with
+<a class="reference internal" href="#pytpy.TmcFile.isolate_DataTypes" title="pytpy.TmcFile.isolate_DataTypes"><code class="xref py py-func docutils literal"><span class="pre">isolate_DataTypes()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytpy.TmcFile.all_SubItems">
+<code class="descname">all_SubItems</code><a class="headerlink" href="#pytpy.TmcFile.all_SubItems" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pytpy.xml_collector.ElementCollector" title="pytpy.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all SubItems in the document. Must be initialized with
+<a class="reference internal" href="#pytpy.TmcFile.isolate_SubItems" title="pytpy.TmcFile.isolate_SubItems"><code class="xref py py-func docutils literal"><span class="pre">isolate_SubItems()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytpy.TmcFile.isolate_DataTypes">
+<code class="descname">isolate_DataTypes</code><span class="sig-paren">(</span><em>process_subitems=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile.isolate_DataTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate <a class="reference internal" href="#pytpy.TmcFile.all_DataTypes" title="pytpy.TmcFile.all_DataTypes"><code class="xref py py-attr docutils literal"><span class="pre">all_DataTypes</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytpy.DataType" title="pytpy.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>
+representing each DataType in the .tmc file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>process_subitems</strong> (<em>bool</em>) – If True, automatically process all subitems containted in the
+datatypes populating <a class="reference internal" href="#pytpy.TmcFile.all_SubItems" title="pytpy.TmcFile.all_SubItems"><code class="xref py py-attr docutils literal"><span class="pre">all_SubItems</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytpy.TmcFile.isolate_SubItems">
+<code class="descname">isolate_SubItems</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile.isolate_SubItems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate <a class="reference internal" href="#pytpy.TmcFile.all_SubItems" title="pytpy.TmcFile.all_SubItems"><code class="xref py py-attr docutils literal"><span class="pre">all_SubItems</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>
+representing each subitem in the .tmc file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent</strong> (<em>:str</em>) – Specify the name string of the datatype to search for subitems.
+Subitems are automatically linked to this parent datatype.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytpy.TmcFile.isolate_Symbols">
+<code class="descname">isolate_Symbols</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile.isolate_Symbols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate <a class="reference internal" href="#pytpy.TmcFile.all_Symbols" title="pytpy.TmcFile.all_Symbols"><code class="xref py py-attr docutils literal"><span class="pre">all_Symbols</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytpy.Symbol" title="pytpy.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>
+representing each symbol in the .tmc file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="elementcollector">
+<h2>ElementCollector<a class="headerlink" href="#elementcollector" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytpy.xml_collector.ElementCollector">
+<em class="property">class </em><code class="descclassname">pytpy.xml_collector.</code><code class="descname">ElementCollector</code><a class="headerlink" href="#pytpy.xml_collector.ElementCollector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary-like object for controlling sets of insntances
+<a class="reference internal" href="xml_obj.html#pytpy.Symbol" title="pytpy.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>, <a class="reference internal" href="xml_obj.html#pytpy.DataType" title="pytpy.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>, and
+<a class="reference internal" href="xml_obj.html#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>. Each entry’s key is the name of the TwinCAT
+variable.  <a class="reference internal" href="#pytpy.xml_collector.ElementCollector.add" title="pytpy.xml_collector.ElementCollector.add"><code class="xref py py-func docutils literal"><span class="pre">add()</span></code></a> automates this
+setup and should be used to add entries instead of normal dictionary
+insertion techniques.</p>
+<p>Subclassed from python’s standard dictionary.</p>
+<dl class="method">
+<dt id="pytpy.xml_collector.ElementCollector.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.xml_collector.ElementCollector.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Include new item in the dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference internal" href="xml_obj.html#pytpy.Symbol" title="pytpy.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>, <a class="reference internal" href="xml_obj.html#pytpy.DataType" title="pytpy.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>,or <a class="reference internal" href="xml_obj.html#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>.) – The instance to add to the ElementCollector</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytpy.xml_collector.ElementCollector.registered">
+<code class="descname">registered</code><a class="headerlink" href="#pytpy.xml_collector.ElementCollector.registered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return subset of the dictionary including only items marked for pytpy’s
+comsumption with pragmas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">TwinCAT variables for pytpy</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dev_notes.html" class="btn btn-neutral float-right" title="Developer’s Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="xml_obj.html" class="btn btn-neutral" title="xml_obj.py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
