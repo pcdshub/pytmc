@@ -8,16 +8,16 @@ import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from pytpy import Symbol, DataType, SubItem
+from pytmc import Symbol, DataType, SubItem
 
 
 
 class ElementCollector(dict):
     '''
     Dictionary-like object for controlling sets of insntances
-    :class:`~pytpy.Symbol`, :class:`~pytpy.DataType`, and
-    :class:`~pytpy.SubItem`. Each entry's key is the name of the TwinCAT
-    variable.  :func:`~pytpy.xml_collector.ElementCollector.add` automates this
+    :class:`~pytmc.Symbol`, :class:`~pytmc.DataType`, and
+    :class:`~pytmc.SubItem`. Each entry's key is the name of the TwinCAT
+    variable.  :func:`~pytmc.xml_collector.ElementCollector.add` automates this
     setup and should be used to add entries instead of normal dictionary
     insertion techniques. 
     
@@ -29,7 +29,7 @@ class ElementCollector(dict):
 
         Parameters 
         ----------
-        value : :class:`~pytpy.Symbol`, :class:`~pytpy.DataType`,or :class:`~pytpy.SubItem`.
+        value : :class:`~pytmc.Symbol`, :class:`~pytmc.DataType`,or :class:`~pytmc.SubItem`.
             The instance to add to the ElementCollector
         '''
         name = value.name
@@ -38,13 +38,13 @@ class ElementCollector(dict):
     @property
     def registered(self):
         '''
-        Return subset of the dictionary including only items marked for pytpy's
+        Return subset of the dictionary including only items marked for pytmc's
         comsumption with pragmas.
 
         Returns
         -------
         dict
-            TwinCAT variables for pytpy
+            TwinCAT variables for pytmc
         '''
         names = list(filter(
             lambda x: self[x].has_pragma,
@@ -62,15 +62,15 @@ class TmcFile:
 
     Attributes
     ----------
-    all_Symbols : :class:`~pytpy.xml_collector.ElementCollector`
+    all_Symbols : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all Symbols in the document. Must be initialized with
         :func:`~isolate_Symbols`.
     
-    all_DataTypes : :class:`~pytpy.xml_collector.ElementCollector`
+    all_DataTypes : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all DataTypes in the document. Must be initialized with
         :func:`~isolate_DataTypes`.
         
-    all_SubItems : :class:`~pytpy.xml_collector.ElementCollector`
+    all_SubItems : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all SubItems in the document. Must be initialized with
         :func:`~isolate_SubItems`.
 
@@ -86,7 +86,7 @@ class TmcFile:
 
     def isolate_Symbols(self):
         '''
-        Populate :attr:`~all_Symbols` with a :class:`~pytpy.Symbol` 
+        Populate :attr:`~all_Symbols` with a :class:`~pytmc.Symbol` 
         representing each symbol in the .tmc file.
         '''
         data_area = self.root.find(
@@ -99,7 +99,7 @@ class TmcFile:
 
     def isolate_DataTypes(self,process_subitems=True):
         '''
-        Populate :attr:`~all_DataTypes` with a :class:`~pytpy.DataType` 
+        Populate :attr:`~all_DataTypes` with a :class:`~pytmc.DataType` 
         representing each DataType in the .tmc file.
 
         Parameters
@@ -119,7 +119,7 @@ class TmcFile:
 
     def isolate_SubItems(self,parent=None):
         '''
-        Populate :attr:`~all_SubItems` with a :class:`~pytpy.SubItem` 
+        Populate :attr:`~all_SubItems` with a :class:`~pytmc.SubItem` 
         representing each subitem in the .tmc file.
         
         Parameters

@@ -1,24 +1,24 @@
 xml_obj.py
 ==========
 
-.. automodule:: pytpy.xml_obj
+.. automodule:: pytmc.xml_obj
 
 Symbol
 ++++++
-.. autoclass:: pytpy.Symbol
+.. autoclass:: pytmc.Symbol
    :members:
 
 DataType
 ++++++++
-.. autoclass:: pytpy.DataType
+.. autoclass:: pytmc.DataType
    :members:
 
 SubItem
 +++++++
-.. autoclass:: pytpy.SubItem
+.. autoclass:: pytmc.SubItem
    :members:
 
 BaseElement
 +++++++++++
-.. autoclass:: pytpy.xml_obj.BaseElement
+.. autoclass:: pytmc.xml_obj.BaseElement
    :members:

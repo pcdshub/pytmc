@@ -4,7 +4,7 @@ python:
 
 env:
   global:
-    - OFFICIAL_REPO="slaclab/pytpy"
+    - OFFICIAL_REPO="slaclab/pytmc"
     - secure: "haLhEWzmlsYROvRhjcdxNY7EZur5q0g+fKmh49bgL0y3Z6Xz8wQiMpfzxKtCnK5xBi8fTtqoB416w5d7O50Q3dzLmomslMBxT2xFZ8CVi9O5XzGFtWo8wCmy4xiOyn+hAMwpghSN/N0fu1baK3T3R81+XMUtOjmQtADX+aEpMbTxnMiPdsEF3eGwBu4jH3PQ0ii0kQ88iTb+aLH0CxzEw7E7SLnSGToxpAZGXAV0Fiq3QktlcFKMh5S4odQWrxej84W91fgRn8r0iHEsnJ9XwOs77ZP5ls/RpKltFGF4/8QAiPYxWWp7HTRNM2jS0bTUAoEmVcibqD+uc44ZItk7AgESY0CKFpgcGY8Mja9FZbxkBz5T6BCAYuhCkCeq46QhyWwAYGakdyIsyL/4xRL/w9Xrt9Ge0WrtG/5JZ2YNimXFDqh3DY2hxLqMkssKuN7fz8x30KneuReLWh8m6BI8KPOoZjkOtgmeZ+v+6gr2rg1N8jzhnXP0HHVgxTQ81KR/pEYG0Jje19SC43+ZadI7asg314X4jZWbtQSxDfwsUrQ5RzxNQ3vKZwZF1JmY1qodDaXE1Qjb0u92wAGAD3kNfTowadXHmPefu3D9bNMBFXLCYxM8LR8C72XLdfyHcUMwIRstLkpiu65uUalVlxlSA+Mp++np9Vdp5MGS0OknTgc="
 
 sudo: false
@@ -24,8 +24,8 @@ install:
   # Useful for debugging
   - conda info -a
   # Manage conda environment
-  - conda create -n pytpy-env pip
-  - source activate pytpy-env 
+  - conda create -n pytmc-env pip
+  - source activate pytmc-env 
   - pip install -r requirements.txt
   - pip install -e .
   - pip install coverage codecov

@@ -1,2 +1,2 @@
 include versioneer.py
-include pytpy/_version.py
+include pytmc/_version.py

@@ -20,9 +20,9 @@ class BaseElement:
         A python xml element object connected to the intended .tmc datagroup
 
     base : str
-        The prefix that will mark pragmas intended for pytpy's consumption. 
+        The prefix that will mark pragmas intended for pytmc's consumption. 
     '''
-    def __init__(self, element, base='pytpy'):
+    def __init__(self, element, base='pytmc'):
         if type(element) != ET.Element:
             raise TypeError("ElementTree.Element required")
         self.element = element
@@ -84,7 +84,7 @@ class BaseElement:
     def pragmas(self):
         """
         Produce a stripped-down set of properties including only those that are
-        recognized as pragmas intended for pytpy's consumption. 
+        recognized as pragmas intended for pytmc's consumption. 
 
         Returns
         -------
@@ -184,7 +184,7 @@ class BaseElement:
 
 class Symbol(BaseElement):
     '''
-    Inherits from :class:`~pytpy.xml_obj.BaseElement`
+    Inherits from :class:`~pytmc.xml_obj.BaseElement`
 
     Symbol instances represent instantiated variables and DataTypes. 
 
@@ -194,9 +194,9 @@ class Symbol(BaseElement):
         A python xml element object connected to the intended .tmc datagroup
 
     base : str
-        The prefix that will mark pragmas intended for pytpy's consumption. 
+        The prefix that will mark pragmas intended for pytmc's consumption. 
     '''
-    def __init__(self, element, base='pytpy'):
+    def __init__(self, element, base='pytmc'):
         super().__init__(element, base)
         registered_pragmas = [
             self.com_base + '_field', 
@@ -222,7 +222,7 @@ class Symbol(BaseElement):
 
 class DataType(BaseElement):
     '''
-    Inherits from :class:`~pytpy.xml_obj.BaseElement`
+    Inherits from :class:`~pytmc.xml_obj.BaseElement`
 
     DataType instances represents the templates for uninstantiated 
     FunctionBlocks, Enums, Structs, Unions, and Aliases.
@@ -230,10 +230,10 @@ class DataType(BaseElement):
     Attributes
     ----------
     children : list
-        This list contains the :class:`~pytpy.SubItem` instances that this
+        This list contains the :class:`~pytmc.SubItem` instances that this
         DataType contains. It is not recommended to set this attribute
-        directly. Instead, set :py:attr:`~pytpy.SubItem.parent`, which
-        automates the setup of :py:attr:`~pytpy.DataType.children` for
+        directly. Instead, set :py:attr:`~pytmc.SubItem.parent`, which
+        automates the setup of :py:attr:`~pytmc.DataType.children` for
         bi-directional look-up. 
 
     Parameters
@@ -242,11 +242,11 @@ class DataType(BaseElement):
         A python xml element object connected to the intended .tmc datagroup
 
     base : str
-        The prefix that will mark pragmas intended for pytpy's consumption. 
+        The prefix that will mark pragmas intended for pytmc's consumption. 
     '''
     children = []
     
-    def __init__(self, element, base='pytpy'):
+    def __init__(self, element, base='pytmc'):
         super().__init__(element, base)
         self.registered_pragmas = [
             self.com_base + '_ds_name',
@@ -312,7 +312,7 @@ class DataType(BaseElement):
 
 class SubItem(BaseElement):
     '''
-    Inherits from :class:`~pytpy.xml_obj.baseElement`
+    Inherits from :class:`~pytmc.xml_obj.baseElement`
 
     SubItem instances represent variables and DataTypes instantiated within
     DataTypes.
@@ -320,14 +320,14 @@ class SubItem(BaseElement):
     Attributes
     ----------
     parent : str or None
-        This is a reference to the :class:`~pytpy.DataType` that contains this
-        :class:`~pytpy.SubItem`.  We reccommend setting this attribute directly
-        instead of setting :attr:`~pytpy.DataType.children`. This property
-        automates settting :attr:`~pytpy.DataType.children` for bi-directional
+        This is a reference to the :class:`~pytmc.DataType` that contains this
+        :class:`~pytmc.SubItem`.  We reccommend setting this attribute directly
+        instead of setting :attr:`~pytmc.DataType.children`. This property
+        automates settting :attr:`~pytmc.DataType.children` for bi-directional
         look-up.  The relationship can be deleted using `del
-        SubItem_instance.parent` or by setting :attr:`~pytpy.SubItem.parent`
+        SubItem_instance.parent` or by setting :attr:`~pytmc.SubItem.parent`
         equal to None. To create a relationship, simply set
-        :attr:`~pytpy.SubItem.parent` equal to the intended parent.
+        :attr:`~pytmc.SubItem.parent` equal to the intended parent.
 
 
     Parameters
@@ -336,12 +336,12 @@ class SubItem(BaseElement):
         A python xml element object connected to the intended .tmc datagroup
 
     base : str
-        The prefix that will mark pragmas intended for pytpy's consumption.
+        The prefix that will mark pragmas intended for pytmc's consumption.
 
-    parent : :class:`~pytpy.xml_obj.baseElement`
+    parent : :class:`~pytmc.xml_obj.baseElement`
         The DataStructure in which this SubItem appears
     '''
-    def __init__(self, element, base='pytpy', parent = None):
+    def __init__(self, element, base='pytmc', parent = None):
         super().__init__(element, base)
         registered_pragmas = [
             self.com_base + '_field', 
