@@ -82,7 +82,7 @@ class TmcFile:
 
         self.all_Symbols = ElementCollector()
         self.all_DataTypes = ElementCollector()
-        self.all_SubItems = ElementCollector() 
+        self.all_SubItems = defaultdict(ElementCollector) 
 
     def isolate_Symbols(self):
         '''
@@ -113,9 +113,9 @@ class TmcFile:
         )
         for xml_data_type in xml_data_types:
             data = DataType(xml_data_type)
-            if process_subitems:
-                self.isolate_SubItems(data)
             self.all_DataTypes.add(data)
+            if process_subitems:
+                self.isolate_SubItems(data.name)
 
     def isolate_SubItems(self,parent=None):
         '''
@@ -124,17 +124,25 @@ class TmcFile:
         
         Parameters
         ----------
-        parent : :class:`~DataType`
-            Specify which datatype to search for subitems. Subitems are
-            automatically linked to this parent datatype.
+        parent : :str
+            Specify the name string of the datatype to search for subitems.
+            Subitems are automatically linked to this parent datatype.
         '''
-        if type(parent) == DataType:
-            xml_subitems = parent.element.findall('./SubItem')
+        if type(parent) == str:
+            parent_obj = self.all_DataTypes[parent]
+            xml_subitems = parent_obj.element.findall('./SubItem')
             for xml_subitem in xml_subitems:
-                s_item = SubItem(xml_subitem,parent=parent)
-                self.all_SubItems.add(s_item)
+                s_item = SubItem(
+                    xml_subitem,
+                    parent=parent_obj
+                )
+                self.all_SubItems[parent].add(s_item)
 
 
         if type(parent) == ET.Element:
             pass
+
+    def isolate_all(self):
+        self.isolate_Symbols()
+        self.isolate_DataTypes()
 
