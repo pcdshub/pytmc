@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>xml_obj.py &mdash; pytpy  documentation</title>
+  <title>xml_obj.py &mdash; pytmc  documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pytpy  documentation" href="index.html"/>
+    <link rel="top" title="pytmc  documentation" href="index.html"/>
         <link rel="up" title="Source code documentation" href="source_docs.html"/>
         <link rel="next" title="xml_collector.py" href="xml_collector.html"/>
         <link rel="prev" title="Source code documentation" href="source_docs.html"/> 
@@ -57,7 +57,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> pytpy
+            <a href="index.html" class="icon icon-home"> pytmc
           
 
           
@@ -115,7 +115,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">pytpy</a>
+          <a href="index.html">pytmc</a>
         
       </nav>
 
@@ -166,17 +166,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-pytpy.xml_obj">
-<span id="xml-obj-py"></span><h1>xml_obj.py<a class="headerlink" href="#module-pytpy.xml_obj" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pytmc.xml_obj">
+<span id="xml-obj-py"></span><h1>xml_obj.py<a class="headerlink" href="#module-pytmc.xml_obj" title="Permalink to this headline">¶</a></h1>
 <p>xml_obj.py</p>
 <p>This file contains the objects for representing the essential TwinCAT
 variables and data structures found in the xml (tmc) formatted file.</p>
 <div class="section" id="symbol">
 <h2>Symbol<a class="headerlink" href="#symbol" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytpy.Symbol">
-<em class="property">class </em><code class="descclassname">pytpy.</code><code class="descname">Symbol</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytpy'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.Symbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from <a class="reference internal" href="#pytpy.xml_obj.BaseElement" title="pytpy.xml_obj.BaseElement"><code class="xref py py-class docutils literal"><span class="pre">BaseElement</span></code></a></p>
+<dt id="pytmc.Symbol">
+<em class="property">class </em><code class="descclassname">pytmc.</code><code class="descname">Symbol</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.Symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <a class="reference internal" href="#pytmc.xml_obj.BaseElement" title="pytmc.xml_obj.BaseElement"><code class="xref py py-class docutils literal"><span class="pre">BaseElement</span></code></a></p>
 <p>Symbol instances represent instantiated variables and DataTypes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -184,15 +184,15 @@ variables and data structures found in the xml (tmc) formatted file.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</li>
-<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytpy’s consumption.</li>
+<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="pytpy.Symbol.tc_type">
-<code class="descname">tc_type</code><a class="headerlink" href="#pytpy.Symbol.tc_type" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.Symbol.tc_type">
+<code class="descname">tc_type</code><a class="headerlink" href="#pytmc.Symbol.tc_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the type of the data this symbol represents.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -212,18 +212,18 @@ variables and data structures found in the xml (tmc) formatted file.</p>
 <div class="section" id="datatype">
 <h2>DataType<a class="headerlink" href="#datatype" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytpy.DataType">
-<em class="property">class </em><code class="descclassname">pytpy.</code><code class="descname">DataType</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytpy'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.DataType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inherits from <a class="reference internal" href="#pytpy.xml_obj.BaseElement" title="pytpy.xml_obj.BaseElement"><code class="xref py py-class docutils literal"><span class="pre">BaseElement</span></code></a></p>
+<dt id="pytmc.DataType">
+<em class="property">class </em><code class="descclassname">pytmc.</code><code class="descname">DataType</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.DataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <a class="reference internal" href="#pytmc.xml_obj.BaseElement" title="pytmc.xml_obj.BaseElement"><code class="xref py py-class docutils literal"><span class="pre">BaseElement</span></code></a></p>
 <p>DataType instances represents the templates for uninstantiated
 FunctionBlocks, Enums, Structs, Unions, and Aliases.</p>
 <dl class="attribute">
-<dt id="pytpy.DataType.children">
-<code class="descname">children</code><a class="headerlink" href="#pytpy.DataType.children" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – This list contains the <a class="reference internal" href="#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a> instances that this
+<dt id="pytmc.DataType.children">
+<code class="descname">children</code><a class="headerlink" href="#pytmc.DataType.children" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – This list contains the <a class="reference internal" href="#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a> instances that this
 DataType contains. It is not recommended to set this attribute
-directly. Instead, set <a class="reference internal" href="#pytpy.SubItem.parent" title="pytpy.SubItem.parent"><code class="xref py py-attr docutils literal"><span class="pre">parent</span></code></a>, which
-automates the setup of <a class="reference internal" href="#pytpy.DataType.children" title="pytpy.DataType.children"><code class="xref py py-attr docutils literal"><span class="pre">children</span></code></a> for
+directly. Instead, set <a class="reference internal" href="#pytmc.SubItem.parent" title="pytmc.SubItem.parent"><code class="xref py py-attr docutils literal"><span class="pre">parent</span></code></a>, which
+automates the setup of <a class="reference internal" href="#pytmc.DataType.children" title="pytmc.DataType.children"><code class="xref py py-attr docutils literal"><span class="pre">children</span></code></a> for
 bi-directional look-up.</p>
 </dd></dl>
 
@@ -233,15 +233,15 @@ bi-directional look-up.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</li>
-<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytpy’s consumption.</li>
+<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="pytpy.DataType.tc_extends">
-<code class="descname">tc_extends</code><a class="headerlink" href="#pytpy.DataType.tc_extends" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.DataType.tc_extends">
+<code class="descname">tc_extends</code><a class="headerlink" href="#pytmc.DataType.tc_extends" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the DataType that this DataType is built upon</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -256,8 +256,8 @@ bi-directional look-up.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.DataType.tc_type">
-<code class="descname">tc_type</code><a class="headerlink" href="#pytpy.DataType.tc_type" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.DataType.tc_type">
+<code class="descname">tc_type</code><a class="headerlink" href="#pytmc.DataType.tc_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the type of the data this symbol represents.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -277,22 +277,22 @@ bi-directional look-up.</p>
 <div class="section" id="subitem">
 <h2>SubItem<a class="headerlink" href="#subitem" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytpy.SubItem">
-<em class="property">class </em><code class="descclassname">pytpy.</code><code class="descname">SubItem</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytpy'</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.SubItem" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.SubItem">
+<em class="property">class </em><code class="descclassname">pytmc.</code><code class="descname">SubItem</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytmc'</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.SubItem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inherits from <code class="xref py py-class docutils literal"><span class="pre">baseElement</span></code></p>
 <p>SubItem instances represent variables and DataTypes instantiated within
 DataTypes.</p>
 <dl class="attribute">
-<dt id="pytpy.SubItem.parent">
-<code class="descname">parent</code><a class="headerlink" href="#pytpy.SubItem.parent" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str or None</em> – This is a reference to the <a class="reference internal" href="#pytpy.DataType" title="pytpy.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a> that contains this
-<a class="reference internal" href="#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>.  We reccommend setting this attribute directly
-instead of setting <a class="reference internal" href="#pytpy.DataType.children" title="pytpy.DataType.children"><code class="xref py py-attr docutils literal"><span class="pre">children</span></code></a>. This property
-automates settting <a class="reference internal" href="#pytpy.DataType.children" title="pytpy.DataType.children"><code class="xref py py-attr docutils literal"><span class="pre">children</span></code></a> for bi-directional
+<dt id="pytmc.SubItem.parent">
+<code class="descname">parent</code><a class="headerlink" href="#pytmc.SubItem.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str or None</em> – This is a reference to the <a class="reference internal" href="#pytmc.DataType" title="pytmc.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a> that contains this
+<a class="reference internal" href="#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>.  We reccommend setting this attribute directly
+instead of setting <a class="reference internal" href="#pytmc.DataType.children" title="pytmc.DataType.children"><code class="xref py py-attr docutils literal"><span class="pre">children</span></code></a>. This property
+automates settting <a class="reference internal" href="#pytmc.DataType.children" title="pytmc.DataType.children"><code class="xref py py-attr docutils literal"><span class="pre">children</span></code></a> for bi-directional
 look-up.  The relationship can be deleted using <cite>del
-SubItem_instance.parent</cite> or by setting <a class="reference internal" href="#pytpy.SubItem.parent" title="pytpy.SubItem.parent"><code class="xref py py-attr docutils literal"><span class="pre">parent</span></code></a>
+SubItem_instance.parent</cite> or by setting <a class="reference internal" href="#pytmc.SubItem.parent" title="pytmc.SubItem.parent"><code class="xref py py-attr docutils literal"><span class="pre">parent</span></code></a>
 equal to None. To create a relationship, simply set
-<a class="reference internal" href="#pytpy.SubItem.parent" title="pytpy.SubItem.parent"><code class="xref py py-attr docutils literal"><span class="pre">parent</span></code></a> equal to the intended parent.</p>
+<a class="reference internal" href="#pytmc.SubItem.parent" title="pytmc.SubItem.parent"><code class="xref py py-attr docutils literal"><span class="pre">parent</span></code></a> equal to the intended parent.</p>
 </dd></dl>
 
 <table class="docutils field-list" frame="void" rules="none">
@@ -301,7 +301,7 @@ equal to None. To create a relationship, simply set
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</li>
-<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytpy’s consumption.</li>
+<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</li>
 <li><strong>parent</strong> (<code class="xref py py-class docutils literal"><span class="pre">baseElement</span></code>) – The DataStructure in which this SubItem appears</li>
 </ul>
 </td>
@@ -309,8 +309,8 @@ equal to None. To create a relationship, simply set
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="pytpy.SubItem.tc_type">
-<code class="descname">tc_type</code><a class="headerlink" href="#pytpy.SubItem.tc_type" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.SubItem.tc_type">
+<code class="descname">tc_type</code><a class="headerlink" href="#pytmc.SubItem.tc_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the type of the data this symbol represents.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -330,8 +330,8 @@ equal to None. To create a relationship, simply set
 <div class="section" id="baseelement">
 <h2>BaseElement<a class="headerlink" href="#baseelement" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytpy.xml_obj.BaseElement">
-<em class="property">class </em><code class="descclassname">pytpy.xml_obj.</code><code class="descname">BaseElement</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytpy'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.xml_obj.BaseElement" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_obj.BaseElement">
+<em class="property">class </em><code class="descclassname">pytmc.xml_obj.</code><code class="descname">BaseElement</code><span class="sig-paren">(</span><em>element</em>, <em>base='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_obj.BaseElement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for representing variables as they appear in the .tmc (xml)
 format.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -340,15 +340,15 @@ format.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</li>
-<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytpy’s consumption.</li>
+<li><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
-<dt id="pytpy.xml_obj.BaseElement.get_subfield">
-<code class="descname">get_subfield</code><span class="sig-paren">(</span><em>field_target</em>, <em>get_all=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.xml_obj.BaseElement.get_subfield" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_obj.BaseElement.get_subfield">
+<code class="descname">get_subfield</code><span class="sig-paren">(</span><em>field_target</em>, <em>get_all=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_obj.BaseElement.get_subfield" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce element(s) within the class instance’s target element. If
 seeking only a single element, return the first one encountered.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -375,15 +375,15 @@ find-all respectively.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.xml_obj.BaseElement.has_pragma">
-<code class="descname">has_pragma</code><a class="headerlink" href="#pytpy.xml_obj.BaseElement.has_pragma" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_obj.BaseElement.has_pragma">
+<code class="descname">has_pragma</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.has_pragma" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns: True if there are regestered pragmas attached to this xml element
 :rtype: bool</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.xml_obj.BaseElement.name">
-<code class="descname">name</code><a class="headerlink" href="#pytpy.xml_obj.BaseElement.name" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_obj.BaseElement.name">
+<code class="descname">name</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the TwinCAT name for this Symbol/DataType/SubItem. This info is
 taken from the text of the name field sub-element.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -399,10 +399,10 @@ taken from the text of the name field sub-element.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.xml_obj.BaseElement.pragmas">
-<code class="descname">pragmas</code><a class="headerlink" href="#pytpy.xml_obj.BaseElement.pragmas" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_obj.BaseElement.pragmas">
+<code class="descname">pragmas</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.pragmas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce a stripped-down set of properties including only those that are
-recognized as pragmas intended for pytpy’s consumption.</p>
+recognized as pragmas intended for pytmc’s consumption.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -417,8 +417,8 @@ values found in the xml</td>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.xml_obj.BaseElement.properties">
-<code class="descname">properties</code><a class="headerlink" href="#pytpy.xml_obj.BaseElement.properties" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_obj.BaseElement.properties">
+<code class="descname">properties</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce a dictionary of lists for the properties associated with this
 element. The value of the dictionary is a list allowing for multiple
 properties w/ the same name.</p>

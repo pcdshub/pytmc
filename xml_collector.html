@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>xml_collector.py &mdash; pytpy  documentation</title>
+  <title>xml_collector.py &mdash; pytmc  documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pytpy  documentation" href="index.html"/>
+    <link rel="top" title="pytmc  documentation" href="index.html"/>
         <link rel="up" title="Source code documentation" href="source_docs.html"/>
         <link rel="next" title="Developer’s Notes" href="dev_notes.html"/>
         <link rel="prev" title="xml_obj.py" href="xml_obj.html"/> 
@@ -57,7 +57,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> pytpy
+            <a href="index.html" class="icon icon-home"> pytmc
           
 
           
@@ -113,7 +113,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">pytpy</a>
+          <a href="index.html">pytmc</a>
         
       </nav>
 
@@ -164,58 +164,58 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-pytpy.xml_collector">
-<span id="xml-collector-py"></span><h1>xml_collector.py<a class="headerlink" href="#module-pytpy.xml_collector" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pytmc.xml_collector">
+<span id="xml-collector-py"></span><h1>xml_collector.py<a class="headerlink" href="#module-pytmc.xml_collector" title="Permalink to this headline">¶</a></h1>
 <p>xml_collector.py</p>
 <p>This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation</p>
 <div class="section" id="tmcfile">
 <h2>TmcFile<a class="headerlink" href="#tmcfile" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytpy.TmcFile">
-<em class="property">class </em><code class="descclassname">pytpy.</code><code class="descname">TmcFile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.TmcFile">
+<em class="property">class </em><code class="descclassname">pytmc.</code><code class="descname">TmcFile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Object for handling the reading comprehension comprehension of .tmc files.</p>
 <dl class="attribute">
-<dt id="pytpy.TmcFile.all_Symbols">
-<code class="descname">all_Symbols</code><a class="headerlink" href="#pytpy.TmcFile.all_Symbols" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pytpy.xml_collector.ElementCollector" title="pytpy.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all Symbols in the document. Must be initialized with
-<a class="reference internal" href="#pytpy.TmcFile.isolate_Symbols" title="pytpy.TmcFile.isolate_Symbols"><code class="xref py py-func docutils literal"><span class="pre">isolate_Symbols()</span></code></a>.</p>
+<dt id="pytmc.TmcFile.all_Symbols">
+<code class="descname">all_Symbols</code><a class="headerlink" href="#pytmc.TmcFile.all_Symbols" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pytmc.xml_collector.ElementCollector" title="pytmc.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all Symbols in the document. Must be initialized with
+<a class="reference internal" href="#pytmc.TmcFile.isolate_Symbols" title="pytmc.TmcFile.isolate_Symbols"><code class="xref py py-func docutils literal"><span class="pre">isolate_Symbols()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.TmcFile.all_DataTypes">
-<code class="descname">all_DataTypes</code><a class="headerlink" href="#pytpy.TmcFile.all_DataTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pytpy.xml_collector.ElementCollector" title="pytpy.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all DataTypes in the document. Must be initialized with
-<a class="reference internal" href="#pytpy.TmcFile.isolate_DataTypes" title="pytpy.TmcFile.isolate_DataTypes"><code class="xref py py-func docutils literal"><span class="pre">isolate_DataTypes()</span></code></a>.</p>
+<dt id="pytmc.TmcFile.all_DataTypes">
+<code class="descname">all_DataTypes</code><a class="headerlink" href="#pytmc.TmcFile.all_DataTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pytmc.xml_collector.ElementCollector" title="pytmc.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all DataTypes in the document. Must be initialized with
+<a class="reference internal" href="#pytmc.TmcFile.isolate_DataTypes" title="pytmc.TmcFile.isolate_DataTypes"><code class="xref py py-func docutils literal"><span class="pre">isolate_DataTypes()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.TmcFile.all_SubItems">
-<code class="descname">all_SubItems</code><a class="headerlink" href="#pytpy.TmcFile.all_SubItems" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pytpy.xml_collector.ElementCollector" title="pytpy.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all SubItems in the document. Must be initialized with
-<a class="reference internal" href="#pytpy.TmcFile.isolate_SubItems" title="pytpy.TmcFile.isolate_SubItems"><code class="xref py py-func docutils literal"><span class="pre">isolate_SubItems()</span></code></a>.</p>
+<dt id="pytmc.TmcFile.all_SubItems">
+<code class="descname">all_SubItems</code><a class="headerlink" href="#pytmc.TmcFile.all_SubItems" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pytmc.xml_collector.ElementCollector" title="pytmc.xml_collector.ElementCollector"><code class="xref py py-class docutils literal"><span class="pre">ElementCollector</span></code></a> – Collection of all SubItems in the document. Must be initialized with
+<a class="reference internal" href="#pytmc.TmcFile.isolate_SubItems" title="pytmc.TmcFile.isolate_SubItems"><code class="xref py py-func docutils literal"><span class="pre">isolate_SubItems()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytpy.TmcFile.isolate_DataTypes">
-<code class="descname">isolate_DataTypes</code><span class="sig-paren">(</span><em>process_subitems=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile.isolate_DataTypes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Populate <a class="reference internal" href="#pytpy.TmcFile.all_DataTypes" title="pytpy.TmcFile.all_DataTypes"><code class="xref py py-attr docutils literal"><span class="pre">all_DataTypes</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytpy.DataType" title="pytpy.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>
+<dt id="pytmc.TmcFile.isolate_DataTypes">
+<code class="descname">isolate_DataTypes</code><span class="sig-paren">(</span><em>process_subitems=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.isolate_DataTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate <a class="reference internal" href="#pytmc.TmcFile.all_DataTypes" title="pytmc.TmcFile.all_DataTypes"><code class="xref py py-attr docutils literal"><span class="pre">all_DataTypes</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytmc.DataType" title="pytmc.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>
 representing each DataType in the .tmc file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>process_subitems</strong> (<em>bool</em>) – If True, automatically process all subitems containted in the
-datatypes populating <a class="reference internal" href="#pytpy.TmcFile.all_SubItems" title="pytpy.TmcFile.all_SubItems"><code class="xref py py-attr docutils literal"><span class="pre">all_SubItems</span></code></a>.</td>
+datatypes populating <a class="reference internal" href="#pytmc.TmcFile.all_SubItems" title="pytmc.TmcFile.all_SubItems"><code class="xref py py-attr docutils literal"><span class="pre">all_SubItems</span></code></a>.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytpy.TmcFile.isolate_SubItems">
-<code class="descname">isolate_SubItems</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile.isolate_SubItems" title="Permalink to this definition">¶</a></dt>
-<dd><p>Populate <a class="reference internal" href="#pytpy.TmcFile.all_SubItems" title="pytpy.TmcFile.all_SubItems"><code class="xref py py-attr docutils literal"><span class="pre">all_SubItems</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>
+<dt id="pytmc.TmcFile.isolate_SubItems">
+<code class="descname">isolate_SubItems</code><span class="sig-paren">(</span><em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.isolate_SubItems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate <a class="reference internal" href="#pytmc.TmcFile.all_SubItems" title="pytmc.TmcFile.all_SubItems"><code class="xref py py-attr docutils literal"><span class="pre">all_SubItems</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>
 representing each subitem in the .tmc file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -229,9 +229,9 @@ Subitems are automatically linked to this parent datatype.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="pytpy.TmcFile.isolate_Symbols">
-<code class="descname">isolate_Symbols</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.TmcFile.isolate_Symbols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Populate <a class="reference internal" href="#pytpy.TmcFile.all_Symbols" title="pytpy.TmcFile.all_Symbols"><code class="xref py py-attr docutils literal"><span class="pre">all_Symbols</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytpy.Symbol" title="pytpy.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>
+<dt id="pytmc.TmcFile.isolate_Symbols">
+<code class="descname">isolate_Symbols</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.isolate_Symbols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate <a class="reference internal" href="#pytmc.TmcFile.all_Symbols" title="pytmc.TmcFile.all_Symbols"><code class="xref py py-attr docutils literal"><span class="pre">all_Symbols</span></code></a> with a <a class="reference internal" href="xml_obj.html#pytmc.Symbol" title="pytmc.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>
 representing each symbol in the .tmc file.</p>
 </dd></dl>
 
@@ -241,39 +241,39 @@ representing each symbol in the .tmc file.</p>
 <div class="section" id="elementcollector">
 <h2>ElementCollector<a class="headerlink" href="#elementcollector" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pytpy.xml_collector.ElementCollector">
-<em class="property">class </em><code class="descclassname">pytpy.xml_collector.</code><code class="descname">ElementCollector</code><a class="headerlink" href="#pytpy.xml_collector.ElementCollector" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_collector.ElementCollector">
+<em class="property">class </em><code class="descclassname">pytmc.xml_collector.</code><code class="descname">ElementCollector</code><a class="headerlink" href="#pytmc.xml_collector.ElementCollector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary-like object for controlling sets of insntances
-<a class="reference internal" href="xml_obj.html#pytpy.Symbol" title="pytpy.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>, <a class="reference internal" href="xml_obj.html#pytpy.DataType" title="pytpy.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>, and
-<a class="reference internal" href="xml_obj.html#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>. Each entry’s key is the name of the TwinCAT
-variable.  <a class="reference internal" href="#pytpy.xml_collector.ElementCollector.add" title="pytpy.xml_collector.ElementCollector.add"><code class="xref py py-func docutils literal"><span class="pre">add()</span></code></a> automates this
+<a class="reference internal" href="xml_obj.html#pytmc.Symbol" title="pytmc.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>, <a class="reference internal" href="xml_obj.html#pytmc.DataType" title="pytmc.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>, and
+<a class="reference internal" href="xml_obj.html#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>. Each entry’s key is the name of the TwinCAT
+variable.  <a class="reference internal" href="#pytmc.xml_collector.ElementCollector.add" title="pytmc.xml_collector.ElementCollector.add"><code class="xref py py-func docutils literal"><span class="pre">add()</span></code></a> automates this
 setup and should be used to add entries instead of normal dictionary
 insertion techniques.</p>
 <p>Subclassed from python’s standard dictionary.</p>
 <dl class="method">
-<dt id="pytpy.xml_collector.ElementCollector.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#pytpy.xml_collector.ElementCollector.add" title="Permalink to this definition">¶</a></dt>
+<dt id="pytmc.xml_collector.ElementCollector.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.ElementCollector.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Include new item in the dictionary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference internal" href="xml_obj.html#pytpy.Symbol" title="pytpy.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>, <a class="reference internal" href="xml_obj.html#pytpy.DataType" title="pytpy.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>,or <a class="reference internal" href="xml_obj.html#pytpy.SubItem" title="pytpy.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>.) – The instance to add to the ElementCollector</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference internal" href="xml_obj.html#pytmc.Symbol" title="pytmc.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a>, <a class="reference internal" href="xml_obj.html#pytmc.DataType" title="pytmc.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>,or <a class="reference internal" href="xml_obj.html#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>.) – The instance to add to the ElementCollector</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytpy.xml_collector.ElementCollector.registered">
-<code class="descname">registered</code><a class="headerlink" href="#pytpy.xml_collector.ElementCollector.registered" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return subset of the dictionary including only items marked for pytpy’s
+<dt id="pytmc.xml_collector.ElementCollector.registered">
+<code class="descname">registered</code><a class="headerlink" href="#pytmc.xml_collector.ElementCollector.registered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return subset of the dictionary including only items marked for pytmc’s
 comsumption with pragmas.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">TwinCAT variables for pytpy</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">TwinCAT variables for pytmc</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
 </tr>
