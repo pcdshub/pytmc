@@ -115,12 +115,6 @@ class BaseElement:
 
         return False
 
-    def _get_raw_parent(self):
-        '''
-        slated for removal
-        '''
-        return self.element.find('.')
-
     def get_subfield(self, field_target, get_all=False):
         """
         Produce element(s) within the class instance's target element. If
