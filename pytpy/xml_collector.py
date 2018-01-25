@@ -13,12 +13,39 @@ from pytpy import Symbol, DataType, SubItem
 
 
 class ElementCollector(dict):
+    '''
+    Dictionary-like object for controlling sets of insntances
+    :class:`~pytpy.Symbol`, :class:`~pytpy.DataType`, and
+    :class:`~pytpy.SubItem`. Each entry's key is the name of the TwinCAT
+    variable.  :func:`~pytpy.xml_collector.ElementCollector.add` automates this
+    setup and should be used to add entries instead of normal dictionary
+    insertion techniques. 
+    
+    Subclassed from python's standard dictionary.
+    '''
     def add(self, value):
+        '''
+        Include new item in the dictionary.
+
+        Parameters 
+        ----------
+        value : :class:`~pytpy.Symbol`, :class:`~pytpy.DataType`,or :class:`~pytpy.SubItem`.
+            The instance to add to the ElementCollector
+        '''
         name = value.name
         dict.__setitem__(self,name,value)
 
     @property
     def registered(self):
+        '''
+        Return subset of the dictionary including only items marked for pytpy's
+        comsumption with pragmas.
+
+        Returns
+        -------
+        dict
+            TwinCAT variables for pytpy
+        '''
         names = list(filter(
             lambda x: self[x].has_pragma,
             self,
@@ -29,6 +56,25 @@ class ElementCollector(dict):
 
 
 class TmcFile:
+    '''
+    Object for handling the reading comprehension comprehension of .tmc files.
+
+
+    Attributes
+    ----------
+    all_Symbols : :class:`~pytpy.xml_collector.ElementCollector`
+        Collection of all Symbols in the document. Must be initialized with
+        :func:`~isolate_Symbols`.
+    
+    all_DataTypes : :class:`~pytpy.xml_collector.ElementCollector`
+        Collection of all DataTypes in the document. Must be initialized with
+        :func:`~isolate_DataTypes`.
+        
+    all_SubItems : :class:`~pytpy.xml_collector.ElementCollector`
+        Collection of all SubItems in the document. Must be initialized with
+        :func:`~isolate_SubItems`.
+
+    '''
     def __init__(self, filename):
         self.filename = filename
         self.tree = ET.parse(self.filename)
@@ -39,6 +85,10 @@ class TmcFile:
         self.all_SubItems = ElementCollector() 
 
     def isolate_Symbols(self):
+        '''
+        Populate :attr:`~all_Symbols` with a :class:`~pytpy.Symbol` 
+        representing each symbol in the .tmc file.
+        '''
         data_area = self.root.find(
             "./Modules/Module/DataAreas/DataArea/[Name='PlcTask Internal']"
         )
@@ -48,6 +98,16 @@ class TmcFile:
             self.all_Symbols.add(sym)
 
     def isolate_DataTypes(self,process_subitems=True):
+        '''
+        Populate :attr:`~all_DataTypes` with a :class:`~pytpy.DataType` 
+        representing each DataType in the .tmc file.
+
+        Parameters
+        ----------
+        process_subitems : bool
+            If True, automatically process all subitems containted in the
+            datatypes populating :attr:`~all_SubItems`.
+        '''
         xml_data_types = self.root.findall(
             "./DataTypes/DataType"
         )
@@ -58,6 +118,16 @@ class TmcFile:
             self.all_DataTypes.add(data)
 
     def isolate_SubItems(self,parent=None):
+        '''
+        Populate :attr:`~all_SubItems` with a :class:`~pytpy.SubItem` 
+        representing each subitem in the .tmc file.
+        
+        Parameters
+        ----------
+        parent : :class:`~DataType`
+            Specify which datatype to search for subitems. Subitems are
+            automatically linked to this parent datatype.
+        '''
         if type(parent) == DataType:
             xml_subitems = parent.element.findall('./SubItem')
             for xml_subitem in xml_subitems:

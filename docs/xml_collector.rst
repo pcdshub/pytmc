@@ -6,3 +6,9 @@ xml_collector.py
 TmcFile
 +++++++
 .. autoclass:: pytpy.TmcFile
+   :members:
+
+ElementCollector
+++++++++++++++++
+.. autoclass:: pytpy.xml_collector.ElementCollector
+   :members:
