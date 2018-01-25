@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# pytpy documentation build configuration file, created by
+# pytmc documentation build configuration file, created by
 # sphinx-quickstart on Thu Dec  7 12:54:14 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -22,19 +22,19 @@ import sys
 module_path = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     os.pardir,
-    'pytpy'
+    'pytmc'
 )
 sys.path.insert(0,module_path)
 '''
 module_path = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     os.pardir,
-    'pytpy',
+    'pytmc',
     
 )
 sys.path.insert(0,module_path)
 '''
-import pytpy
+import pytmc
 # sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -68,7 +68,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'pytpy'
+project = 'pytmc'
 copyright = '2017, SLAC National Accelerator Laboratory'
 author = 'SLAC National Accelerator Laboratory'
 
@@ -134,7 +134,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pytpydoc'
+htmlhelp_basename = 'pytmcdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -161,7 +161,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pytpy.tex', 'pytpy Documentation',
+    (master_doc, 'pytmc.tex', 'pytmc Documentation',
      'SLAC National Accelerator Laboratory', 'manual'),
 ]
 
@@ -171,7 +171,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pytpy', 'pytpy Documentation',
+    (master_doc, 'pytmc', 'pytmc Documentation',
      [author], 1)
 ]
 
@@ -182,8 +182,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pytpy', 'pytpy Documentation',
-     author, 'pytpy', 'One line description of project.',
+    (master_doc, 'pytmc', 'pytmc Documentation',
+     author, 'pytmc', 'One line description of project.',
      'Miscellaneous'),
 ]
 

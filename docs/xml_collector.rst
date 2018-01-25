@@ -1,14 +1,14 @@
 xml_collector.py
 ================
 
-.. automodule:: pytpy.xml_collector
+.. automodule:: pytmc.xml_collector
 
 TmcFile
 +++++++
-.. autoclass:: pytpy.TmcFile
+.. autoclass:: pytmc.TmcFile
    :members:
 
 ElementCollector
 ++++++++++++++++
-.. autoclass:: pytpy.xml_collector.ElementCollector
+.. autoclass:: pytmc.xml_collector.ElementCollector
    :members:

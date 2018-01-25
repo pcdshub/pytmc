@@ -3,9 +3,9 @@ import logging
 
 import xml.etree.ElementTree as ET
 
-#from pytpy.xml_obj import Symbol, DataType
-from pytpy import Symbol, DataType, SubItem
-from pytpy.xml_obj import BaseElement
+#from pytmc.xml_obj import Symbol, DataType
+from pytmc import Symbol, DataType, SubItem
+from pytmc.xml_obj import BaseElement
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
