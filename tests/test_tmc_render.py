@@ -38,12 +38,23 @@ def test_SingleRecordData_instantiation():
             rec_type = "ai",
             fields = [
                 ("DTYP","asynInt32"),
-                ("INP","Fake_input"),
+                ("INP",None),
                 ("ZNAM",""),
             ]
         )
     except:
         pytest.fail("Instantiation with arguments has erred")
+
+def test_SingleRecordData_render(safe_record_factory,capsys):
+    out,err = capsys.readouterr()
+    rec1 = safe_record_factory
+    rec2 = safe_record_factory
+    agent = DbRenderAgent([rec1,rec2])
+    print()
+    print(agent.render())
+    
+
+
 
 def test_SingleRecordData_pv_append():
     rec = SingleRecordData(
@@ -75,5 +86,5 @@ def test_SingleRecordData_check_rec_type(safe_record_factory):
     assert False
 
 @pytest.mark.skip(reason="checking features to be developed soon")
-def test_SingleRecordData_check_fields(save_record_factory):
+def test_SingleRecordData_check_fields(safe_record_factory):
     assert False

@@ -8,12 +8,15 @@ import logging
 logger = logging.getLogger(__name__)
 from jinja2 import Environment, PackageLoader, select_autoescape
 import re
+import versioneer
+import textwrap
 
 class SingleRecordData:
-    def __init__(self, pv=None, rec_type=None, fields=None):
+    def __init__(self, pv=None, rec_type=None, fields=None, comment=None):
         self.pv = pv 
         self.rec_type = rec_type
         self.fields = fields
+        self.comment = comment
 
     def add(self, pv_extra):
         pv_extra = pv_extra.strip(" :")
@@ -21,8 +24,7 @@ class SingleRecordData:
 
     @property
     def check_pv(self):
-        return True
-        
+        return True 
 
     @property
     def check_rec_type(self):
@@ -43,6 +45,27 @@ class DbRenderAgent:
             master_list = []
         self.master_list = master_list
         self.jinja_env = Environment(
-            loader = PackageLoader(*loader)
+            loader = PackageLoader(*loader),
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
         self.template = self.jinja_env.get_template(template)
+
+    def render(self):
+        return self.template.render(
+            header = self.header,
+            master_list = self.master_list
+        )
+
+    @property
+    def header(self):
+        message = '''\
+        Epics Record file automatically generated using Pytmc
+
+            pytmc version: {version}'''
+        message = message.format(
+            version=str(versioneer.get_version())
+        )
+        message = textwrap.dedent(message)
+        message = textwrap.indent(message,"# ",lambda line: True)
+        return message
