@@ -12,6 +12,39 @@ import versioneer
 import textwrap
 
 class SingleRecordData:
+    '''
+    Data structre for packaging all the information required to render an epics
+    record.
+
+    Note
+    ----
+    The parameters for the constructor are for setting the attributes of this
+    class. 
+    
+    Parameters
+    ----------
+    pv : str
+
+    rec_type : str
+
+    fields : dict
+
+    comment : str
+    
+    Attributes
+    ----------
+    pv : str
+        The full PV for the record
+
+    rec_type : str
+        Code for record type (e.g. 'ai','bo', etc.)
+
+    fields : dict
+        Specifications for each field type and their settings.
+
+    comment : str
+        An additional string to be printed above the record in the db file.
+    '''
     def __init__(self, pv=None, rec_type=None, fields=None, comment=None):
         self.pv = pv 
         self.rec_type = rec_type
@@ -19,6 +52,19 @@ class SingleRecordData:
         self.comment = comment
 
     def add(self, pv_extra):
+        '''
+        Append an extension term onto the current base. This allows a PV to be
+        be constructed in multiple stages. This class could start with a PV of
+        'GDET:FEE1' and could use .add('241') and again use .add('ENRC') to
+        produce a final PV of 'GDET:FEE1:241:ENRC'.
+
+        Parameters
+        ----------
+        pv_extra : str
+            This is the new term to be appended to the tail end of the existing
+            PV. Leading/trailing spaces and colons are scrubbed from pv_extra.
+            A colon is used to adjoin the existing PV and the new addition.
+        '''
         pv_extra = pv_extra.strip(" :")
         self.pv = self.pv + ":" + pv_extra
 
@@ -36,9 +82,48 @@ class SingleRecordData:
 
     @property
     def check(self):
+        '''
+        Collection of funcitons to evaluate whether the data in this object
+        would make a safe record
+
+        Note
+        ----
+        Implementation not complete.
+
+        Returns
+        -------
+        bool
+            True if the data is deemed safe through existing checks.  
+        '''
         return check_pv and check_rec_type and check_fields
 
 class DbRenderAgent:
+    '''
+    DbRenderAgent provides convenient tools for rendering the final records
+    file.
+
+    Parameters
+    ----------
+    master_list : list
+        list of :class:`~pytmc.SingleRecordData` instances specifying all
+        records to be made. This parameter can be accessed later. 
+
+    loader : tuple
+        Specify package location of jinja templates. Names in the package are
+        speperated by tuple entries instead of periods like normal python
+        packages. Uses Jinja2's PackageLoader. 
+    
+    template : str
+        name of the template to be used 
+    
+    Attributes
+    ----------
+    master_list : list
+        list of :class:`~pytmc.SingleRecordData` instances specifying all
+        records to be made.
+
+
+    '''
     def __init__(self, master_list=None, loader=("pytmc","templates"),
                 template="EPICS_record_template.db"):
         if master_list == None:
@@ -52,6 +137,14 @@ class DbRenderAgent:
         self.template = self.jinja_env.get_template(template)
 
     def render(self):
+        '''
+        Generate the rendered document
+
+        Returns
+        -------
+        str
+            Epics record document as a string
+        '''
         return self.template.render(
             header = self.header,
             master_list = self.master_list
@@ -59,6 +152,15 @@ class DbRenderAgent:
 
     @property
     def header(self):
+        '''
+        Generate and return the message to be placed at the top of generated
+        files. Includes information such as pytmc verison
+
+        Returns
+        -------
+        str
+            formatted header message
+        '''
         message = '''\
         Epics Record file automatically generated using Pytmc
 

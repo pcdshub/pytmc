@@ -32,12 +32,12 @@ def safe_record_factory():
     rec = SingleRecordData(
         pv = "GDET:FEE1:241:ENRC",
         rec_type = "ai",
-        comment = "sample comment",
         fields = dict([
             ("DTYP","asynInt32"),
             ("INP",None),
             ("ZNAM",""),
-        ])
+        ]),
+        comment = "sample comment",
     )
     return rec 
 
