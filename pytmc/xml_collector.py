@@ -143,6 +143,10 @@ class TmcFile:
             pass
 
     def isolate_all(self):
+        '''
+        Shortcut for running :func:`~isolate_Symbols` and
+        :func:`~isolate_DataTypes`
+        '''
         self.isolate_Symbols()
         self.isolate_DataTypes()
 

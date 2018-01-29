@@ -3,7 +3,7 @@ import logging
 import xml.etree.ElementTree as ET
 import os
 
-from pytmc import SingleRecordData
+from pytmc import SingleRecordData, TmcFile, TmcExplorer
 
 logger = logging.getLogger(__name__)
 
@@ -42,3 +42,16 @@ def safe_record_factory():
     return rec 
 
 
+@pytest.fixture(scope='function')
+def generic_file():
+    directory = os.path.dirname(os.path.realpath(__file__))
+    test_path = os.path.join(directory, "generic.tmc")
+    return TmcFile(test_path)
+
+
+@pytest.fixture(scope='function')
+def generic_explorer():
+    directory = os.path.dirname(os.path.realpath(__file__))
+    test_path = os.path.join(directory, "generic.tmc")
+    tmc = TmcFile(test_path)
+    return TmcExplorer(tmc)

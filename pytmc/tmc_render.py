@@ -175,8 +175,11 @@ class DbRenderAgent:
 
 
 class TmcExplorer:
-    def __init__(self, tmc_f):
-        raise NotImplementedError
+    def __init__(self, tmc):
+        self.tmc = tmc
+        self.tmc.isolate_all()
+        self.all_records = []
+
 
     def exp_DataType(self, dtype):
         raise NotImplementedError
@@ -192,3 +195,7 @@ class TmcExplorer:
     
     def make_Symbol_record(self, target):
         raise NotImplementedError
+
+    def generate_ads_connection(self, target):
+        raise NotImplementedError
+

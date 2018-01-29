@@ -112,5 +112,14 @@ def test_TmcExplorer_make_record(generic_tmc_path):
 def test_TmcExplorer_make_SubItem_record(generic_tmc_path):
     pytest.fail("WIP")
 
-def test_TmcExplorer_make_Symbol_record(genericl_tmc_path):
+def test_TmcExplorer_make_Symbol_record(generic_explorer):
+    explorer = generic_explorer
+    explorer.tmc.all_Symbols['']
+
+
+
+
+
+
+def test_TmcExploreor_generate_ads_connection(generic_tmc_path):
     pytest.fail("WIP")
