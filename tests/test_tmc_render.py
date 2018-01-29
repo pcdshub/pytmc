@@ -100,26 +100,27 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
     except:
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
 
+@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
     pytest.fail("WIP")
 
+@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     pytest.fail("WIP")
 
+@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_make_record(generic_tmc_path):
     pytest.fail("WIP")
 
+@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_make_SubItem_record(generic_tmc_path):
     pytest.fail("WIP")
 
+@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_make_Symbol_record(generic_explorer):
     explorer = generic_explorer
     explorer.tmc.all_Symbols['']
 
-
-
-
-
-
+@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExploreor_generate_ads_connection(generic_tmc_path):
     pytest.fail("WIP")
