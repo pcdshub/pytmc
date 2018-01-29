@@ -9,7 +9,7 @@ from pytmc.xml_obj import BaseElement
 
 from pytmc import TmcFile
 from pytmc.xml_collector import ElementCollector
-from pytmc import DbRenderAgent, SingleRecordData
+from pytmc import DbRenderAgent, SingleRecordData, TmcExplorer
 
 from collections import defaultdict
 
@@ -25,6 +25,7 @@ def test_DbRenderAgent_instantiation():
         agent = DbRenderAgent(master_list = ['a','b'])
     except:
         pytest.fail("Instantiation with arguments has erred")
+
 
 def test_SingleRecordData_instantiation():
     try:
@@ -45,6 +46,7 @@ def test_SingleRecordData_instantiation():
     except:
         pytest.fail("Instantiation with arguments has erred")
 
+
 def test_SingleRecordData_render(safe_record_factory,capsys):
     out,err = capsys.readouterr()
     rec1 = safe_record_factory
@@ -54,14 +56,13 @@ def test_SingleRecordData_render(safe_record_factory,capsys):
     print(agent.render())
     
 
-
-
 def test_SingleRecordData_pv_append():
     rec = SingleRecordData(
         pv = "GDET:FEE1:241:ENRC"
     )
     rec.add("ABC:DEF")
     assert rec.pv == "GDET:FEE1:241:ENRC:ABC:DEF"
+
 
 @pytest.mark.skip(reason="checking features to be developed soon")
 def test_SingleRecordData_check_pv(safe_record_factory):
@@ -81,10 +82,35 @@ def test_SingleRecordData_check_pv(safe_record_factory):
     pv += " ABC"
     assert rec.check_pv == False
 
+
 @pytest.mark.skip(reason="checking features to be developed soon")
 def test_SingleRecordData_check_rec_type(safe_record_factory):
     assert False
 
+
 @pytest.mark.skip(reason="checking features to be developed soon")
 def test_SingleRecordData_check_fields(safe_record_factory):
     assert False
+
+
+def test_TmcExplorer_instantiation(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    try:
+        exp = TmcExplorer(tmc)
+    except:
+        pytest.fail("Instantiation of TmcExplorer should not generate errors")
+
+def test_TmcExplorer_exp_DataType(generic_tmc_path):
+    pytest.fail("WIP")
+
+def test_TmcExplorer_exp_Symbols(generic_tmc_path):
+    pytest.fail("WIP")
+
+def test_TmcExplorer_make_record(generic_tmc_path):
+    pytest.fail("WIP")
+
+def test_TmcExplorer_make_SubItem_record(generic_tmc_path):
+    pytest.fail("WIP")
+
+def test_TmcExplorer_make_Symbol_record(genericl_tmc_path):
+    pytest.fail("WIP")

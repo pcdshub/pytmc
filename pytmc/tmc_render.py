@@ -97,6 +97,7 @@ class SingleRecordData:
         '''
         return check_pv and check_rec_type and check_fields
 
+
 class DbRenderAgent:
     '''
     DbRenderAgent provides convenient tools for rendering the final records
@@ -171,3 +172,23 @@ class DbRenderAgent:
         message = textwrap.dedent(message)
         message = textwrap.indent(message,"# ",lambda line: True)
         return message
+
+
+class TmcExplorer:
+    def __init__(self, tmc_f):
+        raise NotImplementedError
+
+    def exp_DataType(self, dtype):
+        raise NotImplementedError
+
+    def exp_Symbols(self):
+        raise NotImplementedError
+
+    def make_record(self, target):
+        raise NotImplementedError
+    
+    def make_SubItem_record(self, target):
+        raise NotImplementedError
+    
+    def make_Symbol_record(self, target):
+        raise NotImplementedError
