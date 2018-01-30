@@ -3,7 +3,7 @@
 		EGU		mm
 	</Value></Property><Property><Name>pytmc_pv</Name><Value>VALUE ai</Value></Property></Properties></SubItem><SubItem><Name>lim</Name><Type>DINT</Type><BitSize>32</BitSize><BitOffs>160</BitOffs><Default><Value>1000</Value></Default><Properties><Property><Name>lim attr</Name></Property><Property><Name>pytmc_pv</Name><Value>LIM ao</Value></Property><Property><Name>pytmc_field</Name><Value>
 		DTYP	asynFloat64]
-		EGU		mm</Value></Property></Properties></SubItem><Properties><Property><Name>PouType</Name><Value>FunctionBlock</Value></Property><Property><Name>iterator attr</Name><Value>42</Value></Property><Property><Name>pytmc_ds_name</Name><Value>ITERATORNAME</Value></Property></Properties></DataType><DataType><Name>DUT_STRUCT</Name><BitSize>64</BitSize><SubItem><Name>struct_var</Name><Type>REAL</Type><BitSize>32</BitSize><BitOffs>0</BitOffs><Properties><Property><Name>pytmc_field</Name><Value>
+		EGU		mm</Value></Property></Properties></SubItem><Properties><Property><Name>PouType</Name><Value>FunctionBlock</Value></Property><Property><Name>iterator attr</Name><Value>42</Value></Property><Property><Name>pytmc_dt_name</Name><Value>ITERATORNAME</Value></Property></Properties></DataType><DataType><Name>DUT_STRUCT</Name><BitSize>64</BitSize><SubItem><Name>struct_var</Name><Type>REAL</Type><BitSize>32</BitSize><BitOffs>0</BitOffs><Properties><Property><Name>pytmc_field</Name><Value>
 		DTYP asynFloat64
 		EGU	mm
 	</Value></Property><Property><Name>pytmc_pv</Name><Value>STRUCT_VAR ao</Value></Property></Properties></SubItem><SubItem><Name>struct_var2</Name><Type>DINT</Type><BitSize>32</BitSize><BitOffs>32</BitOffs><Properties><Property><Name>pytmc_field</Name><Value>

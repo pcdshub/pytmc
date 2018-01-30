@@ -51,9 +51,11 @@ def test_ElementCollector_registered(generic_tmc_root):
     col.add(iterator)
     col.add(version)
 
-    print(col['iterator'].pragmas)
-    print(col['VERSION'].pragmas)
-    assert col['iterator'].pragmas == {'iterator attr':['42']}
+    logger.info(str(col['iterator'].pragmas))
+    logger.info(str(col['VERSION'].pragmas))
+    assert col['iterator'].pragmas == {
+        'iterator attr':['42'],
+        'pytmc_dt_name':['ITERATORNAME']}
     assert col.registered == {'iterator':iterator}
 
 
@@ -74,7 +76,7 @@ def test_TmcFile_isolate_Symbols(generic_tmc_path):
     assert "MAIN.test_iterator" in tmc.all_Symbols
     assert "Constants.RuntimeVersion" in tmc.all_Symbols
 
-    assert len(tmc.all_Symbols) == 18
+    assert len(tmc.all_Symbols) == 21
 
 
 def test_TmcFile_isolate_DataTypes(generic_tmc_path):
@@ -84,7 +86,7 @@ def test_TmcFile_isolate_DataTypes(generic_tmc_path):
     assert "iterator" in tmc.all_DataTypes
     assert "VERSION" in tmc.all_DataTypes
 
-    assert len(tmc.all_DataTypes) == 7
+    assert len(tmc.all_DataTypes) == 9
 
 
 def test_TmcFile_isolate_SubItems(generic_tmc_path):
@@ -100,8 +102,6 @@ def test_TmcFile_isolate_SubItems(generic_tmc_path):
     assert len(tmc.all_SubItems['iterator']) == 4
 
 
-
-
 def test_TmcFile_isolate_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.isolate_all()
@@ -112,20 +112,13 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert "MAIN.test_iterator" in tmc.all_Symbols
     assert "Constants.RuntimeVersion" in tmc.all_Symbols
 
-    assert len(tmc.all_Symbols) == 18
+    assert len(tmc.all_Symbols) == 21
 
 
     assert "iterator" in tmc.all_DataTypes
     assert "VERSION" in tmc.all_DataTypes
 
-    assert len(tmc.all_DataTypes) == 7
-
-    '''
-    for x in tmc.all_DataTypes:
-        print("\t",x,"  ", len(tmc.all_DataTypes[x].children))
-        for y in tmc.all_DataTypes[x].children:
-            print("\t\t",y)
-    '''
+    assert len(tmc.all_DataTypes) == 9
 
     assert 'increment' in tmc.all_SubItems['iterator']
     assert 'out' in tmc.all_SubItems['iterator']

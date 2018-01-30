@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 
+
 class BaseElement:
     '''
     Base class for representing variables as they appear in the .tmc (xml)
@@ -22,12 +23,23 @@ class BaseElement:
     base : str
         The prefix that will mark pragmas intended for pytmc's consumption. 
     '''
-    def __init__(self, element, base='pytmc'):
+    def __init__(self, element, base=None, suffixes=None):
         if type(element) != ET.Element:
             raise TypeError("ElementTree.Element required")
         self.element = element
         self.registered_pragmas = []
-        self.com_base = base
+        if base == None:
+            self.com_base = 'pytmc'
+        else:
+            self.com_base = base
+        if suffixes == None:
+            self.suffixes = {
+                'Pv' : '_pv',
+                'DataType' : '_dt_name',
+                'Field' : '_field'
+            }
+        else:
+            self.suffixes = suffixes
 
     def _get_raw_properties(self):
         """
@@ -89,7 +101,7 @@ class BaseElement:
         Returns
         -------
 
-        dict()
+        defaultdict(list)
             Dictionary. The key is the property name and the value is a list of
             values found in the xml
 
@@ -101,10 +113,12 @@ class BaseElement:
                 pragmas[entry] = props.get(entry)
 
         return pragmas
-
+    
     @property
     def has_pragma(self):
         '''
+        Shortcut for determining if this element has pragmas. 
+        
         Returns
         -------
         bool
@@ -181,6 +195,27 @@ class BaseElement:
         '''
         return self.get_subfield("Name").text
 
+    @property
+    def pv(self):
+        print(self.properties)
+        print(self.pragmas)
+        print(self.com_base)
+        print(self.suffixes)
+        print(self.registered_pragmas)
+        return self.pragmas[self.com_base+self.suffixes['Pv']][0]
+
+    @property
+    def fields(self):
+        raise NotImplementedError
+
+    @property
+    def dtname(self):
+        raise NotImplementedError
+
+    @property
+    def record_type(self):
+        raise NotImplementedError
+
 
 class Symbol(BaseElement):
     '''
@@ -196,11 +231,11 @@ class Symbol(BaseElement):
     base : str
         The prefix that will mark pragmas intended for pytmc's consumption. 
     '''
-    def __init__(self, element, base='pytmc'):
-        super().__init__(element, base)
-        registered_pragmas = [
-            self.com_base + '_field', 
-            self.com_base + '_pv', 
+    def __init__(self, element, base=None,suffixes=None):
+        super().__init__(element, base, suffixes)
+        self.registered_pragmas = [
+            self.com_base + self.suffixes['Field'], 
+            self.com_base + self.suffixes['Pv'], 
         ]
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
@@ -246,10 +281,10 @@ class DataType(BaseElement):
     '''
     children = []
     
-    def __init__(self, element, base='pytmc'):
-        super().__init__(element, base)
+    def __init__(self, element, base=None, suffixes=None):
+        super().__init__(element, base, suffixes)
         self.registered_pragmas = [
-            self.com_base + '_ds_name',
+            self.com_base + self.suffixes['DataType'],
         ]
         
         self.children = []
@@ -302,11 +337,13 @@ class DataType(BaseElement):
         Returns
         -------
 
-        str
-            DataType name
+        str or None
+            DataType name or None if there is no parent 
 
         '''
         extension_element = self.get_subfield("ExtendsType")
+        if extension_element == None:
+            return None
         return extension_element.text
     
 
@@ -341,11 +378,11 @@ class SubItem(BaseElement):
     parent : :class:`~pytmc.xml_obj.baseElement`
         The DataStructure in which this SubItem appears
     '''
-    def __init__(self, element, base='pytmc', parent = None):
-        super().__init__(element, base)
-        registered_pragmas = [
-            self.com_base + '_field', 
-            self.com_base + '_pv', 
+    def __init__(self, element, base=None, suffixes=None, parent = None):
+        super().__init__(element, base, suffixes)
+        self.registered_pragmas = [
+            self.com_base + self.suffixes['Field'], 
+            self.com_base + self.suffixes['Pv'], 
         ]
         self.__parent = None
         self.parent = parent

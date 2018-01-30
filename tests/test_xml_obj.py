@@ -45,11 +45,17 @@ def test_BaseElement_get_raw_properties(generic_tmc_root):
     #Read properties of MAIN variable w/o pragma
     root = generic_tmc_root
     sym = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.count']"
     )
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
     prop_out = s._get_raw_properties()
+
+    prop_actual = root.findall(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+        + "/Properties/Property"
+    )
+    
     assert prop_out == [], "Reported Properties lists don't match"
     
     #Read properties of DataType w/ pragma
@@ -63,6 +69,7 @@ def test_BaseElement_get_raw_properties(generic_tmc_root):
     prop_actual = root.findall(
         "./DataTypes/DataType/[Name='iterator']/Properties/Property"
     )
+
     assert prop_out == prop_actual, "Reported Properties lists don't match"
 
     #Read properties of DataType variable w/ pragma
@@ -79,38 +86,17 @@ def test_BaseElement_get_raw_properties(generic_tmc_root):
     assert prop_out == prop_actual, "Reported Properties lists don't match"
 
 
-@pytest.mark.parametrize(
-    "path,result",
-    [
-        (
-            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']",
-            defaultdict(list,{'NEW_VAR attr':['17']})
-        ),
-        (
-            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']",
-            defaultdict(list,{})
-        ),
-        (
-            "./DataTypes/DataType/[Name='iterator']",
-            defaultdict(list,{
-                'PouType':['FunctionBlock'],
-                'iterator attr':['42'],
-            })
-        ),
-        (
-            "./DataTypes/DataType/SubItem/[Name='lim']",
-            defaultdict(list,{'lim attr':[None]})
-        ),
-    ]
-)
-def test_BaseElement_properties(generic_tmc_root, path, result):
+def test_BaseElement_properties(generic_tmc_root):
     root = generic_tmc_root
-    sym = root.find(path)
+    sym = root.find("./DataTypes/DataType/[Name='iterator']")
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
     prop_out = s.properties 
-    assert prop_out == result, "Incorrect properties found"
-    
+    assert prop_out == defaultdict(list,{
+                'PouType':['FunctionBlock'],
+                'iterator attr':['42'],
+                'pytmc_dt_name':['ITERATORNAME']}), "Incorrect properties found"
+   
 
 @pytest.mark.parametrize(
     "path,result",
@@ -140,7 +126,7 @@ def test_Symbol_pragmas(generic_tmc_root, path, result):
     sym = root.find(path)
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
-    s.registered_pragmas = [
+    s.registered_pragmas += [
         'NEW_VAR attr',
         'iterator attr',
         'lim attr',
@@ -201,6 +187,7 @@ def test_Symbol_tc_type(generic_tmc_root):
     s = Symbol(sym)
     
     assert s.tc_type == "iterator"
+
 
 def test_DataType_tc_type(generic_tmc_root):
     root = generic_tmc_root
@@ -320,6 +307,7 @@ def test_parent_relation(generic_tmc_root):
     assert c1.parent == None
     assert c2.parent == par
 
+
 def test_BaseElement_name(generic_tmc_root):
     root = generic_tmc_root
     
@@ -330,6 +318,71 @@ def test_BaseElement_name(generic_tmc_root):
     assert el.name == 'iterator'
     
 
+def test_DataType_tc_extends(generic_tmc_root):
+    root = generic_tmc_root
+    
+    element= root.find(
+        "./DataTypes/DataType/[Name='DUT_STRUCT']"
+    )
+    el = DataType(element)
+    assert el.tc_extends == None
 
+    element= root.find(
+        "./DataTypes/DataType/[Name='DUT_EXTENSION_STRUCT']"
+    )
+    el = DataType(element)
+    assert el.tc_extends == 'DUT_STRUCT'
 
+def test_all_dtname(generic_tmc_root):
+    root = generic_tmc_root
+    
+    element= root.find(
+        "./DataTypes/DataType/[Name='iterator']"
+    )
+    el = DataType(element)
+    assert el.dt == 'ITERATORNAME'
 
+def test_all_fields(generic_tmc_root):
+    root = generic_tmc_root
+    subitem_xml = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    subitem_element = SubItem(subitem_xml)
+    assert subitem_element.field == {'DTYP':'asynFloat64','EGU':'mm'}
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert subitem_element.field == {'DTYP':'asynFloat64','EGU':'mm'}
+
+def test_all_pv(generic_tmc_root):
+    root = generic_tmc_root
+    subitem_xml = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    subitem_element = SubItem(subitem_xml)
+    assert subitem_element.pv == 'LIM'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert subitem_element.pv== 'TEST:MAIN:MULTI'
+
+def test_all_record_type(generic_tmc_root):
+    root = generic_tmc_root
+    subitem_xml = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    subitem_element = SubItem(subitem_xml)
+    assert subitem_element.record_type == 'ao'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert subitem_element.record_type== 'TEST:MAIN:MULTI'
