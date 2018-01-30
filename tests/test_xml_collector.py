@@ -54,8 +54,8 @@ def test_ElementCollector_registered(generic_tmc_root):
     logger.info(str(col['iterator'].pragmas))
     logger.info(str(col['VERSION'].pragmas))
     assert col['iterator'].pragmas == {
-        'iterator attr':['42'],
-        'pytmc_dt_name':['ITERATORNAME']}
+        'iterator attr':'42',
+        'pytmc_dt_name':'ITERATORNAME'}
     assert col.registered == {'iterator':iterator}
 
 

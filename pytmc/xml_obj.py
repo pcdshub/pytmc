@@ -72,7 +72,7 @@ class BaseElement:
         if raw == None:
             return None
 
-        result = defaultdict(list)
+        result = {}
 
         for entry in raw:
             name_element = entry.find("./Name")
@@ -88,7 +88,7 @@ class BaseElement:
             else:    
                 value_text = value_element.text
             
-            result[name_text].append(value_text)
+            result[name_text] = value_text
 
         return result
 
@@ -101,13 +101,13 @@ class BaseElement:
         Returns
         -------
 
-        defaultdict(list)
+        dict
             Dictionary. The key is the property name and the value is a list of
             values found in the xml
 
         """
         props = self.properties
-        pragmas = defaultdict(list)
+        pragmas = {}
         for entry in self.registered_pragmas:
             if entry in props:
                 pragmas[entry] = props.get(entry)

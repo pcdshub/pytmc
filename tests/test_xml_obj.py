@@ -92,10 +92,10 @@ def test_BaseElement_properties(generic_tmc_root):
     logging.debug(str(sym.find("./Name").text))    
     s = BaseElement(sym)
     prop_out = s.properties 
-    assert prop_out == defaultdict(list,{
-                'PouType':['FunctionBlock'],
-                'iterator attr':['42'],
-                'pytmc_dt_name':['ITERATORNAME']}), "Incorrect properties found"
+    assert prop_out == {
+                'PouType':'FunctionBlock',
+                'iterator attr':'42',
+                'pytmc_dt_name':'ITERATORNAME'}, "Incorrect properties found"
    
 
 @pytest.mark.parametrize(
@@ -103,21 +103,21 @@ def test_BaseElement_properties(generic_tmc_root):
     [
         (
             "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']",
-            defaultdict(list,{'NEW_VAR attr':['17']})
+            {'NEW_VAR attr':'17'}
         ),
         (
             "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']",
-            defaultdict(list,{})
+            {}
         ),
         (
             "./DataTypes/DataType/[Name='iterator']",
-            defaultdict(list,{
-                'iterator attr':['42'],
-            })
+            {
+                'iterator attr':'42',
+            }
         ),
         (
             "./DataTypes/DataType/SubItem/[Name='lim']",
-            defaultdict(list,{'lim attr':[None]})
+            {'lim attr':None}
         ),
     ]
 )
