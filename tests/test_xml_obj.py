@@ -350,14 +350,14 @@ def test_all_fields(generic_tmc_root):
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
     ) 
     subitem_element = SubItem(subitem_xml)
-    assert subitem_element.field == {'DTYP':'asynFloat64','EGU':'mm'}
+    assert subitem_element.fields == {'DTYP':'asynFloat64','EGU':'mm'}
     
     root = generic_tmc_root
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    assert subitem_element.field == {'DTYP':'asynFloat64','EGU':'mm'}
+    assert subitem_element.fields == {'DTYP':'asynFloat64','EGU':'mm'}
 
 
 def test_all_pv(generic_tmc_root):
@@ -376,18 +376,18 @@ def test_all_pv(generic_tmc_root):
     assert symbol_element.pv == 'TEST:MAIN:MULTI'
 
 
-def test_all_record_type(generic_tmc_root):
+def test_all_rec_type(generic_tmc_root):
     root = generic_tmc_root
     subitem_xml = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
     ) 
     subitem_element = SubItem(subitem_xml)
-    assert subitem_element.record_type == 'ao'
+    assert subitem_element.rec_type == 'ao'
     
     root = generic_tmc_root
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    assert symbol_element.record_type== 'ai'
+    assert symbol_element.rec_type == 'ai'
 

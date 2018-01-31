@@ -180,21 +180,30 @@ class TmcExplorer:
         self.tmc.isolate_all()
         self.all_records = []
 
-
     def exp_DataType(self, dtype):
         raise NotImplementedError
 
     def exp_Symbols(self):
         raise NotImplementedError
 
-    def make_record(self, target):
-        raise NotImplementedError
-    
+    def make_record(self, target, prefix=None):
+        if prefix != None:
+            prefix = prefix + ":"
+        else:
+            prefix = ""
+        record = SingleRecordData(
+            pv = prefix + target.pv,
+            rec_type = target.rec_type,
+            fields = target.fields,
+        )
+        return record
+
+
     def make_SubItem_record(self, target):
         raise NotImplementedError
     
     def make_Symbol_record(self, target):
-        raise NotImplementedError
+        return self.make_record(target)
 
     def generate_ads_connection(self, target):
         raise NotImplementedError

@@ -84,7 +84,6 @@ class TmcFile:
         self.all_SubItems = defaultdict(ElementCollector) 
         self.isolate_all()
 
-
     def isolate_Symbols(self):
         '''
         Populate :attr:`~all_Symbols` with a :class:`~pytmc.Symbol` 

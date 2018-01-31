@@ -214,7 +214,7 @@ class BaseElement:
         return match.group('pv')
     
     @property
-    def field(self):
+    def fields(self):
         '''
         Get the pragma designated fields for this xml entity.
 
@@ -246,7 +246,7 @@ class BaseElement:
         return pragma_dt.strip()
     
     @property
-    def record_type(self):
+    def rec_type(self):
         '''
         Get the pragma designated record type for this xml entity.
 
