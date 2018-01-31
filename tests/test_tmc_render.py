@@ -126,7 +126,7 @@ def test_TmcExplorer_make_record(generic_tmc_path):
     exp = TmcExplorer(tmc)
     record = exp.make_record(tmc.all_Symbols['MAIN.ulimit'])
     assert type(record) == SingleRecordData
-    assert record.pv == 'TEST:MAIN:MULTI'
+    assert record.pv == 'TEST:MAIN:ULIMIT'
     assert record.rec_type == 'ai'
     assert record.fields == {'DTYP':'asynFloat64','EGU':'mm'}
     
@@ -169,7 +169,7 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     exp = TmcExplorer(tmc)
     exp.exp_Symbols(pragmas_only=True,skip_datatype=True)
     assert exp.make_record(tmc.all_Symbols['MAIN.ulimit']) in exp.all_records
-    assert len(exp.all_records) == 9
+    assert len(exp.all_records) == 4
 
 #@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_generate_ads_connection(generic_tmc_path):

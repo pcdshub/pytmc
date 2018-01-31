@@ -373,7 +373,7 @@ def test_all_pv(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    assert symbol_element.pv == 'TEST:MAIN:MULTI'
+    assert symbol_element.pv == 'TEST:MAIN:ULIMIT'
 
 
 def test_all_rec_type(generic_tmc_root):

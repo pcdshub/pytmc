@@ -200,12 +200,15 @@ class TmcExplorer:
             print(dt)
 
         for sym in symbol_set:
-            if symbol_set[sym].tc_type in self.tmc.all_DataTypes \
-                    and not skip_datatype:
-                raise NotImplementedError
+            if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
+                print("****")
+                continue
+                if not skip_datatype:
+                    raise NotImplementedError
+            
             print(sym)
-            print(symbol_set[sym].tc_type)
-
+            print("\t",symbol_set[sym].tc_type)
+            print("\t",symbol_set[sym].pv)
             
             rec = self.make_record(symbol_set[sym])
             self.all_records.append(rec)
@@ -218,6 +221,8 @@ class TmcExplorer:
             prefix = prefix + ":"
         else:
             prefix = ""
+        if target.pv == None:
+            logger.warn("Record for {} lacks a PV".format(str(target)))
         record = SingleRecordData(
             pv = prefix + target.pv,
             rec_type = target.rec_type,
