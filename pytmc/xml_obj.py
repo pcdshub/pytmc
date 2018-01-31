@@ -198,6 +198,14 @@ class BaseElement:
 
     @property
     def pv(self):
+        '''
+        Get the pragma designated PV name for this xml entity.
+
+        Returns
+        -------
+        str
+            The pv or partial pv
+        '''
         pragma_pv_string = self.pragmas[self.com_base+self.suffixes['Pv']]
         match = re.search(
             r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
@@ -207,6 +215,15 @@ class BaseElement:
     
     @property
     def field(self):
+        '''
+        Get the pragma designated fields for this xml entity.
+
+        Returns
+        -------
+        dict
+            Contains pairings between the parameter names (key) and the
+            parameter settings (value)
+        '''
         pragma_field = self.pragmas[self.com_base+self.suffixes['Field']]
         pattern = "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[.]*)(?:[\r\n]*)"
         matches = re.findall( pattern, pragma_field)
@@ -217,11 +234,27 @@ class BaseElement:
 
     @property
     def dtname(self):
+        '''
+        Get the pragma designated data type name for this DataType.
+
+        Returns
+        -------
+        str
+            The partial pv
+        '''
         pragma_dt = self.pragmas[self.com_base+self.suffixes['DataType']]
         return pragma_dt.strip()
     
     @property
     def record_type(self):
+        '''
+        Get the pragma designated record type for this xml entity.
+
+        Returns
+        -------
+        str
+            Record type
+        '''
         pragma_pv_string = self.pragmas[self.com_base+self.suffixes['Pv']]
         match = re.search(
             r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
