@@ -54,7 +54,6 @@ class ElementCollector(dict):
         return {name:self[name] for name in names}
 
 
-
 class TmcFile:
     '''
     Object for handling the reading comprehension comprehension of .tmc files.
@@ -83,6 +82,8 @@ class TmcFile:
         self.all_Symbols = ElementCollector()
         self.all_DataTypes = ElementCollector()
         self.all_SubItems = defaultdict(ElementCollector) 
+        self.isolate_all()
+
 
     def isolate_Symbols(self):
         '''
