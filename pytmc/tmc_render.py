@@ -201,19 +201,14 @@ class TmcExplorer:
 
         for sym in symbol_set:
             if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
-                print("****")
-                continue
                 if not skip_datatype:
                     raise NotImplementedError
-            
-            print(sym)
-            print("\t",symbol_set[sym].tc_type)
-            print("\t",symbol_set[sym].pv)
+                
+                continue
             
             rec = self.make_record(symbol_set[sym])
             self.all_records.append(rec)
             
-        #for symbol in symbol_set:
               
 
     def make_record(self, target, prefix=None):
