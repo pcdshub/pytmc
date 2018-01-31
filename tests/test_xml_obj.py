@@ -333,6 +333,7 @@ def test_DataType_tc_extends(generic_tmc_root):
     el = DataType(element)
     assert el.tc_extends == 'DUT_STRUCT'
 
+
 def test_all_dtname(generic_tmc_root):
     root = generic_tmc_root
     
@@ -340,7 +341,8 @@ def test_all_dtname(generic_tmc_root):
         "./DataTypes/DataType/[Name='iterator']"
     )
     el = DataType(element)
-    assert el.dt == 'ITERATORNAME'
+    assert el.dtname == 'ITERATORNAME'
+
 
 def test_all_fields(generic_tmc_root):
     root = generic_tmc_root
@@ -357,6 +359,7 @@ def test_all_fields(generic_tmc_root):
     symbol_element = Symbol(symbol_xml)
     assert subitem_element.field == {'DTYP':'asynFloat64','EGU':'mm'}
 
+
 def test_all_pv(generic_tmc_root):
     root = generic_tmc_root
     subitem_xml = root.find(
@@ -370,7 +373,8 @@ def test_all_pv(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    assert subitem_element.pv== 'TEST:MAIN:MULTI'
+    assert symbol_element.pv == 'TEST:MAIN:MULTI'
+
 
 def test_all_record_type(generic_tmc_root):
     root = generic_tmc_root
@@ -385,4 +389,5 @@ def test_all_record_type(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    assert subitem_element.record_type== 'TEST:MAIN:MULTI'
+    assert symbol_element.record_type== 'ai'
+

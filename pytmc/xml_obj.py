@@ -8,6 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
+import re
 
 
 class BaseElement:
@@ -197,24 +198,36 @@ class BaseElement:
 
     @property
     def pv(self):
-        print(self.properties)
-        print(self.pragmas)
-        print(self.com_base)
-        print(self.suffixes)
-        print(self.registered_pragmas)
-        return self.pragmas[self.com_base+self.suffixes['Pv']][0]
-
+        pragma_pv_string = self.pragmas[self.com_base+self.suffixes['Pv']]
+        match = re.search(
+            r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
+            pragma_pv_string
+        )
+        return match.group('pv')
+    
     @property
-    def fields(self):
-        raise NotImplementedError
+    def field(self):
+        pragma_field = self.pragmas[self.com_base+self.suffixes['Field']]
+        pattern = "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[.]*)(?:[\r\n]*)"
+        matches = re.findall( pattern, pragma_field)
+        return dict(matches)
+        for x in matches:
+            print(x)
+            #print(x.group())
 
     @property
     def dtname(self):
-        raise NotImplementedError
-
+        pragma_dt = self.pragmas[self.com_base+self.suffixes['DataType']]
+        return pragma_dt.strip()
+    
     @property
     def record_type(self):
-        raise NotImplementedError
+        pragma_pv_string = self.pragmas[self.com_base+self.suffixes['Pv']]
+        match = re.search(
+            r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
+            pragma_pv_string
+        )
+        return match.group('record_type')
 
 
 class Symbol(BaseElement):
