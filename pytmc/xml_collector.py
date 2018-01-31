@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from pytmc import Symbol, DataType, SubItem
+from . import Symbol, DataType, SubItem
 
 
 

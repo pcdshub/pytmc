@@ -63,6 +63,25 @@ def test_SingleRecordData_pv_append():
     rec.add("ABC:DEF")
     assert rec.pv == "GDET:FEE1:241:ENRC:ABC:DEF"
 
+def test_SingleRecordData_eq():
+    a = SingleRecordData(
+        pv = 'a',
+        fields = {'c':'c'},
+        rec_type = 'b'
+    )
+    b = SingleRecordData(
+        pv = 'a',
+        fields = {'c':'c'},
+        rec_type = 'b'
+    )
+    c = SingleRecordData(
+        pv = 'a',
+        fields = {'c':'c'},
+        rec_type = 'n'
+    )
+    assert a == b
+    assert a != c
+
 
 @pytest.mark.skip(reason="checking features to be developed soon")
 def test_SingleRecordData_check_pv(safe_record_factory):
@@ -99,15 +118,6 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
         exp = TmcExplorer(tmc)
     except:
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
-
-#@pytest.mark.skip(reason="Not yet implemented")
-def test_TmcExplorer_exp_DataType(generic_tmc_path):
-    pytest.fail("WIP")
-
-#@pytest.mark.skip(reason="Not yet implemented")
-def test_TmcExplorer_exp_Symbols(generic_tmc_path):
-    pytest.fail("WIP")
-
 
 #@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_make_record(generic_tmc_path):
@@ -149,5 +159,21 @@ def test_TmcExplorer_make_Symbol_record(generic_tmc_path):
     assert record.fields == {'ZNAM':'SINGLE','ONAM':'MULTI'}
 
 #@pytest.mark.skip(reason="Not yet implemented")
-def test_TmcExploreor_generate_ads_connection(generic_tmc_path):
+def test_TmcExplorer_exp_DataType(generic_tmc_path):
     pytest.fail("WIP")
+
+#@pytest.mark.skip(reason="Not yet implemented")
+def test_TmcExplorer_exp_Symbols(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    exp = TmcExplorer(tmc)
+    exp.exp_Symbols(pragmas_only=True,skip_datatype=True)
+    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit']) in exp.all_records
+    assert len(exp.all_records) == 10
+
+#@pytest.mark.skip(reason="Not yet implemented")
+def test_TmcExplorer_generate_ads_connection(generic_tmc_path):
+    pytest.fail("WIP")
+
+def test_TmcExplorer_read_ini(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    exp = TmcExplorer(tmc)

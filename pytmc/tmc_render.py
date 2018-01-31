@@ -10,6 +10,9 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 import re
 import versioneer
 import textwrap
+import pkg_resources
+import configparser
+from . import defaults
 
 class SingleRecordData:
     '''
@@ -67,6 +70,9 @@ class SingleRecordData:
         '''
         pv_extra = pv_extra.strip(" :")
         self.pv = self.pv + ":" + pv_extra
+
+    def __eq__(self,other):
+        return self.__dict__ == other.__dict__
 
     @property
     def check_pv(self):
@@ -183,8 +189,17 @@ class TmcExplorer:
     def exp_DataType(self, dtype):
         raise NotImplementedError
 
-    def exp_Symbols(self):
-        raise NotImplementedError
+    def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
+
+        if pragmas_only:
+            symbol_set = self.tmc.all_Symbols.registered
+        else:
+            symbol_set = self.tmc.all_Symbols
+
+        print(symbol_set)
+
+        #for symbol in symbol_set:
+              
 
     def make_record(self, target, prefix=None):
         if prefix != None:
@@ -197,7 +212,6 @@ class TmcExplorer:
             fields = target.fields,
         )
         return record
-
 
     def make_SubItem_record(self, target):
         raise NotImplementedError
