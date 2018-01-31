@@ -196,8 +196,20 @@ class TmcExplorer:
         else:
             symbol_set = self.tmc.all_Symbols
 
-        print(symbol_set)
+        for dt in self.tmc.all_DataTypes:
+            print(dt)
 
+        for sym in symbol_set:
+            if symbol_set[sym].tc_type in self.tmc.all_DataTypes \
+                    and not skip_datatype:
+                raise NotImplementedError
+            print(sym)
+            print(symbol_set[sym].tc_type)
+
+            
+            rec = self.make_record(symbol_set[sym])
+            self.all_records.append(rec)
+            
         #for symbol in symbol_set:
               
 

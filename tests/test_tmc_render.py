@@ -63,6 +63,7 @@ def test_SingleRecordData_pv_append():
     rec.add("ABC:DEF")
     assert rec.pv == "GDET:FEE1:241:ENRC:ABC:DEF"
 
+
 def test_SingleRecordData_eq():
     a = SingleRecordData(
         pv = 'a',
@@ -168,7 +169,7 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     exp = TmcExplorer(tmc)
     exp.exp_Symbols(pragmas_only=True,skip_datatype=True)
     assert exp.make_record(tmc.all_Symbols['MAIN.ulimit']) in exp.all_records
-    assert len(exp.all_records) == 10
+    assert len(exp.all_records) == 9
 
 #@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_generate_ads_connection(generic_tmc_path):

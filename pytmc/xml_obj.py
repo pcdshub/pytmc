@@ -203,10 +203,14 @@ class BaseElement:
 
         Returns
         -------
-        str
-            The pv or partial pv
+        str or None
+            The pv or partial pv or None if it is not specified
         '''
-        pragma_pv_string = self.pragmas[self.com_base+self.suffixes['Pv']]
+        pragma_pv_string = self.pragmas.get(
+            self.com_base+self.suffixes['Pv']
+        )
+        if pragma_pv_string == None:
+            return None
         match = re.search(
             r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
             pragma_pv_string
@@ -216,15 +220,20 @@ class BaseElement:
     @property
     def fields(self):
         '''
-        Get the pragma designated fields for this xml entity.
+        Get the pragma designated fields for this xml entity or None if it is
+        not specified
 
         Returns
         -------
-        dict
+        dict or None
             Contains pairings between the parameter names (key) and the
             parameter settings (value)
         '''
-        pragma_field = self.pragmas[self.com_base+self.suffixes['Field']]
+        pragma_field = self.pragmas.get(
+            self.com_base+self.suffixes['Field']
+        )
+        if pragma_field == None:
+            return None
         pattern = "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[.]*)(?:[\r\n]*)"
         matches = re.findall( pattern, pragma_field)
         return dict(matches)
@@ -235,14 +244,19 @@ class BaseElement:
     @property
     def dtname(self):
         '''
-        Get the pragma designated data type name for this DataType.
+        Get the pragma designated data type name for this DataType or None if
+        it is not specified
 
         Returns
         -------
-        str
+        str or None
             The partial pv
         '''
-        pragma_dt = self.pragmas[self.com_base+self.suffixes['DataType']]
+        pragma_dt = self.pragmas.get(
+            self.com_base+self.suffixes['DataType']
+        )
+        if pragma_dt == None:
+            return None
         return pragma_dt.strip()
     
     @property
@@ -252,13 +266,17 @@ class BaseElement:
 
         Returns
         -------
-        str
-            Record type
+        str or None
+            Record type or None if it is not specified
         '''
-        pragma_pv_string = self.pragmas[self.com_base+self.suffixes['Pv']]
+        pragma_rec_string = self.pragmas.get(
+            self.com_base+self.suffixes['Pv']
+        )
+        if pragma_rec_string == None:
+            return None
         match = re.search(
             r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
-            pragma_pv_string
+            pragma_rec_string
         )
         return match.group('record_type')
 
