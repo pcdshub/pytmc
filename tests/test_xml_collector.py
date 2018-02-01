@@ -98,8 +98,10 @@ def test_TmcFile_isolate_SubItems(generic_tmc_path):
     assert 'out' in tmc.all_SubItems['iterator']
     assert 'value' in tmc.all_SubItems['iterator']
     assert 'lim' in tmc.all_SubItems['iterator']
+    assert 'extra1' in tmc.all_SubItems['iterator']
+    assert 'extra2' in tmc.all_SubItems['iterator']
    
-    assert len(tmc.all_SubItems['iterator']) == 4
+    assert len(tmc.all_SubItems['iterator']) == 6
 
 
 def test_TmcFile_isolate_all(generic_tmc_path):
@@ -124,8 +126,10 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert 'out' in tmc.all_SubItems['iterator']
     assert 'value' in tmc.all_SubItems['iterator']
     assert 'lim' in tmc.all_SubItems['iterator']
+    assert 'extra1' in tmc.all_SubItems['iterator']
+    assert 'extra2' in tmc.all_SubItems['iterator']
    
-    assert len(tmc.all_SubItems['iterator']) == 4
+    assert len(tmc.all_SubItems['iterator']) == 6
 
 
 

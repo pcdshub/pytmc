@@ -74,6 +74,11 @@ class SingleRecordData:
     def __eq__(self,other):
         return self.__dict__ == other.__dict__
 
+    def __repr__(self):
+        return "{}({})".format(
+            self.__class__.__name__,
+            self.pv,
+        )
     @property
     def check_pv(self):
         return True 
@@ -191,17 +196,22 @@ class TmcExplorer:
         #
         # @ insertions will go here
         #
-        print(dtype_type)
-        print(self.tmc.all_DataTypes[dtype_type])
-        print(self.tmc.all_SubItems[dtype_type].registered)
+        #print(dtype_type)
+        #print(self.tmc.all_DataTypes[dtype_type])
+        #print(self.tmc.all_SubItems[dtype_type].registered)
         subitem_set = self.tmc.all_SubItems[dtype_type].registered
         for entry in subitem_set:
             if subitem_set[entry].tc_type in self.tmc.all_DataTypes: 
+                #
+                #
+                #
+                base = base + ":" + dtype_inst.pv
+                self.exp_DataType(subitem_set[entry],base)
                 continue
             
             rec = self.make_record(
                 subitem_set[entry],
-                prefix = dtype_inst.pv
+                prefix = base + dtype_inst.pv
             )
             self.all_records.append(rec)
                 
