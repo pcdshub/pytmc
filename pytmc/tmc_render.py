@@ -186,11 +186,27 @@ class TmcExplorer:
         self.tmc.isolate_all()
         self.all_records = []
 
-    def exp_DataType(self, dtype):
-        raise NotImplementedError
-
+    def exp_DataType(self, dtype_inst, base=""):
+        dtype_type = dtype_inst.tc_type
+        #
+        # @ insertions will go here
+        #
+        print(dtype_type)
+        print(self.tmc.all_DataTypes[dtype_type])
+        print(self.tmc.all_SubItems[dtype_type].registered)
+        subitem_set = self.tmc.all_SubItems[dtype_type].registered
+        for entry in subitem_set:
+            if subitem_set[entry].tc_type in self.tmc.all_DataTypes: 
+                continue
+            
+            rec = self.make_record(
+                subitem_set[entry],
+                prefix = dtype_inst.pv
+            )
+            self.all_records.append(rec)
+                
+            
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
-
         if pragmas_only:
             symbol_set = self.tmc.all_Symbols.registered
         else:
@@ -209,8 +225,6 @@ class TmcExplorer:
             rec = self.make_record(symbol_set[sym])
             self.all_records.append(rec)
             
-              
-
     def make_record(self, target, prefix=None):
         if prefix != None:
             prefix = prefix + ":"

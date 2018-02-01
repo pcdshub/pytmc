@@ -120,7 +120,7 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
     except:
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
 
-#@pytest.mark.skip(reason="Not yet implemented")
+
 def test_TmcExplorer_make_record(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
@@ -145,9 +145,11 @@ def test_TmcExplorer_make_record(generic_tmc_path):
     assert record.rec_type == 'bo'
     assert record.fields == {'ZNAM':'SINGLE','ONAM':'MULTI'}
     
+
 @pytest.mark.skip(reason="Questionable need")
 def test_TmcExplorer_make_SubItem_record(generic_tmc_path):
     pytest.fail("WIP")
+
 
 @pytest.mark.skip(reason="Questionable need")
 def test_TmcExplorer_make_Symbol_record(generic_tmc_path):
@@ -159,21 +161,40 @@ def test_TmcExplorer_make_Symbol_record(generic_tmc_path):
     assert record.rec_type == 'bo'
     assert record.fields == {'ZNAM':'SINGLE','ONAM':'MULTI'}
 
-#@pytest.mark.skip(reason="Not yet implemented")
-def test_TmcExplorer_exp_DataType(generic_tmc_path):
-    pytest.fail("WIP")
 
-#@pytest.mark.skip(reason="Not yet implemented")
+def test_TmcExplorer_exp_DataType(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    exp = TmcExplorer(tmc)
+    exp.exp_DataType(tmc.all_Symbols['MAIN.struct_base'])
+    struct_var = exp.make_record(
+        tmc.all_SubItems['DUT_STRUCT']['struct_var'],
+        prefix = "TEST:MAIN:STRUCTBASE"
+    ) 
+    assert struct_var in exp.all_records
+    struct_var2 = exp.make_record(
+        tmc.all_SubItems['DUT_STRUCT']['struct_var2'],
+        prefix = "TEST:MAIN:STRUCTBASE"
+    ) 
+    assert struct_var2 in exp.all_records
+    assert len(exp.all_records) == 2
+
+
 def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
     exp.exp_Symbols(pragmas_only=True,skip_datatype=True)
     assert exp.make_record(tmc.all_Symbols['MAIN.ulimit']) in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.multi']) in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR']) in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global']) \
+            in exp.all_records
     assert len(exp.all_records) == 4
 
-#@pytest.mark.skip(reason="Not yet implemented")
+
+@pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_generate_ads_connection(generic_tmc_path):
     pytest.fail("WIP")
+
 
 def test_TmcExplorer_read_ini(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
