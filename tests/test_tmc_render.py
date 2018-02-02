@@ -195,6 +195,17 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
             in exp.all_records
     assert len(exp.all_records) == 4
 
+def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    exp = TmcExplorer(tmc)
+    exp.exp_Symbols(pragmas_only=True)
+    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit']) in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.multi']) in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR']) in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global']) \
+            in exp.all_records
+    assert len(exp.all_records) == 23
+
 
 @pytest.mark.skip(reason="Not yet implemented")
 def test_TmcExplorer_generate_ads_connection(generic_tmc_path):

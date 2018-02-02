@@ -188,6 +188,18 @@ class DbRenderAgent:
 
 
 class TmcExplorer:
+    '''
+    TmcExplorer contains the tools to compile a list of SingleRecordData
+    instances from the :class:`~pytmc.TmcFile`.
+
+    Attributes
+    ----------
+    tmc.all_records : list of :class:`~SingleRecordData`
+        This is a list of all records to be made for the DB file. Populated by
+        running :func:`~exp_Symbols`.
+    
+    '''
+
     def __init__(self, tmc):
         self.tmc = tmc
         self.tmc.isolate_all()
@@ -203,7 +215,7 @@ class TmcExplorer:
             if dtype_parent != None:
                 self.exp_DataType(
                     self.tmc.all_DataTypes[dtype_parent],
-                    base,
+                    base + dtype_inst.pv,
                 )
         dt = False
         if type(dtype_inst) == DataType:
@@ -227,22 +239,20 @@ class TmcExplorer:
                 prefix = base + ("" if dt else dtype_inst.pv)
             )
             self.all_records.append(rec)
-            print("add",rec)
-                
+            logger.debug("create {}".format(str(rec))) 
             
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
         if pragmas_only:
             symbol_set = self.tmc.all_Symbols.registered
         else:
             symbol_set = self.tmc.all_Symbols
-
-        for dt in self.tmc.all_DataTypes:
-            print(dt)
-
+        
         for sym in symbol_set:
             if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
                 if not skip_datatype:
-                    raise NotImplementedError
+                    self.exp_DataType(
+                        symbol_set[sym], 
+                    )
                 
                 continue
             
