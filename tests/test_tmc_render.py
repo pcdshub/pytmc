@@ -196,19 +196,16 @@ def test_TmcExplorer_exp_DataType_multilayer(generic_tmc_path):
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:ITERATOR:EXT1"
     ) 
-    print(struct_var2)
-    for x in exp.all_records:
-        print(x)
     assert struct_var2 in exp.all_records
-    assert len(exp.all_records) == 6
+    assert len(exp.all_records) == 7
 
 
-def test_TmcExplorer_exp_DataType_extension(generic_tmc_path):
+def test_TmcExplorer_exp_DataType_parent(generic_tmc_path):
     '''Explore single DatType that is an extension of another
     '''
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    exp.exp_DataType(tmc.all_Symbols['MAIN.struct_extra'])
+    exp.exp_DataType_parent(tmc.all_Symbols['MAIN.struct_extra'])
     struct_var = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:STRUCTEXTEND"
@@ -218,8 +215,8 @@ def test_TmcExplorer_exp_DataType_extension(generic_tmc_path):
         tmc.all_SubItems['DUT_EXTENSION_STRUCT']['tertiary'],
         prefix = "TEST:MAIN:STRUCTEXTEND"
     )
-    assert struct_var2 in exp.all_records
-    assert len(exp.all_records) == 3
+    assert struct_var2 not in exp.all_records
+    assert len(exp.all_records) == 2
 
 
 def test_TmcExplorer_exp_Symbols(generic_tmc_path):

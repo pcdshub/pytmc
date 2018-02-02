@@ -13,6 +13,7 @@ import textwrap
 import pkg_resources
 import configparser
 from . import defaults
+from . import DataType
 
 class SingleRecordData:
     '''
@@ -79,6 +80,7 @@ class SingleRecordData:
             self.__class__.__name__,
             self.pv,
         )
+
     @property
     def check_pv(self):
         return True 
@@ -191,29 +193,101 @@ class TmcExplorer:
         self.tmc.isolate_all()
         self.all_records = []
 
+    def exp_DataType_parent(self,dtype_inst,base=""):
+        #Does this dtype_inst inherit?
+        dtype_type_str = dtype_inst.tc_type
+        print(self.tmc.all_DataTypes[dtype_type_str].tc_extends)
+        if dtype_type_str in self.tmc.all_DataTypes:
+            dtype_parent_str = \
+                    self.tmc.all_DataTypes[dtype_type_str].tc_extends 
+            if dtype_parent_str == None:
+                #no parent identified, return
+                return None
+        
+        #create the records for subitems in this DT
+        dtype_parent = self.tmc.all_DataTypes[dtype_parent_str]
+
+        for subitem in subitem_set:
+            if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
+                if not skip_datatype:
+                    raise NotImplementedError
+                
+                continue
+            
+            rec = self.make_record(symbol_set[sym])
+            self.all_records.append(rec)
+
+
+        #exp_DataType_parent(dtype_parent,base)
+
+
+
+
     def exp_DataType(self, dtype_inst, base=""):
-        dtype_type = dtype_inst.tc_type
+        dtype_type_str = dtype_inst.tc_type
         #
         # @ insertions will go here
         #
         #print(dtype_type)
         #print(self.tmc.all_DataTypes[dtype_type])
         #print(self.tmc.all_SubItems[dtype_type].registered)
-        subitem_set = self.tmc.all_SubItems[dtype_type].registered
+        print("********")
+        print(dtype_inst)
+        print(type(dtype_inst) == DataType)
+        print(dtype_type_str)
+        #print(self.tmc.all_DataTypes[dtype_type])
+        '''
+        if dtype_type in self.tmc.all_DataTypes:
+            dtype_parent = self.tmc.all_DataTypes[dtype_type].tc_extends 
+            if dtype_parent != None:
+                self.exp_DataType(
+                    self.tmc.all_SubItems[dtype_parent],
+                    base + dtype_inst.pv + ":"
+                )
+        
+        subitem_set = {}
+        print(self.tmc.all_DataTypes[dtype_type].tc_extends)
+        if dtype_type in self.tmc.all_DataTypes:
+            dtype_parent = self.tmc.all_DataTypes[dtype_type].tc_extends 
+            if self.tmc.all_DataTypes[dtype_type].tc_extends != None:
+                subitem_set.update(
+                    
+                )
+        '''
+
+        if dtype_type_str in self.tmc.all_DataTypes:
+            dtype_parent = self.tmc.all_DataTypes[dtype_type_str].tc_extends 
+            if dtype_parent != None:
+                print("DEEP")
+                self.exp_DataType(
+                    self.tmc.all_DataTypes[dtype_parent],
+                    base,
+                )
+        dt = False
+        if type(dtype_inst) == DataType:
+            dt = True
+            dtype_type_str = dtype_inst.name 
+
+        subitem_set = self.tmc.all_SubItems[dtype_type_str].registered
+        print(subitem_set)
+        print("ZZZZ:",dtype_inst.pv)
         for entry in subitem_set:
             if subitem_set[entry].tc_type in self.tmc.all_DataTypes: 
                 #
                 #
                 #
-                base = base + ":" + dtype_inst.pv
-                self.exp_DataType(subitem_set[entry],base)
+                self.exp_DataType(
+                    subitem_set[entry],
+                    base + dtype_inst.pv + ":"
+                )
                 continue
-            
+             
             rec = self.make_record(
                 subitem_set[entry],
-                prefix = base + dtype_inst.pv
+                prefix = base + ("" if dt else dtype_inst.pv)
             )
             self.all_records.append(rec)
+            print("add",rec)
                 
             
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
