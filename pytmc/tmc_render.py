@@ -14,6 +14,7 @@ import pkg_resources
 import configparser
 from . import defaults
 from . import DataType
+from . import TmcFile
 
 class SingleRecordData:
     '''
@@ -149,6 +150,17 @@ class DbRenderAgent:
             lstrip_blocks=True,
         )
         self.template = self.jinja_env.get_template(template)
+    
+    def clean_list(self):
+        for entry in self.master_list:
+            if entry.pv == None:
+                entry.pv = ""
+            if entry.rec_type == None:
+                entry.rec_type = ""
+            if entry.fields ==None:
+                entry.fields = []
+            if entry.comment ==None:
+                entry.comment = ""
 
     def render(self):
         '''
@@ -275,4 +287,15 @@ class TmcExplorer:
 
     def generate_ads_connection(self, target):
         raise NotImplementedError
+
+
+class FullRender:
+    def __init__(self,tmc_path):
+        self.tmc = TmcFile(tmc_path)
+        self.exp = TmcExplorer(self.tmc)
+        self.exp.exp_Symbols()
+        render = DbRenderAgent(self.exp.all_records)
+        render.clean_list()
+        print(render.render())
+
 

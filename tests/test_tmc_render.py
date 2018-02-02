@@ -9,7 +9,7 @@ from pytmc.xml_obj import BaseElement
 
 from pytmc import TmcFile
 from pytmc.xml_collector import ElementCollector
-from pytmc import DbRenderAgent, SingleRecordData, TmcExplorer
+from pytmc import DbRenderAgent, SingleRecordData, TmcExplorer, FullRender
 
 from collections import defaultdict
 
@@ -215,3 +215,6 @@ def test_TmcExplorer_generate_ads_connection(generic_tmc_path):
 def test_TmcExplorer_read_ini(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
+
+def test_FullRender_instantiation(generic_tmc_path):
+    z = FullRender(generic_tmc_path)
