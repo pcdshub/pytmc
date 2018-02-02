@@ -139,28 +139,12 @@ def test_TmcExplorer_make_record(generic_tmc_path):
     assert record.rec_type == 'ao'
     assert record.fields == {'DTYP':'asynFloat64','EGU':'mm'}
     
-    record = exp.make_Symbol_record(tmc.all_Symbols['MAIN.NEW_VAR'])
+    record = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
     assert type(record) == SingleRecordData
     assert record.pv == 'TEST:MAIN:NEW_VAR'
     assert record.rec_type == 'bo'
     assert record.fields == {'ZNAM':'SINGLE','ONAM':'MULTI'}
     
-
-@pytest.mark.skip(reason="Questionable need")
-def test_TmcExplorer_make_SubItem_record(generic_tmc_path):
-    pytest.fail("WIP")
-
-
-@pytest.mark.skip(reason="Questionable need")
-def test_TmcExplorer_make_Symbol_record(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
-    record = exp.make_Symbol_record(tmc.all_Symbols['MAIN.NEW_VAR'])
-    assert type(record) == SingleRecordData
-    assert record.pv == 'TEST:MAIN:NEW_VAR'
-    assert record.rec_type == 'bo'
-    assert record.fields == {'ZNAM':'SINGLE','ONAM':'MULTI'}
-
 
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
     '''Explore single level Datatype (Datatype doesn't contain others)

@@ -263,12 +263,6 @@ class TmcExplorer:
         )
         return record
 
-    def make_SubItem_record(self, target):
-        raise NotImplementedError
-    
-    def make_Symbol_record(self, target):
-        return self.make_record(target)
-
     def generate_ads_connection(self, target):
         raise NotImplementedError
 
