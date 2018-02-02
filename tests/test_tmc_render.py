@@ -200,25 +200,6 @@ def test_TmcExplorer_exp_DataType_multilayer(generic_tmc_path):
     assert len(exp.all_records) == 7
 
 
-def test_TmcExplorer_exp_DataType_parent(generic_tmc_path):
-    '''Explore single DatType that is an extension of another
-    '''
-    tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
-    exp.exp_DataType_parent(tmc.all_Symbols['MAIN.struct_extra'])
-    struct_var = exp.make_record(
-        tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-        prefix = "TEST:MAIN:STRUCTEXTEND"
-    ) 
-    assert struct_var in exp.all_records
-    struct_var2 = exp.make_record(
-        tmc.all_SubItems['DUT_EXTENSION_STRUCT']['tertiary'],
-        prefix = "TEST:MAIN:STRUCTEXTEND"
-    )
-    assert struct_var2 not in exp.all_records
-    assert len(exp.all_records) == 2
-
-
 def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
