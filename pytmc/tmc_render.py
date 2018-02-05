@@ -276,16 +276,26 @@ class TmcExplorer:
             prefix = prefix + ":"
         else:
             prefix = ""
+
         if target.pv == None:
             logger.warn("Record for {} lacks a PV".format(str(target)))
+        
+        fields = target.fields
+        '''
+        if fields.get('INP') == '@@@':
+            fields['INP'] = self.generate_ads_connection(target, 'in')
+
+        if fields.get('OUT') == '@@@':
+            fields['OUT'] = self.generate_ads_connection(target, 'out')
+        '''
         record = SingleRecordData(
             pv = prefix + target.pv,
             rec_type = target.rec_type,
-            fields = target.fields,
+            fields = fields,
         )
         return record
 
-    def generate_ads_connection(self, target):
+    def generate_ads_connection(self, target, direction):
         raise NotImplementedError
 
 
