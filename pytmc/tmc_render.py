@@ -296,6 +296,11 @@ class FullRender:
         self.exp.exp_Symbols()
         render = DbRenderAgent(self.exp.all_records)
         render.clean_list()
-        print(render.render())
+        self.output = render.render()
+        #print(self.output)
 
+    def save(self,outpath):
+        f = open(outpath,"w")
+        f.write(self.output)
+        f.close()
 
