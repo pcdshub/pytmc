@@ -231,7 +231,7 @@ def test_SingleProtoData_instantiation():
 def test_ProtoRenderAgent_instantiation(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     try:
-        agent = ProtoRenderAgent(tmc.master_list)
+        agent = ProtoRenderAgent()
     except:
         pytest.fail("Instantiation has thrown errors")
     

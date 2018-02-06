@@ -125,11 +125,10 @@ class SingleProtoData:
             return True
         return False
 
-    
 
-class DbRenderAgent:
+class RenderAgent:
     '''
-    DbRenderAgent provides convenient tools for rendering the final records
+    RenderAgent provides convenient tools for rendering the final records
     file.
 
     Parameters
@@ -155,7 +154,7 @@ class DbRenderAgent:
 
     '''
     def __init__(self, master_list=None, loader=("pytmc","templates"),
-                template="EPICS_record_template.db"):
+                template=None):
         if master_list == None:
             master_list = []
         self.master_list = master_list
@@ -202,6 +201,65 @@ class DbRenderAgent:
         str
             formatted header message
         '''
+        message = ""
+        return message
+
+
+class DbRenderAgent(RenderAgent):
+    '''
+    DbRenderAgent provides convenient tools for rendering the final records
+    file.
+
+    Parameters
+    ----------
+    master_list : list
+        list of :class:`~pytmc.SingleRecordData` instances specifying all
+        records to be made. This parameter can be accessed later. 
+
+    loader : tuple
+        Specify package location of jinja templates. Names in the package are
+        speperated by tuple entries instead of periods like normal python
+        packages. Uses Jinja2's PackageLoader. 
+    
+    template : str
+        name of the template to be used 
+    
+    Attributes
+    ----------
+    master_list : list
+        list of :class:`~pytmc.SingleRecordData` instances specifying all
+        records to be made.
+    '''
+    def __init__(self, master_list=None, loader=("pytmc","templates"),
+                template="EPICS_record_template.db"):
+        super().__init__(
+            master_list,
+            loader,
+            template="EPICS_record_template.db"
+        )
+
+    def clean_list(self):
+        for entry in self.master_list:
+            if entry.pv == None:
+                entry.pv = ""
+            if entry.rec_type == None:
+                entry.rec_type = ""
+            if entry.fields ==None:
+                entry.fields = []
+            if entry.comment ==None:
+                entry.comment = ""
+
+    @property
+    def header(self):
+        '''
+        Generate and return the message to be placed at the top of generated
+        files. Includes information such as pytmc verison
+
+        Returns
+        -------
+        str
+            formatted header message
+        '''
         message = '''\
         Epics Record file automatically generated using Pytmc
 
@@ -214,36 +272,61 @@ class DbRenderAgent:
         return message
 
 
-class ProtoRenderAgent:
-    def __init__(self,masterlist = None, loader=("pytmc","templates"),
-                template="EPICS_proto_template.proto"):
-        if master_list == None:
-            master_list = []
-        self.master_list = master_list
-        self.jinja_env = Environment(
-            loader = PackageLoader(*loader),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.template = self.jinja_env.get_template(template)
+class ProtoRenderAgent(RenderAgent):
+    '''
+    ProtoRenderAgent provides convenient tools for rendering the final proto
+    file.
+
+    Parameters
+    ----------
+    master_list : list
+        list of :class:`~pytmc.SingleRecordData` instances specifying all
+        records to be made. This parameter can be accessed later. 
+
+    loader : tuple
+        Specify package location of jinja templates. Names in the package are
+        speperated by tuple entries instead of periods like normal python
+        packages. Uses Jinja2's PackageLoader. 
     
-    def render(self):
+    template : str
+        name of the template to be used 
+    
+    Attributes
+    ----------
+    master_list : list
+        list of :class:`~pytmc.SingleRecordData` instances specifying all
+        records to be made.
+    '''
+    def __init__(self, master_list=None, loader=("pytmc","templates"),
+                template="EPICS_record_template.db"):
+        super().__init__(
+            master_list,
+            loader,
+            template="EPICS_proto_template.proto"
+        )
+    
+    @property
+    def header(self):
         '''
-        Generate the rendered document
+        Generate and return the message to be placed at the top of generated
+        files. Includes information such as pytmc verison
 
         Returns
         -------
         str
-            Epics record document as a string
+            formatted header message
         '''
-        return self.template.render(
-            header = self.header,
-            master_list = self.master_list
+        message = '''\
+        Epics PROTO file automatically generated using Pytmc
+
+            pytmc version: {version}'''
+        message = message.format(
+            version=str(versioneer.get_version())
         )
+        message = textwrap.dedent(message)
+        message = textwrap.indent(message,"# ",lambda line: True)
+        return message
     
-
-
-
 
 class TmcExplorer:
     '''
