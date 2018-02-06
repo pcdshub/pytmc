@@ -112,6 +112,21 @@ class SingleRecordData:
         return check_pv and check_rec_type and check_fields
 
 
+class SingleProtoData:
+    def __init__(self,name,out_field,in_field,init=None):
+        self.name = name
+        self.out_field = out_field
+        self.in_field = in_field
+        self.init = init
+
+    @property
+    def has_init(self):
+        if self.init != None:
+            return True
+        return False
+
+    
+
 class DbRenderAgent:
     '''
     DbRenderAgent provides convenient tools for rendering the final records
@@ -197,6 +212,37 @@ class DbRenderAgent:
         message = textwrap.dedent(message)
         message = textwrap.indent(message,"# ",lambda line: True)
         return message
+
+
+class ProtoRenderAgent:
+    def __init__(self,masterlist = None, loader=("pytmc","templates"),
+                template="EPICS_proto_template.proto"):
+        if master_list == None:
+            master_list = []
+        self.master_list = master_list
+        self.jinja_env = Environment(
+            loader = PackageLoader(*loader),
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+        self.template = self.jinja_env.get_template(template)
+    
+    def render(self):
+        '''
+        Generate the rendered document
+
+        Returns
+        -------
+        str
+            Epics record document as a string
+        '''
+        return self.template.render(
+            header = self.header,
+            master_list = self.master_list
+        )
+    
+
+
 
 
 class TmcExplorer:
@@ -295,7 +341,7 @@ class TmcExplorer:
         )
         return record
 
-    def generate_ads_connection(self, target, direction):
+    def generate_ads_line(self, target, direction):
         raise NotImplementedError
 
 

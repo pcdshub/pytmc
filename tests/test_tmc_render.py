@@ -9,7 +9,8 @@ from pytmc.xml_obj import BaseElement
 
 from pytmc import TmcFile
 from pytmc.xml_collector import ElementCollector
-from pytmc import DbRenderAgent, SingleRecordData, TmcExplorer, FullRender
+from pytmc import (DbRenderAgent, SingleRecordData, TmcExplorer, FullRender,
+        SingleProtoData, ProtoRenderAgent)
 
 from collections import defaultdict
 
@@ -208,7 +209,7 @@ def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
 
 
 @pytest.mark.skip(reason="Not yet implemented")
-def test_TmcExplorer_generate_ads_connection(generic_tmc_path):
+def test_TmcExplorer_generate_ads_line(generic_tmc_path):
     pytest.fail("WIP")
 
 
@@ -217,4 +218,30 @@ def test_TmcExplorer_read_ini(generic_tmc_path):
     exp = TmcExplorer(tmc)
 
 def test_FullRender_instantiation(generic_tmc_path):
-    z = FullRender(generic_tmc_path)
+    fr = FullRender(generic_tmc_path)
+
+def test_SingleProtoData_instantiation():
+    spd = SingleProtoData(
+        "Test Function",
+        "OK",
+        "MAIN.test_float=%f",
+    )
+    assert spd.has_init == False
+
+def test_ProtoRenderAgent_instantiation(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    try:
+        agent = ProtoRenderAgent(tmc.master_list)
+    except:
+        pytest.fail("Instantiation has thrown errors")
+    
+    try:
+        agent = ProtoRenderAgent()
+    except:
+        pytest.fail("Instantiation has thrown errors")
+    
+def test_process_item(generic_tmc_path):
+    pytest.fail("WIP")
+
+def test_make_proto(generic_tmc_path):
+    pytest.fail("WIP")
