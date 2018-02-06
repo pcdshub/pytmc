@@ -304,6 +304,9 @@ class ProtoRenderAgent(RenderAgent):
             loader,
             template="EPICS_proto_template.proto"
         )
+
+    def clean_data(self):
+        pass
     
     @property
     def header(self):
@@ -345,6 +348,7 @@ class TmcExplorer:
         self.tmc = tmc
         self.tmc.isolate_all()
         self.all_records = []
+        self.all_protos = []
 
     def exp_DataType(self, dtype_inst, base=""):
         dtype_type_str = dtype_inst.tc_type
@@ -433,13 +437,18 @@ class FullRender:
         self.tmc = TmcFile(tmc_path)
         self.exp = TmcExplorer(self.tmc)
         self.exp.exp_Symbols()
-        render = DbRenderAgent(self.exp.all_records)
-        render.clean_list()
-        self.output = render.render()
-        #print(self.output)
+        db_render = DbRenderAgent(self.exp.all_records)
+        db_render.clean_list()
+        self.dboutput = db_render.render()
+        proto_render = ProtoRenderAgent(self.exp.all_protos)
+        proto_render.clean_list()
+        self.proto_output = proto_render.render()
 
     def save(self,outpath):
-        f = open(outpath,"w")
-        f.write(self.output)
-        f.close()
+        db_f = open(outpath+".db","w")
+        db_f.write(self.dboutput)
+        db_f.close()
+        proto_f = open(outpath+".db","w")
+        proto_f.write(self.proto_output)
+        proto_f.close()
 

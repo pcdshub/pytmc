@@ -239,6 +239,21 @@ def test_ProtoRenderAgent_instantiation(generic_tmc_path):
         agent = ProtoRenderAgent()
     except:
         pytest.fail("Instantiation has thrown errors")
+
+def test_SingleProtoDataRender():
+    a = SingleProtoData(
+        "getFTest",
+        "Main.fTest?",
+        "%d"
+    )
+    b = SingleProtoData(
+        "setfTest",
+        "Main.fTest=%d",
+        "OK",
+        "getFTest",
+    )
+    agent = ProtoRenderAgent([a,b])
+    print(agent.render())
     
 def test_process_item(generic_tmc_path):
     pytest.fail("WIP")

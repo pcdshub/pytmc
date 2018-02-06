@@ -1,0 +1,12 @@
+{{header}}
+
+{% for proto in master_list %}
+{{proto.name}}{
+    out "{{proto.out_field}}";
+    in "{{proto.in_field}}";
+    {% if proto.has_init %}
+    @init { {{proto.init}}; }; 
+    {% endif %}
+}
+
+{% endfor %}
