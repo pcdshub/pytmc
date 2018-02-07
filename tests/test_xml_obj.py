@@ -350,14 +350,20 @@ def test_all_fields(generic_tmc_root):
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
     ) 
     subitem_element = SubItem(subitem_xml)
-    assert subitem_element.fields == {'DTYP':'asynFloat64','EGU':'mm'}
+    assert subitem_element.fields == [
+        {'field':'DTYP','set':'asynFloat64','target':None},
+        {'field':'EGU','set':'mm','target':None},
+    ] 
     
     root = generic_tmc_root
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    assert subitem_element.fields == {'DTYP':'asynFloat64','EGU':'mm'}
+    assert subitem_element.fields == [
+        {'field':'DTYP','set':'asynFloat64','target':None},
+        {'field':'EGU','set':'mm','target':None},
+    ] 
 
 
 def test_all_pv(generic_tmc_root):
