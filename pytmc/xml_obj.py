@@ -211,11 +211,21 @@ class BaseElement:
         )
         if pragma_pv_string == None:
             return None
-        match = re.search(
-            r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
-            pragma_pv_string
+        matcher = re.compile(
+            r"(?P<pv>[\S]+)(?:[^\S]*)(?P<record_type>[\S]*)(?:[^\S]*)",
         )
-        return match.group('pv')
+        result = [
+            match.groupdict() for match in matcher.finditer(pragma_pv_string)
+        ]
+        r2 = []
+        if len(result) == 1:
+            return result[0]['pv']
+        elif len(result) == 2:
+            for entry in result:
+                r2.append(entry['pv'])
+            return r2
+        elif len(result) > 2:
+            raise NotImplementedError("More than two PVs not supported")
     
     @property
     def fields(self):
@@ -234,12 +244,22 @@ class BaseElement:
         )
         if pragma_field == None:
             return None
-        pattern = "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[.]*)(?:[\r\n]*)"
-        matches = re.findall( pattern, pragma_field)
-        return dict(matches)
-        for x in matches:
-            print(x)
-            #print(x.group())
+        #pattern = "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[\r\n]*)"
+        #matches = re.findall( pattern, pragma_field)
+        #pattern =
+        pattern = re.compile(
+            "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)"+
+            "(?:[^\S^\r^\n]*)(?P<target>[0-9]*)(?:[\r\n]*)"
+        )
+        print(pragma_field)
+        result = pattern.finditer(pragma_field)
+        result_dict = [m.groupdict() for m in result]
+        for entry in result_dict:
+            if entry['target'] == "":
+                entry['target'] = None
+            else:
+                entry['target'] = int(entry['target'])
+        return result_dict
 
     @property
     def dtname(self):
