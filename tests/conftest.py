@@ -35,7 +35,7 @@ def safe_record_factory():
         fields = dict([
             ("DTYP","asynInt32"),
             ("INP",None),
-            ("ZNAM",""),
+            ("ZNAM","Z"),
         ]),
         comment = "sample comment",
     )

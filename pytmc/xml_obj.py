@@ -248,8 +248,8 @@ class BaseElement:
         #matches = re.findall( pattern, pragma_field)
         #pattern =
         pattern = re.compile(
-            "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)"+
-            "(?:[^\S^\r^\n]*)(?P<target>[0-9]*)(?:[\r\n]*)"
+            "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[^\S^\r^\n]*)"+
+            "(?:pytmc_target:)*(?P<target>[0-9]*)(?:[\r\n]*)"
         )
         print(pragma_field)
         result = pattern.finditer(pragma_field)
@@ -294,11 +294,21 @@ class BaseElement:
         )
         if pragma_rec_string == None:
             return None
-        match = re.search(
-            r"(?P<pv>[\S]+)(?P<space>[^\S]*)(?P<record_type>[\S]*)",
-            pragma_rec_string
+        matcher = re.compile(
+            r"(?P<pv>[\S]+)(?:[^\S]*)(?P<record_type>[\S]*)(?:[^\S]*)",
         )
-        return match.group('record_type')
+        result = [
+            match.groupdict() for match in matcher.finditer(pragma_rec_string)
+        ]
+        r2 = []
+        if len(result) == 1:
+            return result[0]['record_type']
+        elif len(result) == 2:
+            for entry in result:
+                r2.append(entry['record_type'])
+            return r2
+        elif len(result) > 2:
+            raise NotImplementedError("More than two PVs not supported")
 
 
 class Symbol(BaseElement):
