@@ -269,7 +269,6 @@ def test_make_intf_items(generic_tmc_path):
     pytest.fail("WIP")
 
 
-@pytest.mark.skip(reason="Not yet implemented")
 def test_make_proto(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
