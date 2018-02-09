@@ -45,7 +45,7 @@ def test_ElementCollector_add(generic_tmc_root):
 def test_ElementCollector_registered(generic_tmc_root):
     root = generic_tmc_root
     iterator = DataType(root.find("./DataTypes/DataType/[Name='iterator']"))
-    #iterator.registered_pragmas.append("iterator attr")
+    
     version = DataType(root.find("./DataTypes/DataType/[Name='VERSION']"))
     col = ElementCollector()
     
@@ -53,6 +53,7 @@ def test_ElementCollector_registered(generic_tmc_root):
     col.add(version)
     
     assert col.registered == {'iterator':iterator} 
+
 
 def test_TmcFile_instantiation(generic_tmc_path,generic_tmc_root):
     try:

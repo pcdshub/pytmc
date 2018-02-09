@@ -454,3 +454,52 @@ def test_all_rec_type(generic_tmc_root):
         'bo','bi'
     ]
 
+
+def test_all_str_f(generic_tmc_root):
+    root = generic_tmc_root
+    subitem_xml = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    subitem_element = SubItem(subitem_xml)
+    assert subitem_element.str_f == '%d'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.str_f == '%d'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.str_f == [
+        '%d','%d'
+    ]
+
+
+def test_all_io(generic_tmc_root):
+    root = generic_tmc_root
+    subitem_xml = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    subitem_element = SubItem(subitem_xml)
+    assert subitem_element.io == 'o'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.io == 'input'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.io == [
+        'o','i'
+    ]

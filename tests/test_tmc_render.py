@@ -130,8 +130,8 @@ def test_TmcExplorer_make_record(generic_tmc_path):
     assert record.pv == 'TEST:MAIN:ULIMIT'
     assert record.rec_type == 'ai'
     assert record.fields == [
-        {'field':'DTYP','set':'asynFloat64','target':None},
-        {'field':'EGU','set':'mm','target':None},
+        {'f_name':'DTYP','f_set':'asynFloat64'},
+        {'f_name':'EGU','f_set':'mm'},
     ] 
     record = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
@@ -140,9 +140,10 @@ def test_TmcExplorer_make_record(generic_tmc_path):
     assert type(record) == SingleRecordData
     assert record.pv == 'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
     assert record.rec_type == 'ao'
+    print(record.fields)
     assert record.fields == [
-        {'field':'DTYP','set':'asynFloat64','target':None},
-        {'field':'EGU','set':'mm','target':None},
+        {'f_name':'DTYP','f_set':'asynFloat64'},
+        {'f_name':'EGU','f_set':'mm'},
     ] 
     
     record = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
@@ -150,8 +151,8 @@ def test_TmcExplorer_make_record(generic_tmc_path):
     assert record.pv == 'TEST:MAIN:NEW_VAR'
     assert record.rec_type == 'bo'
     assert record.fields == [
-        {'field':'ZNAM','set':'SINGLE','target':None},
-        {'field':'ONAM','set':'MULTI','target':None},
+        {'f_name':'ZNAM','f_set':'SINGLE'},
+        {'f_name':'ONAM','f_set':'MULTI'},
     ] 
     
 
@@ -204,6 +205,7 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
             in exp.all_records
     assert len(exp.all_records) == 4
 
+
 def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
@@ -236,6 +238,7 @@ def test_SingleProtoData_instantiation():
     )
     assert spd.has_init == False
 
+
 def test_ProtoRenderAgent_instantiation(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     try:
@@ -247,6 +250,7 @@ def test_ProtoRenderAgent_instantiation(generic_tmc_path):
         agent = ProtoRenderAgent()
     except:
         pytest.fail("Instantiation has thrown errors")
+
 
 def test_SingleProtoDataRender():
     a = SingleProtoData(
@@ -267,6 +271,7 @@ def test_SingleProtoDataRender():
 @pytest.mark.skip(reason="Not yet implemented")
 def test_make_intf_items(generic_tmc_path):
     pytest.fail("WIP")
+
 
 @pytest.mark.skip(reason="Not yet implemented")
 def test_make_proto(generic_tmc_path):

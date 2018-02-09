@@ -144,7 +144,6 @@ class BaseElement:
         result = [ m.groupdict() for m in finder.finditer(self.raw_config)]
         for line in result:
             line['tag'] = line['tag'].strip()
-        print(result)
         return result
     
     def neaten_field(self, string):
@@ -327,6 +326,32 @@ class BaseElement:
             See :func:`~extract_pragmas` for details.
         '''
         return self.extract_pragmas('type')
+    
+    @property
+    def str_f(self):
+        '''
+        Retrieve the confic line specifying in-proto data format for this 
+        entity.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        return self.extract_pragmas('str')
+    
+    @property
+    def io(self):
+        '''
+        Retrieve the confic line specifying data direction for this 
+        entity.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        return self.extract_pragmas('io')
 
 
 class Symbol(BaseElement):
