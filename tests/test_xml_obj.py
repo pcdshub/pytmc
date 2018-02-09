@@ -95,46 +95,8 @@ def test_BaseElement_properties(generic_tmc_root):
     assert prop_out == {
                 'PouType':'FunctionBlock',
                 'iterator attr':'42',
-                'pytmc_dt_name':'ITERATORNAME'}, "Incorrect properties found"
+                'pytmc':'name: ITERATORNAME'}, "Incorrect properties found"
    
-
-@pytest.mark.parametrize(
-    "path,result",
-    [
-        (
-            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']",
-            {'NEW_VAR attr':'17'}
-        ),
-        (
-            "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']",
-            {}
-        ),
-        (
-            "./DataTypes/DataType/[Name='iterator']",
-            {
-                'iterator attr':'42',
-            }
-        ),
-        (
-            "./DataTypes/DataType/SubItem/[Name='lim']",
-            {'lim attr':None}
-        ),
-    ]
-)
-def test_Symbol_pragmas(generic_tmc_root, path, result):
-    root = generic_tmc_root
-    sym = root.find(path)
-    logging.debug(str(sym.find("./Name").text))    
-    s = BaseElement(sym)
-    s.registered_pragmas += [
-        'NEW_VAR attr',
-        'iterator attr',
-        'lim attr',
-    ]
-    pragma_out = s.pragmas
-    print(pragma_out)
-    assert pragma_out == result, "Incorrect pragmas found"
-
 
 def test_Symbol_instantiation(generic_tmc_root):
     root = generic_tmc_root
@@ -334,6 +296,83 @@ def test_DataType_tc_extends(generic_tmc_root):
     assert el.tc_extends == 'DUT_STRUCT'
 
 
+def test_raw_config(generic_tmc_root):
+    root = generic_tmc_root
+    
+    element= root.find(
+        "./DataTypes/DataType/[Name='iterator']"
+    )
+    el = DataType(element)
+    assert el.raw_config == 'name: ITERATORNAME'
+
+
+def test_has_config(generic_tmc_root):
+    root = generic_tmc_root
+    subitem_xml = root.find(
+        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
+    ) 
+    subitem_element = SubItem(subitem_xml)
+    assert subitem_element.has_config == True
+    
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.count']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.has_config == False
+
+
+def test_config_lines(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:ULIMIT'}, 
+        {'title': 'type', 'tag': 'ai'},
+        {'title': 'field', 'tag': 'DTYP\tasynFloat64'},
+        {'title': 'field', 'tag': 'EGU\t\tmm'},
+        {'title': 'io', 'tag': 'input'},
+        {'title': 'str', 'tag': '%d'}
+    ]
+    assert symbol_element.config_lines == data
+
+
+def test_neaten_field(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.neaten_field("EGU\tmm") == {
+        'f_name':'EGU',
+        'f_set':'mm'
+    }
+
+    assert symbol_element.neaten_field("EGU") == {
+        'f_name':'EGU',
+        'f_set':''
+    }
+
+def test_config(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:ULIMIT'}, 
+        {'title': 'type', 'tag': 'ai'},
+        {'title': 'field', 'tag': {'f_name':'DTYP','f_set':'asynFloat64'}},
+        {'title': 'field', 'tag': {'f_name':'EGU','f_set':'mm'}},
+        {'title': 'io', 'tag': 'input'},
+        {'title': 'str', 'tag': '%d'}
+    ]
+    print(symbol_element.config)
+    assert symbol_element.config == data
+
+
+
 def test_all_dtname(generic_tmc_root):
     root = generic_tmc_root
     
@@ -351,8 +390,8 @@ def test_all_fields(generic_tmc_root):
     ) 
     subitem_element = SubItem(subitem_xml)
     assert subitem_element.fields == [
-        {'field':'DTYP','set':'asynFloat64','target':None},
-        {'field':'EGU','set':'mm','target':None},
+        {'f_name':'DTYP','f_set':'asynFloat64'},
+        {'f_name':'EGU','f_set':'mm'},
     ] 
     
     root = generic_tmc_root
@@ -361,8 +400,8 @@ def test_all_fields(generic_tmc_root):
     ) 
     symbol_element = Symbol(symbol_xml)
     assert subitem_element.fields == [
-        {'field':'DTYP','set':'asynFloat64','target':None},
-        {'field':'EGU','set':'mm','target':None},
+        {'f_name':'DTYP','f_set':'asynFloat64'},
+        {'f_name':'EGU','f_set':'mm'},
     ] 
 
 
@@ -380,6 +419,15 @@ def test_all_pv(generic_tmc_root):
     ) 
     symbol_element = Symbol(symbol_xml)
     assert symbol_element.pv == 'TEST:MAIN:ULIMIT'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.pv == [
+        'TEST:MAIN:NEW_VAR_OUT','TEST:MAIN:NEW_VAR_IN'
+    ]
 
 
 def test_all_rec_type(generic_tmc_root):
@@ -396,4 +444,13 @@ def test_all_rec_type(generic_tmc_root):
     ) 
     symbol_element = Symbol(symbol_xml)
     assert symbol_element.rec_type == 'ai'
+    
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.rec_type == [
+        'bo','bi'
+    ]
 

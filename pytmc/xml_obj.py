@@ -94,7 +94,7 @@ class BaseElement:
         return result
 
     @property
-    def pragmas(self):
+    def raw_config(self):
         """
         Produce a stripped-down set of properties including only those that are
         recognized as pragmas intended for pytmc's consumption. 
@@ -102,33 +102,52 @@ class BaseElement:
         Returns
         -------
 
-        dict
-            Dictionary. The key is the property name and the value is a list of
-            values found in the xml
+        str or None
+            produce the string from the pragma marked for pytmc or a None if no
+            such pragma can be found
 
         """
-        props = self.properties
-        pragmas = {}
-        for entry in self.registered_pragmas:
-            if entry in props:
-                pragmas[entry] = props.get(entry)
-
-        return pragmas
+        return self.properties.get('pytmc')
     
     @property
-    def has_pragma(self):
+    def has_config(self):
         '''
         Shortcut for determining if this element has pragmas. 
         
         Returns
         -------
         bool
-            True if there are regestered pragmas attached to this xml element
+            True if there is a config pragma attached to this xml element
         '''
-        if len(self.pragmas) > 0:
+        if self.raw_config != None:
             return True
 
         return False
+
+    @property
+    def config_lines(self):
+        finder = re.compile(
+            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
+        )
+        result = [ m.groupdict() for m in finder.finditer(self.raw_config)]
+        for line in result:
+            line['tag'] = line['tag'].strip()
+        print(result)
+        return result
+    
+    def neaten_field(self, string):
+        finder = re.compile(
+            r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)"
+        )
+        return finder.search(string).groupdict()
+
+    @property
+    def config(self):
+        cfg_lines = self.config_lines
+        for line in cfg_lines:
+            if line['title'] == 'field':
+                line['tag'] = self.neaten_field(line['tag'])
+        return cfg_lines
 
     def get_subfield(self, field_target, get_all=False):
         """
@@ -195,6 +214,34 @@ class BaseElement:
             The name of the variable
         '''
         return self.get_subfield("Name").text
+    
+    def extract_pragmas(self, title):
+        '''
+        Get the designated configuration line(s) from the config pragma.
+
+        Parameters
+        ----------
+        title : str 
+            title of the config line searched for 
+
+        Returns
+        -------
+        str, list of str or None
+            If there is only one name for the datatype, return a string, if
+            there are multiple, list each name, returns None if none are found.
+        '''
+        cfg = self.config
+        result = []
+        for line in cfg:
+            if line['title'] == title:
+                result.append(line['tag'])
+        
+        if result == []:
+            result = None
+        elif len(result) == 1:
+            result = result[0]
+
+        return result
 
     @property
     def pv(self):
@@ -206,26 +253,7 @@ class BaseElement:
         str or None
             The pv or partial pv or None if it is not specified
         '''
-        pragma_pv_string = self.pragmas.get(
-            self.com_base+self.suffixes['Pv']
-        )
-        if pragma_pv_string == None:
-            return None
-        matcher = re.compile(
-            r"(?P<pv>[\S]+)(?:[^\S]*)(?P<record_type>[\S]*)(?:[^\S]*)",
-        )
-        result = [
-            match.groupdict() for match in matcher.finditer(pragma_pv_string)
-        ]
-        r2 = []
-        if len(result) == 1:
-            return result[0]['pv']
-        elif len(result) == 2:
-            for entry in result:
-                r2.append(entry['pv'])
-            return r2
-        elif len(result) > 2:
-            raise NotImplementedError("More than two PVs not supported")
+        return self.extract_pragmas('pv')
     
     @property
     def fields(self):
@@ -239,45 +267,21 @@ class BaseElement:
             Contains pairings between the parameter names (key) and the
             parameter settings (value)
         '''
-        pragma_field = self.pragmas.get(
-            self.com_base+self.suffixes['Field']
-        )
-        if pragma_field == None:
-            return None
-        #pattern = "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[\r\n]*)"
-        #matches = re.findall( pattern, pragma_field)
-        #pattern =
-        pattern = re.compile(
-            "(?P<field>[\S]+)(?:[^\S]+)(?P<set>[\S]+)(?:[^\S^\r^\n]*)"+
-            "(?:pytmc_target:)*(?P<target>[0-9]*)(?:[\r\n]*)"
-        )
-        print(pragma_field)
-        result = pattern.finditer(pragma_field)
-        result_dict = [m.groupdict() for m in result]
-        for entry in result_dict:
-            if entry['target'] == "":
-                entry['target'] = None
-            else:
-                entry['target'] = int(entry['target'])
-        return result_dict
+        return self.extract_pragmas('field')
 
+    
     @property
     def dtname(self):
         '''
-        Get the pragma designated data type name for this DataType or None if
-        it is not specified
+        Retrieve the config line specifying a name for this datatype.
 
         Returns
         -------
-        str or None
-            The partial pv
+        str, list of str or None
+            See :func:`~extract_pragmas` for details.
         '''
-        pragma_dt = self.pragmas.get(
-            self.com_base+self.suffixes['DataType']
-        )
-        if pragma_dt == None:
-            return None
-        return pragma_dt.strip()
+        
+        return self.extract_pragmas('name')
     
     @property
     def rec_type(self):
@@ -289,26 +293,7 @@ class BaseElement:
         str or None
             Record type or None if it is not specified
         '''
-        pragma_rec_string = self.pragmas.get(
-            self.com_base+self.suffixes['Pv']
-        )
-        if pragma_rec_string == None:
-            return None
-        matcher = re.compile(
-            r"(?P<pv>[\S]+)(?:[^\S]*)(?P<record_type>[\S]*)(?:[^\S]*)",
-        )
-        result = [
-            match.groupdict() for match in matcher.finditer(pragma_rec_string)
-        ]
-        r2 = []
-        if len(result) == 1:
-            return result[0]['record_type']
-        elif len(result) == 2:
-            for entry in result:
-                r2.append(entry['record_type'])
-            return r2
-        elif len(result) > 2:
-            raise NotImplementedError("More than two PVs not supported")
+        return self.extract_pragmas('type')
 
 
 class Symbol(BaseElement):

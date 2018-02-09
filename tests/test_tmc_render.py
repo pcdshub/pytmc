@@ -268,14 +268,14 @@ def test_SingleProtoDataRender():
 def test_make_intf_items(generic_tmc_path):
     pytest.fail("WIP")
 
-
+@pytest.mark.skip(reason="Not yet implemented")
 def test_make_proto(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    record = exp.make_proto(tmc.all_Symbols['MAIN.ulimit'],)
-    assert type(record) == SingleProtoData
-    assert record.out_field == 'MAINT.ulimit?'
-    assert record.in_field == 'OK'
+    proto = exp.make_proto(tmc.all_Symbols['MAIN.ulimit'],)
+    assert type(proto) == SingleProtoData
+    assert proto.out_field == 'MAINT.ulimit?'
+    assert proto.in_field == 'OK'
     #assert record.init ==  
     
     #record = exp.make_record(
