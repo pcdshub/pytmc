@@ -45,19 +45,14 @@ def test_ElementCollector_add(generic_tmc_root):
 def test_ElementCollector_registered(generic_tmc_root):
     root = generic_tmc_root
     iterator = DataType(root.find("./DataTypes/DataType/[Name='iterator']"))
-    iterator.registered_pragmas.append("iterator attr")
+    #iterator.registered_pragmas.append("iterator attr")
     version = DataType(root.find("./DataTypes/DataType/[Name='VERSION']"))
     col = ElementCollector()
+    
     col.add(iterator)
     col.add(version)
-
-    logger.info(str(col['iterator'].pragmas))
-    logger.info(str(col['VERSION'].pragmas))
-    assert col['iterator'].pragmas == {
-        'iterator attr':'42',
-        'pytmc_dt_name':'ITERATORNAME'}
-    assert col.registered == {'iterator':iterator}
-
+    
+    assert col.registered == {'iterator':iterator} 
 
 def test_TmcFile_instantiation(generic_tmc_path,generic_tmc_root):
     try:

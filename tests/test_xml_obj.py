@@ -354,6 +354,7 @@ def test_neaten_field(generic_tmc_root):
         'f_set':''
     }
 
+
 def test_config(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -370,7 +371,6 @@ def test_config(generic_tmc_root):
     ]
     print(symbol_element.config)
     assert symbol_element.config == data
-
 
 
 def test_all_dtname(generic_tmc_root):

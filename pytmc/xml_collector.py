@@ -47,7 +47,7 @@ class ElementCollector(dict):
             TwinCAT variables for pytmc
         '''
         names = list(filter(
-            lambda x: self[x].has_pragma,
+            lambda x: self[x].has_config,
             self,
 
         ))
