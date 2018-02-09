@@ -126,6 +126,18 @@ class BaseElement:
 
     @property
     def config_lines(self):
+        '''
+        Read in a rudimentary python representation of the config statement.
+        Use :func:`~config` to access a more cleanly formatted version of this
+        information.
+
+        Returns
+        -------
+             list
+                this list contains dictionaries for each line of the config
+                statement
+
+        '''
         finder = re.compile(
             r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
         )
@@ -136,6 +148,20 @@ class BaseElement:
         return result
     
     def neaten_field(self, string):
+        '''
+        Method for formatting the 'field' line
+        
+        Parameters
+        ----------
+        string : str
+            This is the string to be broken into field name and field setting
+
+        Returns
+        -------
+            dict
+                Keys are f_name for the field name and f_set for the
+                corresponding setting.
+        '''
         finder = re.compile(
             r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)"
         )
@@ -143,6 +169,15 @@ class BaseElement:
 
     @property
     def config(self):
+        """
+        Cleanly formatted python representation of the config statement
+
+        Returns
+        -------
+             list
+                this list contains dictionaries for each line of the config
+                statement
+        """
         cfg_lines = self.config_lines
         for line in cfg_lines:
             if line['title'] == 'field':
@@ -246,26 +281,23 @@ class BaseElement:
     @property
     def pv(self):
         '''
-        Get the pragma designated PV name for this xml entity.
+        Retrieve the config line specifying pv name for this entity.
 
         Returns
         -------
-        str or None
-            The pv or partial pv or None if it is not specified
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
         '''
         return self.extract_pragmas('pv')
     
     @property
     def fields(self):
         '''
-        Get the pragma designated fields for this xml entity or None if it is
-        not specified
-
+        Retrieve the config line specifying db fields for this entity.
         Returns
         -------
-        dict or None
-            Contains pairings between the parameter names (key) and the
-            parameter settings (value)
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
         '''
         return self.extract_pragmas('field')
 
@@ -277,7 +309,7 @@ class BaseElement:
 
         Returns
         -------
-        str, list of str or None
+        str, list of str, or None
             See :func:`~extract_pragmas` for details.
         '''
         
@@ -286,12 +318,13 @@ class BaseElement:
     @property
     def rec_type(self):
         '''
-        Get the pragma designated record type for this xml entity.
+        Retrieve the confic line specifying record type (i.e. ao,ai) for this 
+        entity.
 
         Returns
         -------
-        str or None
-            Record type or None if it is not specified
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
         '''
         return self.extract_pragmas('type')
 
