@@ -120,40 +120,86 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
         exp = TmcExplorer(tmc)
     except:
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
+   
 
-
-def test_TmcExplorer_make_record(generic_tmc_path):
+def test_TmcExplorer_create_intf(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    record = exp.make_record(tmc.all_Symbols['MAIN.ulimit'])
+    record = exp.create_intf(tmc.all_Symbols['MAIN.ulimit'])
     assert type(record) == SingleRecordData
     assert record.pv == 'TEST:MAIN:ULIMIT'
     assert record.rec_type == 'ai'
     assert record.fields == [
         {'f_name':'DTYP','f_set':'asynFloat64'},
         {'f_name':'EGU','f_set':'mm'},
-    ] 
-    record = exp.make_record(
+    ]
+
+    record = exp.create_intf(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = tmc.all_Symbols['MAIN.struct_base'].pv
     )
     assert type(record) == SingleRecordData
     assert record.pv == 'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
     assert record.rec_type == 'ao'
-    print(record.fields)
+    assert record.fields == [
+        {'f_name':'DTYP','f_set':'asynFloat64'},
+        {'f_name':'EGU','f_set':'mm'},
+    ] 
+    ''' 
+    record_o, record_i = exp.create_intf(tmc.all_Symbols['MAIN.NEW_VAR'])
+    assert type(record) == SingleRecordData
+    assert record_o.pv == 'TEST:MAIN:NEW_VAR_OUT'
+    assert record_o.rec_type == 'bo'
+    assert record_o.fields == [
+        {'f_name':'ZNAM','f_set':'SINGLE'},
+        {'f_name':'ONAM','f_set':'MULTI'},
+    ] 
+    '''
+
+
+def test_TmcExplorer_make_record(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    exp = TmcExplorer(tmc)
+    records = exp.make_record(tmc.all_Symbols['MAIN.ulimit'])
+    record = records[0]
+    assert type(record) == SingleRecordData
+    assert record.pv == 'TEST:MAIN:ULIMIT'
+    assert record.rec_type == 'ai'
+    assert record.fields == [
+        {'f_name':'DTYP','f_set':'asynFloat64'},
+        {'f_name':'EGU','f_set':'mm'},
+    ]
+
+    records = exp.make_record(
+        tmc.all_SubItems['DUT_STRUCT']['struct_var'],
+        prefix = tmc.all_Symbols['MAIN.struct_base'].pv
+    )
+    record = records[0]
+    assert type(record) == SingleRecordData
+    assert record.pv == 'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
+    assert record.rec_type == 'ao'
     assert record.fields == [
         {'f_name':'DTYP','f_set':'asynFloat64'},
         {'f_name':'EGU','f_set':'mm'},
     ] 
     
-    record = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
+    record_o, record_i = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
     assert type(record) == SingleRecordData
-    assert record.pv == 'TEST:MAIN:NEW_VAR'
-    assert record.rec_type == 'bo'
-    assert record.fields == [
+    assert record_o.pv == 'TEST:MAIN:NEW_VAR_OUT'
+    assert record_o.rec_type == 'bo'
+    assert record_o.fields == [
         {'f_name':'ZNAM','f_set':'SINGLE'},
         {'f_name':'ONAM','f_set':'MULTI'},
+        {'f_name':'scan','f_set':'1 second'},
     ] 
+    assert record_i.pv == 'TEST:MAIN:NEW_VAR_IN'
+    assert record_i.rec_type == 'bi'
+    assert record_i.fields == [
+        {'f_name':'ZNAM','f_set':'SINGLE'},
+        {'f_name':'ONAM','f_set':'MULTI'},
+        {'f_name':'scan','f_set':'1 second'},
+    ] 
+    
     
 
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
@@ -266,11 +312,6 @@ def test_SingleProtoDataRender():
     )
     agent = ProtoRenderAgent([a,b])
     print(agent.render())
-   
-
-@pytest.mark.skip(reason="Not yet implemented")
-def test_make_intf_items(generic_tmc_path):
-    pytest.fail("WIP")
 
 
 @pytest.mark.skip(reason="Not yet implemented")

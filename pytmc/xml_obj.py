@@ -300,7 +300,6 @@ class BaseElement:
         '''
         return self.extract_pragmas('field')
 
-    
     @property
     def dtname(self):
         '''
@@ -353,6 +352,18 @@ class BaseElement:
         '''
         return self.extract_pragmas('io')
 
+    @property
+    def config_by_pv(self):
+        data = self.config
+        separate_lists = []
+        for line in data:
+            if line['title'] == 'pv':
+                separate_lists.append([])
+                index = len(separate_lists) - 1
+            separate_lists[index].append(line)
+        return separate_lists
+
+
 
 class Symbol(BaseElement):
     '''
@@ -386,7 +397,9 @@ class Symbol(BaseElement):
         -------
 
         str
-            Name of data type
+            Name of data type (e.g. DINT in the case of a basic type or
+            'iterator' if it is an instance of a user defined struct/fb named
+            'iterator'
         '''
         name_field = self.get_subfield("BaseType")
         return name_field.text
@@ -430,7 +443,7 @@ class DataType(BaseElement):
             logger.warning("DataType instance not matched to xml DataType")
  
     @property
-    def tc_type(self):
+    def datatype(self):
         '''
         Return the type of the data this symbol represents.
 
@@ -465,6 +478,10 @@ class DataType(BaseElement):
             result = "Enum"
 
         return result
+
+    @property
+    def tc_type(self):
+        return None
 
     @property
     def tc_extends(self):
@@ -537,9 +554,10 @@ class SubItem(BaseElement):
 
         Returns
         -------
-
         str
-            Name of data type
+            Name of data type (e.g. DINT in the case of a basic type or
+            'iterator' if it is an instance of a user defined struct/fb named
+            'iterator'
         '''
         name_field = self.get_subfield("Type")
         return name_field.text

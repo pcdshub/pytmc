@@ -16,6 +16,7 @@ from . import defaults
 from . import DataType
 from . import TmcFile
 
+
 class SingleRecordData:
     '''
     Data structre for packaging all the information required to render an epics
@@ -336,6 +337,10 @@ class TmcExplorer:
     TmcExplorer contains the tools to compile a list of SingleRecordData
     instances from the :class:`~pytmc.TmcFile`.
 
+    Parameters
+    ----------
+    tmc : :class:`~pytmc.xml_collector.TmcFile`
+
     Attributes
     ----------
     tmc.all_records : list of :class:`~SingleRecordData`
@@ -351,10 +356,15 @@ class TmcExplorer:
         self.all_protos = []
 
     def exp_DataType(self, dtype_inst, base=""):
+        # this is the datatype name of the targeted datatype instance
         dtype_type_str = dtype_inst.tc_type
+
         #
         # @ insertions will go here
         #
+
+        # when
+                # when 
         if dtype_type_str in self.tmc.all_DataTypes:
             dtype_parent = self.tmc.all_DataTypes[dtype_type_str].tc_extends 
             if dtype_parent != None:
@@ -362,6 +372,7 @@ class TmcExplorer:
                     self.tmc.all_DataTypes[dtype_parent],
                     base + dtype_inst.pv,
                 )
+                
         dt = False
         if type(dtype_inst) == DataType:
             dt = True
@@ -392,19 +403,22 @@ class TmcExplorer:
         else:
             symbol_set = self.tmc.all_Symbols
         
+        # loop through all symbols in the set of allowed symbols
         for sym in symbol_set:
+            # if the symbol has a user-created type
             if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
                 if not skip_datatype:
+                    # explore the datatype/datatype instance 
                     self.exp_DataType(
                         symbol_set[sym], 
                     )
-                
                 continue
             
+            # if the datatype is not user-created, create/save a record 
             rec = self.make_record(symbol_set[sym])
             self.all_records.append(rec)
-            
-    def make_record(self, target, prefix=None):
+
+    def create_intf(self, target, prefix=None):
         if prefix != None:
             prefix = prefix + ":"
         else:
@@ -414,13 +428,29 @@ class TmcExplorer:
             logger.warn("Record for {} lacks a PV".format(str(target)))
         
         fields = target.fields
-        '''
-        if fields.get('INP') == '@@@':
-            fields['INP'] = self.generate_ads_connection(target, 'in')
+        
+        record = SingleRecordData(
+            pv = prefix + target.pv,
+            rec_type = target.rec_type,
+            fields = fields,
+        )
+        return record
 
-        if fields.get('OUT') == '@@@':
-            fields['OUT'] = self.generate_ads_connection(target, 'out')
-        '''
+    def make_record(self, target, prefix=None):
+        if prefix != None:
+            prefix = prefix + ":"
+        else:
+            prefix = ""
+
+        if target.pv == None:
+            logger.warn("Record for {} lacks a PV".format(str(target)))
+        
+        config = target.config
+        record_set = []
+
+        for line in config:
+            print(line)
+
         record = SingleRecordData(
             pv = prefix + target.pv,
             rec_type = target.rec_type,

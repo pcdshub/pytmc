@@ -151,25 +151,25 @@ def test_Symbol_tc_type(generic_tmc_root):
     assert s.tc_type == "iterator"
 
 
-def test_DataType_tc_type(generic_tmc_root):
+def test_DataType_datatype(generic_tmc_root):
     root = generic_tmc_root
     sym = root.find("./DataTypes/DataType/[Name='iterator']")
     logging.debug(str(sym.find("./Name").text))
     s = DataType(sym)
     
-    assert s.tc_type == "FunctionBlock"
+    assert s.datatype == "FunctionBlock"
     
     sym = root.find("./DataTypes/DataType/[Name='VERSION']")
     logging.debug(str(sym.find("./Name").text))
     s = DataType(sym)
     
-    assert s.tc_type == "Struct"
+    assert s.datatype == "Struct"
     
     sym = root.find("./DataTypes/DataType/[Name='_Implicit_KindOfTask']")
     logging.debug(str(sym.find("./Name").text))
     s = DataType(sym)
     
-    assert s.tc_type == "Enum"
+    assert s.datatype == "Enum"
 
 
 def test_SubItem_tc_type(generic_tmc_root):
@@ -503,3 +503,35 @@ def test_all_io(generic_tmc_root):
     assert symbol_element.io == [
         'o','i'
     ]
+
+def test_all_config_by_pv(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    data = [
+        [
+            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+            {'title': 'type', 'tag': 'bo'},
+            {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+            {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+            {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+            {'title': 'str', 'tag': '%d'},
+            {'title': 'io', 'tag': 'o'},
+            {'title': 'init','tag':'True'},
+        ],
+        [
+            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+            {'title': 'type', 'tag': 'bi'},
+            {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+            {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+            {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+            {'title': 'str', 'tag': '%d'},
+            {'title': 'io', 'tag': 'i'},
+        ]
+    ]
+
+    assert symbol_element.config_by_pv == data
+
+
