@@ -210,12 +210,12 @@ def test_TmcExplorer_exp_DataType(generic_tmc_path):
     struct_var = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:STRUCTBASE"
-    ) 
+    )[0]
     assert struct_var in exp.all_records
     struct_var2 = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var2'],
         prefix = "TEST:MAIN:STRUCTBASE"
-    ) 
+    )[0]
     assert struct_var2 in exp.all_records
     assert len(exp.all_records) == 2
 
@@ -229,12 +229,12 @@ def test_TmcExplorer_exp_DataType_multilayer(generic_tmc_path):
     struct_var = exp.make_record(
         tmc.all_SubItems['iterator']['value'],
         prefix = "TEST:MAIN:ITERATOR"
-    ) 
+    )[0]
     assert struct_var in exp.all_records
     struct_var2 = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:ITERATOR:EXT1"
-    ) 
+    )[0] 
     assert struct_var2 in exp.all_records
     assert len(exp.all_records) == 7
 
