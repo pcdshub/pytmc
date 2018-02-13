@@ -15,6 +15,7 @@ import configparser
 from . import defaults
 from . import DataType
 from . import TmcFile
+from .xml_obj import BaseElement
 
 
 class SingleRecordData:
@@ -445,18 +446,26 @@ class TmcExplorer:
         if target.pv == None:
             logger.warn("Record for {} lacks a PV".format(str(target)))
         
-        config = target.config
-        record_set = []
+        config = target.config_by_pv
+        
+        record_list = []
 
-        for line in config:
-            print(line)
+        for pv_group in config:
+            record_list.append(SingleRecordData(
+                pv = prefix + BaseElement.parse_pragma('pv',pv_group),
+                rec_type = BaseElement.parse_pragma('type',pv_group),
+                fields = BaseElement.parse_pragma('field',pv_group),
+            ))
+    
 
+        ''' 
         record = SingleRecordData(
             pv = prefix + target.pv,
             rec_type = target.rec_type,
             fields = fields,
         )
-        return record
+        '''
+        return record_list
 
     def generate_ads_line(self, target, direction):
         raise NotImplementedError

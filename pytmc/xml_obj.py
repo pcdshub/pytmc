@@ -250,6 +250,10 @@ class BaseElement:
         return self.get_subfield("Name").text
     
     def extract_pragmas(self, title):
+        return __class__.parse_pragma(title,self.config)
+
+    @staticmethod
+    def parse_pragma(title, cfg):
         '''
         Get the designated configuration line(s) from the config pragma.
 
@@ -264,8 +268,10 @@ class BaseElement:
             If there is only one name for the datatype, return a string, if
             there are multiple, list each name, returns None if none are found.
         '''
-        cfg = self.config
+        
+        
         result = []
+                
         for line in cfg:
             if line['title'] == title:
                 result.append(line['tag'])
@@ -276,6 +282,11 @@ class BaseElement:
             result = result[0]
 
         return result
+
+
+
+
+
 
     @property
     def pv(self):

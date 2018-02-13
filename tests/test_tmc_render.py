@@ -190,18 +190,17 @@ def test_TmcExplorer_make_record(generic_tmc_path):
     assert record_o.fields == [
         {'f_name':'ZNAM','f_set':'SINGLE'},
         {'f_name':'ONAM','f_set':'MULTI'},
-        {'f_name':'scan','f_set':'1 second'},
+        {'f_name':'SCAN','f_set':'1 second'},
     ] 
     assert record_i.pv == 'TEST:MAIN:NEW_VAR_IN'
     assert record_i.rec_type == 'bi'
     assert record_i.fields == [
         {'f_name':'ZNAM','f_set':'SINGLE'},
         {'f_name':'ONAM','f_set':'MULTI'},
-        {'f_name':'scan','f_set':'1 second'},
+        {'f_name':'SCAN','f_set':'1 second'},
     ] 
     
     
-
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
     '''Explore single level Datatype (Datatype doesn't contain others)
     '''
