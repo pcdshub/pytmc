@@ -391,13 +391,15 @@ class TmcExplorer:
                 )
                 continue
              
-            rec = self.make_record(
+            recs = self.make_record(
                 subitem_set[entry],
                 prefix = base + ("" if dt else dtype_inst.pv)
             )
-            self.all_records.append(rec)
-            logger.debug("create {}".format(str(rec))) 
+            for rec in recs: 
+                self.all_records.append(rec)
+                logger.debug("create {}".format(str(rec))) 
             
+
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
         if pragmas_only:
             symbol_set = self.tmc.all_Symbols.registered
@@ -416,8 +418,10 @@ class TmcExplorer:
                 continue
             
             # if the datatype is not user-created, create/save a record 
-            rec = self.make_record(symbol_set[sym])
-            self.all_records.append(rec)
+            recs = self.make_record(symbol_set[sym])
+            for rec in recs:
+                self.all_records.append(rec)
+                logger.debug("create {}".format(str(rec))) 
 
     def create_intf(self, target, prefix=None):
         if prefix != None:
@@ -457,14 +461,6 @@ class TmcExplorer:
                 fields = BaseElement.parse_pragma('field',pv_group),
             ))
     
-
-        ''' 
-        record = SingleRecordData(
-            pv = prefix + target.pv,
-            rec_type = target.rec_type,
-            fields = fields,
-        )
-        '''
         return record_list
 
     def generate_ads_line(self, target, direction):

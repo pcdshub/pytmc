@@ -243,24 +243,34 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
     exp.exp_Symbols(pragmas_only=True,skip_datatype=True)
-    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit']) in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.multi']) in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR']) in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global']) \
+    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit'])[0] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.multi'])[0] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global'])[0] \
             in exp.all_records
-    assert len(exp.all_records) == 4
+    assert len(exp.all_records) == 5
 
 
 def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
     exp.exp_Symbols(pragmas_only=True)
-    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit']) in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.multi']) in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR']) in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global']) \
+    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit'])[0] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.multi'])[0] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
+        in exp.all_records
+    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global'])[0] \
             in exp.all_records
-    assert len(exp.all_records) == 23
+    assert len(exp.all_records) == 24
 
 
 @pytest.mark.skip(reason="Not yet implemented")
