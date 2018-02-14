@@ -360,45 +360,45 @@ class TmcExplorer:
         # this is the datatype name of the targeted datatype instance
         dtype_type_str = dtype_inst.tc_type
 
-        #
-        # @ insertions will go here
-        #
-
-        # when
-                # when 
+        # If this datatype is user-defined (also a Symbol or SubItem)
         if dtype_type_str in self.tmc.all_DataTypes:
+            # locate parent if it exists
             dtype_parent = self.tmc.all_DataTypes[dtype_type_str].tc_extends 
             if dtype_parent != None:
+                # recurse, explore the parent datatype
                 self.exp_DataType(
                     self.tmc.all_DataTypes[dtype_parent],
                     base + dtype_inst.pv,
                 )
                 
-        dt = False
-        if type(dtype_inst) == DataType:
+            dt = False
+        # If dtype_inst is pointing to a DataType, not Symbol or SubItem 
+        else:    
             dt = True
             dtype_type_str = dtype_inst.name 
 
+        # Regardles of dtype_inst's typedtype_type_str is now a DataType's name
         subitem_set = self.tmc.all_SubItems[dtype_type_str].registered
+
+        # Loop through SubItems in that DataType
         for entry in subitem_set:
             if subitem_set[entry].tc_type in self.tmc.all_DataTypes: 
-                #
-                #
-                #
+                # recurse, explore SubItems of non-primitave type as necessary
                 self.exp_DataType(
                     subitem_set[entry],
                     base + dtype_inst.pv + ":"
                 )
                 continue
              
+            # Given that the variable is a primitive, create record(s)
             recs = self.make_record(
                 subitem_set[entry],
                 prefix = base + ("" if dt else dtype_inst.pv)
             )
+            # Save the record(s)
             for rec in recs: 
                 self.all_records.append(rec)
-                logger.debug("create {}".format(str(rec))) 
-            
+                logger.debug("create {}".format(str(rec)))    
 
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
         if pragmas_only:
