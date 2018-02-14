@@ -125,36 +125,29 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
 def test_TmcExplorer_create_intf(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    record = exp.create_intf(tmc.all_Symbols['MAIN.ulimit'])
-    assert type(record) == SingleRecordData
-    assert record.pv == 'TEST:MAIN:ULIMIT'
-    assert record.rec_type == 'ai'
-    assert record.fields == [
-        {'f_name':'DTYP','f_set':'asynFloat64'},
-        {'f_name':'EGU','f_set':'mm'},
-    ]
+    exp.create_intf([tmc.all_Symbols['MAIN.ulimit']])
+    records = exp.make_record(tmc.all_Symbols['MAIN.ulimit'])
+    assert records[0] in exp.all_records
 
-    record = exp.create_intf(
+    exp.create_intf(
+        [
+            tmc.all_Symbols['MAIN.struct_base'],
+            tmc.all_SubItems['DUT_STRUCT']['struct_var']
+        ],
+        prefix = "TEST:MAIN:STRUCTBASE" 
+    )
+    records = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = tmc.all_Symbols['MAIN.struct_base'].pv
     )
-    assert type(record) == SingleRecordData
-    assert record.pv == 'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
-    assert record.rec_type == 'ao'
-    assert record.fields == [
-        {'f_name':'DTYP','f_set':'asynFloat64'},
-        {'f_name':'EGU','f_set':'mm'},
-    ] 
-    ''' 
-    record_o, record_i = exp.create_intf(tmc.all_Symbols['MAIN.NEW_VAR'])
-    assert type(record) == SingleRecordData
-    assert record_o.pv == 'TEST:MAIN:NEW_VAR_OUT'
-    assert record_o.rec_type == 'bo'
-    assert record_o.fields == [
-        {'f_name':'ZNAM','f_set':'SINGLE'},
-        {'f_name':'ONAM','f_set':'MULTI'},
-    ] 
-    '''
+    print(exp.all_records[1])
+    print(records[0])
+    assert records[0] in exp.all_records
+
+    exp.create_intf([tmc.all_Symbols['MAIN.NEW_VAR']])
+    record_o, record_i = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
+    assert record_o in exp.all_records
+    assert record_i in exp.all_records
 
 
 def test_TmcExplorer_make_record(generic_tmc_path):
@@ -206,7 +199,10 @@ def test_TmcExplorer_exp_DataType(generic_tmc_path):
     '''
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    exp.exp_DataType(tmc.all_Symbols['MAIN.struct_base'])
+    exp.exp_DataType(
+        tmc.all_Symbols['MAIN.struct_base'],
+        path = [tmc.all_Symbols['MAIN.struct_base']],
+    )
     struct_var = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:STRUCTBASE"
@@ -225,7 +221,10 @@ def test_TmcExplorer_exp_DataType_multilayer(generic_tmc_path):
     '''
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    exp.exp_DataType(tmc.all_Symbols['MAIN.test_iterator'])
+    exp.exp_DataType(
+        tmc.all_Symbols['MAIN.test_iterator'],
+        path = [tmc.all_Symbols['MAIN.test_iterator']],
+    )
     struct_var = exp.make_record(
         tmc.all_SubItems['iterator']['value'],
         prefix = "TEST:MAIN:ITERATOR"
@@ -234,7 +233,9 @@ def test_TmcExplorer_exp_DataType_multilayer(generic_tmc_path):
     struct_var2 = exp.make_record(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:ITERATOR:EXT1"
-    )[0] 
+    )[0]
+    for x in exp.all_records:
+        print(x)
     assert struct_var2 in exp.all_records
     assert len(exp.all_records) == 7
 
@@ -282,6 +283,7 @@ def test_TmcExplorer_read_ini(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
 
+
 def test_FullRender_instantiation(generic_tmc_path):
     fr = FullRender(generic_tmc_path)
 
@@ -323,24 +325,27 @@ def test_SingleProtoDataRender():
     print(agent.render())
 
 
-@pytest.mark.skip(reason="Not yet implemented")
-def test_make_proto(generic_tmc_path):
+def test_TmcExplorer_make_proto(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    proto = exp.make_proto(tmc.all_Symbols['MAIN.ulimit'],)
+    proto = exp.make_proto(
+        tmc.all_Symbols['MAIN.ulimit'],
+        ['MAIN']
+    )
     assert type(proto) == SingleProtoData
     assert proto.out_field == 'MAINT.ulimit?'
     assert proto.in_field == 'OK'
-    #assert record.init ==  
+    assert proto.has_init == False 
     
-    #record = exp.make_record(
-    #    tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-    #    prefix = tmc.all_Symbols['MAIN.struct_base'].pv
-    #)
-    #assert type(record) == SingleRecordData
-    #assert record.pv == 'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
-    #assert record.rec_type == 'ao'
-    #assert record.fields == {'DTYP':'asynFloat64','EGU':'mm'}
+    proto  = exp.make_proto(
+        tmc.all_SubItems['DUT_STRUCT']['struct_var'],
+        ['MAIN', 'struct_base'],
+        prefix = tmc.all_Symbols['MAIN.struct_base'].pv,
+    )
+    assert type(proto) == SingleProtoData
+    assert proto.out_field == 'MAIN.struct_base.struct_var=%d'
+    assert proto.in_field == "OK";
+    assert proto.has_init == False
     #
     #record = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
     #assert type(record) == SingleRecordData

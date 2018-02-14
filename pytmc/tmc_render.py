@@ -356,7 +356,7 @@ class TmcExplorer:
         self.all_records = []
         self.all_protos = []
 
-    def exp_DataType(self, dtype_inst, base=""):
+    def exp_DataType(self, dtype_inst, base="",path=[]):
         # this is the datatype name of the targeted datatype instance
         dtype_type_str = dtype_inst.tc_type
 
@@ -369,6 +369,7 @@ class TmcExplorer:
                 self.exp_DataType(
                     self.tmc.all_DataTypes[dtype_parent],
                     base + dtype_inst.pv,
+                    path
                 )
                 
             dt = False
@@ -386,19 +387,27 @@ class TmcExplorer:
                 # recurse, explore SubItems of non-primitave type as necessary
                 self.exp_DataType(
                     subitem_set[entry],
-                    base + dtype_inst.pv + ":"
+                    base + dtype_inst.pv + ":",
+                    path = path + [subitem_set[entry]]
                 )
                 continue
              
             # Given that the variable is a primitive, create record(s)
+            
+            '''
             recs = self.make_record(
                 subitem_set[entry],
                 prefix = base + ("" if dt else dtype_inst.pv)
             )
+            print(subitem_set[entry])
+            print(path+[subitem_set[entry]])
             # Save the record(s)
             for rec in recs: 
                 self.all_records.append(rec)
-                logger.debug("create {}".format(str(rec)))    
+                logger.debug("create {}".format(str(rec)))  
+            '''
+            print("P",path)
+            self.create_intf(path+[subitem_set[entry]])
 
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
         if pragmas_only:
@@ -414,34 +423,37 @@ class TmcExplorer:
                     # explore the datatype/datatype instance 
                     self.exp_DataType(
                         symbol_set[sym], 
+                        path = [symbol_set[sym]]
                     )
                 continue
             
             # if the datatype is not user-created, create/save a record 
+            '''
             recs = self.make_record(symbol_set[sym])
+            print(symbol_set[sym])
+            print([symbol_set[sym]])
             for rec in recs:
                 self.all_records.append(rec)
                 logger.debug("create {}".format(str(rec))) 
+            '''
+            self.create_intf([symbol_set[sym]])
 
-    def create_intf(self, target, prefix=None):
-        if prefix != None:
-            prefix = prefix + ":"
-        else:
-            prefix = ""
 
-        if target.pv == None:
-            logger.warn("Record for {} lacks a PV".format(str(target)))
-        
-        fields = target.fields
-        
-        record = SingleRecordData(
-            pv = prefix + target.pv,
-            rec_type = target.rec_type,
-            fields = fields,
-        )
-        return record
+    def create_intf(self, target_path, prefix=None):
+        prefix = ""
+        for entry in target_path[:-1]: 
+            prefix += (entry.pv + ":")
 
-    def make_record(self, target, prefix=None):
+        prefix = prefix[:-1]
+        if len(target_path) < 2: 
+            prefix = None
+        print("******",target_path)
+        recs = self.make_record(target_path[-1],prefix)
+        for rec in recs:
+            self.all_records.append(rec)
+            logger.debug("create {}".format(str(rec))) 
+
+    def make_record(self, target, prefix=None): 
         if prefix != None:
             prefix = prefix + ":"
         else:
@@ -462,6 +474,10 @@ class TmcExplorer:
             ))
     
         return record_list
+
+    def make_proto(self, target, name):
+        raise NotImplementedError 
+
 
     def generate_ads_line(self, target, direction):
         raise NotImplementedError
