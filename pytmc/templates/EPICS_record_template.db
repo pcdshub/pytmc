@@ -1,7 +1,9 @@
 {{ header }}
 
 {% for record in master_list %}
+{% if record.has_comment%}
 # {{record.comment}}
+{% endif %} 
 record({{record.rec_type}}, "{{record.pv}}"){
 {% for f  in record.fields %}
     field({{f}}, "{{record.fields[f]}}")
