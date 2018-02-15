@@ -216,7 +216,7 @@ def test_TmcExplorer_exp_DataType(generic_tmc_path):
     assert len(exp.all_records) == 2
 
 
-def test_TmcExplorer_exp_DataType_multilayer(generic_tmc_path):
+def test_TmcExplorer_exp_DataType_recursive(generic_tmc_path):
     '''Explore multi level Datatype (Datatype contains others)
     '''
     tmc = TmcFile(generic_tmc_path)
@@ -325,15 +325,48 @@ def test_SingleProtoDataRender():
     print(agent.render())
 
 
+@pytest.mark.skip(reason="feature to be developed soon")
 def test_TmcExplorer_make_proto(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
+    proto_A = exp.make_proto(
+        tmc.all_Symbols['MAIN.ulimit'],
+        ['MAIN']
+    )    
+    
     proto = exp.make_proto(
+        tmc.all_Symbols['MAIN.ulimit'],
+        ['MAIN']
+    )    
+
+def test_SingleProtoData_has_init(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    exp = TmcExplorer(tmc)
+    proto = SingleProtoData(
+        name = "GetMainulimit",
+        out_field = 'MAIN.ulimit?',
+        in_field = '%d',
+    )
+    assert type(proto) == SingleProtoData
+    assert proto.name == "GetMainulimit"
+    assert proto.out_field == 'MAIN.ulimit?'
+    assert proto.in_field == '%d'
+    assert proto.has_init == False 
+    
+
+
+
+def test_TmcExplorer_make_proto_from_data(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    exp = TmcExplorer(tmc)
+    proto = exp.make_proto(
+        "Main.ulimit",
         tmc.all_Symbols['MAIN.ulimit'],
         ['MAIN']
     )
     assert type(proto) == SingleProtoData
-    assert proto.out_field == 'MAINT.ulimit?'
+    assert proto.name == "Main.ulimit"
+    assert proto.out_field == 'MAIN.ulimit?'
     assert proto.in_field == 'OK'
     assert proto.has_init == False 
     

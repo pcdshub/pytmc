@@ -393,20 +393,6 @@ class TmcExplorer:
                 continue
              
             # Given that the variable is a primitive, create record(s)
-            
-            '''
-            recs = self.make_record(
-                subitem_set[entry],
-                prefix = base + ("" if dt else dtype_inst.pv)
-            )
-            print(subitem_set[entry])
-            print(path+[subitem_set[entry]])
-            # Save the record(s)
-            for rec in recs: 
-                self.all_records.append(rec)
-                logger.debug("create {}".format(str(rec)))  
-            '''
-            print("P",path)
             self.create_intf(path+[subitem_set[entry]])
 
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
@@ -428,14 +414,6 @@ class TmcExplorer:
                 continue
             
             # if the datatype is not user-created, create/save a record 
-            '''
-            recs = self.make_record(symbol_set[sym])
-            print(symbol_set[sym])
-            print([symbol_set[sym]])
-            for rec in recs:
-                self.all_records.append(rec)
-                logger.debug("create {}".format(str(rec))) 
-            '''
             self.create_intf([symbol_set[sym]])
 
 
@@ -444,7 +422,6 @@ class TmcExplorer:
         for entry in target_path[:-1]: 
             prefix += (entry.pv + ":")
 
-        prefix = prefix[:-1]
         if len(target_path) < 2: 
             prefix = None
         print("******",target_path)
@@ -454,11 +431,14 @@ class TmcExplorer:
             logger.debug("create {}".format(str(rec))) 
 
     def make_record(self, target, prefix=None): 
+        
+        # if a colon as not been appended to the end o the PV prefix, add one
         if prefix != None:
-            prefix = prefix + ":"
+            if prefix[-1] != ':':
+                prefix += ":"
         else:
             prefix = ""
-
+        
         if target.pv == None:
             logger.warn("Record for {} lacks a PV".format(str(target)))
         
