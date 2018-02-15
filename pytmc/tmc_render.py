@@ -113,6 +113,33 @@ class SingleRecordData:
         '''
         return check_pv and check_rec_type and check_fields
 
+    @classmethod
+    def from_element(cls, target, prefix=None): 
+        
+        # if a colon as not been appended to the end o the PV prefix, add one
+        if prefix != None:
+            if prefix[-1] != ':':
+                prefix += ":"
+        else:
+            prefix = ""
+        
+        if target.pv == None:
+            logger.warn("Record for {} lacks a PV".format(str(target)))
+        
+        config = target.config_by_pv
+        
+        record_list = []
+
+        for pv_group in config:
+            record_list.append(cls(
+                pv = prefix + BaseElement.parse_pragma('pv',pv_group),
+                rec_type = BaseElement.parse_pragma('type',pv_group),
+                fields = BaseElement.parse_pragma('field',pv_group),
+            ))
+    
+        return record_list
+
+
 
 class SingleProtoData:
     def __init__(self,name=None,out_field=None,in_field=None,init=None):
@@ -134,6 +161,7 @@ class SingleProtoData:
         for entry in path:
             adspath = adspath + entry.name + '.'
         adspath = adspath[:-1]
+
         for config_set in path[-1].config_by_pv:
             inst = cls()
 
@@ -516,11 +544,12 @@ class TmcExplorer:
         if len(target_path) < 2: 
             prefix = None
         print("******",target_path)
-        recs = self.make_record(target_path[-1],prefix)
+        recs = SingleRecordData.from_element(target_path[-1],prefix)
         for rec in recs:
             self.all_records.append(rec)
             logger.debug("create {}".format(str(rec))) 
 
+    '''
     def make_record(self, target, prefix=None): 
         
         # if a colon as not been appended to the end o the PV prefix, add one
@@ -545,6 +574,7 @@ class TmcExplorer:
             ))
     
         return record_list
+    '''
 
     def make_proto(self, target, name):
         raise NotImplementedError 

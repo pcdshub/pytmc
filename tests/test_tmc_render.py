@@ -126,7 +126,7 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
     exp.create_intf([tmc.all_Symbols['MAIN.ulimit']])
-    records = exp.make_record(tmc.all_Symbols['MAIN.ulimit'])
+    records = SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])
     assert records[0] in exp.all_records
 
     exp.create_intf(
@@ -136,7 +136,7 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
         ],
         prefix = "TEST:MAIN:STRUCTBASE" 
     )
-    records = exp.make_record(
+    records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = tmc.all_Symbols['MAIN.struct_base'].pv
     )
@@ -145,15 +145,15 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     assert records[0] in exp.all_records
 
     exp.create_intf([tmc.all_Symbols['MAIN.NEW_VAR']])
-    record_o, record_i = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
+    record_o, record_i = SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])
     assert record_o in exp.all_records
     assert record_i in exp.all_records
 
 
-def test_TmcExplorer_make_record(generic_tmc_path):
+def test_SingleRecordData_from_element(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    records = exp.make_record(tmc.all_Symbols['MAIN.ulimit'])
+    records = SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])
     record = records[0]
     assert type(record) == SingleRecordData
     assert record.pv == 'TEST:MAIN:ULIMIT'
@@ -163,7 +163,7 @@ def test_TmcExplorer_make_record(generic_tmc_path):
         {'f_name':'EGU','f_set':'mm'},
     ]
 
-    records = exp.make_record(
+    records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = tmc.all_Symbols['MAIN.struct_base'].pv
     )
@@ -176,7 +176,9 @@ def test_TmcExplorer_make_record(generic_tmc_path):
         {'f_name':'EGU','f_set':'mm'},
     ] 
     
-    record_o, record_i = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
+    record_o, record_i = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.NEW_VAR']
+    )
     assert type(record) == SingleRecordData
     assert record_o.pv == 'TEST:MAIN:NEW_VAR_OUT'
     assert record_o.rec_type == 'bo'
@@ -193,7 +195,6 @@ def test_TmcExplorer_make_record(generic_tmc_path):
         {'f_name':'SCAN','f_set':'1 second'},
     ] 
     
-    
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
     '''Explore single level Datatype (Datatype doesn't contain others)
     '''
@@ -203,12 +204,12 @@ def test_TmcExplorer_exp_DataType(generic_tmc_path):
         tmc.all_Symbols['MAIN.struct_base'],
         path = [tmc.all_Symbols['MAIN.struct_base']],
     )
-    struct_var = exp.make_record(
+    struct_var = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:STRUCTBASE"
     )[0]
     assert struct_var in exp.all_records
-    struct_var2 = exp.make_record(
+    struct_var2 = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var2'],
         prefix = "TEST:MAIN:STRUCTBASE"
     )[0]
@@ -225,12 +226,12 @@ def test_TmcExplorer_exp_DataType_recursive(generic_tmc_path):
         tmc.all_Symbols['MAIN.test_iterator'],
         path = [tmc.all_Symbols['MAIN.test_iterator']],
     )
-    struct_var = exp.make_record(
+    struct_var = SingleRecordData.from_element(
         tmc.all_SubItems['iterator']['value'],
         prefix = "TEST:MAIN:ITERATOR"
     )[0]
     assert struct_var in exp.all_records
-    struct_var2 = exp.make_record(
+    struct_var2 = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = "TEST:MAIN:ITERATOR:EXT1"
     )[0]
@@ -244,15 +245,15 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
     exp.exp_Symbols(pragmas_only=True,skip_datatype=True)
-    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])[0] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.multi'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.multi'])[0] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['sample_gvl.test_global'])[0] \
             in exp.all_records
     assert len(exp.all_records) == 5
 
@@ -261,15 +262,15 @@ def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
     exp.exp_Symbols(pragmas_only=True)
-    assert exp.make_record(tmc.all_Symbols['MAIN.ulimit'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])[0] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.multi'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.multi'])[0] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
         in exp.all_records
-    assert exp.make_record(tmc.all_Symbols['sample_gvl.test_global'])[0] \
+    assert SingleRecordData.from_element(tmc.all_Symbols['sample_gvl.test_global'])[0] \
             in exp.all_records
     assert len(exp.all_records) == 24
 
