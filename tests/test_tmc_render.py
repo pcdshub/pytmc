@@ -287,6 +287,7 @@ def test_TmcExplorer_read_ini(generic_tmc_path):
 def test_FullRender_instantiation(generic_tmc_path):
     fr = FullRender(generic_tmc_path)
 
+
 def test_SingleProtoData_instantiation():
     spd = SingleProtoData(
         "Test Function",
@@ -325,20 +326,6 @@ def test_SingleProtoDataRender():
     print(agent.render())
 
 
-@pytest.mark.skip(reason="feature to be developed soon")
-def test_TmcExplorer_make_proto(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
-    proto_A = exp.make_proto(
-        tmc.all_Symbols['MAIN.ulimit'],
-        ['MAIN']
-    )    
-    
-    proto = exp.make_proto(
-        tmc.all_Symbols['MAIN.ulimit'],
-        ['MAIN']
-    )    
-
 def test_SingleProtoData_has_init(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
@@ -354,34 +341,60 @@ def test_SingleProtoData_has_init(generic_tmc_path):
     assert proto.has_init == False 
     
 
-
-
-def test_TmcExplorer_make_proto_from_data(generic_tmc_path):
+def test_SingleProtoData_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    proto = exp.make_proto(
-        "Main.ulimit",
-        tmc.all_Symbols['MAIN.ulimit'],
-        ['MAIN']
+    print(tmc.all_Symbols['MAIN.ulimit'].name)
+
+
+    protos = SingleProtoData.from_element_path(
+        [tmc.all_Symbols['MAIN.ulimit']],
+        'fake_name'
     )
+    assert len(protos) == 1
+
+    proto = protos[0]
     assert type(proto) == SingleProtoData
-    assert proto.name == "Main.ulimit"
+    assert proto.name == 'Getfake_name'
     assert proto.out_field == 'MAIN.ulimit?'
+    assert proto.in_field == '%d'
+    assert proto.has_init == False 
+   
+    # Test variable with input and output 
+    proto_out, proto_in = SingleProtoData.from_element_path(
+        [
+            tmc.all_Symbols['MAIN.NEW_VAR'],
+        ],
+        'fake_name',
+    )
+    print(proto_out.__dict__)
+    print(proto_in.__dict__)
+    
+    assert type(proto_out) == SingleProtoData
+    assert proto_out.name == 'Setfake_name'
+    assert proto_out.out_field == 'MAIN.NEW_VAR=%d'
+    assert proto_out.in_field == 'OK'
+    assert proto_out.init == 'Getfake_name'
+
+    assert type(proto_in) == SingleProtoData
+    assert proto_in.name == 'Getfake_name'
+    assert proto_in.out_field == 'MAIN.NEW_VAR?'
+    assert proto_in.in_field == '%d'
+    assert proto_in.has_init == False 
+
+    # Test encapsulated variable
+    protos  = SingleProtoData.from_element_path(
+        [
+            tmc.all_Symbols['MAIN.struct_base'],
+            tmc.all_SubItems['DUT_STRUCT']['struct_var']
+        ],
+        name = 'fake_name'
+    )
+    assert len(protos) == 1
+
+    proto = protos[0]
+    assert type(proto) == SingleProtoData
+    assert proto.name == 'Setfake_name'
+    assert proto.out_field == 'MAIN.struct_base.struct_var=%d'
     assert proto.in_field == 'OK'
     assert proto.has_init == False 
-    
-    proto  = exp.make_proto(
-        tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-        ['MAIN', 'struct_base'],
-        prefix = tmc.all_Symbols['MAIN.struct_base'].pv,
-    )
-    assert type(proto) == SingleProtoData
-    assert proto.out_field == 'MAIN.struct_base.struct_var=%d'
-    assert proto.in_field == "OK";
-    assert proto.has_init == False
-    #
-    #record = exp.make_record(tmc.all_Symbols['MAIN.NEW_VAR'])
-    #assert type(record) == SingleRecordData
-    #assert record.pv == 'TEST:MAIN:NEW_VAR'
-    #assert record.rec_type == 'bo'
-    #assert record.fields == {'ZNAM':'SINGLE','ONAM':'MULTI'}

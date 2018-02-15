@@ -16,7 +16,7 @@ from . import defaults
 from . import DataType
 from . import TmcFile
 from .xml_obj import BaseElement
-
+from . import Symbol, DataType, SubItem
 
 class SingleRecordData:
     '''
@@ -115,7 +115,7 @@ class SingleRecordData:
 
 
 class SingleProtoData:
-    def __init__(self,name,out_field,in_field,init=None):
+    def __init__(self,name=None,out_field=None,in_field=None,init=None):
         self.name = name
         self.out_field = out_field
         self.in_field = in_field
@@ -126,6 +126,34 @@ class SingleProtoData:
         if self.init != None:
             return True
         return False
+
+    @classmethod
+    def from_element_path(cls, path, name):
+        inst_collection = []
+        adspath = ""
+        for entry in path:
+            adspath = adspath + entry.name + '.'
+        adspath = adspath[:-1]
+        for config_set in path[-1].config_by_pv:
+            inst = cls()
+
+            io_line = BaseElement.parse_pragma('io',config_set)
+            print(io_line)
+            if "o" in io_line:
+                inst.name = "Set" + name
+                inst.out_field = adspath + "=" + \
+                    BaseElement.parse_pragma('str',config_set)
+                inst.in_field = "OK"
+                if BaseElement.parse_pragma('init',config_set) == 'True':
+                    inst.init = "Get" + name
+            elif "i" in io_line:
+                inst.name = "Get" + name
+                inst.out_field = adspath + "?"
+                inst.in_field = BaseElement.parse_pragma('str',config_set)
+           
+
+            inst_collection.append(inst)
+        return inst_collection
 
 
 class RenderAgent:
@@ -357,6 +385,34 @@ class TmcExplorer:
         self.all_protos = []
 
     def exp_DataType(self, dtype_inst, base="",path=[]):
+        '''
+        Method for recusively exploring variables of user-defined type and
+        creating the corresponding :class:`~SingleProtoData` and
+        :class:`~SingleRecordData` instances.  
+
+
+        Parameters
+        ----------
+
+        dtype_inst : :class:Symbol`~`, :class:`~SubItem`, or :class:`~DataType`
+            This is the target element to explore. This method is typically
+            passed either a Symbol or Subitem when exploring the main program
+            or user defined DataTypes. A DataType will be passed in when this
+            method explores a parent DataType
+
+        base : str
+            This string builds the full PV string. At each level, the string is
+            appended PV subsections. Consider deprecating as the path argument
+            may take over this functionality.
+
+        path : list
+            This list of Elements is the chain of items traversed to reach the
+            current element. The lowest index is the first level instance
+            likely appearing in Main or a global variable and each successive
+            entry in the list is the encapsulated element instance. The
+            sequence ends with the current element instance. 
+
+        '''
         # this is the datatype name of the targeted datatype instance
         dtype_type_str = dtype_inst.tc_type
 
@@ -396,6 +452,23 @@ class TmcExplorer:
             self.create_intf(path+[subitem_set[entry]])
 
     def exp_Symbols(self, pragmas_only=True,skip_datatype=False):
+        '''
+        Master method for exploring the entirety of the tmc file and creating
+        the corresponding :class:`~SingleProtoData` and
+        :class:`~SingleRecordData` instances. To achieve this, run without
+        parameters
+
+        Parameters
+        ----------
+        
+        pragmas_only : bool
+            If true, only explore symbols that are marked by pragmas. Defaults
+            to True. Consider deprecating this in the near future. 
+
+        skip_datatype : bool
+            If true, skip over variables with user defined data types and only
+            explore top level variables (symbols). Defaults to False.
+        '''
         if pragmas_only:
             symbol_set = self.tmc.all_Symbols.registered
         else:
@@ -418,6 +491,24 @@ class TmcExplorer:
 
 
     def create_intf(self, target_path, prefix=None):
+        '''
+        Create and save the all the necessary :class:`~SingleProtoData` and
+        :class:`~SingleRecordData` instances for a target variable.
+
+        Parameters
+        ----------
+
+        target_path : list 
+            This list of Elements is the chain of items traversed to reach the
+            current element. The lowest index is the first level instance
+            likely appearing in Main or a global variable and each successive
+            entry in the list is the encapsulated element instance. The
+            sequence ends with the current element instance. The target_path is
+            used for constructing the PV prefix.
+        
+        prefix : str
+            If a prefix is ofered use this as the base of constructed PV.
+        '''
         prefix = ""
         for entry in target_path[:-1]: 
             prefix += (entry.pv + ":")
@@ -457,7 +548,6 @@ class TmcExplorer:
 
     def make_proto(self, target, name):
         raise NotImplementedError 
-
 
     def generate_ads_line(self, target, direction):
         raise NotImplementedError
