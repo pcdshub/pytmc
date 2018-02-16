@@ -23,6 +23,9 @@ class SingleRecordData:
     Data structre for packaging all the information required to render an epics
     record.
 
+    SingleRecordData supports equality testing. Two instances are equal if all
+    their attributes are equal.
+    
     Note
     ----
     The parameters for the constructor are for setting the attributes of this
@@ -115,13 +118,37 @@ class SingleRecordData:
 
     @property
     def has_comment(self):
+        '''
+        Returns
+        -------
+        bool
+            True if this record has a non-None comment.
+        '''
         if self.comment != None:
             return True
         return False
 
     @classmethod
     def from_element(cls, target, prefix=None): 
-        
+        '''
+        Create an instance of :class:`~SingleRecordData` from a given element
+        target.
+
+        Parameters
+        ----------
+        target : :class:`~BaseElement` or child thereof
+            This is the target element for which record(s) will be created
+
+        prefix : str
+            The section of the PV name to be appended to the front of the PV of
+            the target element
+
+        Returns
+        -------
+        list
+            This is list of record instances generated. There is one instance
+            per PV given
+        '''
         # if a colon as not been appended to the end o the PV prefix, add one
         if prefix != None:
             if prefix[-1] != ':':
@@ -146,7 +173,6 @@ class SingleRecordData:
         return record_list
 
 
-
 class SingleProtoData:
     def __init__(self,name=None,out_field=None,in_field=None,init=None):
         self.name = name
@@ -156,12 +182,37 @@ class SingleProtoData:
 
     @property
     def has_init(self):
+        '''
+        Returns
+        -------
+        bool
+            True if this proto has a non-None init.
+        '''
         if self.init != None:
             return True
         return False
 
     @classmethod
     def from_element_path(cls, path, name):
+        '''
+        Create an instance of :class:`~SingleProtoData` from a given element
+        path.
+
+        Parameters
+        ----------
+        target : list of :class:`~BaseElement` instances or children thereof
+            This is a list of elements leading to the target element for which
+            protos will be created
+
+        name : str
+            The base name for the proto. 
+
+        Returns
+        -------
+        list
+            This is list of proto instances generated. There is one instance
+            per PV given.
+        '''
         inst_collection = []
         adspath = ""
         for entry in path:
@@ -212,9 +263,7 @@ class RenderAgent:
     Attributes
     ----------
     master_list : list
-        list of :class:`~pytmc.SingleRecordData` instances specifying all
-        records to be made.
-
+        list of : instances specifying all records or protos to be made.
 
     '''
     def __init__(self, master_list=None, loader=("pytmc","templates"),
@@ -554,9 +603,6 @@ class TmcExplorer:
         for rec in recs:
             self.all_records.append(rec)
             logger.debug("create {}".format(str(rec))) 
-
-    def make_proto(self, target, name):
-        raise NotImplementedError 
 
     def generate_ads_line(self, target, direction):
         raise NotImplementedError
