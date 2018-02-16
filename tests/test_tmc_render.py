@@ -121,14 +121,21 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
     except:
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
    
-
+@pytest.mark.skip(reason="Underlying features under work")
 def test_TmcExplorer_create_intf(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
+
+    # Check for variable in MAIN scope
     exp.create_intf([tmc.all_Symbols['MAIN.ulimit']])
     records = SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])
+    protos = SingleProtoData.from_element_path(
+        tmc.all_Symbols['MAIN.ulimit']
+    )
     assert records[0] in exp.all_records
+    assert protos[0] in exp.all_protos
 
+    # Check for variable in encapsulated scope
     exp.create_intf(
         [
             tmc.all_Symbols['MAIN.struct_base'],
@@ -140,12 +147,23 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         prefix = tmc.all_Symbols['MAIN.struct_base'].pv
     )
-    print(exp.all_records[1])
-    print(records[0])
+    protos = SingleProtoData.from_element_path(
+        [
+            tmc.all_Symbols['MAIN.struct_base'],
+            tmc.all_SubItems['DUT_STRUCT']['struct_var']
+        ]
+    )
+    
     assert records[0] in exp.all_records
-
+    assert protos[0] in exp.all_protos
+    
+    # t3
     exp.create_intf([tmc.all_Symbols['MAIN.NEW_VAR']])
-    record_o, record_i = SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])
+    record_o, record_i = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.NEW_VAR']
+    )
+    protos_o, proto_i = SingleProtoData.from_element_path(
+    )
     assert record_o in exp.all_records
     assert record_i in exp.all_records
 
@@ -159,30 +177,37 @@ def test_SingleRecordData_from_element(generic_tmc_path):
     assert record.pv == 'TEST:MAIN:ULIMIT'
     assert record.rec_type == 'ai'
     assert record.fields == [
+        {'f_name':'INP','f_set':'@ () $(PORT)'},
         {'f_name':'DTYP','f_set':'asynFloat64'},
         {'f_name':'EGU','f_set':'mm'},
     ]
 
     records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-        prefix = tmc.all_Symbols['MAIN.struct_base'].pv
+        prefix = tmc.all_Symbols['MAIN.struct_base'].pv,
+        proto_file = 'file.proto',
+        names = ['SetVar']
     )
     record = records[0]
     assert type(record) == SingleRecordData
     assert record.pv == 'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
     assert record.rec_type == 'ao'
     assert record.fields == [
+        {'f_name':'OUT','f_set':'@file.proto SetVar() $(PORT)'},
         {'f_name':'DTYP','f_set':'asynFloat64'},
         {'f_name':'EGU','f_set':'mm'},
     ] 
     
     record_o, record_i = SingleRecordData.from_element(
-        tmc.all_Symbols['MAIN.NEW_VAR']
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+        proto_file = 'file.proto',
+        names = ['SetVar','GetVar']
     )
     assert type(record) == SingleRecordData
     assert record_o.pv == 'TEST:MAIN:NEW_VAR_OUT'
     assert record_o.rec_type == 'bo'
     assert record_o.fields == [
+        {'f_name':'OUT','f_set':'@file.proto SetVar() $(PORT)'},
         {'f_name':'ZNAM','f_set':'SINGLE'},
         {'f_name':'ONAM','f_set':'MULTI'},
         {'f_name':'SCAN','f_set':'1 second'},
@@ -190,6 +215,7 @@ def test_SingleRecordData_from_element(generic_tmc_path):
     assert record_i.pv == 'TEST:MAIN:NEW_VAR_IN'
     assert record_i.rec_type == 'bi'
     assert record_i.fields == [
+        {'f_name':'INP','f_set':'@file.proto GetVar() $(PORT)'},
         {'f_name':'ZNAM','f_set':'SINGLE'},
         {'f_name':'ONAM','f_set':'MULTI'},
         {'f_name':'SCAN','f_set':'1 second'},

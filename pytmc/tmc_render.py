@@ -129,7 +129,7 @@ class SingleRecordData:
         return False
 
     @classmethod
-    def from_element(cls, target, prefix=None): 
+    def from_element(cls, target, prefix=None, proto_file=None, names=None): 
         '''
         Create an instance of :class:`~SingleRecordData` from a given element
         target.
@@ -163,14 +163,37 @@ class SingleRecordData:
         
         record_list = []
 
-        for pv_group in config:
+        if names == None:
+            names = [''] * len(config)
+
+        if proto_file == None:
+            proto_file = ""
+
+        for pv_group, name in zip(config,names):
+            fields = BaseElement.parse_pragma('field',pv_group)
+            if type(fields) != list:
+                fields = [fields]
             record_list.append(cls(
                 pv = prefix + BaseElement.parse_pragma('pv',pv_group),
                 rec_type = BaseElement.parse_pragma('type',pv_group),
-                fields = BaseElement.parse_pragma('field',pv_group),
+                fields = fields,
             ))
-    
+            record = record_list[-1]
+            record.guess_ADS_line(pv_group, proto_file, name)
+
         return record_list
+
+    def guess_ADS_line(self, pv_group,proto_file,name):
+        for x in pv_group:
+            print(x)
+        if 'i' in BaseElement.parse_pragma('io',pv_group):
+            f_name = "INP"
+        elif 'o' in BaseElement.parse_pragma('io',pv_group):
+            f_name = "OUT"
+        
+        f_set = "@" + proto_file + " " + name + "() $(PORT)"
+        
+        self.fields.insert(0,{'f_name':f_name,'f_set':f_set})
 
 
 class SingleProtoData:
@@ -193,7 +216,7 @@ class SingleProtoData:
         return False
 
     @classmethod
-    def from_element_path(cls, path, name):
+    def from_element_path(cls, path, name=None):
         '''
         Create an instance of :class:`~SingleProtoData` from a given element
         path.
@@ -572,7 +595,6 @@ class TmcExplorer:
             # if the datatype is not user-created, create/save a record 
             self.create_intf([symbol_set[sym]])
 
-
     def create_intf(self, target_path, prefix=None):
         '''
         Create and save the all the necessary :class:`~SingleProtoData` and
@@ -598,7 +620,6 @@ class TmcExplorer:
 
         if len(target_path) < 2: 
             prefix = None
-        print("******",target_path)
         recs = SingleRecordData.from_element(target_path[-1],prefix)
         for rec in recs:
             self.all_records.append(rec)
@@ -613,16 +634,18 @@ class FullRender:
         self.tmc = TmcFile(tmc_path)
         self.exp = TmcExplorer(self.tmc)
         self.exp.exp_Symbols()
+        
         db_render = DbRenderAgent(self.exp.all_records)
         db_render.clean_list()
-        self.dboutput = db_render.render()
+        self.db_output = db_render.render()
+        
         proto_render = ProtoRenderAgent(self.exp.all_protos)
         proto_render.clean_list()
         self.proto_output = proto_render.render()
 
     def save(self,outpath):
         db_f = open(outpath+".db","w")
-        db_f.write(self.dboutput)
+        db_f.write(self.db_output)
         db_f.close()
         proto_f = open(outpath+".db","w")
         proto_f.write(self.proto_output)
