@@ -120,28 +120,33 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
         exp = TmcExplorer(tmc)
     except:
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
-   
-@pytest.mark.skip(reason="Underlying features under work")
+
+
 def test_TmcExplorer_create_intf(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
+    exp = TmcExplorer(tmc,'file.proto')
 
     # Check for variable in MAIN scope
     exp.create_intf([tmc.all_Symbols['MAIN.ulimit']])
-    records = SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])
+    records = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.ulimit'],
+        proto_file = "file.proto",
+        names=['GetMAINulimit'])
     protos = SingleProtoData.from_element_path(
-        tmc.all_Symbols['MAIN.ulimit']
+        [tmc.all_Symbols['MAIN.ulimit'],],
+        name='MAINulimit'
     )
+    print(protos[0].__dict__)
+    print(exp.all_protos[0].__dict__)
     assert records[0] in exp.all_records
     assert protos[0] in exp.all_protos
-
+    '''
     # Check for variable in encapsulated scope
     exp.create_intf(
         [
             tmc.all_Symbols['MAIN.struct_base'],
             tmc.all_SubItems['DUT_STRUCT']['struct_var']
         ],
-        prefix = "TEST:MAIN:STRUCTBASE" 
     )
     records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
@@ -166,6 +171,7 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     )
     assert record_o in exp.all_records
     assert record_i in exp.all_records
+    '''
 
 
 def test_SingleRecordData_from_element(generic_tmc_path):

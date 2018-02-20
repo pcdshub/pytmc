@@ -184,8 +184,6 @@ class SingleRecordData:
         return record_list
 
     def guess_ADS_line(self, pv_group,proto_file,name):
-        for x in pv_group:
-            print(x)
         if 'i' in BaseElement.parse_pragma('io',pv_group):
             f_name = "INP"
         elif 'o' in BaseElement.parse_pragma('io',pv_group):
@@ -215,6 +213,9 @@ class SingleProtoData:
             return True
         return False
 
+    def __eq__(self,other):
+        return self.__dict__ == other.__dict__
+    
     @classmethod
     def from_element_path(cls, path, name=None):
         '''
@@ -236,6 +237,9 @@ class SingleProtoData:
             This is list of proto instances generated. There is one instance
             per PV given.
         '''
+        if name == None:
+            name = ''
+        
         inst_collection = []
         adspath = ""
         for entry in path:
@@ -246,7 +250,6 @@ class SingleProtoData:
             inst = cls()
 
             io_line = BaseElement.parse_pragma('io',config_set)
-            print(io_line)
             if "o" in io_line:
                 inst.name = "Set" + name
                 inst.out_field = adspath + "=" + \
@@ -441,7 +444,7 @@ class ProtoRenderAgent(RenderAgent):
             template="EPICS_proto_template.proto"
         )
 
-    def clean_data(self):
+    def clean_list(self):
         pass
     
     @property
@@ -484,11 +487,13 @@ class TmcExplorer:
     
     '''
 
-    def __init__(self, tmc):
+    def __init__(self, tmc, proto_file=None):
         self.tmc = tmc
+        self.proto_file = proto_file
         self.tmc.isolate_all()
         self.all_records = []
         self.all_protos = []
+        self.proto_name_list = []
 
     def exp_DataType(self, dtype_inst, base="",path=[]):
         '''
@@ -620,10 +625,41 @@ class TmcExplorer:
 
         if len(target_path) < 2: 
             prefix = None
-        recs = SingleRecordData.from_element(target_path[-1],prefix)
+
+        #construct pvname
+        base_proto_name = ""
+        for entry in target_path:
+            base_proto_name += entry.name
+
+
+        base_proto_name = re.sub("\.","",base_proto_name)
+        print(base_proto_name)
+
+        hypothesis_name = base_proto_name
+        index = 0
+        while hypothesis_name in self.proto_name_list:
+            hypothesis_name = base_proto_name + str(index)
+            index +=1
+        self.proto_name_list.append(hypothesis_name)
+
+        protos = SingleProtoData.from_element_path(
+            target_path,
+            name=hypothesis_name
+        )
+        
+        recs = SingleRecordData.from_element(
+            target_path[-1],
+            proto_file=self.proto_file,
+            prefix=prefix,
+            names=[proto.name for proto in protos]
+        )
         for rec in recs:
             self.all_records.append(rec)
-            logger.debug("create {}".format(str(rec))) 
+            logger.debug("create {}".format(str(rec)))
+
+        for proto in protos:
+            self.all_protos.append(proto)
+            logger.debug("create {}".format(str(proto)))
 
     def generate_ads_line(self, target, direction):
         raise NotImplementedError

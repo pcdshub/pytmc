@@ -260,16 +260,17 @@ class BaseElement:
         Parameters
         ----------
         title : str 
-            title of the config line searched for 
+            title of the config line searched for
+
+        cfg : list
+            The list of pragma lines to be searched  
 
         Returns
         -------
         str, list of str or None
             If there is only one name for the datatype, return a string, if
             there are multiple, list each name, returns None if none are found.
-        '''
-        
-        
+        ''' 
         result = []
                 
         for line in cfg:
@@ -282,11 +283,6 @@ class BaseElement:
             result = result[0]
 
         return result
-
-
-
-
-
 
     @property
     def pv(self):
@@ -373,7 +369,6 @@ class BaseElement:
                 index = len(separate_lists) - 1
             separate_lists[index].append(line)
         return separate_lists
-
 
 
 class Symbol(BaseElement):
@@ -596,7 +591,6 @@ class SubItem(BaseElement):
                 lambda g : g != self,
                 self.__parent.children
             ))
-            print("NEW_LIST",new_list)
             self.__parent.children = new_list
             self.__parent = None 
     
