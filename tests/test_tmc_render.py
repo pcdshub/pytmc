@@ -136,11 +136,9 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
         [tmc.all_Symbols['MAIN.ulimit'],],
         name='MAINulimit'
     )
-    print(protos[0].__dict__)
-    print(exp.all_protos[0].__dict__)
     assert records[0] in exp.all_records
     assert protos[0] in exp.all_protos
-    '''
+    
     # Check for variable in encapsulated scope
     exp.create_intf(
         [
@@ -150,29 +148,35 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     )
     records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-        prefix = tmc.all_Symbols['MAIN.struct_base'].pv
+        proto_file = "file.proto",
+        prefix = tmc.all_Symbols['MAIN.struct_base'].pv,
+        names=['SetMAINstruct_basestruct_var']
     )
     protos = SingleProtoData.from_element_path(
         [
             tmc.all_Symbols['MAIN.struct_base'],
             tmc.all_SubItems['DUT_STRUCT']['struct_var']
-        ]
+        ],
+        name='MAINstruct_basestruct_var'
     )
-    
     assert records[0] in exp.all_records
     assert protos[0] in exp.all_protos
     
     # t3
     exp.create_intf([tmc.all_Symbols['MAIN.NEW_VAR']])
     record_o, record_i = SingleRecordData.from_element(
-        tmc.all_Symbols['MAIN.NEW_VAR']
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+        proto_file = 'file.proto',
+        names=['SetMAINNEW_VAR','GetMAINNEW_VAR']
     )
-    protos_o, proto_i = SingleProtoData.from_element_path(
+    proto_o, proto_i = SingleProtoData.from_element_path(
+        [tmc.all_Symbols['MAIN.NEW_VAR']],
+        name='MAINNEW_VAR'
     )
     assert record_o in exp.all_records
     assert record_i in exp.all_records
-    '''
-
+    assert proto_o in exp.all_protos
+    assert proto_i in exp.all_protos
 
 def test_SingleRecordData_from_element(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)

@@ -600,6 +600,7 @@ class TmcExplorer:
             # if the datatype is not user-created, create/save a record 
             self.create_intf([symbol_set[sym]])
 
+
     def create_intf(self, target_path, prefix=None):
         '''
         Create and save the all the necessary :class:`~SingleProtoData` and
@@ -631,9 +632,7 @@ class TmcExplorer:
         for entry in target_path:
             base_proto_name += entry.name
 
-
         base_proto_name = re.sub("\.","",base_proto_name)
-        print(base_proto_name)
 
         hypothesis_name = base_proto_name
         index = 0
