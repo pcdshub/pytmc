@@ -600,7 +600,6 @@ class TmcExplorer:
             # if the datatype is not user-created, create/save a record 
             self.create_intf([symbol_set[sym]])
 
-
     def create_intf(self, target_path, prefix=None):
         '''
         Create and save the all the necessary :class:`~SingleProtoData` and
@@ -665,9 +664,11 @@ class TmcExplorer:
 
 
 class FullRender:
-    def __init__(self,tmc_path):
+    def __init__(self,tmc_path,outpath):
+        self.db_f_path = outpath+".db"
+        self.proto_f_path = outpath+".proto"
         self.tmc = TmcFile(tmc_path)
-        self.exp = TmcExplorer(self.tmc)
+        self.exp = TmcExplorer(self.tmc,self.proto_f_path)
         self.exp.exp_Symbols()
         
         db_render = DbRenderAgent(self.exp.all_records)
@@ -678,11 +679,11 @@ class FullRender:
         proto_render.clean_list()
         self.proto_output = proto_render.render()
 
-    def save(self,outpath):
-        db_f = open(outpath+".db","w")
+    def save(self):
+        db_f = open(self.db_f_path,"w")
         db_f.write(self.db_output)
         db_f.close()
-        proto_f = open(outpath+".db","w")
+        proto_f = open(self.proto_f_path,"w")
         proto_f.write(self.proto_output)
         proto_f.close()
 

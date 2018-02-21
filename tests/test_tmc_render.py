@@ -371,7 +371,7 @@ def test_TmcExplorer_read_ini(generic_tmc_path):
 
 
 def test_FullRender_instantiation(generic_tmc_path):
-    fr = FullRender(generic_tmc_path)
+    fr = FullRender(generic_tmc_path,'TEST')
 
 
 def test_SingleProtoData_instantiation():
