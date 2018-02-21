@@ -178,6 +178,7 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     assert proto_o in exp.all_protos
     assert proto_i in exp.all_protos
 
+
 def test_SingleRecordData_from_element(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
@@ -230,26 +231,32 @@ def test_SingleRecordData_from_element(generic_tmc_path):
         {'f_name':'ONAM','f_set':'MULTI'},
         {'f_name':'SCAN','f_set':'1 second'},
     ] 
-    
+   
+
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
     '''Explore single level Datatype (Datatype doesn't contain others)
     '''
     tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
+    exp = TmcExplorer(tmc,'file.proto')
     exp.exp_DataType(
         tmc.all_Symbols['MAIN.struct_base'],
         path = [tmc.all_Symbols['MAIN.struct_base']],
     )
-    struct_var = SingleRecordData.from_element(
+    records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-        prefix = "TEST:MAIN:STRUCTBASE"
-    )[0]
-    assert struct_var in exp.all_records
-    struct_var2 = SingleRecordData.from_element(
+        proto_file= 'file.proto',
+        prefix = "TEST:MAIN:STRUCTBASE",
+        names = ['SetMAINstruct_basestruct_var']
+    )
+    assert records[0] in exp.all_records
+
+    records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var2'],
-        prefix = "TEST:MAIN:STRUCTBASE"
-    )[0]
-    assert struct_var2 in exp.all_records
+        proto_file= 'file.proto',
+        prefix = "TEST:MAIN:STRUCTBASE",
+        names = ['GetMAINstruct_basestruct_var2']
+    )
+    assert records[0] in exp.all_records
     assert len(exp.all_records) == 2
 
 
@@ -257,57 +264,99 @@ def test_TmcExplorer_exp_DataType_recursive(generic_tmc_path):
     '''Explore multi level Datatype (Datatype contains others)
     '''
     tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
+    exp = TmcExplorer(tmc,'file.proto')
     exp.exp_DataType(
         tmc.all_Symbols['MAIN.test_iterator'],
         path = [tmc.all_Symbols['MAIN.test_iterator']],
     )
-    struct_var = SingleRecordData.from_element(
+    records = SingleRecordData.from_element(
         tmc.all_SubItems['iterator']['value'],
-        prefix = "TEST:MAIN:ITERATOR"
-    )[0]
-    assert struct_var in exp.all_records
-    struct_var2 = SingleRecordData.from_element(
+        proto_file= 'file.proto',
+        prefix = "TEST:MAIN:ITERATOR",
+        names = ['SetMAINtest_iteratorvalue']
+    )
+    assert records[0] in exp.all_records
+
+    records = SingleRecordData.from_element(
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-        prefix = "TEST:MAIN:ITERATOR:EXT1"
-    )[0]
-    for x in exp.all_records:
-        print(x)
-    assert struct_var2 in exp.all_records
+        proto_file= 'file.proto',
+        prefix = "TEST:MAIN:ITERATOR:EXT1",
+        names = ['SetMAINtest_iteratorextra1struct_var']
+    )
+    
+    assert records[0] in exp.all_records
     assert len(exp.all_records) == 7
 
 
 def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
+    exp = TmcExplorer(tmc,'file.proto')
     exp.exp_Symbols(pragmas_only=True,skip_datatype=True)
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])[0] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.multi'])[0] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['sample_gvl.test_global'])[0] \
-            in exp.all_records
+
+    records = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.ulimit'],
+        proto_file = 'file.proto',
+        names=['GetMAINulimit']
+    )
+    assert records[0] in exp.all_records
+    records = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.multi'],
+        proto_file = 'file.proto',
+        names=['GetMAINmulti']
+    )
+    assert records[0]in exp.all_records
+
+    record_o, record_i = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+        proto_file = 'file.proto',
+        names=['SetMAINNEW_VAR','GetMAINNEW_VAR']
+    )
+    assert record_o in exp.all_records
+    assert record_i in exp.all_records 
+    
+    records = SingleRecordData.from_element(
+        tmc.all_Symbols['sample_gvl.test_global'],
+        proto_file = 'file.proto',
+        names=['Setsample_gvltest_global']
+    )    
+    assert records[0]in exp.all_records
+    
     assert len(exp.all_records) == 5
 
 
 def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
-    exp = TmcExplorer(tmc)
+    exp = TmcExplorer(tmc,'file.proto')
     exp.exp_Symbols(pragmas_only=True)
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.ulimit'])[0] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.multi'])[0] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[0] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['MAIN.NEW_VAR'])[1] \
-        in exp.all_records
-    assert SingleRecordData.from_element(tmc.all_Symbols['sample_gvl.test_global'])[0] \
-            in exp.all_records
+    
+    records = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.ulimit'],
+        proto_file = 'file.proto',
+        names=['GetMAINulimit']
+    )
+    assert records[0] in exp.all_records
+    records = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.multi'],
+        proto_file = 'file.proto',
+        names=['GetMAINmulti']
+    )
+    assert records[0]in exp.all_records
+
+    record_o, record_i = SingleRecordData.from_element(
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+        proto_file = 'file.proto',
+        names=['SetMAINNEW_VAR','GetMAINNEW_VAR']
+    )
+    assert record_o in exp.all_records
+    assert record_i in exp.all_records 
+    
+    records = SingleRecordData.from_element(
+        tmc.all_Symbols['sample_gvl.test_global'],
+        proto_file = 'file.proto',
+        names=['Setsample_gvltest_global']
+    )    
+    assert records[0]in exp.all_records 
+    
     assert len(exp.all_records) == 24
 
 
