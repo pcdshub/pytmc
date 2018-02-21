@@ -8,7 +8,6 @@ import logging
 logger = logging.getLogger(__name__)
 from jinja2 import Environment, PackageLoader, select_autoescape
 import re
-import versioneer
 import textwrap
 import pkg_resources
 import configparser
@@ -17,6 +16,7 @@ from . import DataType
 from . import TmcFile
 from .xml_obj import BaseElement
 from . import Symbol, DataType, SubItem
+import pytmc
 
 class SingleRecordData:
     '''
@@ -404,7 +404,7 @@ class DbRenderAgent(RenderAgent):
 
             pytmc version: {version}'''
         message = message.format(
-            version=str(versioneer.get_version())
+            version=str(pytmc.__version__)
         )
         message = textwrap.dedent(message)
         message = textwrap.indent(message,"# ",lambda line: True)
@@ -463,7 +463,7 @@ class ProtoRenderAgent(RenderAgent):
 
             pytmc version: {version}'''
         message = message.format(
-            version=str(versioneer.get_version())
+            version=str(pytmc.__version__)
         )
         message = textwrap.dedent(message)
         message = textwrap.indent(message,"# ",lambda line: True)

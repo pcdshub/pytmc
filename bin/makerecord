@@ -3,7 +3,7 @@ logger = logging.getLogger(__name__)
 
 import argparse
 from pytmc import FullRender
-import versioneer
+#import versioneer
 import pytmc
 
 description = """Tool for generating .db files (Currently in alpha)"""
@@ -27,9 +27,8 @@ args = parser.parse_args()
 
 
 def main():
-    print(versioneer.get_version())
-    f = FullRender(args.input_file)
-    f.save(args.output_file)
+    f = FullRender(args.input_file,args.output_file)
+    f.save()
 
 
 
