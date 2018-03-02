@@ -52,10 +52,7 @@ def test_SingleRecordData_render(safe_record_factory,capsys):
     out,err = capsys.readouterr()
     rec1 = safe_record_factory
     rec2 = safe_record_factory
-    agent = DbRenderAgent([rec1,rec2])
-    print()
-    print(agent.render())
-    
+    agent = DbRenderAgent([rec1,rec2]) 
 
 def test_SingleRecordData_pv_append():
     rec = SingleRecordData(
@@ -409,7 +406,6 @@ def test_SingleProtoDataRender():
         "getFTest",
     )
     agent = ProtoRenderAgent([a,b])
-    print(agent.render())
 
 
 def test_SingleProtoData_has_init(generic_tmc_path):
@@ -430,7 +426,6 @@ def test_SingleProtoData_has_init(generic_tmc_path):
 def test_SingleProtoData_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
-    print(tmc.all_Symbols['MAIN.ulimit'].name)
 
 
     protos = SingleProtoData.from_element_path(
@@ -453,8 +448,6 @@ def test_SingleProtoData_from_element_path(generic_tmc_path):
         ],
         'fake_name',
     )
-    print(proto_out.__dict__)
-    print(proto_in.__dict__)
     
     assert type(proto_out) == SingleProtoData
     assert proto_out.name == 'Setfake_name'
