@@ -1,4 +1,4 @@
-PYTPY
+PYTMC
 =====
 
 .. image:: https://travis-ci.org/slaclab/pytmc.svg?branch=master

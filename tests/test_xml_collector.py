@@ -45,16 +45,14 @@ def test_ElementCollector_add(generic_tmc_root):
 def test_ElementCollector_registered(generic_tmc_root):
     root = generic_tmc_root
     iterator = DataType(root.find("./DataTypes/DataType/[Name='iterator']"))
-    iterator.registered_pragmas.append("iterator attr")
+    
     version = DataType(root.find("./DataTypes/DataType/[Name='VERSION']"))
     col = ElementCollector()
+    
     col.add(iterator)
     col.add(version)
-
-    print(col['iterator'].pragmas)
-    print(col['VERSION'].pragmas)
-    assert col['iterator'].pragmas == {'iterator attr':['42']}
-    assert col.registered == {'iterator':iterator}
+    
+    assert col.registered == {'iterator':iterator} 
 
 
 def test_TmcFile_instantiation(generic_tmc_path,generic_tmc_root):
@@ -74,7 +72,7 @@ def test_TmcFile_isolate_Symbols(generic_tmc_path):
     assert "MAIN.test_iterator" in tmc.all_Symbols
     assert "Constants.RuntimeVersion" in tmc.all_Symbols
 
-    assert len(tmc.all_Symbols) == 18
+    assert len(tmc.all_Symbols) == 21
 
 
 def test_TmcFile_isolate_DataTypes(generic_tmc_path):
@@ -84,7 +82,7 @@ def test_TmcFile_isolate_DataTypes(generic_tmc_path):
     assert "iterator" in tmc.all_DataTypes
     assert "VERSION" in tmc.all_DataTypes
 
-    assert len(tmc.all_DataTypes) == 7
+    assert len(tmc.all_DataTypes) == 9
 
 
 def test_TmcFile_isolate_SubItems(generic_tmc_path):
@@ -96,10 +94,10 @@ def test_TmcFile_isolate_SubItems(generic_tmc_path):
     assert 'out' in tmc.all_SubItems['iterator']
     assert 'value' in tmc.all_SubItems['iterator']
     assert 'lim' in tmc.all_SubItems['iterator']
+    assert 'extra1' in tmc.all_SubItems['iterator']
+    assert 'extra2' in tmc.all_SubItems['iterator']
    
-    assert len(tmc.all_SubItems['iterator']) == 4
-
-
+    assert len(tmc.all_SubItems['iterator']) == 6
 
 
 def test_TmcFile_isolate_all(generic_tmc_path):
@@ -112,27 +110,22 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert "MAIN.test_iterator" in tmc.all_Symbols
     assert "Constants.RuntimeVersion" in tmc.all_Symbols
 
-    assert len(tmc.all_Symbols) == 18
+    assert len(tmc.all_Symbols) == 21
 
 
     assert "iterator" in tmc.all_DataTypes
     assert "VERSION" in tmc.all_DataTypes
 
-    assert len(tmc.all_DataTypes) == 7
-
-    '''
-    for x in tmc.all_DataTypes:
-        print("\t",x,"  ", len(tmc.all_DataTypes[x].children))
-        for y in tmc.all_DataTypes[x].children:
-            print("\t\t",y)
-    '''
+    assert len(tmc.all_DataTypes) == 9
 
     assert 'increment' in tmc.all_SubItems['iterator']
     assert 'out' in tmc.all_SubItems['iterator']
     assert 'value' in tmc.all_SubItems['iterator']
     assert 'lim' in tmc.all_SubItems['iterator']
+    assert 'extra1' in tmc.all_SubItems['iterator']
+    assert 'extra2' in tmc.all_SubItems['iterator']
    
-    assert len(tmc.all_SubItems['iterator']) == 4
+    assert len(tmc.all_SubItems['iterator']) == 6
 
 
 

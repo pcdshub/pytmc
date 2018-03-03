@@ -9,6 +9,6 @@ setup(name     = 'pytmc',
 
       packages    = find_packages(),
       description = 'Generate Epics DB records from TwinCAT .tmc files',
-      scripts = ['bin/xmltranslate'],
+      scripts = ['bin/xmltranslate','bin/makerecord'],
       include_package_data = True,
 )

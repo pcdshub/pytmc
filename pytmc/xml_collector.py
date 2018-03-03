@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from pytmc import Symbol, DataType, SubItem
+from . import Symbol, DataType, SubItem
 
 
 
@@ -47,12 +47,11 @@ class ElementCollector(dict):
             TwinCAT variables for pytmc
         '''
         names = list(filter(
-            lambda x: self[x].has_pragma,
+            lambda x: self[x].has_config,
             self,
 
         ))
         return {name:self[name] for name in names}
-
 
 
 class TmcFile:
@@ -83,6 +82,7 @@ class TmcFile:
         self.all_Symbols = ElementCollector()
         self.all_DataTypes = ElementCollector()
         self.all_SubItems = defaultdict(ElementCollector) 
+        self.isolate_all()
 
     def isolate_Symbols(self):
         '''
@@ -143,6 +143,10 @@ class TmcFile:
             pass
 
     def isolate_all(self):
+        '''
+        Shortcut for running :func:`~isolate_Symbols` and
+        :func:`~isolate_DataTypes`
+        '''
         self.isolate_Symbols()
         self.isolate_DataTypes()
 

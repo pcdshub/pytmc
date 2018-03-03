@@ -8,6 +8,8 @@ import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
+import re
+
 
 class BaseElement:
     '''
@@ -22,12 +24,23 @@ class BaseElement:
     base : str
         The prefix that will mark pragmas intended for pytmc's consumption. 
     '''
-    def __init__(self, element, base='pytmc'):
+    def __init__(self, element, base=None, suffixes=None):
         if type(element) != ET.Element:
             raise TypeError("ElementTree.Element required")
         self.element = element
         self.registered_pragmas = []
-        self.com_base = base
+        if base == None:
+            self.com_base = 'pytmc'
+        else:
+            self.com_base = base
+        if suffixes == None:
+            self.suffixes = {
+                'Pv' : '_pv',
+                'DataType' : '_dt_name',
+                'Field' : '_field'
+            }
+        else:
+            self.suffixes = suffixes
 
     def _get_raw_properties(self):
         """
@@ -60,7 +73,7 @@ class BaseElement:
         if raw == None:
             return None
 
-        result = defaultdict(list)
+        result = {}
 
         for entry in raw:
             name_element = entry.find("./Name")
@@ -76,12 +89,12 @@ class BaseElement:
             else:    
                 value_text = value_element.text
             
-            result[name_text].append(value_text)
+            result[name_text] = value_text
 
         return result
 
     @property
-    def pragmas(self):
+    def raw_config(self):
         """
         Produce a stripped-down set of properties including only those that are
         recognized as pragmas intended for pytmc's consumption. 
@@ -89,31 +102,86 @@ class BaseElement:
         Returns
         -------
 
-        dict()
-            Dictionary. The key is the property name and the value is a list of
-            values found in the xml
+        str or None
+            produce the string from the pragma marked for pytmc or a None if no
+            such pragma can be found
 
         """
-        props = self.properties
-        pragmas = defaultdict(list)
-        for entry in self.registered_pragmas:
-            if entry in props:
-                pragmas[entry] = props.get(entry)
-
-        return pragmas
-
+        return self.properties.get('pytmc')
+    
     @property
-    def has_pragma(self):
+    def has_config(self):
         '''
+        Shortcut for determining if this element has pragmas. 
+        
         Returns
         -------
         bool
-            True if there are regestered pragmas attached to this xml element
+            True if there is a config pragma attached to this xml element
         '''
-        if len(self.pragmas) > 0:
+        if self.raw_config != None:
             return True
 
         return False
+
+    @property
+    def config_lines(self):
+        '''
+        Read in a rudimentary python representation of the config statement.
+        Use :func:`~config` to access a more cleanly formatted version of this
+        information.
+
+        Returns
+        -------
+             list
+                this list contains dictionaries for each line of the config
+                statement
+
+        '''
+        finder = re.compile(
+            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
+        )
+        result = [ m.groupdict() for m in finder.finditer(self.raw_config)]
+        for line in result:
+            line['tag'] = line['tag'].strip()
+        return result
+    
+    def neaten_field(self, string):
+        '''
+        Method for formatting the 'field' line
+        
+        Parameters
+        ----------
+        string : str
+            This is the string to be broken into field name and field setting
+
+        Returns
+        -------
+            dict
+                Keys are f_name for the field name and f_set for the
+                corresponding setting.
+        '''
+        finder = re.compile(
+            r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)"
+        )
+        return finder.search(string).groupdict()
+
+    @property
+    def config(self):
+        """
+        Cleanly formatted python representation of the config statement
+
+        Returns
+        -------
+             list
+                this list contains dictionaries for each line of the config
+                statement
+        """
+        cfg_lines = self.config_lines
+        for line in cfg_lines:
+            if line['title'] == 'field':
+                line['tag'] = self.neaten_field(line['tag'])
+        return cfg_lines
 
     def get_subfield(self, field_target, get_all=False):
         """
@@ -180,6 +248,127 @@ class BaseElement:
             The name of the variable
         '''
         return self.get_subfield("Name").text
+    
+    def extract_pragmas(self, title):
+        return __class__.parse_pragma(title,self.config)
+
+    @staticmethod
+    def parse_pragma(title, cfg):
+        '''
+        Get the designated configuration line(s) from the config pragma.
+
+        Parameters
+        ----------
+        title : str 
+            title of the config line searched for
+
+        cfg : list
+            The list of pragma lines to be searched  
+
+        Returns
+        -------
+        str, list of str or None
+            If there is only one name for the datatype, return a string, if
+            there are multiple, list each name, returns None if none are found.
+        ''' 
+        result = []
+                
+        for line in cfg:
+            if line['title'] == title:
+                result.append(line['tag'])
+        
+        if result == []:
+            result = None
+        elif len(result) == 1:
+            result = result[0]
+
+        return result
+
+    @property
+    def pv(self):
+        '''
+        Retrieve the config line specifying pv name for this entity.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        return self.extract_pragmas('pv')
+    
+    @property
+    def fields(self):
+        '''
+        Retrieve the config line specifying db fields for this entity.
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        return self.extract_pragmas('field')
+
+    @property
+    def dtname(self):
+        '''
+        Retrieve the config line specifying a name for this datatype.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        
+        return self.extract_pragmas('name')
+    
+    @property
+    def rec_type(self):
+        '''
+        Retrieve the confic line specifying record type (i.e. ao,ai) for this 
+        entity.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        return self.extract_pragmas('type')
+    
+    @property
+    def str_f(self):
+        '''
+        Retrieve the confic line specifying in-proto data format for this 
+        entity.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        return self.extract_pragmas('str')
+    
+    @property
+    def io(self):
+        '''
+        Retrieve the confic line specifying data direction for this 
+        entity.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        return self.extract_pragmas('io')
+
+    @property
+    def config_by_pv(self):
+        data = self.config
+        separate_lists = []
+        for line in data:
+            if line['title'] == 'pv':
+                separate_lists.append([])
+                index = len(separate_lists) - 1
+            separate_lists[index].append(line)
+        return separate_lists
 
 
 class Symbol(BaseElement):
@@ -196,11 +385,11 @@ class Symbol(BaseElement):
     base : str
         The prefix that will mark pragmas intended for pytmc's consumption. 
     '''
-    def __init__(self, element, base='pytmc'):
-        super().__init__(element, base)
-        registered_pragmas = [
-            self.com_base + '_field', 
-            self.com_base + '_pv', 
+    def __init__(self, element, base=None,suffixes=None):
+        super().__init__(element, base, suffixes)
+        self.registered_pragmas = [
+            self.com_base + self.suffixes['Field'], 
+            self.com_base + self.suffixes['Pv'], 
         ]
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
@@ -214,7 +403,9 @@ class Symbol(BaseElement):
         -------
 
         str
-            Name of data type
+            Name of data type (e.g. DINT in the case of a basic type or
+            'iterator' if it is an instance of a user defined struct/fb named
+            'iterator'
         '''
         name_field = self.get_subfield("BaseType")
         return name_field.text
@@ -246,10 +437,10 @@ class DataType(BaseElement):
     '''
     children = []
     
-    def __init__(self, element, base='pytmc'):
-        super().__init__(element, base)
+    def __init__(self, element, base=None, suffixes=None):
+        super().__init__(element, base, suffixes)
         self.registered_pragmas = [
-            self.com_base + '_ds_name',
+            self.com_base + self.suffixes['DataType'],
         ]
         
         self.children = []
@@ -258,7 +449,7 @@ class DataType(BaseElement):
             logger.warning("DataType instance not matched to xml DataType")
  
     @property
-    def tc_type(self):
+    def datatype(self):
         '''
         Return the type of the data this symbol represents.
 
@@ -295,6 +486,10 @@ class DataType(BaseElement):
         return result
 
     @property
+    def tc_type(self):
+        return None
+
+    @property
     def tc_extends(self):
         '''
         Return the DataType that this DataType is built upon
@@ -302,11 +497,13 @@ class DataType(BaseElement):
         Returns
         -------
 
-        str
-            DataType name
+        str or None
+            DataType name or None if there is no parent 
 
         '''
         extension_element = self.get_subfield("ExtendsType")
+        if extension_element == None:
+            return None
         return extension_element.text
     
 
@@ -341,11 +538,11 @@ class SubItem(BaseElement):
     parent : :class:`~pytmc.xml_obj.baseElement`
         The DataStructure in which this SubItem appears
     '''
-    def __init__(self, element, base='pytmc', parent = None):
-        super().__init__(element, base)
-        registered_pragmas = [
-            self.com_base + '_field', 
-            self.com_base + '_pv', 
+    def __init__(self, element, base=None, suffixes=None, parent = None):
+        super().__init__(element, base, suffixes)
+        self.registered_pragmas = [
+            self.com_base + self.suffixes['Field'], 
+            self.com_base + self.suffixes['Pv'], 
         ]
         self.__parent = None
         self.parent = parent
@@ -363,9 +560,10 @@ class SubItem(BaseElement):
 
         Returns
         -------
-
         str
-            Name of data type
+            Name of data type (e.g. DINT in the case of a basic type or
+            'iterator' if it is an instance of a user defined struct/fb named
+            'iterator'
         '''
         name_field = self.get_subfield("Type")
         return name_field.text
@@ -393,7 +591,6 @@ class SubItem(BaseElement):
                 lambda g : g != self,
                 self.__parent.children
             ))
-            print("NEW_LIST",new_list)
             self.__parent.children = new_list
             self.__parent = None 
     
