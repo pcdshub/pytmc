@@ -1,6 +1,7 @@
 ./_sources/dev_notes.rst.txt
 ./_sources/index.rst.txt
 ./_sources/source_docs.rst.txt
+./_sources/tmc_render.rst.txt
 ./_sources/xml_collector.rst.txt
 ./_sources/xml_obj.rst.txt
 ./_static/ajax-loader.gif
@@ -45,5 +46,6 @@
 ./search.html
 ./searchindex.js
 ./source_docs.html
+./tmc_render.html
 ./xml_collector.html
 ./xml_obj.html
