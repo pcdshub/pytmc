@@ -9,7 +9,8 @@ Welcome to pytmc's documentation!
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
-   
+
+   user_guide.rst
    source_docs.rst
    dev_notes.rst
 

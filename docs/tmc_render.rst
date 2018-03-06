@@ -23,7 +23,7 @@ ProtoRenderAgent
 ++++++++++++++++
 .. autoclass:: pytmc.ProtoRenderAgent
 
-DbRenderAgent
+TmcExplorer
 +++++++++++++
 .. autoclass:: pytmc.TmcExplorer
 

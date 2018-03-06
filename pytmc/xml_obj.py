@@ -65,7 +65,7 @@ class BaseElement:
         Returns
         -------
 
-        dict()
+        dict
             Dictionary. The key is the property name and the value is a list of
             values found in the xml
         """
@@ -133,9 +133,9 @@ class BaseElement:
 
         Returns
         -------
-             list
-                this list contains dictionaries for each line of the config
-                statement
+        list
+            this list contains dictionaries for each line of the config 
+            statement
 
         '''
         finder = re.compile(
@@ -214,6 +214,10 @@ class BaseElement:
         return target_element 
 
     def __eq__(self,other):
+        '''
+        Two objects are equal if they point to the same xml element. e.g. their
+        element fields point to the same place in the same file.
+        '''
         if (type(other) != BaseElement
                 and type(other) != Symbol
                 and type(other) != DataType
@@ -239,8 +243,9 @@ class BaseElement:
     @property
     def name(self):
         '''
-        Return the TwinCAT name for this Symbol/DataType/SubItem. This info is
-        taken from the text of the name field sub-element.
+        Return the user assigned TwinCAT variable name for this
+        Symbol/DataType/SubItem. This info is taken from the text of the name
+        field sub-element.
 
         Returns
         -------
@@ -361,6 +366,16 @@ class BaseElement:
 
     @property
     def config_by_pv(self):
+        '''
+        Parse the pytmc pragma into groups, one for each PV to be made from the
+        variable. 
+
+        Returns
+        -------
+        list 
+            This list contains a list for each unique PV. These lists contain
+            dictionaries, one for each row of the pragma.
+        '''
         data = self.config
         separate_lists = []
         for line in data:
