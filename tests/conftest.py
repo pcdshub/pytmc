@@ -20,6 +20,7 @@ def generic_tmc_root():
     root = tree.getroot()
     return root
 
+
 @pytest.fixture(scope='function')
 def generic_tmc_path():
     directory = os.path.dirname(os.path.realpath(__file__))

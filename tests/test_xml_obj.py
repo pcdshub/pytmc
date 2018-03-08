@@ -249,8 +249,6 @@ def test_parent_relation(generic_tmc_root):
     assert c1.parent == par
     assert c2.parent == par
 
-    print(par.children)
-    print(c1.parent)
     del c1.parent 
 
     assert c0 in par.children
@@ -369,7 +367,6 @@ def test_config(generic_tmc_root):
         {'title': 'io', 'tag': 'input'},
         {'title': 'str', 'tag': '%d'}
     ]
-    print(symbol_element.config)
     assert symbol_element.config == data
 
 
@@ -503,6 +500,7 @@ def test_all_io(generic_tmc_root):
     assert symbol_element.io == [
         'o','i'
     ]
+
 
 def test_all_config_by_pv(generic_tmc_root):
     root = generic_tmc_root
