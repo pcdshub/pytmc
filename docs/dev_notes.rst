@@ -3,11 +3,16 @@ Developer's Notes
 A page for storing information and announcements concerning the development of
 Pytpy
 
+Concerning ADS Driver upgrades (3/8/18)
++++++++++++++++++++++++++++++++++++++++
+Newer iterations of ESS's ADS Driver no longer use the .proto file and can
+offer better performance for the IOC. While the driver's backwards
+compatibility should still work with pytmc's current output, upgrading pytmc to
+use the new format has been added as a priority.
 
 PYTPY is now PYTMC (1/25/18)
 ++++++++++++++++++++++++++++
 The name of the package has been updated to reflect the change in target file.
-
 
 TPY vs. TMC (1/16/18)
 +++++++++++++++++++++

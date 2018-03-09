@@ -119,6 +119,9 @@ class SingleRecordData:
     @property
     def has_comment(self):
         '''
+        This property allows jinja to evaluate whether or not to draw a
+        comments region. 
+
         Returns
         -------
         bool
@@ -139,15 +142,25 @@ class SingleRecordData:
         target : :class:`~BaseElement` or child thereof
             This is the target element for which record(s) will be created
 
-        prefix : str
+        prefix : str or None
             The section of the PV name to be appended to the front of the PV of
             the target element
+
+        proto_file : str or None
+            The full name of the proto file where the prototypes used by the
+            record are held.
+
+        names : list or None
+            This is the list of prototype methods to be matched with the record
+            created from the target element. This list must be the same size
+            as the number of records to be created or be None. Note that .
 
         Returns
         -------
         list
             This is list of record instances generated. There is one instance
-            per PV given
+            per PV specified for the target variable
+
         '''
         # if a colon as not been appended to the end o the PV prefix, add one
         if prefix != None:
@@ -184,6 +197,13 @@ class SingleRecordData:
         return record_list
 
     def guess_ADS_line(self, pv_group,proto_file,name):
+        '''
+        For a given set of pragmas concerning a single PV, construct the ADS
+        reference.
+
+        pv_group : list
+            This list of dictionaries gives the 
+        '''
         if 'i' in BaseElement.parse_pragma('io',pv_group):
             f_name = "INP"
         elif 'o' in BaseElement.parse_pragma('io',pv_group):
@@ -195,6 +215,49 @@ class SingleRecordData:
 
 
 class SingleProtoData:
+    '''
+    Data structre for packaging all the information required to render an epics
+    proto entry.
+
+    SingleProtoData supports equality testing. Two instances are equal if all
+    their attributes are equal.
+    
+    Note
+    ----
+    The parameters for the constructor are for setting the attributes of this
+    class. 
+    
+    Parameters
+    ----------
+    name : str
+
+    out_field : str
+    
+    in_field : str
+    
+    init : str
+
+    Attributes
+    ----------
+    name : str
+        This specifies the name of the proto 'method'. This is the name used to
+        refer to the proto in the .db file. Name collision is prevented in
+        :func:`~TmcExplorer.make_intf` by manually assigning a name for the
+        :func:`~from_element_path`.
+
+    out_field : str
+        This is the content to be placed after the 'out' field in the proto
+        file.
+    
+    in_field : str
+        This is the content to be placed after the 'in' field in the proto
+        file.
+    
+    init : str
+        If this field is meant to be initialized with another value, place the
+        name of the proto here. 
+    
+    '''
     def __init__(self,name=None,out_field=None,in_field=None,init=None):
         self.name = name
         self.out_field = out_field
@@ -224,7 +287,7 @@ class SingleProtoData:
 
         Parameters
         ----------
-        target : list of :class:`~BaseElement` instances or children thereof
+        path : list of :class:`~BaseElement` instances or children thereof
             This is a list of elements leading to the target element for which
             protos will be created
 
