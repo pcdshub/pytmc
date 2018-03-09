@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>User Guide &mdash; pytmc  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pytmc  documentation" href="index.html"/>
+        <link rel="next" title="Source code documentation" href="source_docs.html"/>
+        <link rel="prev" title="Welcome to pytmc’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pytmc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#obtaining-the-code">Obtaining the code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-in-an-environment">Installing in an environment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#general-usage">General Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-makerecord">Using makerecord</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#marking-the-twincat-project">Marking the TwinCAT project</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#declaring-top-level-variables">Declaring top level variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#declaring-bidirectional-pvs">Declaring bidirectional PVs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pragma-fields">Pragma fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#automatic-lines">Automatic lines</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#python-usage">Python Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source_docs.html">Source code documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_notes.html">Developer’s Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>User Guide</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/user_guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="obtaining-the-code">
+<h3>Obtaining the code<a class="headerlink" href="#obtaining-the-code" title="Permalink to this headline">¶</a></h3>
+<p>Download the code via the tagged releases posted on the <a class="reference external" href="https://github.com/slaclab/pytmc/releases">github releases page</a> or by cloning the source code
+with the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span></span>$ git clone https://github.com/slaclab/pytmc.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-in-an-environment">
+<h3>Installing in an environment<a class="headerlink" href="#installing-in-an-environment" title="Permalink to this headline">¶</a></h3>
+<p>Create a python virtual environment using conda and install the package.</p>
+<p>Begin by creating an environment and replacing [env-name] with the
+name of your environment. If you’re installing pytmc in a preexisting
+environment, you may skip this step.</p>
+<div class="highlight-sh"><div class="highlight"><pre><span></span>$ conda create --name <span class="o">[</span>env-name<span class="o">]</span>
+</pre></div>
+</div>
+<p>Activate your environment.</p>
+<div class="highlight-sh"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> activate <span class="o">[</span>env-name<span class="o">]</span>
+</pre></div>
+</div>
+<p>After cloning or unzipping the package, navigate to the base directory of
+pytmc. There you will find a file titled setup.py. Run the following command
+from this directory. Make sure to install pip in this conda environment prior
+to running pip. Using pip in an environment lacking a pip installation will
+install pytmc in your root environment.</p>
+<div class="highlight-sh"><div class="highlight"><pre><span></span>$ pip install .
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The snippet above has a ‘.’ at the end. It is very difficult to see with
+certain browsers.</p>
+</div>
+<p>Pytmc should be installed now. This can be tested by seeing if the following
+bash command can be found.</p>
+<div class="highlight-sh"><div class="highlight"><pre><span></span>$ makerecord
+</pre></div>
+</div>
+<p>Alternatively, a python shell can be opened and you can attempt to import
+pytmc.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pytmc</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While all of these instructions should work with python environments
+managed by virtualenv and pipenv, only conda has been tested.</p>
+</div>
+</div>
+</div>
+<div class="section" id="general-usage">
+<h2>General Usage<a class="headerlink" href="#general-usage" title="Permalink to this headline">¶</a></h2>
+<p>Pytmc comes with two scripts for users. <code class="docutils literal"><span class="pre">makerecord</span></code> is the primary script
+for generating epics db (.db) and their proto (.proto) files from TwinCAT
+project’s .tmc file. The user must mark the TwinCAT project’s variables to
+indicate which should receive epics records.</p>
+<p>The second tool, <code class="docutils literal"><span class="pre">xmltranslate</span></code>, makes xml and tmc
+files human readable. It is intended primarily for debugging.</p>
+<div class="section" id="using-makerecord">
+<h3>Using makerecord<a class="headerlink" href="#using-makerecord" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">makerecord</span></code> script is the primary tool in the pytmc package. It
+automates the creation of epics db and proto files for an EPICS IOC. Before
+<code class="docutils literal"><span class="pre">makerecord</span></code> can be used, the TwinCAT project must be marked appropriately.
+This tells <code class="docutils literal"><span class="pre">makerecord</span></code> how to create the appropriate records from the the
+TwinCAT variables.  The resulting IOC depends upon EPICS ADS driver. This
+driver is provided by the <a class="reference external" href="https://europeanspallationsource.se/">European Spallation Source</a> and is hosted on their <a class="reference external" href="https://bitbucket.org/europeanspallationsource/m-epics-twincat-ads">bitbucket page</a>.</p>
+<p>Once pytmc has been installed in a virtual environment the <code class="docutils literal"><span class="pre">makerecord</span></code>
+command can be called from the command line. The command uses two positional
+arguments. The first is the input specifying the location of the .tmc file to
+be processed. In most TwinCAT projects the .tmc file will be located in the
+[solution folder]/[project folder]/[plc project] named [plc project].tmc The
+second argument is the path and base name for the output proto and db files.
+Don’t add either of these suffixes to the name as they’ll be appended
+automatically. The <code class="docutils literal"><span class="pre">-h</span></code> argument can be used access to the script’s help
+pages.</p>
+</div>
+<div class="section" id="marking-the-twincat-project">
+<h3>Marking the TwinCAT project<a class="headerlink" href="#marking-the-twincat-project" title="Permalink to this headline">¶</a></h3>
+<p>Marking the TwinCAT project determines how the epics record will be generated.
+The marking process uses custom attribute pragmas to designate variables for
+pytmc to process. The pragma should be applied just above the declaration of
+the variable you wish to mark. You can read more about the TwinCAT pragma
+system <a class="reference external" href="https://infosys.beckhoff.com/english.php?content=../content/1033/tc3_plc_intro/9007201784297355.html&amp;id=">here</a>.</p>
+<div class="section" id="declaring-top-level-variables">
+<h4>Declaring top level variables<a class="headerlink" href="#declaring-top-level-variables" title="Permalink to this headline">¶</a></h4>
+<p>With a pragma, a variable declaration in a main program will appear similar to
+the following:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:SCALE
+    type: ai
+    field: DTYP stream
+    field: SCAN 1 second
+    io: input
+    str: %f
+&#39;}
+scale : LREAL := 0.0;
+</pre></div>
+</div>
+</div>
+<div class="section" id="declaring-encapsulated-variables">
+<h4>Declaring encapsulated variables<a class="headerlink" href="#declaring-encapsulated-variables" title="Permalink to this headline">¶</a></h4>
+<p>Variables declared inside of data structures can be processed by makerecord so
+long as each level of encapsulation is marked for pytmc.</p>
+<p>The top level instantiation of a function block could resemble the following:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:COUNTER_B
+&#39;}
+counter_b : counter;
+</pre></div>
+</div>
+<p>A variable declaration within the <code class="docutils literal"><span class="pre">counter</span></code> function block could resemble the
+following:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: VALUE_F_R
+    type: ai
+    field: DTYP stream
+    field: SCAN 1 second
+    io: input
+    str: %d
+&#39;}
+value_d : DINT;
+</pre></div>
+</div>
+<p>When combined, the PV specified at the instantiation of the user-defined data
+type will be appended to the beginning of the PV for all data types defined
+within. The final PV will be <code class="docutils literal"><span class="pre">TEST:MAIN:COUNTER_B:VALUE_F_R</span></code>. The colons are
+automatically included.</p>
+<p>Information other than the PV name should be specified at the level of the
+specific variable, not where the data type is instantiated.</p>
+<p>This can be recursively applied to data types containing data types.</p>
+</div>
+<div class="section" id="declaring-bidirectional-pvs">
+<h4>Declaring bidirectional PVs<a class="headerlink" href="#declaring-bidirectional-pvs" title="Permalink to this headline">¶</a></h4>
+<p>In instances where a single TwinCAT variable should be able to be both written
+and read, multiple PVs can be specified. This allows multiple PVs to be tied to
+a single TwinCAT variable.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:ULIMIT_R
+    type: ai
+    field: DTYP stream
+    field: SCAN 1 second
+    io: input
+    str: %d
+    pv: TEST:MAIN:ULIMIT_W
+    type: ao
+    field: DTYP stream
+    io: out
+    str: %d
+&#39;}
+upper_limit : DINT := 5000;
+</pre></div>
+</div>
+<p>When specifying multiple PVs, the configuration lines all apply to the nearest,
+previous <code class="docutils literal"><span class="pre">pv</span></code> line. For example in the code snippet above, <code class="docutils literal"><span class="pre">type:</span> <span class="pre">ai</span></code> will
+be applied to the <code class="docutils literal"><span class="pre">TEST:MAIN:ULIMIT_R</span></code> pv and the <code class="docutils literal"><span class="pre">type:</span> <span class="pre">ao</span></code> will be
+applied to <code class="docutils literal"><span class="pre">TEST:MAIN:ULIMT_W</span></code>.</p>
+</div>
+<div class="section" id="pragma-fields">
+<h4>Pragma fields<a class="headerlink" href="#pragma-fields" title="Permalink to this headline">¶</a></h4>
+<p>The lines of the pragma tell makerecord how to generate the db and proto. This
+section contains more specific descriptions of each of the configuration lines.</p>
+<div class="section" id="pv">
+<h5>pv<a class="headerlink" href="#pv" title="Permalink to this headline">¶</a></h5>
+<p>This specifies the PV name that will represent this variable  in EPICS. This
+line can be used on specific variables as well as the instantiations of data
+types. When used on variables declared in the main scope, the PV for the
+variable will be generated verbatim. When used on instantiations, this string
+will be appended to the front of any PVs that are declared within the data
+type.</p>
+</div>
+<div class="section" id="type">
+<h5>type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h5>
+<p>This specifies the EPICS record type. For more information about EPICS records,
+read this page from the <a class="reference external" href="https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14">EPICS wiki</a>. Due to the ADS
+driver records for variables that aren’t array-like are typically of type ai or
+ao.</p>
+</div>
+<div class="section" id="field">
+<h5>field<a class="headerlink" href="#field" title="Permalink to this headline">¶</a></h5>
+<p>This specifies the lines that will be placed in the epics db as ‘fields’. These
+lines determine the PV’s behaviors such as alarm limits and scanning frequency.
+Each field specified in the db corresponds to a field line in the pragma.
+Almost all PVs will have multiple fields and hence multiple field lines in the
+pragma. The field line has two sections, the field type and the argument. The
+field type is the first string of characters up until the first character of
+whitespace. It us usually an all-caps abbreviation like RVAL, DTYP or EGU. This
+determines the type of field being set. All characters after the first space
+are treated as the argument to the field. The argument can include any
+characters including spaces and is only broken on a new line. The INP and OUT
+fields are generated automatically so there is no need to manually include
+them.</p>
+</div>
+<div class="section" id="io">
+<h5>io<a class="headerlink" href="#io" title="Permalink to this headline">¶</a></h5>
+<p>Specify the whether the IOC is reading or writing this value. Values being sent
+from the PLC to the IOC should be marked as input with ‘i’ or ‘input’ and
+values being sent to the PLC from the IOC should be marked ‘o’ or ‘output’.</p>
+</div>
+<div class="section" id="str">
+<h5>str<a class="headerlink" href="#str" title="Permalink to this headline">¶</a></h5>
+<p>Specify how to format the data for the ADS interface. E.g. use <code class="docutils literal"><span class="pre">%s</span></code>, <code class="docutils literal"><span class="pre">%d</span></code>,
+and <code class="docutils literal"><span class="pre">%f</span></code> as if this were a C/C++ program.</p>
+</div>
+<div class="section" id="init">
+<h5>init<a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h5>
+<p>Variables with both read and write variables can use <code class="docutils literal"><span class="pre">init:</span> <span class="pre">true</span></code> to indicate
+that the initial value of the writable value should be initialized as the
+current value read from this PV. The init line should be attached to the output
+PV. Given that the ADS driver is moving away from using the proto file, this
+field may be deprecated soon.</p>
+</div>
+</div>
+<div class="section" id="automatic-lines">
+<h4>Automatic lines<a class="headerlink" href="#automatic-lines" title="Permalink to this headline">¶</a></h4>
+<p>The goal of pytmc is to make IOC creation much faster and less error prone.
+Makerecord’s goal is to guess as many of the configuration lines as possible.
+To allow pytmc to guess the lines, do not include them in the pragma. If you
+wish to override a value that is normally guessed, write the line into the
+pragma. Pytmc is still in development and this list will grow with time. The
+latest version of pytmc can guess the following lines:</p>
+<blockquote>
+<div><ul class="simple">
+<li>INP and OUT fields</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="python-usage">
+<h2>Python Usage<a class="headerlink" href="#python-usage" title="Permalink to this headline">¶</a></h2>
+<p>Once installed pytmc and its components can be imported into a python program
+or shell like any normal python package. Consult the source code documentation
+for specifics.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="source_docs.html" class="btn btn-neutral float-right" title="Source code documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to pytmc’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

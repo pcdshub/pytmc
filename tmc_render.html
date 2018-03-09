@@ -89,6 +89,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="source_docs.html">Source code documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="xml_obj.html">xml_obj.py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xml_collector.html">xml_collector.py</a></li>
@@ -98,7 +99,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#renderagent">RenderAgent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dbrenderagent">DbRenderAgent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#protorenderagent">ProtoRenderAgent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">DbRenderAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tmcexplorer">TmcExplorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fullrender">FullRender</a></li>
 </ul>
 </li>
@@ -235,7 +236,60 @@ class.</p>
 <dl class="class">
 <dt id="pytmc.SingleProtoData">
 <em class="property">class </em><code class="descclassname">pytmc.</code><code class="descname">SingleProtoData</code><span class="sig-paren">(</span><em>name=None</em>, <em>out_field=None</em>, <em>in_field=None</em>, <em>init=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.SingleProtoData" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Data structre for packaging all the information required to render an epics
+proto entry.</p>
+<p>SingleProtoData supports equality testing. Two instances are equal if all
+their attributes are equal.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The parameters for the constructor are for setting the attributes of this
+class.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – </li>
+<li><strong>out_field</strong> (<em>str</em>) – </li>
+<li><strong>in_field</strong> (<em>str</em>) – </li>
+<li><strong>init</strong> (<em>str</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.name">
+<code class="descname">name</code><a class="headerlink" href="#pytmc.SingleProtoData.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – This specifies the name of the proto ‘method’. This is the name used to
+refer to the proto in the .db file. Name collision is prevented in
+<code class="xref py py-func docutils literal"><span class="pre">make_intf()</span></code> by manually assigning a name for the
+<code class="xref py py-func docutils literal"><span class="pre">from_element_path()</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.out_field">
+<code class="descname">out_field</code><a class="headerlink" href="#pytmc.SingleProtoData.out_field" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – This is the content to be placed after the ‘out’ field in the proto
+file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.in_field">
+<code class="descname">in_field</code><a class="headerlink" href="#pytmc.SingleProtoData.in_field" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – This is the content to be placed after the ‘in’ field in the proto
+file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.init">
+<code class="descname">init</code><a class="headerlink" href="#pytmc.SingleProtoData.init" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – If this field is meant to be initialized with another value, place the
+name of the proto here.</p>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="renderagent">
@@ -336,8 +390,8 @@ records to be made.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="id1">
-<h2>DbRenderAgent<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="tmcexplorer">
+<h2>TmcExplorer<a class="headerlink" href="#tmcexplorer" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pytmc.TmcExplorer">
 <em class="property">class </em><code class="descclassname">pytmc.</code><code class="descname">TmcExplorer</code><span class="sig-paren">(</span><em>tmc</em>, <em>proto_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcExplorer" title="Permalink to this definition">¶</a></dt>

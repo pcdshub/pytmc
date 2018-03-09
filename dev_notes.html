@@ -87,8 +87,10 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source_docs.html">Source code documentation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer’s Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#concerning-ads-driver-upgrades-3-8-18">Concerning ADS Driver upgrades (3/8/18)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pytpy-is-now-pytmc-1-25-18">PYTPY is now PYTMC (1/25/18)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tpy-vs-tmc-1-16-18">TPY vs. TMC (1/16/18)</a></li>
 </ul>
@@ -160,6 +162,13 @@
 <h1>Developer’s Notes<a class="headerlink" href="#developer-s-notes" title="Permalink to this headline">¶</a></h1>
 <p>A page for storing information and announcements concerning the development of
 Pytpy</p>
+<div class="section" id="concerning-ads-driver-upgrades-3-8-18">
+<h2>Concerning ADS Driver upgrades (3/8/18)<a class="headerlink" href="#concerning-ads-driver-upgrades-3-8-18" title="Permalink to this headline">¶</a></h2>
+<p>Newer iterations of ESS’s ADS Driver no longer use the .proto file and can
+offer better performance for the IOC. While the driver’s backwards
+compatibility should still work with pytmc’s current output, upgrading pytmc to
+use the new format has been added as a priority.</p>
+</div>
 <div class="section" id="pytpy-is-now-pytmc-1-25-18">
 <h2>PYTPY is now PYTMC (1/25/18)<a class="headerlink" href="#pytpy-is-now-pytmc-1-25-18" title="Permalink to this headline">¶</a></h2>
 <p>The name of the package has been updated to reflect the change in target file.</p>
