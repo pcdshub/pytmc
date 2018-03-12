@@ -9,6 +9,7 @@
 .vscode
 docs/_build/*
 .coverage
+*.cover
 .cache
 *.egg
 *.egg-info/
