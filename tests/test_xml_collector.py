@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from pytmc import Symbol, DataType, SubItem
 from pytmc.xml_obj import BaseElement
 
-from pytmc import TmcFile
+from pytmc import TmcFile, PvPackage
 from pytmc.xml_collector import ElementCollector
 
 from collections import defaultdict
@@ -127,5 +127,56 @@ def test_TmcFile_isolate_all(generic_tmc_path):
    
     assert len(tmc.all_SubItems['iterator']) == 6
 
+
+def test_pv_package_instantiation(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    #print(tmc.all_Symbols)
+    #print(tmc.all_DataTypes)
+    #print(tmc.all_SubItems)
+    element_path = [
+        tmc.all_Symbols['MAIN.test_iterator'],
+        tmc.all_SubItems['iterator']['value']
+    ]
+
+    # ensure that you can instantiate w/o errors
+    try:
+        pv_pack = PvPackage(
+            target_path = element_path,
+            pragma = element_path[-1].config_by_pv[0],
+            proto_name = '',
+            proto_file_name = '',
+        )
+    except:
+        pytest.fail()
+
+    # ensure that the pragmas properly crossed over
+    print(tmc.all_SubItems['iterator']['value'].config_by_pv)
+    assert pv_pack.pv_complete == "TEST:MAIN:ITERATOR:VALUE"
+    assert {'title':'pv', 'tag':'VALUE'} in pv_pack.pragma
+
+    
+
+def test_pv_package_from_element_path(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    element_path = [
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+    ]
+
+    pv_packs = PvPackage.from_element_path(
+        target_path = element_path,
+        base_proto_name = 'NEW_VAR',
+        proto_file_name = '',
+    )
+
+    assert len(pv_packs) == 2 
+    assert pv_packs[0].pv_complete == "TEST:MAIN:NEW_VAR_OUT"
+    assert pv_packs[1].pv_complete == "TEST:MAIN:NEW_VAR_IN"
+
+    assert pv_packs[0].proto_name == "SetNEW_VAR"
+    assert pv_packs[1].proto_name == "GetNEW_VAR"
+
+    
+
+    
 
 

@@ -9,7 +9,8 @@ logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from . import Symbol, DataType, SubItem
-
+from copy import deepcopy
+from .xml_obj import BaseElement
 
 
 class ElementCollector(dict):
@@ -149,4 +150,108 @@ class TmcFile:
         '''
         self.isolate_Symbols()
         self.isolate_DataTypes()
+
+
+class PvPackage:
+    '''
+    PvPackage stores the information for each PV to be created. These instances
+    can store the complete set of configuration lines. The initial set is taken
+    from the pragma and those unfilled are guessed into place when the object
+    is created.
+
+    Most of the work occurs during instantiation so the instances of this
+    object are intended for single setup.
+
+    Parameters
+    ----------
+    target_path : list
+        This is a list of Symbols, DataTypes, and/or subitems leading to the
+        targeted TwinCAT variable
+
+    pragma : list
+        The list of configuration lines specific to a single PV, taken from the
+        config_by_pv method. 
+
+    proto_name : str, optional
+        The name for this proto method.
+
+    proto_file_name : str, optional
+        The local file name for the proto file. Full path is not necessary
+
+    Attributes
+    ----------
+    target_path : list
+        Identical to target_path parameter
+
+    pragma : list
+        this list of dictionaries is a deep-copied version of the pragmas
+        attached to the TwinCAT variable. This variable is to be used for
+        guessing in the automated fields.
+
+    pv_partial : str
+        This str designates the pv term specific to this variable.
+
+    pv_complete : str
+        The full PV for this variable concatenating all encapsulating PVs and
+        the target PV. 
+
+    proto_name : str, None
+        Identical to proto_name parameter.
+
+    proto_file_name : str, None
+        Identical to proto_file_name parameter.
+        
+    '''
+    def __init__(self, target_path, pragma, proto_name=None,
+            proto_file_name=None):
+        self.target_path = target_path
+        self.pragma = deepcopy(pragma)
+        for row in self.pragma:
+            if row['title'] == 'pv':
+                pv = row['tag']
+
+        self.pv_partial = pv
+        self.prefix = ""
+        for entry in target_path[:-1]: 
+            self.prefix += (entry.pv + ":")
+        self.pv_complete = self.prefix + self.pv_partial
+        self.proto_name = proto_name
+        self.proto_file_name = proto_file_name
+
+    @classmethod
+    def from_element_path(cls, target_path, base_proto_name=None, 
+            proto_file_name=None):
+        '''
+        Produce a list of PvPackage instances, one for each unique PV being
+        created from a specific TwinCAT variable. 
+        
+        Parameters
+        ----------
+        target_path : list
+            Identical to target_path in __init__.
+    
+        proto_name : str, None
+            Identical to proto_name parameter in __init__.
+    
+        proto_file_name : str, None
+            Identical to proto_file_name parameter in __init__.
+        '''
+        pvpacks_output_list = []
+
+        for config_set in target_path[-1].config_by_pv:
+            io_line = BaseElement.parse_pragma('io',config_set)
+            if "o" in io_line:
+                proto_name = "Set" + base_proto_name
+            elif "i" in io_line:
+                proto_name = "Get" + base_proto_name
+
+            new_pvpack = cls(
+                target_path = target_path,
+                pragma = config_set,
+                proto_name = proto_name,
+                proto_file_name = proto_file_name
+            )
+            pvpacks_output_list.append(new_pvpack)
+
+        return pvpacks_output_list
 
