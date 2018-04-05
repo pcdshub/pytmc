@@ -159,6 +159,7 @@ class PvPackage:
     from the pragma and those unfilled are guessed into place when the object
     is created.
 
+    Deprecate the following? 
     Most of the work occurs during instantiation so the instances of this
     object are intended for single setup.
 
@@ -185,7 +186,7 @@ class PvPackage:
 
     pragma : list
         this list of dictionaries is a deep-copied version of the pragmas
-        attached to the TwinCAT variable. This variable is to be used for
+        attached to the TwinCAT variable. This variable is meant for
         guessing in the automated fields.
 
     pv_partial : str
@@ -200,27 +201,35 @@ class PvPackage:
 
     proto_file_name : str, None
         Identical to proto_file_name parameter.
-        
+
+    guessing_applied : bool
+        Have the guessing procedures been run yet?
     '''
     def __init__(self, target_path, pragma, proto_name=None,
-            proto_file_name=None):
+            proto_file_name=None, use_proto=True):
         self.target_path = target_path
+        # Create separate pragma copy to hold both original and guessed lines 
         self.pragma = deepcopy(pragma)
+        # Acquire the Pv attached to this pragma (may only be the tail)
         for row in self.pragma:
             if row['title'] == 'pv':
                 pv = row['tag']
-
+        # Set partial to the component of the PV specified in this element
         self.pv_partial = pv
+        # Construct the full PV by iterating through all PVs in the path
         self.prefix = ""
         for entry in target_path[:-1]: 
             self.prefix += (entry.pv + ":")
         self.pv_complete = self.prefix + self.pv_partial
+        # Save the name of the proto method and file
         self.proto_name = proto_name
         self.proto_file_name = proto_file_name
-
+        # Indicate that guessing procedures have not been applied
+        self.guessing_applied = False
+         
     @classmethod
     def from_element_path(cls, target_path, base_proto_name=None, 
-            proto_file_name=None):
+            proto_file_name=None, use_proto=True):
         '''
         Produce a list of PvPackage instances, one for each unique PV being
         created from a specific TwinCAT variable. 
@@ -238,6 +247,8 @@ class PvPackage:
         '''
         pvpacks_output_list = []
 
+        # Iterate through each pragma-set (one per PV) for the final element in
+        # target path
         for config_set in target_path[-1].config_by_pv:
             io_line = BaseElement.parse_pragma('io',config_set)
             if "o" in io_line:
@@ -249,9 +260,46 @@ class PvPackage:
                 target_path = target_path,
                 pragma = config_set,
                 proto_name = proto_name,
-                proto_file_name = proto_file_name
+                proto_file_name = proto_file_name,
+                use_proto = use_proto
             )
             pvpacks_output_list.append(new_pvpack)
 
         return pvpacks_output_list
+
+    def add_config(self, title, setting, field=False):
+        """Add a single entry to this object's pragma
+
+        Parameters
+        ----------
+        title : str
+            Configuration lines and fields have both a title designating what
+            the line sets. This string sets the configuraiton type or the field
+            type.
+
+        setting : str
+            Configuration lines and fields must then apply some setting. This
+             argument defines what setting is applied.
+
+        field : bool, optional, defaults to False
+            If true, this method will add a field line with title and setting
+            specified by the previous parameters,
+        """
+        if field:    
+            new_entry = {
+                'title': 'field', 
+                'tag': {'f_name': title, 'f_set': setting}
+            }
+        
+        else:
+            new_entry = {'title': title, 'tag': setting}
+
+        self.pragma.append(new_entry)
+        
+    
+    def create_record(self):
+        raise NotImplementedError
+
+    def create_proto(self):
+        raise NotImplementedError
 

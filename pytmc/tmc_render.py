@@ -325,7 +325,6 @@ class SingleProtoData:
                 inst.out_field = adspath + "?"
                 inst.in_field = BaseElement.parse_pragma('str',config_set)
            
-
             inst_collection.append(inst)
         return inst_collection
 
