@@ -7,10 +7,11 @@ interpretations. Db Files can be produced from the interpretation
 import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
-from collections import defaultdict
+from collections import defaultdict, OrderedDict as odict
 from . import Symbol, DataType, SubItem
 from copy import deepcopy
 from .xml_obj import BaseElement
+
 
 
 class ElementCollector(dict):
@@ -205,8 +206,11 @@ class PvPackage:
     guessing_applied : bool
         Have the guessing procedures been run yet?
     '''
+    versions = ['legacy']
+    
     def __init__(self, target_path, pragma, proto_name=None,
-            proto_file_name=None, use_proto=True):
+            proto_file_name=None, use_proto=True,version='legacy'):
+        self.define_versions()
         self.target_path = target_path
         # Create separate pragma copy to hold both original and guessed lines 
         self.pragma = deepcopy(pragma)
@@ -223,9 +227,108 @@ class PvPackage:
         self.pv_complete = self.prefix + self.pv_partial
         # Save the name of the proto method and file
         self.proto_name = proto_name
+
         self.proto_file_name = proto_file_name
         # Indicate that guessing procedures have not been applied
         self.guessing_applied = False
+        self.version = version
+        self.set_version()
+
+    def define_versions(self):
+        '''Define all auto-complete rule sets for ALL versions.
+        '''
+        # list out required pragma fields for this version
+        self._all_req_fields = {
+            'legacy':[
+                odict([('pv',['title'])]),
+                odict([('type',['title'])]),
+                odict([('str',['title'])]),
+                odict([('io',['title'])]),
+                odict([('field',['title']),('DTYP',['tag','f_name'])]),
+                odict([('field',['title']),('SCAN',['tag','f_name'])]),
+                odict([('field',['title']),('INP',['tag','f_name'])]),
+            ]
+        }
+
+        '''
+        # list out variables that must be =/= None for this version 
+        sefl._all_req_vars = {
+            'legacy':[
+                self.proto_name,
+                self.
+            ]
+        }
+
+        '''
+        # list the approved guessig methods for this version 
+        self._all_guess_methods = {
+            'legacy': [
+            ]
+        }
+
+        # list if this version uses the proto file 
+        self._all_use_proto = {
+            'legacy': True
+        }
+
+    def set_version(self):
+        '''Set variables indicating the rules for the version this pack uses
+        '''
+        self.req_fields = self._all_req_fields[self.version]
+        # self.req_vars = ._all_req_vars[self.version] 
+        self.guess_methods = self._all_guess_methods[self.version]
+        self.use_proto = self._all_use_proto[self.version]
+
+    def term_exists(self, req_line):
+        '''Return True if the req_line (required rule) exists in pragma
+        '''
+        for row in self.pragma:
+            # determine wether this line satisfies the rule 
+            valid = True
+            for req_term in req_line:
+                # req_term indicates the individual tags that mush exist
+                req_location = req_line[req_term]
+                try:
+                    # recursively step into encapsulated dictionaries
+                    target = row
+                    for page in req_location:
+                        target = target[page]
+                    # If the term found at the end of dictionary rabbit-hole
+                    # matches, accept it and check the next term of the rule.
+                    # Allow valid to remain true
+                    valid = valid and (target == req_term)
+                    if not valid:
+                        break
+                except KeyError:
+                    valid = False
+                    break
+            
+            if valid == True:
+                return True
+
+        return False
+
+    def missing_pragma_lines(self):
+        '''Identify missing pragma lines in an array.
+        '''
+        requirment = self.req_fields[self.version]
+        rejection_list = []
+        for req_line in requirement:
+            # each req_line is an individual requirement for a term to exist
+            for req_term in req_line:
+                # some terms need multiple 'tiers' to be verivied to exist
+                #if  != term 
+                pass
+            
+
+
+
+    @property
+    def is_config_complete(self):
+        '''Return True if all necessary config information is pressent
+        '''
+        raise NotImplementedError  
+        
          
     @classmethod
     def from_element_path(cls, target_path, base_proto_name=None, 

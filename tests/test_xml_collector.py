@@ -135,7 +135,7 @@ def test_PvPackage_instantiation(generic_tmc_path):
         tmc.all_Symbols['MAIN.test_iterator'],
         tmc.all_SubItems['iterator']['value']
     ]
-
+    
     # ensure that you can instantiate w/o errors
     try:
         pv_pack = PvPackage(
@@ -148,7 +148,7 @@ def test_PvPackage_instantiation(generic_tmc_path):
         pytest.fail()
 
     # ensure that the pragmas properly crossed over
-    print(tmc.all_SubItems['iterator']['value'].config_by_pv)
+    #print(tmc.all_SubItems['iterator']['value'].config_by_pv)
     assert pv_pack.pv_complete == "TEST:MAIN:ITERATOR:VALUE"
     assert {'title':'pv', 'tag':'VALUE'} in pv_pack.pragma
     
@@ -180,7 +180,7 @@ def test_PvPackage_from_element_path(generic_tmc_path):
     assert pv_packs[1].proto_name == "GetNEW_VAR"
 
 
-def testPvPackage_add_config(generic_tmc_path):
+def test_PvPackage_add_config(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
         tmc.all_Symbols['MAIN.NEW_VAR'],
@@ -200,9 +200,86 @@ def testPvPackage_add_config(generic_tmc_path):
     } in pv_out.pragma 
 
 
+def test_PvPackage_missing_pragma_lines(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    element_path = [
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+    ]
+    pv_out, pv_in = PvPackage.from_element_path(
+        target_path = element_path,
+        base_proto_name = 'NEW_VAR',
+        proto_file_name = '',
+    )
+    ''' 
+    for x in pv_out.pragma:
+        print(x)
+    '''
+    missing = pv_out.missing_pragma_lines()
+    
+    assert odict([('field',['title']),('DTYP',['tag','f_name'])]) in missing
+    assert odict([('field',['title']),('INP',['tag','f_name'])]) in missing
+    
+    pv_out.pragma.append(
+        {'title': 'field', 'tag': {'f_name': 'DTYP', 'f_set': ''}}
+    )
+    pv_out.pragma.append(
+        {'title': 'field', 'tag': {'f_name': 'INP', 'f_set': ''}}
+    )
+    
+    assert [] == pv_out.missing_pragma_lines()
+    
+
+
+def test_PvPackage_is_config_complete(generic_tmc_path):
+    '''Test a single version for pragma completeness. This only tests for the
+    existance of these fields, it does NOT test if they are valid.
+    '''
+    tmc = TmcFile(generic_tmc_path)
+    element_path = [
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+    ]
+    pv_out, pv_in = PvPackage.from_element_path(
+        target_path = element_path,
+        base_proto_name = 'NEW_VAR',
+        proto_file_name = '',
+    )
+    '''
+    for x in pv_out.pragma:
+        print(x)
+    '''
+
+    assert False == pv_out.is_config_complete
+    
+    pv_out.pragma.append(
+        {'title': 'field', 'tag': {'f_name': 'DTYP', 'f_set': ''}}
+    )
+    pv_out.pragma.append(
+        {'title': 'field', 'tag': {'f_name': 'INP', 'f_set': ''}}
+    )
+    
+    assert True == pv_out.is_config_complete
+
+
+def test_PvPackage_term_exists(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    element_path = [
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+    ]
+    pv_out, _ = PvPackage.from_element_path(
+        target_path = element_path,
+        base_proto_name = 'NEW_VAR',
+        proto_file_name = '',
+    )
+
+    # confirm that the 'pv' field exists, rule 0
+    assert pv_out.term_exists(pv_out.req_fields[0]) == True
+    # confirm that the 'INP field does not exist, rule 6
+    assert pv_out.term_exists(pv_out.req_fields[6]) == False
+
+
 @pytest.mark.skip(reason="Incomplete")
 def test_PvPackage_guess():
-    '''
+    ''
     assert pv_packs[0].fields == {
         "ZNAM":"SINGLE",
         "ONAM":"MULTI",
@@ -213,7 +290,6 @@ def test_PvPackage_guess():
         "ONAM":"MULTI",
         "SCAN":"1 second"
     }
-    '''
 
 
 @pytest.mark.skip(reason="Pending development of feature guessing")
