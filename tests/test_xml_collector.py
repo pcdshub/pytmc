@@ -9,7 +9,7 @@ from pytmc.xml_obj import BaseElement
 from pytmc import TmcFile, PvPackage
 from pytmc.xml_collector import ElementCollector
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict as odict
 
 logger = logging.getLogger(__name__)
 

@@ -308,17 +308,17 @@ class PvPackage:
 
         return False
 
+    
     def missing_pragma_lines(self):
         '''Identify missing pragma lines in an array.
         '''
-        requirment = self.req_fields[self.version]
         rejection_list = []
-        for req_line in requirement:
+        for req_line in self.req_fields:
             # each req_line is an individual requirement for a term to exist
-            for req_term in req_line:
-                # some terms need multiple 'tiers' to be verivied to exist
-                #if  != term 
-                pass
+            if not self.term_exists(req_line):
+                rejection_list.append(req_line)
+            
+        return rejection_list 
             
 
 
@@ -327,8 +327,10 @@ class PvPackage:
     def is_config_complete(self):
         '''Return True if all necessary config information is pressent
         '''
-        raise NotImplementedError  
-        
+        if len(self.missing_pragma_lines()) == 0:
+            return True
+
+        return False
          
     @classmethod
     def from_element_path(cls, target_path, base_proto_name=None, 
