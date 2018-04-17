@@ -651,16 +651,18 @@ class TmcExplorer:
         for sym in symbol_set:
             # if the symbol has a user-created type
             if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
-                if not skip_datatype:
-                    # explore the datatype/datatype instance 
-                    self.exp_DataType(
-                        symbol_set[sym], 
-                        path = [symbol_set[sym]]
-                    )
-                continue
+                if skip_datatype:
+                    continue
+
+                # explore the datatype/datatype instance 
+                self.exp_DataType(
+                    symbol_set[sym], 
+                    path = [symbol_set[sym]]
+                )
             
             # if the datatype is not user-created, create/save a record 
-            self.create_intf([symbol_set[sym]])
+            else:
+                self.create_intf([symbol_set[sym]])
 
     def create_intf(self, target_path, prefix=None):
         '''

@@ -13,6 +13,7 @@ from collections import defaultdict, OrderedDict as odict
 
 logger = logging.getLogger(__name__)
 
+# ElementCollector tests
 
 def test_ElementCollector_instantiation(generic_tmc_root):
     try:
@@ -52,6 +53,8 @@ def test_ElementCollector_registered(generic_tmc_root):
 
     assert col.registered == {'iterator': iterator}
 
+
+# TmcFile tests
 
 def test_TmcFile_instantiation(generic_tmc_path, generic_tmc_root):
     try:
@@ -126,6 +129,8 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert len(tmc.all_SubItems['iterator']) == 6
 
 
+# PvPackage tests
+
 def test_PvPackage_instantiation(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     #print(tmc.all_Symbols)
@@ -180,7 +185,7 @@ def test_PvPackage_from_element_path(generic_tmc_path):
     assert pv_packs[1].proto_name == "GetNEW_VAR"
 
 
-def test_PvPackage_add_config(generic_tmc_path):
+def test_PvPackage_make_config(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
         tmc.all_Symbols['MAIN.NEW_VAR'],
@@ -190,14 +195,14 @@ def test_PvPackage_add_config(generic_tmc_path):
         base_proto_name = 'NEW_VAR',
         proto_file_name = '',
     )
-    pv_out.add_config(title="test_line", setting="test", field=False)
-    assert {'title': 'test_line', 'tag': 'test'} in pv_out.pragma 
+    new = pv_out.make_config(title="test_line", setting="test", field=False)
+    assert {'title': 'test_line', 'tag': 'test'} == new 
 
-    pv_out.add_config(title="FLD", setting="test 9", field=True)
+    new = pv_out.make_config(title="FLD", setting="test 9", field=True)
     assert {
         'title': 'field',
         'tag': {'f_name': "FLD", 'f_set': 'test 9'}
-    } in pv_out.pragma 
+    } == new 
 
 
 def test_PvPackage_missing_pragma_lines(generic_tmc_path):
@@ -227,7 +232,6 @@ def test_PvPackage_missing_pragma_lines(generic_tmc_path):
     )
     
     assert [] == pv_out.missing_pragma_lines()
-    
 
 
 def test_PvPackage_is_config_complete(generic_tmc_path):
@@ -275,6 +279,15 @@ def test_PvPackage_term_exists(generic_tmc_path):
     assert pv_out.term_exists(pv_out.req_fields[0]) == True
     # confirm that the 'INP field does not exist, rule 6
     assert pv_out.term_exists(pv_out.req_fields[6]) == False
+
+# PvPackage field guessing tests
+
+
+
+
+
+
+
 
 
 @pytest.mark.skip(reason="Incomplete")

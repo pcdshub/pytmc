@@ -260,10 +260,24 @@ class PvPackage:
         }
 
         '''
-        # list the approved guessig methods for this version 
+        # list the approved guessig methods for this version
+        # number referes to which requirement in _all_req_fields (by index)
         self._all_guess_methods = {
-            'legacy': [
-            ]
+            'legacy': {
+                 1: [ # type
+                    self.set_version
+                 ],
+                 2: [ # str
+                 ],
+                 3: [ # io
+                 ],
+                 4: [ # DTYP field
+                 ],
+                 5: [ # SCAN field
+                 ],
+                 6: [ # INP field
+                 ],
+            }
         }
 
         # list if this version uses the proto file 
@@ -307,7 +321,6 @@ class PvPackage:
                 return True
 
         return False
-
     
     def missing_pragma_lines(self):
         '''Identify missing pragma lines in an array.
@@ -320,9 +333,6 @@ class PvPackage:
             
         return rejection_list 
             
-
-
-
     @property
     def is_config_complete(self):
         '''Return True if all necessary config information is pressent
@@ -372,8 +382,8 @@ class PvPackage:
 
         return pvpacks_output_list
 
-    def add_config(self, title, setting, field=False):
-        """Add a single entry to this object's pragma
+    def make_config(self, title, setting, field=False):
+        """Create pragma formatted dict. 
 
         Parameters
         ----------
@@ -399,8 +409,7 @@ class PvPackage:
         else:
             new_entry = {'title': title, 'tag': setting}
 
-        self.pragma.append(new_entry)
-        
+        return new_entry
     
     def create_record(self):
         raise NotImplementedError
