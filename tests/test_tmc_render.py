@@ -354,7 +354,7 @@ def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     )    
     assert records[0]in exp.all_records 
     
-    assert len(exp.all_records) == 24
+    assert len(exp.all_records) == 26
 
 
 @pytest.mark.skip(reason="Not yet implemented")

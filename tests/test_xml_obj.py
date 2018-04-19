@@ -532,4 +532,29 @@ def test_all_config_by_pv(generic_tmc_root):
 
     assert symbol_element.config_by_pv == data
 
+def test_multiple_is_array(generic_tmc_root):
+    root = generic_tmc_root
+    
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.is_array
+    
+    datatype_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.is_array
+
+    item_xml = root.find(
+        "./DataTypes/DataType/[Name='DUT_CONTAINER']/SubItem/"
+        +"[Name='dtype_samples_iter_array']"
+    )
+    subitem_element = SubItem(item_xml)
+    assert subitem_element.is_array
+
+
 

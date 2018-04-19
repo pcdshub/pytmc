@@ -72,8 +72,9 @@ def test_TmcFile_isolate_Symbols(generic_tmc_path):
     assert "MAIN.NEW_VAR" in tmc.all_Symbols
     assert "MAIN.test_iterator" in tmc.all_Symbols
     assert "Constants.RuntimeVersion" in tmc.all_Symbols
-
-    assert len(tmc.all_Symbols) == 21
+    for x in tmc.all_Symbols:
+        print(x)
+    assert len(tmc.all_Symbols) == 25
 
 
 def test_TmcFile_isolate_DataTypes(generic_tmc_path):
@@ -83,7 +84,7 @@ def test_TmcFile_isolate_DataTypes(generic_tmc_path):
     assert "iterator" in tmc.all_DataTypes
     assert "VERSION" in tmc.all_DataTypes
 
-    assert len(tmc.all_DataTypes) == 9
+    assert len(tmc.all_DataTypes) == 11
 
 
 def test_TmcFile_isolate_SubItems(generic_tmc_path):
@@ -111,13 +112,13 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert "MAIN.test_iterator" in tmc.all_Symbols
     assert "Constants.RuntimeVersion" in tmc.all_Symbols
 
-    assert len(tmc.all_Symbols) == 21
+    assert len(tmc.all_Symbols) == 25
 
 
     assert "iterator" in tmc.all_DataTypes
     assert "VERSION" in tmc.all_DataTypes
-
-    assert len(tmc.all_DataTypes) == 9
+    
+    assert len(tmc.all_DataTypes) == 11
 
     assert 'increment' in tmc.all_SubItems['iterator']
     assert 'out' in tmc.all_SubItems['iterator']

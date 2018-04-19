@@ -211,7 +211,13 @@ class BaseElement:
         else:
             target_element = self.element.find("./"+field_target)
 
-        return target_element 
+        return target_element
+
+    @property
+    def is_array(self):
+        if None != self.get_subfield('ArrayInfo'):
+            return True
+        return False
 
     def __eq__(self,other):
         '''
