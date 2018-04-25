@@ -532,6 +532,7 @@ def test_all_config_by_pv(generic_tmc_root):
 
     assert symbol_element.config_by_pv == data
 
+
 def test_multiple_is_array(generic_tmc_root):
     root = generic_tmc_root
     

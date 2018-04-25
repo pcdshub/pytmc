@@ -263,6 +263,12 @@ class SingleProtoData:
         self.out_field = out_field
         self.in_field = in_field
         self.init = init
+    
+    def __repr__(self):
+        return "{}({})".format(
+            self.__class__.__name__,
+            self.name,
+        )
 
     @property
     def has_init(self):
@@ -649,6 +655,7 @@ class TmcExplorer:
         
         # loop through all symbols in the set of allowed symbols
         for sym in symbol_set:
+            logger.debug("++++++++++++"+str(sym))
             # if the symbol has a user-created type
             if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
                 if skip_datatype:
