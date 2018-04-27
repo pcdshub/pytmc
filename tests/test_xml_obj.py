@@ -508,7 +508,7 @@ def test_all_config_by_pv(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    data = [
+    data_unfiltered = [
         [
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
             {'title': 'type', 'tag': 'bo'},
@@ -529,8 +529,10 @@ def test_all_config_by_pv(generic_tmc_root):
             {'title': 'io', 'tag': 'i'},
         ]
     ]
+    data_filtered = [data_unfiltered[1]]
 
-    assert symbol_element.config_by_pv == data
+    assert symbol_element.config_by_pv() == data_unfiltered
+    assert symbol_element.config_by_pv('TEST:MAIN:NEW_VAR_IN') == data_filtered
 
 
 def test_multiple_is_array(generic_tmc_root):
@@ -556,6 +558,4 @@ def test_multiple_is_array(generic_tmc_root):
     )
     subitem_element = SubItem(item_xml)
     assert subitem_element.is_array
-
-
 

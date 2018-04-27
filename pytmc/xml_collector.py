@@ -252,7 +252,7 @@ class PvPackage:
 
         '''
         # list out variables that must be =/= None for this version 
-        sefl._all_req_vars = {
+        self._all_req_vars = {
             'legacy':[
                 self.proto_name,
                 self.
@@ -341,10 +341,32 @@ class PvPackage:
             return True
 
         return False
-         
+
+    @classmethod
+    def assemble_package_chains(cls, target_path, progress=[]):
+        
+        all_chains = []
+        previous_level_count = 1
+        # iterate down the length of the target_path
+        for element_node_index in range(len(target_path)):
+            element_node = target_path(element_node_index)
+            current_level_count = 0 
+            # repeat 
+            for nth in range(previous_level_count):   
+                for config_set in element_node.config_by_pv():
+                    current_level_count += 1 
+                    pv_line = BaseElement.parse_pragma('pv',config_set)
+                    element_copy = deepcopy(element_node).filter_by_pv(pv_line)
+                    if chain_root == None:
+                        chain_root = element_copy 
+                        parent = chain_root
+            
+            previous_level_count = current_level_count 
+                
+
     @classmethod
     def from_element_path(cls, target_path, base_proto_name=None, 
-            proto_file_name=None, use_proto=True):
+            proto_file_name=None,use_proto=None,return_rejects=False):
         '''
         Produce a list of PvPackage instances, one for each unique PV being
         created from a specific TwinCAT variable. 
@@ -354,22 +376,52 @@ class PvPackage:
         target_path : list
             Identical to target_path in __init__.
     
-        proto_name : str, None
-            Identical to proto_name parameter in __init__.
-    
+        base_proto_name : str, None
+            Stub for the name of the proto. Get/Set will be appended to the
+            front depnding on io.
+
         proto_file_name : str, None
-            Identical to proto_file_name parameter in __init__.
+            Name of the file to store the protos.
+
+        use_proto : bool, None
+            Explicity state whether or not to use protos. Typically this should
+            be left undefined (equal to None) so from_element_path will guess 
+            it automatically
         '''
+        logger.debug("target_path: "+str(target_path))
         pvpacks_output_list = []
+        reject_list = []
+        # Presume that no proto file is being used if all are left blank 
+        if use_proto == None:
+            if base_proto_name != None or proto_file_name != None:
+                use_proto = True
+            else:
+                use_proto = False
 
         # Iterate through each pragma-set (one per PV) for the final element in
         # target path
-        for config_set in target_path[-1].config_by_pv:
-            io_line = BaseElement.parse_pragma('io',config_set)
-            if "o" in io_line:
-                proto_name = "Set" + base_proto_name
-            elif "i" in io_line:
-                proto_name = "Get" + base_proto_name
+        for element_node in target_path:
+            # will need to make some changes here to implement a greedy mode
+            for config_set in element_node.config_by_pv():
+                element_copy =  deepcopy(element_node)
+       
+       
+       
+        for config_set in target_path[-1].config_by_pv():
+            if use_proto:
+                io_line = BaseElement.parse_pragma('io',config_set)
+                try:
+                    if "o" in io_line:
+                        proto_name = "Set" + base_proto_name
+                    elif "i" in io_line:
+                        proto_name = "Get" + base_proto_name
+                # If no 'io' value is set, do the following 
+                except TypeError:
+                    proto_name = base_proto_name
+
+            else:
+                proto_file_name = None
+                proto_name = None
 
             new_pvpack = cls(
                 target_path = target_path,
@@ -379,7 +431,10 @@ class PvPackage:
                 use_proto = use_proto
             )
             pvpacks_output_list.append(new_pvpack)
-
+        
+        
+        if return_rejects:
+            return pvpacks_output_list, reject_list
         return pvpacks_output_list
 
     def make_config(self, title, setting, field=False):
@@ -416,4 +471,21 @@ class PvPackage:
 
     def create_proto(self):
         raise NotImplementedError
+
+    def __eq__(self, other):
+        # compare the dictionaries of the two objects against one another but
+        # don't compare the entries in the 'skip field - this causes infinite
+        # recursion issues 
+        skip = [
+            '_all_req_fields',
+            '_all_req_vars',
+            '_all_guess_methods',
+            'req_fields',
+            'req_vars',
+            'guess_methods',
+        ] 
+        s_dict = {i:self.__dict__[i] for i in self.__dict__ if i not in skip}
+        o_dict = {i:other.__dict__[i] for i in other.__dict__ if i not in skip}
+
+        return s_dict == o_dict
 

@@ -29,6 +29,9 @@ class BaseElement:
             raise TypeError("ElementTree.Element required")
         self.element = element
         self.registered_pragmas = []
+        self.freeze_config = False
+        self.freeze_pv_target = None 
+
         if base == None:
             self.com_base = 'pytmc'
         else:
@@ -370,8 +373,7 @@ class BaseElement:
         '''
         return self.extract_pragmas('io')
 
-    @property
-    def config_by_pv(self):
+    def config_by_pv(self, only_pv=None):
         '''
         Parse the pytmc pragma into groups, one for each PV to be made from the
         variable. 
@@ -389,7 +391,28 @@ class BaseElement:
                 separate_lists.append([])
                 index = len(separate_lists) - 1
             separate_lists[index].append(line)
+
+        if only_pv != None:
+            for pv_config in separate_lists:
+                if {'title': 'pv', 'tag':only_pv} in pv_config:
+                    return [pv_config]
+
+            return []
+
         return separate_lists
+
+    def filter_by_pv(self,pv):
+        '''
+        Internally set the element to behave as if only a single PV is tied
+        to this element when config_by_pv is used.
+
+        Parameters
+        ----------
+        pf : str
+            String of the target PV
+        '''
+        self.freeze_config = True
+        self.freeze_pv_target = pv 
 
 
 class Symbol(BaseElement):

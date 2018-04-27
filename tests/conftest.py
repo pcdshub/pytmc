@@ -15,7 +15,7 @@ def load_generic_tmc():
 @pytest.fixture(scope='function')
 def generic_tmc_root():
     directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic_w_pragmas180425.tmc")
+    test_path = os.path.join(directory, "generic_w_pragmas180426.tmc")
     tree = ET.parse(test_path)
     root = tree.getroot()
     return root
@@ -24,7 +24,7 @@ def generic_tmc_root():
 @pytest.fixture(scope='function')
 def generic_tmc_path():
     directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic_w_pragmas180425.tmc")
+    test_path = os.path.join(directory, "generic_w_pragmas180426.tmc")
     return test_path
 
 

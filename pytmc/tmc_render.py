@@ -16,7 +16,9 @@ from . import DataType
 from . import TmcFile
 from .xml_obj import BaseElement
 from . import Symbol, DataType, SubItem
+from . import PvPackage
 import pytmc
+
 
 class SingleRecordData:
     '''
@@ -172,7 +174,7 @@ class SingleRecordData:
         if target.pv == None:
             logger.warn("Record for {} lacks a PV".format(str(target)))
         
-        config = target.config_by_pv
+        config = target.config_by_pv()
         
         record_list = []
 
@@ -315,7 +317,7 @@ class SingleProtoData:
             adspath = adspath + entry.name + '.'
         adspath = adspath[:-1]
 
-        for config_set in path[-1].config_by_pv:
+        for config_set in path[-1].config_by_pv():
             inst = cls()
 
             io_line = BaseElement.parse_pragma('io',config_set)
@@ -562,6 +564,7 @@ class TmcExplorer:
         self.all_records = []
         self.all_protos = []
         self.proto_name_list = []
+        self.all_pvpacks = []
 
     def exp_DataType(self, dtype_inst, base="",path=[]):
         '''
@@ -618,7 +621,11 @@ class TmcExplorer:
 
         # Loop through SubItems in that DataType
         for entry in subitem_set:
-            if subitem_set[entry].tc_type in self.tmc.all_DataTypes: 
+            # immediately go to create_intf if symbol is an array 
+            if subitem_set[entry].is_array:
+                self.create_intf(path+[subitem_set[entry]])
+                continue
+            elif subitem_set[entry].tc_type in self.tmc.all_DataTypes: 
                 # recurse, explore SubItems of non-primitave type as necessary
                 self.exp_DataType(
                     subitem_set[entry],
@@ -655,9 +662,12 @@ class TmcExplorer:
         
         # loop through all symbols in the set of allowed symbols
         for sym in symbol_set:
-            logger.debug("++++++++++++"+str(sym))
+            # immediately go to create_intf if symbol is an array 
+            if symbol_set[sym].is_array:
+                self.create_intf([symbol_set[sym]])
+            
             # if the symbol has a user-created type
-            if symbol_set[sym].tc_type in self.tmc.all_DataTypes:
+            elif symbol_set[sym].tc_type in self.tmc.all_DataTypes:
                 if skip_datatype:
                     continue
 
@@ -690,14 +700,8 @@ class TmcExplorer:
         prefix : str
             If a prefix is ofered use this as the base of constructed PV.
         '''
-        prefix = ""
-        for entry in target_path[:-1]: 
-            prefix += (entry.pv + ":")
-
-        if len(target_path) < 2: 
-            prefix = None
-
-        #construct pvname
+        
+        # construct pvname
         base_proto_name = ""
         for entry in target_path:
             base_proto_name += entry.name
@@ -706,32 +710,22 @@ class TmcExplorer:
 
         hypothesis_name = base_proto_name
         index = 0
+
+        # reject and modify names if they are already being used
         while hypothesis_name in self.proto_name_list:
             hypothesis_name = base_proto_name + str(index)
             index +=1
         self.proto_name_list.append(hypothesis_name)
 
-        protos = SingleProtoData.from_element_path(
-            target_path,
-            name=hypothesis_name
+        # generate and save the new pvpackages 
+        pv_pack_out = PvPackage.from_element_path(
+            target_path = target_path,
+            base_proto_name = hypothesis_name,
+            proto_file_name = self.proto_file,
         )
         
-        recs = SingleRecordData.from_element(
-            target_path[-1],
-            proto_file=self.proto_file,
-            prefix=prefix,
-            names=[proto.name for proto in protos]
-        )
-        for rec in recs:
-            self.all_records.append(rec)
-            logger.debug("create {}".format(str(rec)))
-
-        for proto in protos:
-            self.all_protos.append(proto)
-            logger.debug("create {}".format(str(proto)))
-
-    def generate_ads_line(self, target, direction):
-        raise NotImplementedError
+        for pack in pv_pack_out:
+            self.all_pvpacks.append(pack)
 
 
 class FullRender:
