@@ -559,3 +559,24 @@ def test_multiple_is_array(generic_tmc_root):
     subitem_element = SubItem(item_xml)
     assert subitem_element.is_array
 
+
+def test_freeze_pv(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
+    data = [
+        [
+            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+            {'title': 'type', 'tag': 'bi'},
+            {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+            {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+            {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+            {'title': 'str', 'tag': '%d'},
+            {'title': 'io', 'tag': 'i'},
+        ]
+    ]
+
+    assert symbol_element.config_by_pv() == data

@@ -10,6 +10,7 @@ from pytmc import TmcFile, PvPackage
 from pytmc.xml_collector import ElementCollector
 
 from collections import defaultdict, OrderedDict as odict
+from copy import copy, deepcopy
 
 logger = logging.getLogger(__name__)
 
@@ -162,44 +163,49 @@ def test_PvPackage_instantiation(generic_tmc_path):
 def test_PvPackage_assemble_package_chains(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-    paths = PvPackage.assemble_package_chains(element_path)
-    assert paths == [
-        [tmc.all_Symbols['MAIN.NEW_VAR'].filter_by_pv('TEST:MAIN:NEW_VAR_IN')],
-        [tmc.all_Symbols['MAIN.NEW_VAR'].filter_by_pv('TEST:MAIN:NEW_VAR_OUT')]
-    ]
-    
-    
-    element_path = [
-        tmc.all_Symbols['MAIN.dtype_samples_iter_array'],
-    ]
-    paths = PvPackage.assemble_package_chains(element_path)
-    assert paths == [
-        [
-            tmc.all_Symbols['MAIN.dtype_samples_iter_array'].flter_by_pv(
-                'TEST:MAIN:VAR_ARRAY'+str(n)
-            )
-        ] for n in range(1,5)
-    ]
-    
+
+
+    PvPackage.tester(3,2)
+    PvPackage.tester(1)
+
+
     element_path = [
         tmc.all_Symbols['MAIN.struct_base'],
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
     ]
-    paths = PvPackage.assemble_package_chains(element_path)
-    assert paths == [
+    chains = PvPackage.assemble_package_chains(element_path)
+    '''
+    logging.debug('chains: '+str(chains))
+    tmc.all_Symbols['MAIN.struct_base'].freeze_pv(
+        'TEST:MAIN:STRUCTBASE'
+    )
+    tmc.all_SubItems['DUT_STRUCT']['struct_var'].freeze_pv(
+        'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
+    )
+    
+    
+    data = [
         [
-            tmc.all_Symbols['MAIN.struct_base'].flter_by_pv(
-                'TEST:MAIN:STRUCTBASE'
-            ),
-            tmc.all_SubItems['DUT_STRUCT']['struct_var'].flter_by_pv(
-                'TEST:MAIN:STRUCTBASE:STRUCT_VAR'
-            ),
+            tmc.all_Symbols['MAIN.struct_base'],
+            tmc.all_SubItems['DUT_STRUCT']['struct_var'],
         ]
     ]
+    logging.debug('data: '+str(data))
     
+    assert chains == data
+    '''
+    
+    element_path = [
+        tmc.all_Symbols['MAIN.NEW_VAR'],
+    ]
+    chains2 = PvPackage.assemble_package_chains(element_path)
+    logging.debug('chains: '+str(chains2))
+    c1 = copy(tmc.all_Symbols['MAIN.NEW_VAR'])
+    c2 = copy(tmc.all_Symbols['MAIN.NEW_VAR'])
+    assert False
+
+
+
 
 def test_PvPackage_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)

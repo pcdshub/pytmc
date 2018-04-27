@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
 from collections import defaultdict, OrderedDict as odict
 from . import Symbol, DataType, SubItem
-from copy import deepcopy
+from copy import deepcopy, copy
 from .xml_obj import BaseElement
 
 
@@ -343,25 +343,60 @@ class PvPackage:
         return False
 
     @classmethod
-    def assemble_package_chains(cls, target_path, progress=[]):
+    def assemble_package_chains(cls, target_path, progress_chain=[]):
+        '''
+        if progress_chain == None:
+            progress_chain = []
+        '''
+        print()
+        print('target: ', target_path)
+        print('progress_chain: ', progress_chain)
+        target = target_path[0]
+        progress_chain_inital_len = len(progress_chain)
         
-        all_chains = []
-        previous_level_count = 1
-        # iterate down the length of the target_path
-        for element_node_index in range(len(target_path)):
-            element_node = target_path(element_node_index)
-            current_level_count = 0 
-            # repeat 
-            for nth in range(previous_level_count):   
-                for config_set in element_node.config_by_pv():
-                    current_level_count += 1 
-                    pv_line = BaseElement.parse_pragma('pv',config_set)
-                    element_copy = deepcopy(element_node).filter_by_pv(pv_line)
-                    if chain_root == None:
-                        chain_root = element_copy 
-                        parent = chain_root
+        new_elements = []
+        # Examine the configs in the first entry of the target_path provided
+        for config_set in target.config_by_pv():
+
+            # construct the 'virtual tree' of copied 1:1 element-pragmas  
+            pv_line = BaseElement.parse_pragma('pv',config_set)
+            element_copy = copy(target)
+            element_copy.freeze_pv(pv_line)
+
+            new_elements.append(element_copy)
+
+        print('new_elements: ', new_elements)
+        print('progress_chain: ', progress_chain)
+        for chain_idx in range(len(progress_chain)):
+            for new_elem_idx in range(len(new_elements)):
+                if new_elem_idx == 0:
+                    # append the new element to an existing chain
+                    progress_chain[chain_idx].append(new_elements[new_elem_idx])
+                if new_elem_idx > 0:
+                    # create new chain and append the new element
+                    progress_chain.append(progress_chain[chain_idx].copy())
+                    progress_chain[-1].append(new_elements[new_elem_idx])
+        if len(progress_chain) == 0: 
+            for new_elem_idx in range(len(new_elements)):
+                progress_chain.append([new_elements[new_elem_idx]])
+
             
-            previous_level_count = current_level_count 
+        if len(target_path) == 1:
+            return progress_chain
+        return cls.assemble_package_chains(
+            target_path = target_path[1:],
+            progress_chain = progress_chain
+        )
+
+    @classmethod
+    def tester(cls,a,b=[],c=[]):
+        print(cls,a,b,c)
+        if a > 0:
+            cls.tester(a-1,b,c)
+                
+                
+
+
                 
 
     @classmethod

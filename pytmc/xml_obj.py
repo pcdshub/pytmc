@@ -392,6 +392,9 @@ class BaseElement:
                 index = len(separate_lists) - 1
             separate_lists[index].append(line)
 
+        if self.freeze_config:
+            only_pv = self.freeze_pv_target
+
         if only_pv != None:
             for pv_config in separate_lists:
                 if {'title': 'pv', 'tag':only_pv} in pv_config:
@@ -401,7 +404,7 @@ class BaseElement:
 
         return separate_lists
 
-    def filter_by_pv(self,pv):
+    def freeze_pv(self,pv):
         '''
         Internally set the element to behave as if only a single PV is tied
         to this element when config_by_pv is used.
