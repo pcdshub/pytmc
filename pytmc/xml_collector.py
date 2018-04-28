@@ -343,26 +343,22 @@ class PvPackage:
         return False
 
     @classmethod
-    def assemble_package_chains(cls, target_path, progress_chain=[]):
+    def assemble_package_chains(cls, target_path, progress_chain=None):
+        '''
+        When provided with a tree of 
         '''
         if progress_chain == None:
             progress_chain = []
-        '''
-        print()
-        print('target: ', target_path)
-        print('progress_chain: ', progress_chain)
         target = target_path[0]
         progress_chain_inital_len = len(progress_chain)
         
         new_elements = []
         # Examine the configs in the first entry of the target_path provided
         for config_set in target.config_by_pv():
-
             # construct the 'virtual tree' of copied 1:1 element-pragmas  
             pv_line = BaseElement.parse_pragma('pv',config_set)
             element_copy = copy(target)
             element_copy.freeze_pv(pv_line)
-
             new_elements.append(element_copy)
 
         print('new_elements: ', new_elements)
@@ -376,28 +372,19 @@ class PvPackage:
                     # create new chain and append the new element
                     progress_chain.append(progress_chain[chain_idx].copy())
                     progress_chain[-1].append(new_elements[new_elem_idx])
+        # If this is the first-tier call and the progress chain is empty,
         if len(progress_chain) == 0: 
             for new_elem_idx in range(len(new_elements)):
                 progress_chain.append([new_elements[new_elem_idx]])
 
-            
+        # Limit recursion depth
         if len(target_path) == 1:
             return progress_chain
+
         return cls.assemble_package_chains(
             target_path = target_path[1:],
             progress_chain = progress_chain
         )
-
-    @classmethod
-    def tester(cls,a,b=[],c=[]):
-        print(cls,a,b,c)
-        if a > 0:
-            cls.tester(a-1,b,c)
-                
-                
-
-
-                
 
     @classmethod
     def from_element_path(cls, target_path, base_proto_name=None, 

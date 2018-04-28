@@ -162,19 +162,12 @@ def test_PvPackage_instantiation(generic_tmc_path):
 
 def test_PvPackage_assemble_package_chains(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
-    
-
-
-    PvPackage.tester(3,2)
-    PvPackage.tester(1)
-
 
     element_path = [
         tmc.all_Symbols['MAIN.struct_base'],
         tmc.all_SubItems['DUT_STRUCT']['struct_var'],
     ]
     chains = PvPackage.assemble_package_chains(element_path)
-    '''
     logging.debug('chains: '+str(chains))
     tmc.all_Symbols['MAIN.struct_base'].freeze_pv(
         'TEST:MAIN:STRUCTBASE'
@@ -193,16 +186,17 @@ def test_PvPackage_assemble_package_chains(generic_tmc_path):
     logging.debug('data: '+str(data))
     
     assert chains == data
-    '''
     
     element_path = [
         tmc.all_Symbols['MAIN.NEW_VAR'],
     ]
-    chains2 = PvPackage.assemble_package_chains(element_path)
-    logging.debug('chains: '+str(chains2))
+    chains = PvPackage.assemble_package_chains(element_path)
+    logging.debug('chains: '+str(chains))
     c1 = copy(tmc.all_Symbols['MAIN.NEW_VAR'])
     c2 = copy(tmc.all_Symbols['MAIN.NEW_VAR'])
-    assert False
+    data = [[c1],[c2]]
+    logging.debug('data: '+str(data))
+    assert chains ==[[c1],[c2]]
 
 
 
