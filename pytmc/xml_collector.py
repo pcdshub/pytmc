@@ -345,7 +345,27 @@ class PvPackage:
     @classmethod
     def assemble_package_chains(cls, target_path, progress_chain=None):
         '''
-        When provided with a tree of 
+        When provided with a target path (list of element objects), assemble
+        unique lists for each PV to be created. Because multiple PVs can be
+        specified from a single element (arrays or IO pairs) the PV hierarchy
+        can follow a tree like structure.
+
+        Parameters
+        ----------
+        target_path : list of elements
+            Specify the sequence of encapsulated elements in order of
+            least deeply encapsulated to most deeply encapsulated.
+
+        progress_chain : list or None
+            This is the list of individual lists to be returned when the
+            recursion is complete. Only used for recursive application of this
+            method. 
+
+        Returns
+        -------
+        list
+            List contains lists of elements with frozen PVs such that each list
+            can be be used for constructing a single PV package or be 
         '''
         if progress_chain == None:
             progress_chain = []
@@ -361,8 +381,6 @@ class PvPackage:
             element_copy.freeze_pv(pv_line)
             new_elements.append(element_copy)
 
-        print('new_elements: ', new_elements)
-        print('progress_chain: ', progress_chain)
         for chain_idx in range(len(progress_chain)):
             for new_elem_idx in range(len(new_elements)):
                 if new_elem_idx == 0:
@@ -400,7 +418,7 @@ class PvPackage:
     
         base_proto_name : str, None
             Stub for the name of the proto. Get/Set will be appended to the
-            front depnding on io.
+            front depending on io.
 
         proto_file_name : str, None
             Name of the file to store the protos.

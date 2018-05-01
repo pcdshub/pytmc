@@ -199,8 +199,6 @@ def test_PvPackage_assemble_package_chains(generic_tmc_path):
     assert chains ==[[c1],[c2]]
 
 
-
-
 def test_PvPackage_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     # test the creation of a normal multi-pv variable  
