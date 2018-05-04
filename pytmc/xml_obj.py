@@ -10,6 +10,11 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 import re
 
+class XmlObjError(Exception):
+    pass
+
+class PvNotFrozenError(XmlObjError):
+    pass
 
 class BaseElement:
     '''
@@ -172,7 +177,8 @@ class BaseElement:
     @property
     def config(self):
         """
-        Cleanly formatted python representation of the config statement
+        Cleanly formatted python representation of the config statement. Fields
+        are broken into their own dictionaries.
 
         Returns
         -------
@@ -269,7 +275,7 @@ class BaseElement:
     @staticmethod
     def parse_pragma(title, cfg):
         '''
-        Get the designated configuration line(s) from the config pragma.
+        Get the first designated configuration line(s) from the config pragma.
 
         Parameters
         ----------
@@ -298,81 +304,81 @@ class BaseElement:
 
         return result
 
-    @property
-    def pv(self):
-        '''
-        Retrieve the config line specifying pv name for this entity.
-
-        Returns
-        -------
-        str, list of str, or None
-            See :func:`~extract_pragmas` for details.
-        '''
-        return self.extract_pragmas('pv')
-    
-    @property
-    def fields(self):
-        '''
-        Retrieve the config line specifying db fields for this entity.
-        Returns
-        -------
-        str, list of str, or None
-            See :func:`~extract_pragmas` for details.
-        '''
-        return self.extract_pragmas('field')
-
-    @property
-    def dtname(self):
-        '''
-        Retrieve the config line specifying a name for this datatype.
-
-        Returns
-        -------
-        str, list of str, or None
-            See :func:`~extract_pragmas` for details.
-        '''
-        
-        return self.extract_pragmas('name')
-    
-    @property
-    def rec_type(self):
-        '''
-        Retrieve the confic line specifying record type (i.e. ao,ai) for this 
-        entity.
-
-        Returns
-        -------
-        str, list of str, or None
-            See :func:`~extract_pragmas` for details.
-        '''
-        return self.extract_pragmas('type')
-    
-    @property
-    def str_f(self):
-        '''
-        Retrieve the confic line specifying in-proto data format for this 
-        entity.
-
-        Returns
-        -------
-        str, list of str, or None
-            See :func:`~extract_pragmas` for details.
-        '''
-        return self.extract_pragmas('str')
-    
-    @property
-    def io(self):
-        '''
-        Retrieve the confic line specifying data direction for this 
-        entity.
-
-        Returns
-        -------
-        str, list of str, or None
-            See :func:`~extract_pragmas` for details.
-        '''
-        return self.extract_pragmas('io')
-
+#    @property
+#    def pv(self):
+#        '''
+#        Retrieve the config line specifying pv name for this entity.
+#
+#        Returns
+#        -------
+#        str, list of str, or None
+#            See :func:`~extract_pragmas` for details.
+#        '''
+#        return self.extract_pragmas('pv')
+#    
+#    @property
+#    def fields(self):
+#        '''
+#        Retrieve the config line specifying db fields for this entity.
+#        Returns
+#        -------
+#        str, list of str, or None
+#            See :func:`~extract_pragmas` for details.
+#        '''
+#        return self.extract_pragmas('field')
+#
+#    @property
+#    def dtname(self):
+#        '''
+#        Retrieve the config line specifying a name for this datatype.
+#
+#        Returns
+#        -------
+#        str, list of str, or None
+#            See :func:`~extract_pragmas` for details.
+#        '''
+#        
+#        return self.extract_pragmas('name')
+#    
+#    @property
+#    def rec_type(self):
+#        '''
+#        Retrieve the confic line specifying record type (i.e. ao,ai) for this 
+#        entity.
+#
+#        Returns
+#        -------
+#        str, list of str, or None
+#            See :func:`~extract_pragmas` for details.
+#        '''
+#        return self.extract_pragmas('type')
+#    
+#    @property
+#    def str_f(self):
+#        '''
+#        Retrieve the confic line specifying in-proto data format for this 
+#        entity.
+#
+#        Returns
+#        -------
+#        str, list of str, or None
+#            See :func:`~extract_pragmas` for details.
+#        '''
+#        return self.extract_pragmas('str')
+#    
+#    @property
+#    def io(self):
+#        '''
+#        Retrieve the confic line specifying data direction for this 
+#        entity.
+#
+#        Returns
+#        -------
+#        str, list of str, or None
+#            See :func:`~extract_pragmas` for details.
+#        '''
+#        return self.extract_pragmas('io')
+#    
     def config_by_pv(self, only_pv=None):
         '''
         Parse the pytmc pragma into groups, one for each PV to be made from the

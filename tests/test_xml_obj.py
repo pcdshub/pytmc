@@ -369,8 +369,8 @@ def test_config(generic_tmc_root):
     ]
     assert symbol_element.config == data
 
-
-def test_all_dtname(generic_tmc_root):
+'''
+def test_BaseElement_dtname(generic_tmc_root):
     root = generic_tmc_root
     
     element= root.find(
@@ -380,7 +380,7 @@ def test_all_dtname(generic_tmc_root):
     assert el.dtname == 'ITERATORNAME'
 
 
-def test_all_fields(generic_tmc_root):
+def test_BaseElement_fields(generic_tmc_root):
     root = generic_tmc_root
     subitem_xml = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
@@ -402,7 +402,7 @@ def test_all_fields(generic_tmc_root):
     ] 
 
 
-def test_all_pv(generic_tmc_root):
+def test_BaseElement_pv(generic_tmc_root):
     root = generic_tmc_root
     subitem_xml = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
@@ -427,7 +427,7 @@ def test_all_pv(generic_tmc_root):
     ]
 
 
-def test_all_rec_type(generic_tmc_root):
+def test_BaseElement_rec_type(generic_tmc_root):
     root = generic_tmc_root
     subitem_xml = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
@@ -452,7 +452,7 @@ def test_all_rec_type(generic_tmc_root):
     ]
 
 
-def test_all_str_f(generic_tmc_root):
+def test_BaseElement_str_f(generic_tmc_root):
     root = generic_tmc_root
     subitem_xml = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
@@ -477,7 +477,7 @@ def test_all_str_f(generic_tmc_root):
     ]
 
 
-def test_all_io(generic_tmc_root):
+def test_BaseElement_io(generic_tmc_root):
     root = generic_tmc_root
     subitem_xml = root.find(
         "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
@@ -500,9 +500,9 @@ def test_all_io(generic_tmc_root):
     assert symbol_element.io == [
         'o','i'
     ]
+'''
 
-
-def test_all_config_by_pv(generic_tmc_root):
+def test_BaseElement_config_by_pv(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
@@ -535,7 +535,7 @@ def test_all_config_by_pv(generic_tmc_root):
     assert symbol_element.config_by_pv('TEST:MAIN:NEW_VAR_IN') == data_filtered
 
 
-def test_multiple_is_array(generic_tmc_root):
+def test_BaseElement_is_array(generic_tmc_root):
     root = generic_tmc_root
     
     symbol_xml = root.find(
@@ -560,7 +560,7 @@ def test_multiple_is_array(generic_tmc_root):
     assert subitem_element.is_array
 
 
-def test_freeze_pv(generic_tmc_root):
+def test_BaseElement_freeze_pv(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
