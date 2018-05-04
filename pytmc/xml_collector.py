@@ -441,50 +441,10 @@ class PvPackage:
                 use_proto = True
             else:
                 use_proto = False
-        '''
-        # Iterate through each pragma-set (one per PV) for the final element in
-        # target path
-        for element_node in target_path:
-            # will need to make some changes here to implement a greedy mode
-            for config_set in element_node.config_by_pv():
-                element_copy =  deepcopy(element_node)
-       
-       
-       
-        for config_set in target_path[-1].config_by_pv():
-            if use_proto:
-                io_line = BaseElement.parse_pragma('io',config_set)
-                try:
-                    if "o" in io_line:
-                        proto_name = "Set" + base_proto_name
-                    elif "i" in io_line:
-                        proto_name = "Get" + base_proto_name
-                # If no 'io' value is set, do the following 
-                except TypeError:
-                    proto_name = base_proto_name
-
-            else:
-                proto_file_name = None
-                proto_name = None
-
-            new_pvpack = cls(
-                target_path = target_path,
-                pragma = config_set,
-                proto_name = proto_name,
-                proto_file_name = proto_file_name,
-                use_proto = use_proto
-            )
-            pvpacks_output_list.append(new_pvpack)
-        '''
 
         direct_paths = cls.assemble_package_chains(target_path)
         
         for path in direct_paths:
-            '''
-            print(direct_path)
-            for x in direct_path:
-                print(x.tc_type)
-            '''
             # If the last element in the path isn't default type, don't create
             # a package and pass the path back for further processing
             if path[-1].tc_type not in beckhoff_types:
