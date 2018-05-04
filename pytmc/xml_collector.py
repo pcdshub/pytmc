@@ -11,7 +11,7 @@ from collections import defaultdict, OrderedDict as odict
 from . import Symbol, DataType, SubItem
 from copy import deepcopy, copy
 from .xml_obj import BaseElement
-
+from .beckhoff import beckhoff_types
 
 
 class ElementCollector(dict):
@@ -208,12 +208,15 @@ class PvPackage:
     '''
     versions = ['legacy']
     
-    def __init__(self, target_path, pragma, proto_name=None,
+    def __init__(self, target_path, pragma=None, proto_name=None,
             proto_file_name=None, use_proto=True,version='legacy'):
         self.define_versions()
         self.target_path = target_path
-        # Create separate pragma copy to hold both original and guessed lines 
-        self.pragma = deepcopy(pragma)
+        # Create separate pragma copy to hold both original and guessed lines
+        if pragma != None:
+            self.pragma = deepcopy(pragma)
+        else:
+            self.pragma = target_path[-1].config_by_pv()[0]
         # Acquire the Pv attached to this pragma (may only be the tail)
         for row in self.pragma:
             if row['title'] == 'pv':
@@ -379,6 +382,7 @@ class PvPackage:
             pv_line = BaseElement.parse_pragma('pv',config_set)
             element_copy = copy(target)
             element_copy.freeze_pv(pv_line)
+            # add array parsing here (for discrete arrays) 
             new_elements.append(element_copy)
 
         for chain_idx in range(len(progress_chain)):
@@ -430,14 +434,14 @@ class PvPackage:
         '''
         logger.debug("target_path: "+str(target_path))
         pvpacks_output_list = []
-        reject_list = []
+        reject_path_list = []
         # Presume that no proto file is being used if all are left blank 
         if use_proto == None:
             if base_proto_name != None or proto_file_name != None:
                 use_proto = True
             else:
                 use_proto = False
-
+        '''
         # Iterate through each pragma-set (one per PV) for the final element in
         # target path
         for element_node in target_path:
@@ -471,10 +475,50 @@ class PvPackage:
                 use_proto = use_proto
             )
             pvpacks_output_list.append(new_pvpack)
+        '''
+
+        direct_paths = cls.assemble_package_chains(target_path)
         
+        for path in direct_paths:
+            '''
+            print(direct_path)
+            for x in direct_path:
+                print(x.tc_type)
+            '''
+            # If the last element in the path isn't default type, don't create
+            # a package and pass the path back for further processing
+            if path[-1].tc_type not in beckhoff_types:
+                reject_path_list.append(path)
+            # otherwise create a pvpackage
+            else:
+                # prepare the proto if it is necessary
+                if use_proto:
+                    io_line = BaseElement.parse_pragma(
+                        'io',
+                        path[-1].config_by_pv()[0]
+                    )
+                    try:
+                        if "o" in io_line:
+                            proto_name = "Set" + base_proto_name
+                        elif "i" in io_line:
+                            proto_name = "Get" + base_proto_name
+                    # If no 'io' value is set, do the following 
+                    except TypeError:
+                        proto_name = base_proto_name
+                else:
+                    proto_file_name = None
+                    proto_name = None
+    
+                new_pvpack = cls(
+                    target_path = path,
+                    proto_name = proto_name,
+                    proto_file_name = proto_file_name,
+                    use_proto = use_proto
+                )
+                pvpacks_output_list.append(new_pvpack)
         
         if return_rejects:
-            return pvpacks_output_list, reject_list
+            return pvpacks_output_list, reject_path_list
         return pvpacks_output_list
 
     def make_config(self, title, setting, field=False):

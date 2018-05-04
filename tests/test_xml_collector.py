@@ -199,6 +199,7 @@ def test_PvPackage_assemble_package_chains(generic_tmc_path):
     assert chains ==[[c1],[c2]]
 
 
+
 def test_PvPackage_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     # test the creation of a normal multi-pv variable  
@@ -243,15 +244,14 @@ def test_PvPackage_from_element_path(generic_tmc_path):
     
     assert len(pv_packs) == 0
     assert len(rejects) == 1
-    assert rejects[0].pv_partial == "TEST:MAIN:VAR_ARRAY[]"
-    assert rejects[0].pv_complete == "TEST:MAIN:VAR_ARRAY[]"
-    assert rejects[0].proto_name == None
+    assert rejects[0][-1].freeze_pv_target == "TEST:MAIN:VAR_ARRAY[]"
 
     # test the creation of an encapsulated 
     element_path = [
         tmc.all_Symbols['MAIN.struct_base'],
-        tmc.all_SubItems['struct_var'],
+        tmc.all_SubItems['DUT_STRUCT']['struct_var'],
     ]
+    
     pv_packs, rejects = PvPackage.from_element_path(
         target_path = element_path,
         return_rejects = True
@@ -260,8 +260,8 @@ def test_PvPackage_from_element_path(generic_tmc_path):
     logging.debug("rejects: " + str(rejects))
     assert len(pv_packs) == 1
     assert len(rejects) == 0
-    assert rejects[0].pv_partial == "STRUCT_VAR"
-    assert rejects[0].pv_complete == "TEST:MAIN:STRUCT_BASE"
+    assert pv_packs[0].pv_partial == "STRUCT_VAR"
+    assert pv_packs[0].pv_complete == "TEST:MAIN:STRUCTBASE:STRUCT_VAR"
 
 
 def test_PvPackage_make_config(generic_tmc_path):
