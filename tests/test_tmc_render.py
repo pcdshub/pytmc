@@ -134,8 +134,8 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     )
     
     for pack in pv_packs:
-        logging.debug(str(pack.__dict__))
-        logging.debug(str(exp.all_pvpacks[0].__dict__))
+        #logging.debug(str(pack.__dict__))
+        #logging.debug(str(exp.all_pvpacks[0].__dict__))
         assert pack in exp.all_pvpacks
 
     # create intf for variable in encapsulated scope
@@ -151,8 +151,8 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     )
     
     for pack in pv_packs:
-        logging.debug(str(pack.__dict__))
-        logging.debug(str(exp.all_pvpacks[1].__dict__))
+        #logging.debug(str(pack.__dict__))
+        #logging.debug(str(exp.all_pvpacks[1].__dict__))
         assert pack in exp.all_pvpacks
 
 
@@ -164,10 +164,10 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
         base_proto_name = 'MAINNEW_VAR',
         proto_file_name = 'file.proto',
     )
-    logging.debug(str(exp.all_pvpacks[2].__dict__))
-    logging.debug(str(exp.all_pvpacks[3].__dict__))
+    #logging.debug(str(exp.all_pvpacks[2].__dict__))
+    #logging.debug(str(exp.all_pvpacks[3].__dict__))
     for pack in pv_packs:
-        logging.debug(str(pack.__dict__))
+        #logging.debug(str(pack.__dict__))
         assert pack in exp.all_pvpacks
 
     # create intf for basic array
@@ -181,8 +181,18 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     for pack in pv_packs:
         assert pack in exp.all_pvpacks
     
-
     # create intf for array of user-defined types
+    path = [tmc.all_Symbols['MAIN.dtype_samples_iter_array']]
+    exp.create_intf(path)
+    pv_packs, rejects = PvPackage.from_element_path(
+        target_path = path,
+        base_proto_name = 'MAINdtype_samples_iter_array',
+        proto_file_name = 'file.proto',
+        return_rejects = True,
+    )
+    for pack in pv_packs:
+        assert pack not in exp.all_pvpacks
+    logging.debug(str(rejects))
 
 
 def test_SingleRecordData_from_element(generic_tmc_path):

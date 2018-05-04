@@ -385,6 +385,7 @@ class PvPackage:
             # add array parsing here (for discrete arrays) 
             new_elements.append(element_copy)
 
+        # Iterate through the previously processed chains
         for chain_idx in range(len(progress_chain)):
             for new_elem_idx in range(len(new_elements)):
                 if new_elem_idx == 0:
@@ -433,6 +434,7 @@ class PvPackage:
             it automatically
         '''
         logger.debug("target_path: "+str(target_path))
+        logger.debug("t: "+str(target_path[-1].is_array))
         pvpacks_output_list = []
         reject_path_list = []
         # Presume that no proto file is being used if all are left blank 
@@ -447,7 +449,9 @@ class PvPackage:
         for path in direct_paths:
             # If the last element in the path isn't default type, don't create
             # a package and pass the path back for further processing
-            if path[-1].tc_type not in beckhoff_types:
+            logging.debug(str(path[-1])+ ' tc_type: ' + path[-1].tc_type)
+            target_pv = path[-1].freeze_pv_target
+            if '[' in target_pv or ']' in target_pv:
                 reject_path_list.append(path)
             # otherwise create a pvpackage
             else:
@@ -517,9 +521,11 @@ class PvPackage:
         raise NotImplementedError
 
     def __eq__(self, other):
-        # compare the dictionaries of the two objects against one another but
-        # don't compare the entries in the 'skip field - this causes infinite
-        # recursion issues 
+        """
+        Compare the dictionaries of the two objects against one another but
+        don't compare the entries in the 'skip field - this causes infinite
+        recursion issues 
+        """
         skip = [
             '_all_req_fields',
             '_all_req_vars',
