@@ -409,138 +409,6 @@ def test_config(generic_tmc_root):
     ]
     assert symbol_element._config == data
 
-'''
-def test_BaseElement_dtname(generic_tmc_root):
-    root = generic_tmc_root
-    
-    element= root.find(
-        "./DataTypes/DataType/[Name='iterator']"
-    )
-    el = DataType(element)
-    assert el.dtname == 'ITERATORNAME'
-
-
-def test_BaseElement_fields(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.fields == [
-        {'f_name':'DTYP','f_set':'asynFloat64'},
-        {'f_name':'EGU','f_set':'mm'},
-    ] 
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert subitem_element.fields == [
-        {'f_name':'DTYP','f_set':'asynFloat64'},
-        {'f_name':'EGU','f_set':'mm'},
-    ] 
-
-
-def test_BaseElement_pv(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.pv == 'LIM'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.pv == 'TEST:MAIN:ULIMIT'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.pv == [
-        'TEST:MAIN:NEW_VAR_OUT','TEST:MAIN:NEW_VAR_IN'
-    ]
-
-
-def test_BaseElement_rec_type(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.rec_type == 'ao'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.rec_type == 'ai'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.rec_type == [
-        'bo','bi'
-    ]
-
-
-def test_BaseElement_str_f(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.str_f == '%d'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.str_f == '%d'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.str_f == [
-        '%d','%d'
-    ]
-
-
-def test_BaseElement_io(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.io == 'o'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.io == 'input'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.io == [
-        'o','i'
-    ]
-'''
 
 def test_BaseElement_config_by_pv(generic_tmc_root):
     root = generic_tmc_root
@@ -598,6 +466,18 @@ def test_BaseElement_is_array(generic_tmc_root):
     subitem_element = SubItem(item_xml)
     assert subitem_element.is_array
 
+def test_BaseElement_all_pvs(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    result = symbol_element.all_pvs()
+    assert result == [
+        "TEST:MAIN:NEW_VAR_OUT",
+        "TEST:MAIN:NEW_VAR_IN"
+    ]
+
 
 def test_BaseElement_freeze_pv(generic_tmc_root):
     root = generic_tmc_root
@@ -616,5 +496,5 @@ def test_BaseElement_freeze_pv(generic_tmc_root):
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'i'},
     ]
-
+    assert symbol_element.pv() == 'TEST:MAIN:NEW_VAR_IN'
     assert symbol_element.pragma() == data

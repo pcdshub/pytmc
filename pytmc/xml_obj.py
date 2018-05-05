@@ -332,9 +332,6 @@ class BaseElement:
             if {'title': 'pv', 'tag':only_pv} in specific_pv_config:
                 return specific_pv_config
 
-    
-
-    @property
     def pv(self):
         '''
         Retrieve the config line specifying pv name for this entity.
@@ -346,71 +343,12 @@ class BaseElement:
         '''
         if not self.freeze_config:
             raise PvNotFrozenError
-        return self.extract_pragmas('pv')
+        [result] = self.extract_from_pragma('pv',pv=self.freeze_pv_target)
+        return result
+
+    def all_pvs(self):
+        return self.extract_from_pragma('pv')
     
-#    @property
-#    def fields(self):
-#        '''
-#        Retrieve the config line specifying db fields for this entity.
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        return self.extract_pragmas('field')
-#
-#    @property
-#    def dtname(self):
-#        '''
-#        Retrieve the config line specifying a name for this datatype.
-#
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        
-#        return self.extract_pragmas('name')
-#    
-#    @property
-#    def rec_type(self):
-#        '''
-#        Retrieve the confic line specifying record type (i.e. ao,ai) for this 
-#        entity.
-#
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        return self.extract_pragmas('type')
-#    
-#    @property
-#    def str_f(self):
-#        '''
-#        Retrieve the confic line specifying in-proto data format for this 
-#        entity.
-#
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        return self.extract_pragmas('str')
-#    
-#    @property
-#    def io(self):
-#        '''
-#        Retrieve the confic line specifying data direction for this 
-#        entity.
-#
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        return self.extract_pragmas('io')
-#    
     def config_by_pv(self):
         '''
         Parse the pytmc pragma into groups, one for each PV to be made from the
