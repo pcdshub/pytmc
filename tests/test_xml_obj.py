@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 #from pytmc.xml_obj import Symbol, DataType
 from pytmc import Symbol, DataType, SubItem
-from pytmc.xml_obj import BaseElement
+from pytmc.xml_obj import BaseElement, PvNotFrozenError
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -96,7 +96,47 @@ def test_BaseElement_properties(generic_tmc_root):
                 'PouType':'FunctionBlock',
                 'iterator attr':'42',
                 'pytmc':'name: ITERATORNAME'}, "Incorrect properties found"
-   
+
+def test_BaseElement_extract_from_pragma(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    result = symbol_element.extract_from_pragma('pv')
+    assert result == [
+        "TEST:MAIN:NEW_VAR_OUT",
+        "TEST:MAIN:NEW_VAR_IN"
+    ]
+
+
+def test_BaseElement_pragma(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    try:
+        data = symbol_element.pragma()
+        pytest.fail("PvNotFrozenError not thrown")
+    except PvNotFrozenError:
+        # success
+        pass
+    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_OUT')
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init','tag':'True'},
+    ]
+
+    assert symbol_element.pragma() == data 
+
+
 
 def test_Symbol_instantiation(generic_tmc_root):
     root = generic_tmc_root
@@ -333,7 +373,7 @@ def test_config_lines(generic_tmc_root):
         {'title': 'io', 'tag': 'input'},
         {'title': 'str', 'tag': '%d'}
     ]
-    assert symbol_element.config_lines == data
+    assert symbol_element._config_lines == data
 
 
 def test_neaten_field(generic_tmc_root):
@@ -367,7 +407,7 @@ def test_config(generic_tmc_root):
         {'title': 'io', 'tag': 'input'},
         {'title': 'str', 'tag': '%d'}
     ]
-    assert symbol_element.config == data
+    assert symbol_element._config == data
 
 '''
 def test_BaseElement_dtname(generic_tmc_root):
@@ -532,7 +572,6 @@ def test_BaseElement_config_by_pv(generic_tmc_root):
     data_filtered = [data_unfiltered[1]]
 
     assert symbol_element.config_by_pv() == data_unfiltered
-    assert symbol_element.config_by_pv('TEST:MAIN:NEW_VAR_IN') == data_filtered
 
 
 def test_BaseElement_is_array(generic_tmc_root):
@@ -566,17 +605,16 @@ def test_BaseElement_freeze_pv(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
     ) 
     symbol_element = Symbol(symbol_xml)
+    
     symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
     data = [
-        [
-            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
-            {'title': 'type', 'tag': 'bi'},
-            {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
-            {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
-            {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
-            {'title': 'str', 'tag': '%d'},
-            {'title': 'io', 'tag': 'i'},
-        ]
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
     ]
 
-    assert symbol_element.config_by_pv() == data
+    assert symbol_element.pragma() == data

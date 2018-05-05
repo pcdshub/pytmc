@@ -133,7 +133,7 @@ class BaseElement:
         return False
 
     @property
-    def config_lines(self):
+    def _config_lines(self):
         '''
         Read in a rudimentary python representation of the config statement.
         Use :func:`~config` to access a more cleanly formatted version of this
@@ -175,7 +175,7 @@ class BaseElement:
         return finder.search(string).groupdict()
 
     @property
-    def config(self):
+    def _config(self):
         """
         Cleanly formatted python representation of the config statement. Fields
         are broken into their own dictionaries.
@@ -186,13 +186,13 @@ class BaseElement:
                 this list contains dictionaries for each line of the config
                 statement
         """
-        cfg_lines = self.config_lines
+        cfg_lines = self._config_lines
         for line in cfg_lines:
             if line['title'] == 'field':
                 line['tag'] = self.neaten_field(line['tag'])
         return cfg_lines
 
-    def get_subfield(self, field_target, get_all=False):
+    def _get_subfield(self, field_target, get_all=False):
         """
         Produce element(s) within the class instance's target element. If
         seeking only a single element, return the first one encountered.
@@ -224,7 +224,7 @@ class BaseElement:
 
     @property
     def is_array(self):
-        if None != self.get_subfield('ArrayInfo'):
+        if None != self._get_subfield('ArrayInfo'):
             return True
         return False
 
@@ -267,55 +267,87 @@ class BaseElement:
         str
             The name of the variable
         '''
-        return self.get_subfield("Name").text
+        return self._get_subfield("Name").text
     
-    def extract_pragmas(self, title):
-        return __class__.parse_pragma(title,self.config)
-
-    @staticmethod
-    def parse_pragma(title, cfg):
+    def extract_from_pragma(self, title, pv=None):
         '''
-        Get the first designated configuration line(s) from the config pragma.
+        Extract a given setting(s) from the pragma.
+
+        Attributes
+        ----------
+        title : str
+            Specify the name of the field to seek from
+
+        pv : str, optional
+            Specify which PV to pull the config line from. If not specified 
+        Returns
+        -------
+        list 
+            list of all pragma information from the specified location.
+        '''
+
+        if pv == None:
+            # scan for the title across config lines from all PVs
+            config_set = self._config
+        else:
+            # only lines specific to this PV are available for examination
+            config_set = self.pragma(only_pv = pv)
+
+        results = []
+        for line in config_set:
+            if line['title'] == title:
+                results.append(line['tag'])
+
+        return results
+
+        
+
+
+
+    def pragma(self, only_pv=None):
+        '''
+        Return the cropped down pragma that is specific to a single PV.
 
         Parameters
         ----------
-        title : str 
-            title of the config line searched for
-
-        cfg : list
-            The list of pragma lines to be searched  
+        only_pv : str or None
+            Specify which PV's pragma to print. Defaults to the frozen PV. Must
+            be provided if no PV has been frozen.
 
         Returns
         -------
-        str, list of str or None
-            If there is only one name for the datatype, return a string, if
-            there are multiple, list each name, returns None if none are found.
-        ''' 
-        result = []
-                
-        for line in cfg:
-            if line['title'] == title:
-                result.append(line['tag'])
+        list:
+            The PV specific pragma for this element
+        '''
+        if not self.freeze_config and only_pv == None:
+            raise PvNotFrozenError
         
-        if result == []:
-            result = None
-        elif len(result) == 1:
-            result = result[0]
+        if self.freeze_config and only_pv == None:
+            only_pv = self.freeze_pv_target
 
-        return result
+        
+        all_results = self.config_by_pv()
 
-#    @property
-#    def pv(self):
-#        '''
-#        Retrieve the config line specifying pv name for this entity.
-#
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        return self.extract_pragmas('pv')
-#    
+        for specific_pv_config in all_results:
+            if {'title': 'pv', 'tag':only_pv} in specific_pv_config:
+                return specific_pv_config
+
+    
+
+    @property
+    def pv(self):
+        '''
+        Retrieve the config line specifying pv name for this entity.
+
+        Returns
+        -------
+        str, list of str, or None
+            See :func:`~extract_pragmas` for details.
+        '''
+        if not self.freeze_config:
+            raise PvNotFrozenError
+        return self.extract_pragmas('pv')
+    
 #    @property
 #    def fields(self):
 #        '''
@@ -379,7 +411,7 @@ class BaseElement:
 #        '''
 #        return self.extract_pragmas('io')
 #    
-    def config_by_pv(self, only_pv=None):
+    def config_by_pv(self):
         '''
         Parse the pytmc pragma into groups, one for each PV to be made from the
         variable. 
@@ -390,24 +422,13 @@ class BaseElement:
             This list contains a list for each unique PV. These lists contain
             dictionaries, one for each row of the pragma.
         '''
-        data = self.config
+        data = self._config
         separate_lists = []
         for line in data:
             if line['title'] == 'pv':
                 separate_lists.append([])
                 index = len(separate_lists) - 1
             separate_lists[index].append(line)
-
-        if self.freeze_config:
-            only_pv = self.freeze_pv_target
-
-        if only_pv != None:
-            for pv_config in separate_lists:
-                if {'title': 'pv', 'tag':only_pv} in pv_config:
-                    return [pv_config]
-
-            return []
-
         return separate_lists
 
     def freeze_pv(self,pv):
@@ -460,7 +481,7 @@ class Symbol(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
-        name_field = self.get_subfield("BaseType")
+        name_field = self._get_subfield("BaseType")
         return name_field.text
 
 
@@ -516,13 +537,13 @@ class DataType(BaseElement):
         has_SubItem = False
         has_Properties = False
 
-        if None != self.get_subfield("EnumInfo"):
+        if None != self._get_subfield("EnumInfo"):
             has_EnumInfo = True
             
-        if None != self.get_subfield("SubItem"):
+        if None != self._get_subfield("SubItem"):
             has_SubItem = True
         
-        if None != self.get_subfield("Properties"):
+        if None != self._get_subfield("Properties"):
             has_Properties = True
         
         result = None
@@ -554,7 +575,7 @@ class DataType(BaseElement):
             DataType name or None if there is no parent 
 
         '''
-        extension_element = self.get_subfield("ExtendsType")
+        extension_element = self._get_subfield("ExtendsType")
         if extension_element == None:
             return None
         return extension_element.text
@@ -618,7 +639,7 @@ class SubItem(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
-        name_field = self.get_subfield("Type")
+        name_field = self._get_subfield("Type")
         return name_field.text
 
     @property
