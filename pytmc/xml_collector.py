@@ -152,6 +152,91 @@ class TmcFile:
         self.isolate_Symbols()
         self.isolate_DataTypes()
 
+    def create_chains(self):
+        raise NotImplementedError
+
+    def recursive_explore(self, root_path):
+        """
+        Given a starting Symbol or SubItem, recursively explore the contents of
+        the target and return a list for the path to each final leaf-item. 
+
+        Parameters 
+        ----------
+        root_path : list
+            This is a list leading to the initial item to explore from. The
+            list is composed of :class:`~Symbol` and :class:`~SubItem`
+            instances
+
+        Returns
+        -------
+        list
+            This list contains a list for each leaf-item detected. The
+            individual lists are the paths through the tree to each leaf-item
+            charted by :class:`~Symbol` and :class:`~SubItem`.
+        """
+        root = root_path[-1]
+        response = []
+        target_SubItems = []
+        
+        # If this is a user defined datatype
+        DataType_str = root.tc_type
+        if DataType_str in self.all_DataTypes:
+            
+            # Accumulate list of SubItems in this Subitem/Symbol
+            target_DataType = self.all_DataTypes[DataType_str]
+            target_SubItems.extend(
+                self.recursive_list_SubItems(target_DataType)
+            )
+
+            # For each subitem in this object/datatype explore further 
+            for subitem in target_SubItems:
+                new_paths = self.recursive_explore(root_path + [subitem])
+                response.extend(new_paths)
+
+            return response
+
+        # If not a use defined datatype
+        else:
+            return [root_path]
+        
+    def recursive_list_SubItems(self, root_DataType):
+        """
+        For a given DataType, provide all of its SubItems including those
+        derived from inherited DataTypes
+
+        Parameters
+        ----------
+        root_DataType : :class:`~DataType`
+            instance of the target datatype
+        
+        Returns
+        -------
+        list
+            list of :class:`~SubItem` of contained subItems
+        """
+        response = []
+        root_DataType_str = root_DataType.name
+
+        # Recursively explore inherited DataTypes
+        parent_DataType_str = self.all_DataTypes[root_DataType_str].tc_extends
+        if parent_DataType_str is not None:
+            parent_DataType = self.all_DataTypes[parent_DataType_str]
+            response.extend(self.recursive_list_SubItems(parent_DataType))
+
+        # Append all SubItems from THIS DataType
+        SubItem_str_list = self.all_SubItems[root_DataType_str]
+        response.extend(
+            [self.all_SubItems[root_DataType_str][z] for z in SubItem_str_list]
+        )
+
+        return response
+
+
+class TmcChain:
+    # just point to the tmc instances
+    def __init__(self, *args, **kwargs):    
+        raise NotImplementedError
+
 
 class PvPackage:
     '''
