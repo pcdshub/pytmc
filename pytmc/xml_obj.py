@@ -10,11 +10,14 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 import re
 
+
 class XmlObjError(Exception):
     pass
 
+
 class PvNotFrozenError(XmlObjError):
     pass
+
 
 class BaseElement:
     '''
@@ -27,7 +30,7 @@ class BaseElement:
         A python xml element object connected to the intended .tmc datagroup
 
     base : str
-        The prefix that will mark pragmas intended for pytmc's consumption. 
+        The prefix that will mark pragmas intended for pytmc's consumption.
     '''
     def __init__(self, element, base=None, suffixes=None):
         if type(element) != ET.Element:
@@ -37,15 +40,15 @@ class BaseElement:
         self.freeze_config = False
         self.freeze_pv_target = None 
 
-        if base == None:
+        if base is None:
             self.com_base = 'pytmc'
         else:
             self.com_base = base
-        if suffixes == None:
+        if suffixes is None:
             self.suffixes = {
-                'Pv' : '_pv',
-                'DataType' : '_dt_name',
-                'Field' : '_field'
+                'Pv': '_pv',
+                'DataType': '_dt_name',
+                'Field': '_field'
             }
         else:
             self.suffixes = suffixes
@@ -54,7 +57,7 @@ class BaseElement:
         """
         Obtain all elements contained in the 'Properties' element. Intended for
         internal use.
-        
+
         Returns
         -------
 
@@ -78,25 +81,25 @@ class BaseElement:
             values found in the xml
         """
         raw = self._get_raw_properties()
-        if raw == None:
+        if raw is None:
             return None
 
         result = {}
 
         for entry in raw:
             name_element = entry.find("./Name")
-            if name_element == None:
+            if name_element is None:
                 logger.debug("Property Name not found")
                 continue
 
             name_text = name_element.text
 
             value_element = entry.find("./Value")
-            if value_element == None:
+            if value_element is None:
                 value_text = None
-            else:    
+            else:
                 value_text = value_element.text
-            
+
             result[name_text] = value_text
 
         return result
@@ -105,7 +108,7 @@ class BaseElement:
     def raw_config(self):
         """
         Produce a stripped-down set of properties including only those that are
-        recognized as pragmas intended for pytmc's consumption. 
+        recognized as pragmas intended for pytmc's consumption.
 
         Returns
         -------
@@ -116,18 +119,18 @@ class BaseElement:
 
         """
         return self.properties.get('pytmc')
-    
+
     @property
     def has_config(self):
         '''
-        Shortcut for determining if this element has pragmas. 
-        
+        Shortcut for determining if this element has pragmas.
+
         Returns
         -------
         bool
             True if there is a config pragma attached to this xml element
         '''
-        if self.raw_config != None:
+        if self.raw_config is not None:
             return True
 
         return False
@@ -228,7 +231,7 @@ class BaseElement:
             return True
         return False
 
-    def __eq__(self,other):
+    def __eq__(self, other):
         '''
         Two objects are equal if they point to the same xml element. e.g. their
         element fields point to the same place in the same file.
@@ -244,11 +247,10 @@ class BaseElement:
             return False
 
     def __repr__(self):
-        if self.element == None:
+        if self.element is None:
             name = "None"
         else:
             name = "<xml(" + self.element.find("./Name").text + ")>"
-            #name = "<xml(" + self.element.tag + ")>"
             
         return "{}(element={})".format(
             self.__class__.__name__,
@@ -299,10 +301,6 @@ class BaseElement:
                 results.append(line['tag'])
 
         return results
-
-        
-
-
 
     def pragma(self, only_pv=None):
         '''
