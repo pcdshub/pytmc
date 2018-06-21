@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 #from pytmc.xml_obj import Symbol, DataType
 from pytmc import Symbol, DataType, SubItem
-from pytmc.xml_obj import BaseElement, PvNotFrozenError
+from pytmc.xml_obj import BaseElement, PvNotFrozenError, Configuration
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -519,6 +519,8 @@ def test_BaseElement_add_pragma_line(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
     ) 
     symbol_element = Symbol(symbol_xml)
+    with pytest.raises(PvNotFrozenError):
+        symbol_element.add_pragma_line('a','b')
     symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
     data = [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
@@ -539,6 +541,8 @@ def test_BaseElement_add_pragma_field(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
     ) 
     symbol_element = Symbol(symbol_xml)
+    with pytest.raises(PvNotFrozenError):
+        symbol_element.add_pragma_field('a','b')
     symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
     data = [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
@@ -553,4 +557,23 @@ def test_BaseElement_add_pragma_field(generic_tmc_root):
     data.append({'title': 'field', 'tag': {'f_name': 'a', 'f_set': 'b'}})
     assert symbol_element.pragma == data
 
-
+def test_Configuration_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg._config_lines()
+    assert result == [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':'ZNAM\tSINGLE'},
+        {'title': 'field', 'tag':'ONAM\tMULTI'},
+        {'title': 'field', 'tag':'SCAN\t1 second'},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init', 'tag': 'True'},
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':'ZNAM\tSINGLE'},
+        {'title': 'field', 'tag':'ONAM\tMULTI'},
+        {'title': 'field', 'tag':'SCAN\t1 second'},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]

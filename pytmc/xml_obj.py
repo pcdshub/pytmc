@@ -18,6 +18,112 @@ class XmlObjError(Exception):
 class PvNotFrozenError(XmlObjError):
     pass
 
+class Configuration:
+    def __init__(self, str):
+        # str: self._raw_config (READ ONLY, set at instantaiation)
+        # list: self.config
+        self._raw_config = str
+        self.config = None
+
+    @property
+    def raw_config(self):
+        """
+        raw_config will behave like a read-only variable
+        """
+        return self._raw_config
+
+
+    def _config_lines(self, raw_config=None):
+        """
+        Return dictionaries for each line. 
+        Derived from raw_config
+        """
+        if raw_config is None:
+            raw_config = self.raw_config
+
+        finder = re.compile(
+            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
+        )
+        result = [ m.groupdict() for m in finder.finditer(raw_config)]
+        for line in result:
+            line['tag'] = line['tag'].strip()
+        return result
+        
+    def _neaten_fields(self, string):
+        """
+        When applied to field line's tag, break the string into its own dict
+        Use on things derived from raw_config
+        """
+        raise NotImplementedError
+
+    def _formatted_config_lines(self, config_lines=None): 
+        """
+        Apply the neaten (_neaten_fields) methods to clean up _config_lines.
+        Formerly _config
+        Derived from _config_lines
+        Derived from raw_config
+        """
+        raise NotImplementedError
+
+    def _config_by_name(self, formatted_config_lines=None): 
+        """
+        Break pragma block into separate lists for each Configuration (Pv)
+        Formerly config_by_pv
+        Derived from _formatted_config_lines
+        Can be derived from raw_config or config
+        """
+        raise NotImplementedError
+
+    def _select_config_by_name(self, config_name, formatted_config_lines=None):
+        """
+        Produce subset of formatted_config_lines specific to given config_name
+        derived from _config_by_name
+        can be derived from raw_config or config 
+        """
+        raise NotImplementedError
+
+    def _config_names(self, formatted_config_lines=None):
+        """
+        Produce a list of configuration names (Pvs)
+        Derived from _config_by_name
+        Can be derived from raw_config or config
+        """
+        raise NotImplementedError
+
+    def fix_to_config_name(self, config_name):
+        """
+        Cut config down to a single configuration
+        Derived from _select_config_by_name
+        """
+        raise NotImplementedError
+
+    def add_config_line(self, title, tag, line_no=None, config=None):
+        """
+        add basic line to config
+        """
+        raise NotImplementedError
+
+    def add_config_field(self, f_name, f_set, line_no=None, config=None):
+        """
+        add field to config
+        """
+        raise NotImplementedError
+
+    def extract_config_lines(self,title, config=None):
+        """
+        return list of lines of this title type
+        """
+        raise NotImplementedError
+
+    def extract_config_fields(self, f_name, config=None):
+        """
+        return list of fields of this f_name type
+        """
+        raise NotImplementedError
+
+    def __eq__(self,other):
+        raise NotImplementedError  
+
 
 class BaseElement:
     '''
@@ -411,8 +517,7 @@ class BaseElement:
         if not self.freeze_config:
             raise PvNotFrozenError
         
-        self.add_pragma_line('field',{'f_name': f_name, 'f_set': f_set})
-        
+        self.add_pragma_line('field',{'f_name': f_name, 'f_set': f_set}) 
 
 
 class Symbol(BaseElement):
