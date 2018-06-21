@@ -585,7 +585,27 @@ def test_Configuration_neaten_field(leaf_bool_pragma_string):
     
     assert result == {'f_name':'ZNAM','f_set':'SINGLE'}
 
-
+def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg._formatted_config_lines()
+    assert result == [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init', 'tag': 'True'},
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+    
 
 
 

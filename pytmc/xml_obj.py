@@ -88,7 +88,14 @@ class Configuration:
         Derived from _config_lines
         Derived from raw_config
         """
-        raise NotImplementedError
+        if config_lines is None:
+            config_lines = self._config_lines()
+        
+        for line in config_lines:
+            if line['title'] == 'field':
+                line['tag'] = self._neaten_field(line['tag'])
+        return config_lines
+
 
     def _config_by_name(self, formatted_config_lines=None): 
         """
