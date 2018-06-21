@@ -110,7 +110,6 @@ class Configuration:
                 line['tag'] = self._neaten_field(line['tag'])
         return config_lines
 
-
     def _config_by_name(self, formatted_config_lines=None): 
         """
         Break pragma block into separate lists for each Configuration (Pv)
@@ -146,9 +145,32 @@ class Configuration:
         """
         Produce subset of formatted_config_lines specific to given config_name
         derived from _config_by_name
-        can be derived from raw_config or config 
+        can be derived from raw_config or config
+
+        Parameters
+        ----------
+        config_name : str
+            string for the target configuration name you're looking for
+
+        formatted_config_lines : list
+            List of line-by-line dictionaries with formatted fields like the
+            output of :func:`~_formatted_config_lines`
+
+        Returns
+        -------
+        list or None
+            List of formatted configuration lines specific to the configuration
+            named in the parameters. If there was no such configuration, return
+            None instead.
         """
-        raise NotImplementedError
+        if formatted_config_lines is None:
+            formatted_config_lines = self._formatted_config_lines()
+                
+        specific_configs = self._config_by_name(formatted_config_lines)
+
+        for specific_config in specific_configs:
+            if {'title': 'pv', 'tag': config_name} in specific_config:
+                return specific_config
 
     def _config_names(self, formatted_config_lines=None):
         """
@@ -481,6 +503,7 @@ class BaseElement:
 
         return results
 
+    # refactored
     def read_pragma(self, only_pv=None):
         '''
         Return the cropped down pragma that is specific to a single PV.
