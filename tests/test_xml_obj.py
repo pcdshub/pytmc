@@ -577,3 +577,17 @@ def test_Configuration_config_lines(leaf_bool_pragma_string):
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'i'},
     ]
+
+def test_Configuration_neaten_field(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    cfg_lines = cfg._config_lines()
+    result = cfg._neaten_field(cfg_lines[2]['tag'])
+    
+    assert result == {'f_name':'ZNAM','f_set':'SINGLE'}
+
+
+
+
+
+
+

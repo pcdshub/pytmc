@@ -37,6 +37,17 @@ class Configuration:
         """
         Return dictionaries for each line. 
         Derived from raw_config
+
+        Parameters
+        ----------
+        raw_config : str
+            completely unformatted string from configuration
+
+        Returns
+        -------
+        list
+            This list contains a dictionary for each line broken up into two
+            keys: 'title' and 'tag'.
         """
         if raw_config is None:
             raw_config = self.raw_config
@@ -49,12 +60,26 @@ class Configuration:
             line['tag'] = line['tag'].strip()
         return result
         
-    def _neaten_fields(self, string):
+    def _neaten_field(self, string):
         """
         When applied to field line's tag, break the string into its own dict
         Use on things derived from raw_config
+        
+        Parameters
+        ----------
+        string : str
+            This is the string to be broken into field name and field setting
+
+        Returns
+        -------
+        dict
+            Keys are 'f_name' for the field name and 'f_set' for the
+            corresponding setting.
         """
-        raise NotImplementedError
+        finder = re.compile(
+            r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)"
+        )
+        return finder.search(string).groupdict()
 
     def _formatted_config_lines(self, config_lines=None): 
         """
