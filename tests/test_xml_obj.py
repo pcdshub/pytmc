@@ -97,6 +97,7 @@ def test_BaseElement_properties(generic_tmc_root):
                 'iterator attr':'42',
                 'pytmc':'name: ITERATORNAME'}, "Incorrect properties found"
 
+
 def test_BaseElement_extract_from_pragma(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -117,7 +118,7 @@ def test_BaseElement_pragma(generic_tmc_root):
     ) 
     symbol_element = Symbol(symbol_xml)
     try:
-        data = symbol_element.pragma()
+        data = symbol_element.read_pragma()
         pytest.fail("PvNotFrozenError not thrown")
     except PvNotFrozenError:
         # success
@@ -134,8 +135,7 @@ def test_BaseElement_pragma(generic_tmc_root):
         {'title': 'init','tag':'True'},
     ]
 
-    assert symbol_element.pragma() == data 
-
+    assert symbol_element.read_pragma() == data 
 
 
 def test_Symbol_instantiation(generic_tmc_root):
@@ -485,7 +485,13 @@ def test_BaseElement_freeze_pv(generic_tmc_root):
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
     ) 
     symbol_element = Symbol(symbol_xml)
+     
+    with pytest.raises(PvNotFrozenError):
+        z = symbol_element.pragma
     
+    with pytest.raises(PvNotFrozenError):
+        symbol_element.pragma = 2
+
     symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
     data = [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
@@ -497,4 +503,54 @@ def test_BaseElement_freeze_pv(generic_tmc_root):
         {'title': 'io', 'tag': 'i'},
     ]
     assert symbol_element.pv() == 'TEST:MAIN:NEW_VAR_IN'
-    assert symbol_element.pragma() == data
+    assert symbol_element.read_pragma() == data
+
+    assert symbol_element.pragma == data, "Pragma not prperly read or set"
+    extra = {'title': 'none', 'tag': 'blank'}
+    symbol_element.pragma.append(extra)
+    data.append(extra)
+    assert symbol_element.pragma == data, "Pragma not properly added"
+    del symbol_element.pragma
+    assert symbol_element._pragma == None, "Pragma not deleted properly"
+
+def test_BaseElement_add_pragma_line(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+    symbol_element.add_pragma_line("a","b")
+    data.append({'title': 'a', 'tag': 'b'})
+    assert symbol_element.pragma == data
+
+def test_BaseElement_add_pragma_field(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+    symbol_element.add_pragma_field("a","b")
+    data.append({'title': 'field', 'tag': {'f_name': 'a', 'f_set': 'b'}})
+    assert symbol_element.pragma == data
+
+

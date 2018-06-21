@@ -53,6 +53,8 @@ class BaseElement:
         else:
             self.suffixes = suffixes
 
+        self._pragma = None
+
     def _get_raw_properties(self):
         """
         Obtain all elements contained in the 'Properties' element. Intended for
@@ -293,7 +295,7 @@ class BaseElement:
             config_set = self._config
         else:
             # only lines specific to this PV are available for examination
-            config_set = self.pragma(only_pv = pv)
+            config_set = self.read_pragma(only_pv = pv)
 
         results = []
         for line in config_set:
@@ -302,7 +304,7 @@ class BaseElement:
 
         return results
 
-    def pragma(self, only_pv=None):
+    def read_pragma(self, only_pv=None):
         '''
         Return the cropped down pragma that is specific to a single PV.
 
@@ -378,7 +380,39 @@ class BaseElement:
             String of the target PV
         '''
         self.freeze_config = True
-        self.freeze_pv_target = pv 
+        self.freeze_pv_target = pv
+
+        self._pragma = self.read_pragma()
+
+    @property
+    def pragma(self):
+        if not self.freeze_config:
+            raise PvNotFrozenError
+        return self._pragma
+
+    @pragma.setter
+    def pragma(self, pragma):
+        if not self.freeze_config:
+            raise PvNotFrozenError
+        self._pragma = pragma
+
+    @pragma.deleter
+    def pragma(self):
+        if not self.freeze_config:
+            raise PvNotFrozenError
+        self._pragma = None
+
+    def add_pragma_line(self, title, tag):
+        if not self.freeze_config:
+            raise PvNotFrozenError
+        self._pragma.append({'title': title, 'tag': tag})
+    
+    def add_pragma_field(self, f_name, f_set):
+        if not self.freeze_config:
+            raise PvNotFrozenError
+        
+        self.add_pragma_line('field',{'f_name': f_name, 'f_set': f_set})
+        
 
 
 class Symbol(BaseElement):
