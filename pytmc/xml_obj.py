@@ -87,6 +87,20 @@ class Configuration:
         Formerly _config
         Derived from _config_lines
         Derived from raw_config
+
+        Parameters
+        ----------
+        config_lines : list 
+            This is the list of line-by-line dictionaries. Has the same format
+            as the return of :func:`~_config`
+        
+        Returns
+        -------
+        list
+            this list contains dictionaries for each line of the config 
+            statement
+
+
         """
         if config_lines is None:
             config_lines = self._config_lines()
@@ -103,8 +117,30 @@ class Configuration:
         Formerly config_by_pv
         Derived from _formatted_config_lines
         Can be derived from raw_config or config
+        
+        Parameters
+        ----------
+        formatted_config_lines : list
+            List of line-by-line dictionaries for each line of the
+            configuration text with fields broken up. Same format as the return
+            of :func:`~_formatted_config_lines`.
+        
+        Returns
+        -------
+        list 
+            This list contains a list for each unique PV. These lists contain
+            dictionaries, one for each row of the pragma.
         """
-        raise NotImplementedError
+        if formatted_config_lines is None:
+            formatted_config_lines = self._formatted_config_lines()
+
+        separate_lists = []
+        for line in formatted_config_lines:
+            if line['title'] == 'pv':
+                separate_lists.append([])
+                index = len(separate_lists) - 1
+            separate_lists[index].append(line)
+        return separate_lists
 
     def _select_config_by_name(self, config_name, formatted_config_lines=None):
         """
@@ -275,6 +311,7 @@ class BaseElement:
 
         return False
 
+    # refactored   
     @property
     def _config_lines(self):
         '''
@@ -297,6 +334,7 @@ class BaseElement:
             line['tag'] = line['tag'].strip()
         return result
     
+    # refactored   
     def neaten_field(self, string):
         '''
         Method for formatting the 'field' line
@@ -317,6 +355,7 @@ class BaseElement:
         )
         return finder.search(string).groupdict()
 
+    # refactored   
     @property
     def _config(self):
         """
@@ -487,6 +526,7 @@ class BaseElement:
     def all_pvs(self):
         return self.extract_from_pragma('pv')
     
+    # refactored
     def config_by_pv(self):
         '''
         Parse the pytmc pragma into groups, one for each PV to be made from the
