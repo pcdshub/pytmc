@@ -56,3 +56,32 @@ def generic_explorer():
     test_path = os.path.join(directory, "generic.tmc")
     tmc = TmcFile(test_path)
     return TmcExplorer(tmc)
+
+@pytest.fixture(scope='function')
+def leaf_bool_pragma_string():
+    str = """
+                     pv: TEST:MAIN:NEW_VAR_OUT
+                     type: bo 
+                     field: ZNAM	SINGLE
+                     field: ONAM	MULTI
+                     field: SCAN	1 second
+                     str: %d
+                     io: o
+                     init: True
+                     pv: TEST:MAIN:NEW_VAR_IN
+                     type: bi
+                     field: ZNAM	SINGLE
+                     field: ONAM	MULTI
+                     field: SCAN	1 second
+                     str: %d
+                     io: i
+    """
+    return str
+
+@pytest.fixture(scope='function')
+def branch_bool_pragma_string():
+    str = """
+            pv: FIRST
+            pv: SECOND
+    """
+    return str 
