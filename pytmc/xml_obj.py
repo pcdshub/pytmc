@@ -152,9 +152,10 @@ class Configuration:
         config_name : str
             string for the target configuration name you're looking for
 
-        formatted_config_lines : list
+        formatted_config_lines : list, optional
             List of line-by-line dictionaries with formatted fields like the
-            output of :func:`~_formatted_config_lines`
+            output of :func:`~_formatted_config_lines`. Defaults to the raw
+            configuration
 
         Returns
         -------
@@ -177,8 +178,31 @@ class Configuration:
         Produce a list of configuration names (Pvs)
         Derived from _config_by_name
         Can be derived from raw_config or config
+
+        Parameters
+        ----------
+        formatted_config_lines : list 
+            List of line-by-line dictionaries with formatted fields like the
+            output of :func:`~_formatted_config_lines`. Defaults to the raw
+            configuration
+
+        Returns
+        -------
+        list
+            List of strings of all configurations found
         """
-        raise NotImplementedError
+        if formatted_config_lines is None:
+            formatted_config_lines = self._formatted_config_lines()
+                
+        specific_configs = self._config_by_name(formatted_config_lines)
+        
+        config_names_list = []
+        for specific_config in specific_configs:
+            for line in specific_config:
+                if line['title'] == 'pv':
+                    config_names_list.append(line['tag'])
+
+        return config_names_list
 
     def fix_to_config_name(self, config_name):
         """
