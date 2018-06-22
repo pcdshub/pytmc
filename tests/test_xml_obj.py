@@ -652,6 +652,17 @@ def test_Configuration_config_names(leaf_bool_pragma_string):
         "TEST:MAIN:NEW_VAR_OUT",
         "TEST:MAIN:NEW_VAR_IN"
     ]
-    
 
-
+def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg.fix_to_config_name('TEST:MAIN:NEW_VAR_OUT')
+    assert cfg.config == [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init', 'tag': 'True'},
+    ]

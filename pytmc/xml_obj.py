@@ -23,7 +23,7 @@ class Configuration:
         # str: self._raw_config (READ ONLY, set at instantaiation)
         # list: self.config
         self._raw_config = str
-        self.config = None
+        self.config = self._formatted_config_lines()
 
     @property
     def raw_config(self):
@@ -31,7 +31,6 @@ class Configuration:
         raw_config will behave like a read-only variable
         """
         return self._raw_config
-
 
     def _config_lines(self, raw_config=None):
         """
@@ -208,8 +207,18 @@ class Configuration:
         """
         Cut config down to a single configuration
         Derived from _select_config_by_name
+
+        Parameters
+        ----------
+        config_name : str
+            Provide the name of the 
+
+        Returns
+        -------
+        None
         """
-        raise NotImplementedError
+        self.config = self._select_config_by_name(config_name)
+
 
     def add_config_line(self, title, tag, line_no=None, config=None):
         """
