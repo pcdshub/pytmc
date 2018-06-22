@@ -383,24 +383,26 @@ class BaseElement:
         if type(element) != ET.Element:
             raise TypeError("ElementTree.Element required")
         self.element = element
-        self.registered_pragmas = []
-        self.freeze_config = False
-        self.freeze_pv_target = None 
+        #self.registered_pragmas = []
+        #self.freeze_config = False
+        #self.freeze_pv_target = None 
 
         if base is None:
             self.com_base = 'pytmc'
         else:
             self.com_base = base
-        if suffixes is None:
-            self.suffixes = {
-                'Pv': '_pv',
-                'DataType': '_dt_name',
-                'Field': '_field'
-            }
-        else:
-            self.suffixes = suffixes
+            
+        #if suffixes is None:
+        #    self.suffixes = {
+        #        'Pv': '_pv',
+        #        'DataType': '_dt_name',
+        #        'Field': '_field'
+        #    }
+        #else:
+        #    self.suffixes = suffixes
 
-        self._pragma = None
+        #self._pragma = None
+        self.pragma = Configuration(self.raw_config)
 
     def _get_raw_properties(self):
         """
@@ -409,7 +411,6 @@ class BaseElement:
 
         Returns
         -------
-
         [xml.etree.ElementTree.Element]
             List of elements
         """
@@ -424,7 +425,6 @@ class BaseElement:
 
         Returns
         -------
-
         dict
             Dictionary. The key is the property name and the value is a list of
             values found in the xml
@@ -736,34 +736,34 @@ class BaseElement:
 
         self._pragma = self.read_pragma()
 
-    @property
-    def pragma(self):
-        if not self.freeze_config:
-            raise PvNotFrozenError
-        return self._pragma
-
-    @pragma.setter
-    def pragma(self, pragma):
-        if not self.freeze_config:
-            raise PvNotFrozenError
-        self._pragma = pragma
-
-    @pragma.deleter
-    def pragma(self):
-        if not self.freeze_config:
-            raise PvNotFrozenError
-        self._pragma = None
-
-    def add_pragma_line(self, title, tag):
-        if not self.freeze_config:
-            raise PvNotFrozenError
-        self._pragma.append({'title': title, 'tag': tag})
-    
-    def add_pragma_field(self, f_name, f_set):
-        if not self.freeze_config:
-            raise PvNotFrozenError
-        
-        self.add_pragma_line('field',{'f_name': f_name, 'f_set': f_set}) 
+#    @property
+#    def pragma(self):
+#        if not self.freeze_config:
+#            raise PvNotFrozenError
+#        return self._pragma
+#
+#    @pragma.setter
+#    def pragma(self, pragma):
+#        if not self.freeze_config:
+#            raise PvNotFrozenError
+#        self._pragma = pragma
+#
+#    @pragma.deleter
+#    def pragma(self):
+#        if not self.freeze_config:
+#            raise PvNotFrozenError
+#        self._pragma = None
+#
+#    def add_pragma_line(self, title, tag):
+#        if not self.freeze_config:
+#            raise PvNotFrozenError
+#        self._pragma.append({'title': title, 'tag': tag})
+#    
+#    def add_pragma_field(self, f_name, f_set):
+#        if not self.freeze_config:
+#            raise PvNotFrozenError
+#        
+#        self.add_pragma_line('field',{'f_name': f_name, 'f_set': f_set}) 
 
 
 class Symbol(BaseElement):
@@ -782,10 +782,10 @@ class Symbol(BaseElement):
     '''
     def __init__(self, element, base=None,suffixes=None):
         super().__init__(element, base, suffixes)
-        self.registered_pragmas = [
-            self.com_base + self.suffixes['Field'], 
-            self.com_base + self.suffixes['Pv'], 
-        ]
+        #self.registered_pragmas = [
+        #    self.com_base + self.suffixes['Field'], 
+        #    self.com_base + self.suffixes['Pv'], 
+        #]
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
 
@@ -834,9 +834,9 @@ class DataType(BaseElement):
     
     def __init__(self, element, base=None, suffixes=None):
         super().__init__(element, base, suffixes)
-        self.registered_pragmas = [
-            self.com_base + self.suffixes['DataType'],
-        ]
+        #self.registered_pragmas = [
+        #    self.com_base + self.suffixes['DataType'],
+        #]
         
         self.children = []
 
@@ -935,10 +935,10 @@ class SubItem(BaseElement):
     '''
     def __init__(self, element, base=None, suffixes=None, parent = None):
         super().__init__(element, base, suffixes)
-        self.registered_pragmas = [
-            self.com_base + self.suffixes['Field'], 
-            self.com_base + self.suffixes['Pv'], 
-        ]
+        #self.registered_pragmas = [
+        #    self.com_base + self.suffixes['Field'], 
+        #    self.com_base + self.suffixes['Pv'], 
+        #]
         self.__parent = None
         self.parent = parent
 

@@ -117,14 +117,9 @@ def test_BaseElement_pragma(generic_tmc_root):
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
     ) 
-    symbol_element = Symbol(symbol_xml)
-    try:
-        data = symbol_element.read_pragma()
-        pytest.fail("PvNotFrozenError not thrown")
-    except PvNotFrozenError:
-        # success
-        pass
-    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_OUT')
+    base_element = BaseElement(symbol_xml)
+
+    base_element.pragma.fix_to_config_name('TEST:MAIN:NEW_VAR_OUT')
     data = [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
         {'title': 'type', 'tag': 'bo'},
@@ -136,7 +131,7 @@ def test_BaseElement_pragma(generic_tmc_root):
         {'title': 'init','tag':'True'},
     ]
 
-    assert symbol_element.read_pragma() == data 
+    assert base_element.pragma.config == data 
 
 
 def test_Symbol_instantiation(generic_tmc_root):
