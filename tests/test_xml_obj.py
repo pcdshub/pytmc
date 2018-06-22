@@ -669,9 +669,19 @@ def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
 
 def test_Configuration_add_config_line(branch_bool_pragma_string):
     cfg = Configuration(branch_bool_pragma_string)
-    cfg.add_config_line('pv','THIRD',1)
+    cfg.add_config_line('pv','THIRD')
     assert cfg.config == [
         {'title': 'pv', 'tag': 'FIRST'}, 
+        {'title': 'pv', 'tag': 'SECOND'}, 
         {'title': 'pv', 'tag': 'THIRD'}, 
+    ]
+
+def test_Configuration_add_config_field(branch_bool_pragma_string):
+    cfg = Configuration(branch_bool_pragma_string)
+    cfg.add_config_field('ABC','XYZ',1)
+    assert cfg.config == [
+        {'title': 'pv', 'tag': 'FIRST'}, 
+        {'title': 'field', 'tag': {'f_name': 'ABC', 'f_set': 'XYZ'}}, 
         {'title': 'pv', 'tag': 'SECOND'}, 
     ]
+

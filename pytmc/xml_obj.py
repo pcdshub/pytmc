@@ -239,6 +239,10 @@ class Configuration:
         config : list, optional
             List of line-by-line dictionaries specifying config. Defaults to
             self.config
+
+        Returns
+        -------
+        None
         """
         if config is None:
             config = self.config
@@ -253,8 +257,36 @@ class Configuration:
     def add_config_field(self, f_name, f_set, line_no=None, config=None):
         """
         add field to config
+
+        Parameters
+        ----------
+        f_name : str
+            The new field type 
+
+        f_set : str
+            The argument for the setting
+
+        line_no : int, optional
+            The line at which to insert the new line. Defaults to appending it
+            at the end 
+
+        config : list, optional
+            List of line-by-line dictionaries specifying config. Defaults to
+            self.config
+
+        Returns
+        -------
+        None
+
         """
-        raise NotImplementedError
+        self.add_config_line(
+            title='field',
+            tag={'f_set': f_set, 'f_name': f_name},
+            line_no=line_no,
+            config=config
+        )
+
+
 
     def extract_config_lines(self,title, config=None):
         """
