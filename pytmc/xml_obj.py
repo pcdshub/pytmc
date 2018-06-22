@@ -40,7 +40,8 @@ class Configuration:
         Parameters
         ----------
         raw_config : str
-            completely unformatted string from configuration
+            completely unformatted string from configuration. Defaults to
+            raw_config.
 
         Returns
         -------
@@ -62,7 +63,6 @@ class Configuration:
     def _neaten_field(self, string):
         """
         When applied to field line's tag, break the string into its own dict
-        Use on things derived from raw_config
         
         Parameters
         ----------
@@ -91,7 +91,7 @@ class Configuration:
         ----------
         config_lines : list 
             This is the list of line-by-line dictionaries. Has the same format
-            as the return of :func:`~_config`
+            as the return of :func:`~_config`. Defaults to raw_config.
         
         Returns
         -------
@@ -121,7 +121,7 @@ class Configuration:
         formatted_config_lines : list
             List of line-by-line dictionaries for each line of the
             configuration text with fields broken up. Same format as the return
-            of :func:`~_formatted_config_lines`.
+            of :func:`~_formatted_config_lines`. Defaults to raw_config.
         
         Returns
         -------
@@ -223,8 +223,32 @@ class Configuration:
     def add_config_line(self, title, tag, line_no=None, config=None):
         """
         add basic line to config
+
+        Parameters
+        ----------
+        title : str
+            The title or 'type' of the new line 
+
+        tag : str
+            The argument for the new line 
+
+        line_no : int, optional
+            The line at which to insert the new line. Defaults to appending it
+            at the end 
+
+        config : list, optional
+            List of line-by-line dictionaries specifying config. Defaults to
+            self.config
         """
-        raise NotImplementedError
+        if config is None:
+            config = self.config
+
+        new_line = {'title': title, 'tag': tag}
+        
+        if line_no is None:
+            config.append(new_line)
+        else:
+            config.insert(line_no, new_line)
 
     def add_config_field(self, f_name, f_set, line_no=None, config=None):
         """

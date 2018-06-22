@@ -666,3 +666,12 @@ def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
         {'title': 'io', 'tag': 'o'},
         {'title': 'init', 'tag': 'True'},
     ]
+
+def test_Configuration_add_config_line(branch_bool_pragma_string):
+    cfg = Configuration(branch_bool_pragma_string)
+    cfg.add_config_line('pv','THIRD',1)
+    assert cfg.config == [
+        {'title': 'pv', 'tag': 'FIRST'}, 
+        {'title': 'pv', 'tag': 'THIRD'}, 
+        {'title': 'pv', 'tag': 'SECOND'}, 
+    ]
