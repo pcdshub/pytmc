@@ -50,7 +50,7 @@ class Configuration:
             keys: 'title' and 'tag'.
         """
         if raw_config is None:
-            raw_config = self.raw_config
+            raw_config = self._raw_config
 
         finder = re.compile(
             r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
@@ -402,7 +402,11 @@ class BaseElement:
         #    self.suffixes = suffixes
 
         #self._pragma = None
-        self.pragma = Configuration(self.raw_config)
+        raw_config = self.raw_config
+        if raw_config is None:
+            self.pragma = None
+        else:
+            self.pragma = Configuration(self.raw_config)
 
     def _get_raw_properties(self):
         """
