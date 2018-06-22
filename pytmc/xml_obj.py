@@ -322,8 +322,34 @@ class Configuration:
     def get_config_fields(self, f_name, config=None):
         """
         return list of fields of this f_name type
+
+        Parameters 
+        ----------
+        f_name : str
+            Provide a list of all config fields with this f_name
+
+        config : list, optional
+            List of line-by-line dictionaries with formatted fields like the
+            output of :func:`~_formatted_config_lines`. Defaults to
+            self.config.
+
+        Returns
+        -------
+        list
+            list contains all configuration line dictionaries with the proper
+            title. Preserves order.
         """
-        raise NotImplementedError
+
+        results_list = []
+        fields_list = self.get_config_lines('field',config)
+
+        for line in fields_list:
+            if line['tag']['f_name'] == f_name:
+                results_list.append(line)
+
+        return results_list
+
+
 
     def __eq__(self,other):
         raise NotImplementedError  

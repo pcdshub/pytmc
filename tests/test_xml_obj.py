@@ -693,3 +693,11 @@ def test_Configuration_get_config_lines(leaf_bool_pragma_string):
         {'title': 'io', 'tag': 'o'},
         {'title': 'io', 'tag': 'i'},
     ]
+
+def test_Configuration_get_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    response = cfg.get_config_fields('ZNAM')
+    assert response == [ 
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+    ]
