@@ -352,7 +352,18 @@ class Configuration:
 
 
     def __eq__(self,other):
-        raise NotImplementedError  
+        """
+        two Configurations are equal if their _raw_config and config are the
+        same
+        """
+        if other.__class__ != Configuration:
+            return False
+
+        if (other._raw_config == self._raw_config
+                    and other.config == self.config):
+            return True
+
+        return False
 
 
 class BaseElement:

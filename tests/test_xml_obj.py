@@ -701,3 +701,11 @@ def test_Configuration_get_config_lines(leaf_bool_pragma_string):
         {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
         {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
     ]
+def test_Configuration__eq__(leaf_bool_pragma_string):
+    cfg_A = Configuration(leaf_bool_pragma_string)
+    cfg_B = Configuration(leaf_bool_pragma_string)
+    assert cfg_A == cfg_B
+    cfg_A.add_config_line("a","b")
+    assert cfg_A != cfg_B
+
+
