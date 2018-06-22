@@ -685,3 +685,11 @@ def test_Configuration_add_config_field(branch_bool_pragma_string):
         {'title': 'pv', 'tag': 'SECOND'}, 
     ]
 
+def test_Configuration_get_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    response = cfg.get_config_lines('io')
+    
+    assert response == [ 
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'io', 'tag': 'i'},
+    ]

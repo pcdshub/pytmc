@@ -219,7 +219,6 @@ class Configuration:
         """
         self.config = self._select_config_by_name(config_name)
 
-
     def add_config_line(self, title, tag, line_no=None, config=None):
         """
         add basic line to config
@@ -237,8 +236,9 @@ class Configuration:
             at the end 
 
         config : list, optional
-            List of line-by-line dictionaries specifying config. Defaults to
-            self.config
+            List of line-by-line dictionaries with formatted fields like the
+            output of :func:`~_formatted_config_lines`. Defaults to
+            self.config.
 
         Returns
         -------
@@ -271,8 +271,9 @@ class Configuration:
             at the end 
 
         config : list, optional
-            List of line-by-line dictionaries specifying config. Defaults to
-            self.config
+            List of line-by-line dictionaries with formatted fields like the
+            output of :func:`~_formatted_config_lines`. Defaults to
+            self.config.
 
         Returns
         -------
@@ -286,15 +287,39 @@ class Configuration:
             config=config
         )
 
-
-
-    def extract_config_lines(self,title, config=None):
+    def get_config_lines(self, title, config=None):
         """
         return list of lines of this title type
-        """
-        raise NotImplementedError
 
-    def extract_config_fields(self, f_name, config=None):
+        Parameters 
+        ----------
+        title : str
+            Provide a list of all config lines with this title
+
+        config : list, optional
+            List of line-by-line dictionaries with formatted fields like the
+            output of :func:`~_formatted_config_lines`. Defaults to
+            self.config.
+
+        Returns
+        -------
+        list
+            list contains all configuration line dictionaries with the proper
+            title. Preserves order.
+        """
+        if config is None:
+            config = self.config
+
+        results_list = []
+
+        for line in config:
+            if line['title'] == title:
+                results_list.append(line)
+
+        return results_list
+
+
+    def get_config_fields(self, f_name, config=None):
         """
         return list of fields of this f_name type
         """
