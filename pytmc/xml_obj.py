@@ -485,67 +485,67 @@ class BaseElement:
         return False
 
     # refactored   
-    @property
-    def _config_lines(self):
-        '''
-        Read in a rudimentary python representation of the config statement.
-        Use :func:`~config` to access a more cleanly formatted version of this
-        information.
-
-        Returns
-        -------
-        list
-            this list contains dictionaries for each line of the config 
-            statement
-
-        '''
-        finder = re.compile(
-            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
-        )
-        result = [ m.groupdict() for m in finder.finditer(self.raw_config)]
-        for line in result:
-            line['tag'] = line['tag'].strip()
-        return result
+#    @property
+#    def _config_lines(self):
+#        '''
+#        Read in a rudimentary python representation of the config statement.
+#        Use :func:`~config` to access a more cleanly formatted version of this
+#        information.
+#
+#        Returns
+#        -------
+#        list
+#            this list contains dictionaries for each line of the config 
+#            statement
+#
+#        '''
+#        finder = re.compile(
+#            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
+#        )
+#        result = [ m.groupdict() for m in finder.finditer(self.raw_config)]
+#        for line in result:
+#            line['tag'] = line['tag'].strip()
+#        return result
     
     # refactored   
-    def neaten_field(self, string):
-        '''
-        Method for formatting the 'field' line
-        
-        Parameters
-        ----------
-        string : str
-            This is the string to be broken into field name and field setting
-
-        Returns
-        -------
-            dict
-                Keys are f_name for the field name and f_set for the
-                corresponding setting.
-        '''
-        finder = re.compile(
-            r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)"
-        )
-        return finder.search(string).groupdict()
+#    def neaten_field(self, string):
+#        '''
+#        Method for formatting the 'field' line
+#        
+#        Parameters
+#        ----------
+#        string : str
+#            This is the string to be broken into field name and field setting
+#
+#        Returns
+#        -------
+#            dict
+#                Keys are f_name for the field name and f_set for the
+#                corresponding setting.
+#        '''
+#        finder = re.compile(
+#            r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)"
+#        )
+#        return finder.search(string).groupdict()
 
     # refactored   
-    @property
-    def _config(self):
-        """
-        Cleanly formatted python representation of the config statement. Fields
-        are broken into their own dictionaries.
-
-        Returns
-        -------
-             list
-                this list contains dictionaries for each line of the config
-                statement
-        """
-        cfg_lines = self._config_lines
-        for line in cfg_lines:
-            if line['title'] == 'field':
-                line['tag'] = self.neaten_field(line['tag'])
-        return cfg_lines
+#    @property
+#    def _config(self):
+#        """
+#        Cleanly formatted python representation of the config statement. Fields
+#        are broken into their own dictionaries.
+#
+#        Returns
+#        -------
+#             list
+#                this list contains dictionaries for each line of the config
+#                statement
+#        """
+#        cfg_lines = self._config_lines
+#        for line in cfg_lines:
+#            if line['title'] == 'field':
+#                line['tag'] = self.neaten_field(line['tag'])
+#        return cfg_lines
 
     def _get_subfield(self, field_target, get_all=False):
         """
@@ -655,33 +655,33 @@ class BaseElement:
         return results
 
     # refactored
-    def read_pragma(self, only_pv=None):
-        '''
-        Return the cropped down pragma that is specific to a single PV.
-
-        Parameters
-        ----------
-        only_pv : str or None
-            Specify which PV's pragma to print. Defaults to the frozen PV. Must
-            be provided if no PV has been frozen.
-
-        Returns
-        -------
-        list:
-            The PV specific pragma for this element
-        '''
-        if not self.freeze_config and only_pv == None:
-            raise PvNotFrozenError
-        
-        if self.freeze_config and only_pv == None:
-            only_pv = self.freeze_pv_target
-
-        
-        all_results = self.config_by_pv()
-
-        for specific_pv_config in all_results:
-            if {'title': 'pv', 'tag':only_pv} in specific_pv_config:
-                return specific_pv_config
+#    def read_pragma(self, only_pv=None):
+#        '''
+#        Return the cropped down pragma that is specific to a single PV.
+#
+#        Parameters
+#        ----------
+#        only_pv : str or None
+#            Specify which PV's pragma to print. Defaults to the frozen PV. Must
+#            be provided if no PV has been frozen.
+#
+#        Returns
+#        -------
+#        list:
+#            The PV specific pragma for this element
+#        '''
+#        if not self.freeze_config and only_pv == None:
+#            raise PvNotFrozenError
+#        
+#        if self.freeze_config and only_pv == None:
+#            only_pv = self.freeze_pv_target
+#
+#        
+#        all_results = self.config_by_pv()
+#
+#        for specific_pv_config in all_results:
+#            if {'title': 'pv', 'tag':only_pv} in specific_pv_config:
+#                return specific_pv_config
 
     def pv(self):
         '''

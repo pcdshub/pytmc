@@ -98,6 +98,7 @@ def test_BaseElement_properties(generic_tmc_root):
                 'pytmc':'name: ITERATORNAME'}, "Incorrect properties found"
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_BaseElement_extract_from_pragma(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -359,6 +360,7 @@ def test_has_config(generic_tmc_root):
     assert symbol_element.has_config == False
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_config_lines(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -376,6 +378,7 @@ def test_config_lines(generic_tmc_root):
     assert symbol_element._config_lines == data
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_neaten_field(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -393,6 +396,7 @@ def test_neaten_field(generic_tmc_root):
     }
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_config(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -410,6 +414,7 @@ def test_config(generic_tmc_root):
     assert symbol_element._config == data
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_BaseElement_config_by_pv(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -466,6 +471,8 @@ def test_BaseElement_is_array(generic_tmc_root):
     subitem_element = SubItem(item_xml)
     assert subitem_element.is_array
 
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_BaseElement_all_pvs(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -479,6 +486,7 @@ def test_BaseElement_all_pvs(generic_tmc_root):
     ]
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_BaseElement_freeze_pv(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -513,6 +521,8 @@ def test_BaseElement_freeze_pv(generic_tmc_root):
     del symbol_element.pragma
     assert symbol_element._pragma == None, "Pragma not deleted properly"
 
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_BaseElement_add_pragma_line(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -535,6 +545,8 @@ def test_BaseElement_add_pragma_line(generic_tmc_root):
     data.append({'title': 'a', 'tag': 'b'})
     assert symbol_element.pragma == data
 
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_BaseElement_add_pragma_field(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -557,6 +569,7 @@ def test_BaseElement_add_pragma_field(generic_tmc_root):
     data.append({'title': 'field', 'tag': {'f_name': 'a', 'f_set': 'b'}})
     assert symbol_element.pragma == data
 
+
 def test_Configuration_config_lines(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     result = cfg._config_lines()
@@ -578,12 +591,14 @@ def test_Configuration_config_lines(leaf_bool_pragma_string):
         {'title': 'io', 'tag': 'i'},
     ]
 
+
 def test_Configuration_neaten_field(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     cfg_lines = cfg._config_lines()
     result = cfg._neaten_field(cfg_lines[2]['tag'])
     
     assert result == {'f_name':'ZNAM','f_set':'SINGLE'}
+
 
 def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
@@ -605,7 +620,8 @@ def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'i'},
     ]
-    
+ 
+
 def test_Configuration_config_by_name(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     result = cfg._config_by_name()
@@ -631,6 +647,7 @@ def test_Configuration_config_by_name(leaf_bool_pragma_string):
         ]
     ]
 
+
 def test_Configuration_select_config_by_name(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     result = cfg._select_config_by_name('TEST:MAIN:NEW_VAR_OUT')
@@ -645,6 +662,7 @@ def test_Configuration_select_config_by_name(leaf_bool_pragma_string):
         {'title': 'init', 'tag': 'True'},
     ]
 
+
 def test_Configuration_config_names(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     result = cfg._config_names()
@@ -652,6 +670,7 @@ def test_Configuration_config_names(leaf_bool_pragma_string):
         "TEST:MAIN:NEW_VAR_OUT",
         "TEST:MAIN:NEW_VAR_IN"
     ]
+
 
 def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
@@ -667,6 +686,7 @@ def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
         {'title': 'init', 'tag': 'True'},
     ]
 
+
 def test_Configuration_add_config_line(branch_bool_pragma_string):
     cfg = Configuration(branch_bool_pragma_string)
     cfg.add_config_line('pv','THIRD')
@@ -675,6 +695,7 @@ def test_Configuration_add_config_line(branch_bool_pragma_string):
         {'title': 'pv', 'tag': 'SECOND'}, 
         {'title': 'pv', 'tag': 'THIRD'}, 
     ]
+
 
 def test_Configuration_add_config_field(branch_bool_pragma_string):
     cfg = Configuration(branch_bool_pragma_string)
@@ -685,6 +706,7 @@ def test_Configuration_add_config_field(branch_bool_pragma_string):
         {'title': 'pv', 'tag': 'SECOND'}, 
     ]
 
+
 def test_Configuration_get_config_lines(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     response = cfg.get_config_lines('io')
@@ -694,6 +716,7 @@ def test_Configuration_get_config_lines(leaf_bool_pragma_string):
         {'title': 'io', 'tag': 'i'},
     ]
 
+
 def test_Configuration_get_config_lines(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     response = cfg.get_config_fields('ZNAM')
@@ -701,6 +724,8 @@ def test_Configuration_get_config_lines(leaf_bool_pragma_string):
         {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
         {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
     ]
+    
+
 def test_Configuration__eq__(leaf_bool_pragma_string):
     cfg_A = Configuration(leaf_bool_pragma_string)
     cfg_B = Configuration(leaf_bool_pragma_string)
