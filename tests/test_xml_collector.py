@@ -129,11 +129,22 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert len(tmc.all_SubItems['iterator']) == 6
 
 
-def test_TmcFile_create_chains(generic_tmc_path):
+def test_TmcFile_explore_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.isolate_all()
+    complete_chain_list = tmc.explore_all()
 
-    assert False
+    #assert len(complete_chain_list) == 27
+    assert [tmc.all_Symbols['MAIN.ulimit']] in complete_chain_list
+
+    target = [
+        tmc.all_Symbols['MAIN.test_iterator'],
+        tmc.all_SubItems['iterator']['extra1'],
+        tmc.all_SubItems['DUT_STRUCT']['struct_var']
+    ]
+    assert target in complete_chain_list
+
+
 
 def test_TmcFile_recursive_explore(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
@@ -160,6 +171,7 @@ def test_TmcFile_recursive_explore(generic_tmc_path):
             tmc.all_SubItems['DUT_EXTENSION_STRUCT']['tertiary']],
     ]
 
+
 def test_TmcFile_recursive_list_SubItems(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.isolate_all()
@@ -172,7 +184,30 @@ def test_TmcFile_recursive_list_SubItems(generic_tmc_path):
             tmc.all_SubItems['DUT_EXTENSION_STRUCT']['tertiary'],
     ]
 
+def test_TmcFile_create_chains(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    tmc.create_chains()
 
+    target = [tmc.all_Symbols['MAIN.ulimit']]
+    accept = False
+    for row in tmc.all_TmcChains:
+        if row.chain == target:
+            accept = True
+            break
+    assert accept
+
+    
+    target = [
+        tmc.all_Symbols['MAIN.test_iterator'],
+        tmc.all_SubItems['iterator']['extra1'],
+        tmc.all_SubItems['DUT_STRUCT']['struct_var']
+    ]
+    accept = False
+    for row in tmc.all_TmcChains:
+        if row.chain == target:
+            accept = True
+            break
+    assert accept
 
 
 
@@ -340,11 +375,6 @@ def test_PvPacakge_guess(generic_tmc_path):
         base_proto_name = 'NEW_VAR',
         proto_file_name = '',
     )
-
-
-
-
-
 
 
 @pytest.mark.skip(reason="Incomplete")

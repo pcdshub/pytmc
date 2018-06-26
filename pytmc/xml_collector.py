@@ -74,7 +74,6 @@ class TmcFile:
     all_SubItems : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all SubItems in the document. Must be initialized with
         :func:`~isolate_SubItems`.
-
     '''
     def __init__(self, filename):
         self.filename = filename
@@ -85,6 +84,10 @@ class TmcFile:
         self.all_DataTypes = ElementCollector()
         self.all_SubItems = defaultdict(ElementCollector) 
         self.isolate_all()
+        
+        self.all_TmcChains = []
+
+        
 
     def isolate_Symbols(self):
         '''
@@ -152,8 +155,23 @@ class TmcFile:
         self.isolate_Symbols()
         self.isolate_DataTypes()
 
-    def create_chains(self):
-        raise NotImplementedError
+    def explore_all(self):
+        """
+        Return a list of ALL paths to leaf-variables in the tmc file.
+
+        Returns
+        -------
+        list 
+            For every instantiated variable in the TmcFile, return a list
+            documenting the path to that variable. This path starts at the
+            global level instantiation and tracks through successive levels of
+            encapsulation to find the final value itself. For each value, this
+            list contains a single row. 
+        """
+        results = []
+        for sym in self.all_Symbols:
+            results.extend(self.recursive_explore([self.all_Symbols[sym]]))
+        return results
 
     def recursive_explore(self, root_path):
         """
@@ -231,12 +249,18 @@ class TmcFile:
 
         return response
 
+    def create_chains(self):
+        """
+        Add all new TmcChains to this object instance's all_TmcChains variable
+        """
+        full_list = self.explore_all()
+        for row in full_list:
+            self.all_TmcChains.append(TmcChain(row))
 
 class TmcChain:
     # just point to the tmc instances
-    def __init__(self, *args, **kwargs):    
-        raise NotImplementedError
-
+    def __init__(self, chain):    
+        self.chain = chain
 
 class PvPackage:
     '''
