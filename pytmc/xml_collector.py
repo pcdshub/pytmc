@@ -258,11 +258,16 @@ class TmcFile:
             self.all_TmcChains.append(TmcChain(row))
 
 class TmcChain:
-    # just point to the tmc instances
+    """
+    Pointer to the tmc instances and track order
+    """
     def __init__(self, chain):    
         self.chain = chain
 
 class PvPackage:
+    pass
+
+class PvPackage_old:
     '''
     PvPackage stores the information for each PV to be created. These instances
     can store the complete set of configuration lines. The initial set is taken

@@ -24,6 +24,8 @@ class Configuration:
         # list: self.config
         self._raw_config = str
         self.config = self._formatted_config_lines()
+        # what name identifies unique configurations? cfg_header
+        self.cfg_header = 'pv'
 
     @property
     def raw_config(self):
@@ -134,7 +136,7 @@ class Configuration:
 
         separate_lists = []
         for line in formatted_config_lines:
-            if line['title'] == 'pv':
+            if line['title'] == self.cfg_header:
                 separate_lists.append([])
                 index = len(separate_lists) - 1
             separate_lists[index].append(line)
@@ -168,9 +170,9 @@ class Configuration:
                 
         specific_configs = self._config_by_name(formatted_config_lines)
 
-        for specific_config in specific_configs:
-            if {'title': 'pv', 'tag': config_name} in specific_config:
-                return specific_config
+        for spec_config in specific_configs:
+            if {'title': self.cfg_header, 'tag': config_name} in spec_config:
+                return spec_config
 
     def _config_names(self, formatted_config_lines=None):
         """
@@ -198,7 +200,7 @@ class Configuration:
         config_names_list = []
         for specific_config in specific_configs:
             for line in specific_config:
-                if line['title'] == 'pv':
+                if line['title'] == self.cfg_header:
                     config_names_list.append(line['tag'])
 
         return config_names_list
@@ -626,37 +628,38 @@ class BaseElement:
             The name of the variable
         '''
         return self._get_subfield("Name").text
-    
-    def extract_from_pragma(self, title, pv=None):
-        '''
-        Extract a given setting(s) from the pragma.
 
-        Attributes
-        ----------
-        title : str
-            Specify the name of the field to seek from
-
-        pv : str, optional
-            Specify which PV to pull the config line from. If not specified 
-        Returns
-        -------
-        list 
-            list of all pragma information from the specified location.
-        '''
-
-        if pv == None:
-            # scan for the title across config lines from all PVs
-            config_set = self._config
-        else:
-            # only lines specific to this PV are available for examination
-            config_set = self.read_pragma(only_pv = pv)
-
-        results = []
-        for line in config_set:
-            if line['title'] == title:
-                results.append(line['tag'])
-
-        return results
+    # refactored
+#    def extract_from_pragma(self, title, pv=None):
+#        '''
+#        Extract a given setting(s) from the pragma.
+#
+#        Attributes
+#        ----------
+#        title : str
+#            Specify the name of the field to seek from
+#
+#        pv : str, optional
+#            Specify which PV to pull the config line from. If not specified 
+#        Returns
+#        -------
+#        list 
+#            list of all pragma information from the specified location.
+#        '''
+#
+#        if pv == None:
+#            # scan for the title across config lines from all PVs
+#            config_set = self._config
+#        else:
+#            # only lines specific to this PV are available for examination
+#            config_set = self.read_pragma(only_pv = pv)
+#
+#        results = []
+#        for line in config_set:
+#            if line['title'] == title:
+#                results.append(line['tag'])
+#
+#        return results
 
     # refactored
 #    def read_pragma(self, only_pv=None):
@@ -686,60 +689,62 @@ class BaseElement:
 #        for specific_pv_config in all_results:
 #            if {'title': 'pv', 'tag':only_pv} in specific_pv_config:
 #                return specific_pv_config
-
-    def pv(self):
-        '''
-        Retrieve the config line specifying pv name for this entity.
-
-        Returns
-        -------
-        str, list of str, or None
-            See :func:`~extract_pragmas` for details.
-        '''
-        if not self.freeze_config:
-            raise PvNotFrozenError
-        [result] = self.extract_from_pragma('pv',pv=self.freeze_pv_target)
-        return result
-
-    def all_pvs(self):
-        return self.extract_from_pragma('pv')
-    
     # refactored
-    def config_by_pv(self):
-        '''
-        Parse the pytmc pragma into groups, one for each PV to be made from the
-        variable. 
-
-        Returns
-        -------
-        list 
-            This list contains a list for each unique PV. These lists contain
-            dictionaries, one for each row of the pragma.
-        '''
-        data = self._config
-        separate_lists = []
-        for line in data:
-            if line['title'] == 'pv':
-                separate_lists.append([])
-                index = len(separate_lists) - 1
-            separate_lists[index].append(line)
-        return separate_lists
-
-    def freeze_pv(self,pv):
-        '''
-        Internally set the element to behave as if only a single PV is tied
-        to this element when config_by_pv is used.
-
-        Parameters
-        ----------
-        pf : str
-            String of the target PV
-        '''
-        self.freeze_config = True
-        self.freeze_pv_target = pv
-
-        self._pragma = self.read_pragma()
-
+#    def pv(self):
+#        '''
+#        Retrieve the config line specifying pv name for this entity.
+#
+#        Returns
+#        -------
+#        str, list of str, or None
+#            See :func:`~extract_pragmas` for details.
+#        '''
+#        if not self.freeze_config:
+#            raise PvNotFrozenError
+#        [result] = self.extract_from_pragma('pv',pv=self.freeze_pv_target)
+#        return result
+#
+#    # refactored 
+#    def all_pvs(self):
+#        return self.extract_from_pragma('pv')
+#    
+#    # refactored
+#    def config_by_pv(self):
+#        '''
+#        Parse the pytmc pragma into groups, one for each PV to be made from the
+#        variable. 
+#
+#        Returns
+#        -------
+#        list 
+#            This list contains a list for each unique PV. These lists contain
+#            dictionaries, one for each row of the pragma.
+#        '''
+#        data = self._config
+#        separate_lists = []
+#        for line in data:
+#            if line['title'] == 'pv':
+#                separate_lists.append([])
+#                index = len(separate_lists) - 1
+#            separate_lists[index].append(line)
+#        return separate_lists
+#
+#    
+#    def freeze_pv(self,pv):
+#        '''
+#        Internally set the element to behave as if only a single PV is tied
+#        to this element when config_by_pv is used.
+#
+#        Parameters
+#        ----------
+#        pf : str
+#            String of the target PV
+#        '''
+#        self.freeze_config = True
+#        self.freeze_pv_target = pv
+#
+#        self._pragma = self.read_pragma()
+#
 #    @property
 #    def pragma(self):
 #        if not self.freeze_config:
