@@ -175,7 +175,7 @@ class Configuration:
             if {'title': self.cfg_header, 'tag': config_name} in spec_config:
                 return spec_config
 
-    def _config_names(self, formatted_config_lines=None):
+    def config_names(self, formatted_config_lines=None):
         """
         Produce a list of configuration names (Pvs)
         Derived from _config_by_name
@@ -185,8 +185,8 @@ class Configuration:
         ----------
         formatted_config_lines : list 
             List of line-by-line dictionaries with formatted fields like the
-            output of :func:`~_formatted_config_lines`. Defaults to the raw
-            configuration
+            output of :func:`~_formatted_config_lines`. Defaults to the
+            processed configuration
 
         Returns
         -------
@@ -194,7 +194,7 @@ class Configuration:
             List of strings of all configurations found
         """
         if formatted_config_lines is None:
-            formatted_config_lines = self._formatted_config_lines()
+            formatted_config_lines = self.config
                 
         specific_configs = self._config_by_name(formatted_config_lines)
         
@@ -321,7 +321,6 @@ class Configuration:
 
         return results_list
 
-
     def get_config_fields(self, f_name, config=None):
         """
         return list of fields of this f_name type
@@ -351,8 +350,6 @@ class Configuration:
                 results_list.append(line)
 
         return results_list
-
-
 
     def __eq__(self,other):
         """

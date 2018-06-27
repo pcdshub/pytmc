@@ -277,16 +277,32 @@ class TmcChain:
         """
         full_list = []
         for entry in self.chain:
-            full_list.append(entry.pragma._config_names())
+            full_list.append(entry.pragma.config_names())
         return full_list
+    
+    def is_singular(self):
+        """
+        Determine whether this TmcChain has only a single configuration for
+        each element
 
+        Returns
+        -------
+        bool 
+            True if all elements in this chain are singular
+        """
+        no_violations = True
+        for element in self.forkmap():
+            if len(element) > 1:
+                no_violations = False
+                break
+        
+        return no_violations
 
 class RecordPackage:
-    def __init__(self):
+    def __init__(self, chain=None, origin=None):
         self.config = {}
-        self.origin_chain = None # TmcChain instance -  do I need this? unclear
-        self.chain = None # TmcChain instance - so I could add methods there
-
+        self.chain = chain # TmcChain instance - so I could add methods there
+        self.origin_chain = origin # TmcChain instance-do I need this? unclear
 
 
 class PvPackage:

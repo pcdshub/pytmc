@@ -660,7 +660,7 @@ def test_Configuration_select_config_by_name(leaf_bool_pragma_string):
 
 def test_Configuration_config_names(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
-    result = cfg._config_names()
+    result = cfg.config_names()
     assert result == [
         "TEST:MAIN:NEW_VAR_OUT",
         "TEST:MAIN:NEW_VAR_IN"

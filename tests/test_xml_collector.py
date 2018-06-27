@@ -233,13 +233,35 @@ def test_TmcFile_forkmap(generic_tmc_path, leaf_bool_pragma_string,
         ['FIRST', 'SECOND'],
         ['TEST:MAIN:NEW_VAR_OUT', 'TEST:MAIN:NEW_VAR_IN']
     ]
+    
+def test_TmcFile_is_singular(generic_tmc_path, leaf_bool_pragma_string,
+            branch_bool_pragma_string, branch_connection_pragma_string):
+    stem = BaseElement(element=None)
+    stem.pragma = Configuration(branch_connection_pragma_string) 
+    leaf_a = BaseElement(element=None)
+    leaf_a.pragma = Configuration(branch_bool_pragma_string)
+    leaf_b = BaseElement(element=None)
+    leaf_b.pragma = Configuration(leaf_bool_pragma_string)
+
+    chain = TmcChain(
+        [stem, leaf_a, leaf_b]
+    )
+    print(chain.forkmap())
+    assert chain.is_singular() == False
+
+    for element in chain.chain:
+        element.pragma.fix_to_config_name(element.pragma.config_names()[0])
+    
+    for element in chain.chain:
+        print(element.pragma.config)
+    
+
+    assert chain.is_singular() == True
+
 
 
 
 # RecordPackage tests
-
-
-
 
 
 # PvPackage tests
