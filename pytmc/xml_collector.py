@@ -12,7 +12,7 @@ from . import Symbol, DataType, SubItem
 from copy import deepcopy, copy
 from .xml_obj import BaseElement
 from .beckhoff import beckhoff_types
-
+from functools import reduce
 
 class ElementCollector(dict):
     '''
@@ -292,11 +292,139 @@ class TmcChain:
         """
         no_violations = True
         for element in self.forkmap():
-            if len(element) > 1:
+            if len(element) != 1:
                 no_violations = False
                 break
         
         return no_violations
+
+    def __eq__(self, other):    
+        """
+        Two chains are equal if all their elements share the same xml element
+        targets (elements are ==) and their configurations are the same.
+        """
+        if type(self) != type(other):
+            return False
+
+        if len(self.chain) != len(other.chain):
+            return False
+
+        for self_element, other_element in zip(self.chain, other.chain):
+            if self_element != other_element:
+                return False
+
+            if self_element.pragma != other_element.pragma:
+                return False
+
+        return True
+
+    def build_singular_chains(self):
+        """
+        """
+        chain_map = self.forkmap()
+        # list: number of configs per element in the chain
+        chain_config_count = list(map(len,chain_map))
+        # int: number of chains to produce 
+        chain_count = reduce((lambda x, y: x * y), chain_config_count)
+        # list: at each row, apply this cfg how many times? (last should be 1)            # PI(all)/PI(progress) = step length
+        apply_count = [
+            int(chain_count/reduce(lambda x, y: x*y, chain_config_count[:r+1]))
+            for r in range(len(chain_config_count))
+        ]
+        repeat_count = [
+            int(chain_count / (apply_count[i] * chain_config_count[i]))
+            for i in range(len(chain_map))
+            # reduce((lambda x, y: x * y),chain_config_count[:i+1])
+            # for i in range(len(chain_config_count))
+        ]
+        
+        logger.debug("{} {} {} {}".format(
+            chain_map,
+            chain_config_count,
+            chain_count,apply_count,
+            repeat_count)
+        )
+
+        result_chains = []
+        # Reject any chain where configs are not given for each tier
+        # for greedy config generation, create config names at lower level
+        if min(chain_config_count) < 1:
+            return result_chains
+
+        result_chains = []
+        for i in range(chain_count):
+            result_chains.append(deepcopy(self))    
+        
+        # iterate down the length of the chain
+        for row, row_idx in zip(chain_map, range(len(chain_map))):
+            # repeat this pattern a given number of times 
+            for rep_idx in range(repeat_count[row_idx]):
+                for cfg, cfg_idx in zip(row,range(len(row))):
+                    for n in range(apply_count[row_idx]):
+                        # res_idx = (n) + (cfg_idx+1) * (z+1) -1
+                        res_idx = (
+                            (
+                                rep_idx * chain_config_count[row_idx] *
+                                apply_count[row_idx]
+                            ) +
+                            (
+                                cfg_idx * apply_count[row_idx]
+                            ) +
+                            (
+                                n
+                            )
+                        )
+                        target = result_chains[res_idx].chain[row_idx].pragma
+                        logger.debug(" {} {} {} {} {}".format(
+                            cfg,
+                            n,
+                            cfg_idx,
+                            rep_idx,
+                            res_idx)
+                        )
+                        target.fix_to_config_name(
+                            cfg
+                        )
+
+
+        return result_chains  
+        '''
+        
+        
+        
+        result_chains.append(deepcopy(self))
+        for element_row in chain_map:
+            result_additions = []
+            # for configurations beyond the first (branching) create new chains
+            for cfg, cfg_index in zip(element_row,range(len(element_row))):
+                if cfg_index >= 1:
+                    for existing_chain in result_chains:
+                        # Use separate list to prevent copying config twice 
+                        result_additions.append(deepcopy(existing_chain))
+            # Add new chains to main list            
+            result_chains.extend(result_additions)
+
+
+
+
+
+
+
+
+
+
+
+
+        return result_chains
+
+                    
+        '''
+        
+        
+         
+
+
+
 
 class RecordPackage:
     def __init__(self, chain=None, origin=None):

@@ -246,14 +246,14 @@ def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
     chain = TmcChain(
         [stem, leaf_a, leaf_b]
     )
-    print(chain.forkmap())
+    logger.debug(str(chain.forkmap()))
     assert chain.is_singular() == False
 
     for element in chain.chain:
         element.pragma.fix_to_config_name(element.pragma.config_names()[0])
     
-    for element in chain.chain:
-        print(element.pragma.config)
+    # for element in chain.chain:
+        # print(element.pragma.config)
 
     assert chain.is_singular() == True
 
@@ -270,27 +270,27 @@ def test_TmcChain_build_singular_chains(generic_tmc_path,
     chain = TmcChain(
         [stem, leaf_a, leaf_b]
     )
-    print(stem.pragma.config)
-    stem.pragma.fix_to_config_name("MEEPLE")
-    print(stem.pragma.config)
-    print(stem.pragma.config_names())
-    print(stem.pragma.config)
+    logger.debug(str(chain.forkmap()))
 
-    assert False 
-    '''
-    
     response_set = chain.build_singular_chains()
     assert len(response_set) == 4
     for x in response_set:
+        logger.debug(str(x.forkmap()))
         assert x.is_singular()
-
+    
     for x in response_set:
         for y in response_set:
             if x is y:
                 continue
-            if x.chain == y.chain:
+            if x == y:
                 assert False
-    '''
+
+    #print(response_set[0].chain.forkmap())
+    assert response_set[0].forkmap() == [
+        ['MIDDLE'],
+        ['FIRST'],
+        ['TEST:MAIN:NEW_VAR_OUT'],
+    ]
 
 
 
