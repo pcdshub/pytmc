@@ -84,4 +84,20 @@ def branch_bool_pragma_string():
             pv: FIRST
             pv: SECOND
     """
-    return str 
+    return str
+
+@pytest.fixture(scope='function')
+def branch_connection_pragma_string():
+    str = """
+            pv: MIDDLE
+            aux: nothing
+    """
+    return str
+
+@pytest.fixture(scope='function')
+def branch_skip_pragma_string():
+    str = """
+            skip:
+    """
+    return str
+    

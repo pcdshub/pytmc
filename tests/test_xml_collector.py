@@ -4,10 +4,10 @@ import logging
 import xml.etree.ElementTree as ET
 
 from pytmc import Symbol, DataType, SubItem
-from pytmc.xml_obj import BaseElement
+from pytmc.xml_obj import BaseElement, Configuration
 
 from pytmc import TmcFile, PvPackage
-from pytmc.xml_collector import ElementCollector
+from pytmc.xml_collector import ElementCollector, TmcChain, RecordPackage
 
 from collections import defaultdict, OrderedDict as odict
 
@@ -145,7 +145,6 @@ def test_TmcFile_explore_all(generic_tmc_path):
     assert target in complete_chain_list
 
 
-
 def test_TmcFile_recursive_explore(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.isolate_all()
@@ -184,6 +183,7 @@ def test_TmcFile_recursive_list_SubItems(generic_tmc_path):
             tmc.all_SubItems['DUT_EXTENSION_STRUCT']['tertiary'],
     ]
 
+
 def test_TmcFile_create_chains(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.create_chains()
@@ -211,8 +211,40 @@ def test_TmcFile_create_chains(generic_tmc_path):
 
 
 
+# TmcChain tests
+
+def test_TmcFile_forkmap(generic_tmc_path, leaf_bool_pragma_string,
+            branch_bool_pragma_string, branch_connection_pragma_string):
+    stem = BaseElement(element=None)
+    stem.pragma = Configuration(branch_connection_pragma_string) 
+    leaf_a = BaseElement(element=None)
+    leaf_a.pragma = Configuration(branch_bool_pragma_string)
+    leaf_b = BaseElement(element=None)
+    leaf_b.pragma = Configuration(leaf_bool_pragma_string)
+
+    chain = TmcChain(
+        [stem, leaf_a, leaf_b]
+    )
+
+    result = chain.forkmap()
+
+    assert result == [
+        ['MIDDLE'],
+        ['FIRST', 'SECOND'],
+        ['TEST:MAIN:NEW_VAR_OUT', 'TEST:MAIN:NEW_VAR_IN']
+    ]
+
+
+
+# RecordPackage tests
+
+
+
+
+
 # PvPackage tests
 
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_instantiation(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     #print(tmc.all_Symbols)
@@ -240,6 +272,7 @@ def test_PvPackage_instantiation(generic_tmc_path):
     assert {'title':'pv', 'tag':'VALUE'} in pv_pack.pragma
     
 
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
@@ -267,6 +300,7 @@ def test_PvPackage_from_element_path(generic_tmc_path):
     assert pv_packs[1].proto_name == "GetNEW_VAR"
 
 
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_make_config(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
@@ -287,6 +321,7 @@ def test_PvPackage_make_config(generic_tmc_path):
     } == new 
 
 
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_missing_pragma_lines(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
@@ -316,6 +351,7 @@ def test_PvPackage_missing_pragma_lines(generic_tmc_path):
     assert [] == pv_out.missing_pragma_lines()
 
 
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_is_config_complete(generic_tmc_path):
     '''Test a single version for pragma completeness. This only tests for the
     existance of these fields, it does NOT test if they are valid.
@@ -346,6 +382,7 @@ def test_PvPackage_is_config_complete(generic_tmc_path):
     assert True == pv_out.is_config_complete
 
 
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_term_exists(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
@@ -365,6 +402,7 @@ def test_PvPackage_term_exists(generic_tmc_path):
 
 # PvPackage field guessing tests
 
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPacakge_guess(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
@@ -377,7 +415,7 @@ def test_PvPacakge_guess(generic_tmc_path):
     )
 
 
-@pytest.mark.skip(reason="Incomplete")
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_guess():
     ''
     assert pv_packs[0].fields == {
@@ -392,7 +430,7 @@ def test_PvPackage_guess():
     }
 
 
-@pytest.mark.skip(reason="Pending development of feature guessing")
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_create_record(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [
@@ -418,7 +456,7 @@ def test_PvPackage_create_record(generic_tmc_path):
     assert record0.comment
 
 
-@pytest.mark.skip(reason="Pending development of feature guessing")
+@pytest.mark.skip(reason="PvPackage pending deprecation")
 def test_PvPackage_create_proto(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     element_path = [

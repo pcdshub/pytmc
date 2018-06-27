@@ -26,6 +26,7 @@ class Configuration:
         self.config = self._formatted_config_lines()
         # what name identifies unique configurations? cfg_header
         self.cfg_header = 'pv'
+        self.cfg_skip = 'skip'
 
     @property
     def raw_config(self):
@@ -382,7 +383,7 @@ class BaseElement:
         The prefix that will mark pragmas intended for pytmc's consumption.
     '''
     def __init__(self, element, base=None, suffixes=None):
-        if type(element) != ET.Element:
+        if type(element) != ET.Element and element is not None:
             raise TypeError("ElementTree.Element required")
         self.element = element
         #self.registered_pragmas = []
@@ -404,6 +405,12 @@ class BaseElement:
         #    self.suffixes = suffixes
 
         #self._pragma = None
+        
+        # This is to allow testing without actual tmc elements 
+        if element is None:
+            self.pragma = None 
+            return
+
         raw_config = self.raw_config
         if raw_config is None:
             self.pragma = None

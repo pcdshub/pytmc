@@ -87,8 +87,6 @@ class TmcFile:
         
         self.all_TmcChains = []
 
-        
-
     def isolate_Symbols(self):
         '''
         Populate :attr:`~all_Symbols` with a :class:`~pytmc.Symbol` 
@@ -257,17 +255,41 @@ class TmcFile:
         for row in full_list:
             self.all_TmcChains.append(TmcChain(row))
 
+
 class TmcChain:
     """
-    Pointer to the tmc instances and track order
+    Pointer to the tmc instances and track order. Leaf node is last.
     """
     def __init__(self, chain):    
         self.chain = chain
 
-class PvPackage:
-    pass
+    def forkmap(self):
+        """
+        Provide a description of the branching hierarchy for entries with
+        multiple Configurations.
 
-class PvPackage_old:
+        Returns
+        -------
+        list
+            This list contains a list for each element contained in the chain.
+            This interior list documents all configuration names held by that
+            element in the chain.
+        """
+        full_list = []
+        for entry in self.chain:
+            full_list.append(entry.pragma._config_names())
+        return full_list
+
+
+class RecordPackage:
+    def __init__(self):
+        self.config = {}
+        self.origin_chain = None # TmcChain instance -  do I need this? unclear
+        self.chain = None # TmcChain instance - so I could add methods there
+
+
+
+class PvPackage:
     '''
     PvPackage stores the information for each PV to be created. These instances
     can store the complete set of configuration lines. The initial set is taken
