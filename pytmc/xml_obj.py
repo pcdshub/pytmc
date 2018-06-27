@@ -175,6 +175,8 @@ class Configuration:
             if {'title': self.cfg_header, 'tag': config_name} in spec_config:
                 return spec_config
 
+        return []
+
     def config_names(self, formatted_config_lines=None):
         """
         Produce a list of configuration names (Pvs)
@@ -195,10 +197,8 @@ class Configuration:
         """
         if formatted_config_lines is None:
             formatted_config_lines = self.config
-                
         specific_configs = self._config_by_name(formatted_config_lines)
-        
-        config_names_list = []
+        config_names_list = list()
         for specific_config in specific_configs:
             for line in specific_config:
                 if line['title'] == self.cfg_header:

@@ -213,7 +213,7 @@ def test_TmcFile_create_chains(generic_tmc_path):
 
 # TmcChain tests
 
-def test_TmcFile_forkmap(generic_tmc_path, leaf_bool_pragma_string,
+def test_TmcChain_forkmap(generic_tmc_path, leaf_bool_pragma_string,
             branch_bool_pragma_string, branch_connection_pragma_string):
     stem = BaseElement(element=None)
     stem.pragma = Configuration(branch_connection_pragma_string) 
@@ -234,7 +234,7 @@ def test_TmcFile_forkmap(generic_tmc_path, leaf_bool_pragma_string,
         ['TEST:MAIN:NEW_VAR_OUT', 'TEST:MAIN:NEW_VAR_IN']
     ]
     
-def test_TmcFile_is_singular(generic_tmc_path, leaf_bool_pragma_string,
+def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
             branch_bool_pragma_string, branch_connection_pragma_string):
     stem = BaseElement(element=None)
     stem.pragma = Configuration(branch_connection_pragma_string) 
@@ -254,14 +254,49 @@ def test_TmcFile_is_singular(generic_tmc_path, leaf_bool_pragma_string,
     
     for element in chain.chain:
         print(element.pragma.config)
-    
 
     assert chain.is_singular() == True
+
+def test_TmcChain_build_singular_chains(generic_tmc_path, 
+            leaf_bool_pragma_string, branch_bool_pragma_string,
+            branch_connection_pragma_string):
+    stem = BaseElement(element=None)
+    stem.pragma = Configuration(branch_connection_pragma_string) 
+    leaf_a = BaseElement(element=None)
+    leaf_a.pragma = Configuration(branch_bool_pragma_string)
+    leaf_b = BaseElement(element=None)
+    leaf_b.pragma = Configuration(leaf_bool_pragma_string)
+
+    chain = TmcChain(
+        [stem, leaf_a, leaf_b]
+    )
+    print(stem.pragma.config)
+    stem.pragma.fix_to_config_name("MEEPLE")
+    print(stem.pragma.config)
+    print(stem.pragma.config_names())
+    print(stem.pragma.config)
+
+    assert False 
+    '''
+    
+    response_set = chain.build_singular_chains()
+    assert len(response_set) == 4
+    for x in response_set:
+        assert x.is_singular()
+
+    for x in response_set:
+        for y in response_set:
+            if x is y:
+                continue
+            if x.chain == y.chain:
+                assert False
+    '''
 
 
 
 
 # RecordPackage tests
+
 
 
 # PvPackage tests
