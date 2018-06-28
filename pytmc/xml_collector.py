@@ -319,6 +319,26 @@ class TmcChain:
         return True
 
     def _recursive_permute(self, master_list, so_far=None):
+        """
+        For a given list of lists, create all possible combinations of lists in
+        which the interior list defines the acceptable values for that place in
+        the list
+
+        Parameters
+        ----------
+        master_list : list
+            This list contains a list at each index. These internal lists
+            specify the acceptable values at each location in the output lists
+
+        so_far : list or None
+            Only used for internal recursive work. This lists the the 'so_far'
+            assembled chains. This list grows with each iteration, either in
+            length or in the length of the contained lists 
+        Returns
+        -------
+        list
+            This list contains a single list for each possible permutation.
+        """
         if so_far is None:
             so_far = [[]]
 
@@ -340,16 +360,16 @@ class TmcChain:
         else:
             return so_far
             
-            
-
-        
-
-
-    def permute_name(self):
-        raise NotImplementedError
-        
-
     def build_singular_chains(self):
+        """
+        Generate list of all acceptable configurations
+
+        Returns
+        -------
+        list
+            List of TmcChains. Each chain is bound to one of the possible paths
+            given the configurations available at each step. 
+        """
         name_sequences = self._recursive_permute(self.forkmap())
         print(name_sequences)
         results = []
@@ -361,74 +381,6 @@ class TmcChain:
 
         return results
 
-
-
-    '''
-    def build_singular_chains(self):
-        """
-        For each acceptable permutation of configurations, produce a
-        single-config chain. 
-
-        Returns
-        list
-            list of chain permutations
-        """
-        chain_map = self.forkmap()
-        
-        # list: number of configs per element in the chain
-        chain_config_count = list(map(len,chain_map))
-        
-        # int: number of chains to produce 
-        chain_count = reduce((lambda x, y: x * y), chain_config_count)
-        
-        # list: at each row, apply this cfg how many times? (last should be 1)            # PI(all)/PI(progress) = step length
-        apply_count = [
-            int(chain_count/reduce(lambda x, y: x*y, chain_config_count[:r+1]))
-            for r in range(len(chain_config_count))
-        ]
-        
-        # list: at each row repeat the cfg sequence this many times 
-        repeat_count = [
-            int(chain_count / (apply_count[i] * chain_config_count[i]))
-            for i in range(len(chain_map))
-        ]
-        logger.debug("{} {} {} {}".format(chain_map, chain_config_count,
-            chain_count, apply_count, repeat_count)
-        )
-        result_chains = []
-        # Reject any chain where configs are not given for each tier
-        # for greedy config generation, create config names at lower level
-        if min(chain_config_count) < 1:
-            return result_chains
-
-        result_chains = []
-        for i in range(chain_count):
-            result_chains.append(deepcopy(self))    
-        
-        # iterate down the length of each chain (they all have the same len)
-        for row, row_idx in zip(chain_map, range(len(chain_map))):
-            # repeat this pattern of cfg's
-            for rep_idx in range(repeat_count[row_idx]):
-                # cycle through the individual cfg's 
-                for cfg, cfg_idx in zip(row,range(len(row))):
-                    # repeat a specific cfg
-                    for apply_idx in range(apply_count[row_idx]):
-                        # this is specifies which in result_chain gets changed
-                        res_idx = (
-                            (
-                                rep_idx * chain_config_count[row_idx] *
-                                apply_count[row_idx]
-                            )
-                            + (cfg_idx * apply_count[row_idx]) 
-                            + (apply_idx)
-                        )
-                        target = result_chains[res_idx].chain[row_idx].pragma
-                        logger.debug(" {} {} {} {} {}".format(cfg, apply_idx,
-                            cfg_idx,rep_idx,res_idx))
-                        target.fix_to_config_name(cfg)
-
-        return result_chains  
-    '''
 
 
 class RecordPackage:
