@@ -257,6 +257,23 @@ def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
 
     assert chain.is_singular() == True
 
+
+def test_TmcChain_recursive_permute():
+    l = [['a'],['b','c','d'],['e','f']]
+    chain = TmcChain(None)
+    result = chain._recursive_permute(l)
+    for s in result:
+        print(s)
+    assert result == [
+        [['a'],['b'],['e']],
+        [['a'],['c'],['e']],
+        [['a'],['d'],['e']],
+        [['a'],['b'],['f']],
+        [['a'],['c'],['f']],
+        [['a'],['d'],['f']],
+    ]
+
+
 def test_TmcChain_build_singular_chains(generic_tmc_path, 
             leaf_bool_pragma_string, branch_bool_pragma_string,
             branch_connection_pragma_string):
@@ -285,11 +302,25 @@ def test_TmcChain_build_singular_chains(generic_tmc_path,
             if x == y:
                 assert False
 
-    #print(response_set[0].chain.forkmap())
     assert response_set[0].forkmap() == [
         ['MIDDLE'],
         ['FIRST'],
         ['TEST:MAIN:NEW_VAR_OUT'],
+    ]
+    assert response_set[1].forkmap() == [
+        ['MIDDLE'],
+        ['SECOND'],
+        ['TEST:MAIN:NEW_VAR_OUT'],
+    ]
+    assert response_set[2].forkmap() == [
+        ['MIDDLE'],
+        ['FIRST'],
+        ['TEST:MAIN:NEW_VAR_IN'],
+    ]
+    assert response_set[3].forkmap() == [
+        ['MIDDLE'],
+        ['SECOND'],
+        ['TEST:MAIN:NEW_VAR_IN'],
     ]
 
 
