@@ -210,6 +210,12 @@ def test_TmcFile_create_chains(generic_tmc_path):
     assert accept
 
 
+def test_TmcFile_create_packages(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    tmc.create_chains()
+    tmc.create_packages()
+
+    assert False
 
 # TmcChain tests
 
@@ -233,7 +239,8 @@ def test_TmcChain_forkmap(generic_tmc_path, leaf_bool_pragma_string,
         ['FIRST', 'SECOND'],
         ['TEST:MAIN:NEW_VAR_OUT', 'TEST:MAIN:NEW_VAR_IN']
     ]
-    
+
+
 def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
             branch_bool_pragma_string, branch_connection_pragma_string):
     stem = BaseElement(element=None)

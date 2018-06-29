@@ -86,6 +86,7 @@ class TmcFile:
         self.isolate_all()
         
         self.all_TmcChains = []
+        self.all_RecordPackages = []
 
     def isolate_Symbols(self):
         '''
@@ -254,7 +255,19 @@ class TmcFile:
         full_list = self.explore_all()
         for row in full_list:
             self.all_TmcChains.append(TmcChain(row))
+    
+    def create_packages(self):
+        """
+        Add all new TmcChains to this object instance's all_TmcChains variable
+        """
+        for chain in self.all_TmcChains:
+            singulars = chain.build_singular_chains()
+            for singular_chain in singulars:
+                self.all_RecordPackages.append(
+                    RecordPackage(chain=singular_chain, origin=chain)
+                )
 
+            
 
 class TmcChain:
     """
@@ -277,7 +290,11 @@ class TmcChain:
         """
         full_list = []
         for entry in self.chain:
-            full_list.append(entry.pragma.config_names())
+            logger.debug(str(entry))
+            if entry.pragma is None:
+                full_list.append([])
+            else:
+                full_list.append(entry.pragma.config_names())
         return full_list
     
     def is_singular(self):
@@ -362,7 +379,7 @@ class TmcChain:
             
     def build_singular_chains(self):
         """
-        Generate list of all acceptable configurations
+        Generate list of all acceptable configurations. 
 
         Returns
         -------
@@ -371,7 +388,7 @@ class TmcChain:
             given the configurations available at each step. 
         """
         name_sequences = self._recursive_permute(self.forkmap())
-        print(name_sequences)
+        logging.debug(str(name_sequences))
         results = []
         for seq in name_sequences:
             new_TmcChain = deepcopy(self)
@@ -387,8 +404,39 @@ class RecordPackage:
     def __init__(self, chain=None, origin=None):
         self.config = {}
         self.chain = chain # TmcChain instance - so I could add methods there
+        
         self.origin_chain = origin # TmcChain instance-do I need this? unclear
+        
+        self.validation_module = None
 
+    def apply_config_validation(self):
+        """
+        Apply the guessing module. Assert that the proper fields exist 
+        """
+        raise NotImplementedError
+
+    def apply_guessing(self):
+        """
+        Cycle through guessing methods until none can be applied.
+        guessing methods is a list of functions. 
+        
+        
+        """
+        raise NotImplementedError
+
+    def generate_naive_config(self):
+        """
+        Create config dictionary from current chain. Move from lowest to
+        highest level to create 
+        """
+        raise NotImplementedError
+
+    def generate_record_entry(self):
+        """
+        apply jinja functionality to create the template
+        """
+        raise NotImplementedError
+        
 
 class PvPackage:
     '''
