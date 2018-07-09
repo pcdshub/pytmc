@@ -413,24 +413,8 @@ class TmcChain:
         new_config = Configuration(config=[])
         cfg_title = ""
         for entry in self.chain:
-            '''
-            for line in entry.pragma.config:
-                # if this is the title line, build up the title and insert it
-                if line['title'] is new_config.cfg_header:
-                    cfg_title = cfg_title + cc_symbol + line['tag'] 
-                    new_config.add_config_line(
-                        title=line['title'],
-                        tag=cfg_title,
-                    )
-                # If not, insert line regardless
-                else:
-                    new_config.add_config_line(
-                        title=line['title'],
-                        tag=line['tag']
-                    )
-
-            '''
-            new_config.concat(entry.pragma)
+            new_config.concat(entry.pragma, cc_symbol = cc_symbol)
+        
         return new_config
 
 
