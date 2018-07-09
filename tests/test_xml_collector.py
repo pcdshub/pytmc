@@ -7,7 +7,8 @@ from pytmc import Symbol, DataType, SubItem
 from pytmc.xml_obj import BaseElement, Configuration
 
 from pytmc import TmcFile, PvPackage
-from pytmc.xml_collector import ElementCollector, TmcChain, RecordPackage
+from pytmc.xml_collector import ElementCollector, TmcChain, BaseRecordPackage
+from pytmc.xml_collector import ChainNotSingularError
 
 from collections import defaultdict, OrderedDict as odict
 
@@ -214,8 +215,9 @@ def test_TmcFile_create_packages(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.create_chains()
     tmc.create_packages()
-
     assert False
+
+
 
 # TmcChain tests
 
@@ -330,10 +332,45 @@ def test_TmcChain_build_singular_chains(generic_tmc_path,
         ['TEST:MAIN:NEW_VAR_IN'],
     ]
 
+@pytest.fixture(scope='function')
+def sample_TmcChain(generic_tmc_path, 
+            leaf_bool_pragma_string, branch_bool_pragma_string,
+            branch_connection_pragma_string):
+    stem = BaseElement(element=None)
+    stem.pragma = Configuration(branch_connection_pragma_string) 
+    leaf_a = BaseElement(element=None)
+    leaf_a.pragma = Configuration(branch_bool_pragma_string)
+    leaf_b = BaseElement(element=None)
+    leaf_b.pragma = Configuration(leaf_bool_pragma_string)
+
+    chain = TmcChain(
+        [stem, leaf_a, leaf_b]
+    )
+    
+    return chain
+
+def test_TmcChain_naive_config(sample_TmcChain):
+    with pytest.raises(ChainNotSingularError):
+        sample_TmcChain.naive_config()
+
+    test_chain = sample_TmcChain.build_singular_chains()[0]
+    cfg = test_chain.naive_config()
+    for x in test_chain.chain:
+        print(x.pragma.config)
+    print(cfg.config)
+    assert cfg.config[0:3] == [
+        {'title':'pv', 'tag':'MIDDLE:FIRST:TEST:MAIN:NEW_VAR_OUT'},
+        {'title':'aux', 'tag':'nothing'},
+        {'title':'type', 'tag':'bo'},
+    ]
+
+
+# BaseRecordPackage tests
 
 
 
-# RecordPackage tests
+
+
 
 
 

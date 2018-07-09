@@ -18,12 +18,16 @@ class XmlObjError(Exception):
 class PvNotFrozenError(XmlObjError):
     pass
 
+
 class Configuration:
-    def __init__(self, str):
+    def __init__(self, str=None, config=None):
         # str: self._raw_config (READ ONLY, set at instantaiation)
         # list: self.config
         self._raw_config = str
-        self.config = self._formatted_config_lines()
+        if config is None:
+            self.config = self._formatted_config_lines()
+        else:
+            self.config = config
         # what name identifies unique configurations? cfg_header
         self.cfg_header = 'pv'
         self.cfg_skip = 'skip'
@@ -161,7 +165,7 @@ class Configuration:
 
         Returns
         -------
-        list or None
+        list
             List of formatted configuration lines specific to the configuration
             named in the parameters. If there was no such configuration, return
             None instead.
@@ -222,7 +226,8 @@ class Configuration:
         """
         self.config = self._select_config_by_name(config_name)
 
-    def add_config_line(self, title, tag, line_no=None, config=None):
+    def add_config_line(self, title, tag, line_no=None, config=None,
+                overwrite=False):
         """
         add basic line to config
 
@@ -243,6 +248,9 @@ class Configuration:
             output of :func:`~_formatted_config_lines`. Defaults to
             self.config.
 
+        overwrite : bool
+            Defaults to False. If the line already exists, overwrite it. 
+
         Returns
         -------
         None
@@ -251,13 +259,20 @@ class Configuration:
             config = self.config
 
         new_line = {'title': title, 'tag': tag}
+
+        if overwrite:
+            for line in self.get_config_lines(title):
+                if line['title'] == title:
+                    line['tag'] = tag
+                    return
         
         if line_no is None:
             config.append(new_line)
         else:
             config.insert(line_no, new_line)
 
-    def add_config_field(self, f_name, f_set, line_no=None, config=None):
+    def add_config_field(self, f_name, f_set, line_no=None, config=None,
+                overwrite=False):
         """
         add field to config
 
@@ -278,16 +293,32 @@ class Configuration:
             output of :func:`~_formatted_config_lines`. Defaults to
             self.config.
 
+        overwrite : bool
+            Defaults to False. If the line already exists, overwrite it. 
+
         Returns
         -------
         None
 
         """
+        if overwrite:
+            for field in self.get_config_fields(f_name):
+                if line['tag']['f_set'] == f_set:
+                    self.add_config_line(
+                        title='field',
+                        tag={'f_set': f_set, 'f_name': f_name},
+                        line_no=line_no,
+                        config=config,
+                        overwrite=True
+                    )
+
+
         self.add_config_line(
             title='field',
             tag={'f_set': f_set, 'f_name': f_name},
             line_no=line_no,
-            config=config
+            config=config,
+            overwrite=False
         )
 
     def get_config_lines(self, title, config=None):
@@ -365,6 +396,39 @@ class Configuration:
 
         return False
 
+    def concat(self, other, cc_symbol = ":"):
+        """
+        Only works for singular or empty Configurations
+        """
+        if not self.config_names():
+            title_base = ""
+        if len(self.config_names()) == 1:
+            title_base = self.config_names()[0]+cc_symbol
+        
+        for line in other.config:
+            # handle config titles
+            print(line['title'])
+            if line['title'] == self.cfg_header:
+                print("TRIPPED")
+                self.add_config_line(
+                    title=self.cfg_header,
+                    tag=title_base+line['tag'],
+                    overwrite=True
+                )
+            # handle fields
+            elif line['title'] is 'field':
+                self.add_config_field(
+                    f_name=line['tag']['f_name'],
+                    f_set=line['tag']['f_set'],
+                    overwrite=True
+                )
+            # hanlde all normal lines
+            else:
+                self.add_config_line(
+                    title = line['title'],
+                    tag = line['tag'],
+                    overwrite=True
+                )
 
 class BaseElement:
     '''

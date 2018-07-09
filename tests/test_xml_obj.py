@@ -728,4 +728,15 @@ def test_Configuration__eq__(leaf_bool_pragma_string):
     cfg_A.add_config_line("a","b")
     assert cfg_A != cfg_B
 
-
+def test_Configuration_concat(branch_connection_pragma_string,
+            branch_bool_pragma_string): 
+    cfg_A = Configuration(branch_connection_pragma_string)
+    cfg_B = Configuration(branch_bool_pragma_string)
+    cfg_B.fix_to_config_name("FIRST")
+    new_config = Configuration(config=[])
+    new_config.concat(cfg_A)
+    new_config.concat(cfg_B)
+    assert new_config.config == [
+        {'title':'pv', 'tag':'MIDDLE:FIRST'},
+        {'title':'aux', 'tag':'nothing'},
+    ]

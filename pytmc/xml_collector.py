@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict, OrderedDict as odict
 from . import Symbol, DataType, SubItem
 from copy import deepcopy, copy
-from .xml_obj import BaseElement
+from .xml_obj import BaseElement, Configuration
 from .beckhoff import beckhoff_types
 from functools import reduce
 
@@ -264,10 +264,14 @@ class TmcFile:
             singulars = chain.build_singular_chains()
             for singular_chain in singulars:
                 self.all_RecordPackages.append(
+                    # Intentionally leaving this broken -- version must go here
                     RecordPackage(chain=singular_chain, origin=chain)
                 )
 
-            
+
+class ChainNotSingularError(Exception):
+    pass
+
 
 class TmcChain:
     """
@@ -398,16 +402,57 @@ class TmcChain:
 
         return results
 
+    def naive_config(self, cc_symbol = ":"):
+        """
+        On singular chains, stack up configurations from lowest to highest to
+        generate a guess-free configuration. 
+        """
+        if not self.is_singular():
+            raise ChainNotSingularError
+
+        new_config = Configuration(config=[])
+        cfg_title = ""
+        for entry in self.chain:
+            '''
+            for line in entry.pragma.config:
+                # if this is the title line, build up the title and insert it
+                if line['title'] is new_config.cfg_header:
+                    cfg_title = cfg_title + cc_symbol + line['tag'] 
+                    new_config.add_config_line(
+                        title=line['title'],
+                        tag=cfg_title,
+                    )
+                # If not, insert line regardless
+                else:
+                    new_config.add_config_line(
+                        title=line['title'],
+                        tag=line['tag']
+                    )
+
+            '''
+            new_config.concat(entry.pragma)
+        return new_config
 
 
-class RecordPackage:
+class BaseRecordPackage:
     def __init__(self, chain=None, origin=None):
-        self.config = {}
+        """
+        Classes based off of this class should never need super, 
+        """
+        self.cfg = Configuration(config={})
         self.chain = chain # TmcChain instance - so I could add methods there
         
         self.origin_chain = origin # TmcChain instance-do I need this? unclear
-        
+        # ^could be relevant for
         self.validation_module = None
+        self.list_guess_methods()
+
+    def list_guess_methods(self):
+        """
+        Should be redefined.
+        Create a list of all the guessing methods as self.guess_methods
+        """
+        raise NotImplementedError
 
     def apply_config_validation(self):
         """
@@ -419,21 +464,19 @@ class RecordPackage:
         """
         Cycle through guessing methods until none can be applied.
         guessing methods is a list of functions. 
-        
-        
         """
         raise NotImplementedError
 
     def generate_naive_config(self):
         """
         Create config dictionary from current chain. Move from lowest to
-        highest level to create 
+        highest level to create config (highest level has highest precedence)
         """
         raise NotImplementedError
 
     def generate_record_entry(self):
         """
-        apply jinja functionality to create the template
+        apply all jinja functionality to create the template
         """
         raise NotImplementedError
         
