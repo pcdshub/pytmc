@@ -367,8 +367,15 @@ def test_TmcChain_naive_config(sample_TmcChain):
 
 # BaseRecordPackage tests
 
-
-
+def test_BaseRecordPackage_generate_naive_config(sample_TmcChain):
+    test_chain = sample_TmcChain.build_singular_chains()[0]
+    brp = BaseRecordPackage(test_chain)
+    brp.generate_naive_config()
+    assert brp.cfg.config[0:3] == [
+        {'title':'pv', 'tag':'MIDDLE:FIRST:TEST:MAIN:NEW_VAR_OUT'},
+        {'title':'aux', 'tag':'nothing'},
+        {'title':'type', 'tag':'bo'},
+    ]
 
 
 

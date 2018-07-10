@@ -404,8 +404,14 @@ class TmcChain:
 
     def naive_config(self, cc_symbol = ":"):
         """
-        On singular chains, stack up configurations from lowest to highest to
-        generate a guess-free configuration. 
+        On chains of singular configs, stack up configurations from lowest to
+        highest to generate a guess-free configuration.
+
+        Returns
+        -------
+        Configuration
+            Returns the configuration built from the existing pragmas in the
+            chain.
         """
         if not self.is_singular():
             raise ChainNotSingularError
@@ -419,28 +425,39 @@ class TmcChain:
 
 
 class BaseRecordPackage:
+    """
+    BaseRecordPackage includes some basic funcionality that should be shared
+    across most versions. This includes things like common methods so things
+    like validation can be configured at the __init__ with an instance
+    variable. Overwrite/inherit features as necessary. 
+
+    """
     def __init__(self, chain=None, origin=None):
         """
-        Classes based off of this class should never need super, 
+        All subclasses should use super on their init method.
         """
+        # Just fills in a default
         self.cfg = Configuration(config={})
+
         self.chain = chain # TmcChain instance - so I could add methods there
         
-        self.origin_chain = origin # TmcChain instance-do I need this? unclear
-        # ^could be relevant for
-        self.validation_module = None
-        self.list_guess_methods()
+        # TmcChain instance-do I need this? unclear
+        self.origin_chain = origin 
+        # ^could be relevant for init fields
+        # Will continue without this for now 
 
-    def list_guess_methods(self):
-        """
-        Should be redefined.
-        Create a list of all the guessing methods as self.guess_methods
-        """
-        raise NotImplementedError
+        # List of methods defined in the class 
+        self.guess_methods_list = None
+        
+        # use form list of lists,1st list has 1 entry per requirement
+        # second list is list of dictionary keys to the point of interest
+        self.validation_list = None
+        
 
     def apply_config_validation(self):
         """
-        Apply the guessing module. Assert that the proper fields exist 
+        Apply the guessing module. Assert that the proper fields exist.
+        Return a list of the missing requirements 
         """
         raise NotImplementedError
 
@@ -456,11 +473,12 @@ class BaseRecordPackage:
         Create config dictionary from current chain. Move from lowest to
         highest level to create config (highest level has highest precedence)
         """
-        raise NotImplementedError
+        self.cfg = self.chain.naive_config()
 
     def generate_record_entry(self):
         """
         apply all jinja functionality to create the template
+        return dict w/ filename as key for each entry in the iterable 
         """
         raise NotImplementedError
         
