@@ -430,6 +430,39 @@ class Configuration:
                     overwrite=True
                 )
 
+    def seek(self, path, target):
+        """
+        Return list of parameters that fit this description.
+       
+        Parameters
+        ----------
+        path : list
+            List of dictionary keys to seek the target value
+        target : any
+            The value or variable expected at this location
+
+        Returns
+        -------
+        List 
+            list of all rows that fulfill the given description
+        """
+        results = []
+        for line in self.config:
+            z = line 
+            for step in path:
+                if type(z) is not dict:
+                    break
+                try:
+                    z = z[step]
+                except KeyError:
+                    pass
+            if z == target:
+                results.append(line)
+
+        return results
+    
+
+
 class BaseElement:
     '''
     Base class for representing variables as they appear in the .tmc (xml)

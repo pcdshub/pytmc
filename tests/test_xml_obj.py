@@ -740,3 +740,13 @@ def test_Configuration_concat(branch_connection_pragma_string,
         {'title':'pv', 'tag':'MIDDLE:FIRST'},
         {'title':'aux', 'tag':'nothing'},
     ]
+
+def test_Configuration_seek():
+    c = Configuration(config=[])
+    c.add_config_line(title="pv",tag="ABC")
+    c.add_config_field(f_name="ONAM",f_set="ABC")
+    assert c.seek(['title'],'pv') == [{'title':'pv','tag':'ABC'}]
+    assert c.seek(['tag','f_name'],'ONAM') == [
+        {'title':'field','tag':{'f_name':'ONAM','f_set':'ABC'}}
+    ]
+    assert c.seek(['bad'],3) == []
