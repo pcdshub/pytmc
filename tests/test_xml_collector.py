@@ -377,6 +377,28 @@ def test_BaseRecordPackage_generate_naive_config(sample_TmcChain):
         {'title':'type', 'tag':'bo'},
     ]
 
+def test_BaseRecordPackage_apply_config_validation(sample_TmcChain):
+    test_chain = sample_TmcChain.build_singular_chains()[0]
+    brp = BaseRecordPackage(test_chain)
+    brp.generate_naive_config()
+    for x in brp.cfg.config:
+        print(x)
+    
+    
+    brp.validation_list = [
+        {'path':[],'target':3},
+    ]
+    assert brp.apply_config_validation() == [
+        {'path':[],'target':3},
+    ]
+
+    brp.validation_list = [
+        {'path':['tag','f_name'],'target':'SCAN'},
+        {'path':['title'],'target':'pv'},
+    ]
+    assert len(brp.apply_config_validation()) == 0
+
+
 
 
 

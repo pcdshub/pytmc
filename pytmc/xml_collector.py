@@ -449,17 +449,30 @@ class BaseRecordPackage:
         # List of methods defined in the class 
         self.guess_methods_list = None
         
-        # use form list of lists,1st list has 1 entry per requirement
-        # second list is list of dictionary keys to the point of interest
+        # use form list of dicts,1st list has 1 entry per requirement
+        # dict has form {'path':[],'target':n} where n is any variable
         self.validation_list = None
         
 
     def apply_config_validation(self):
         """
         Apply the guessing module. Assert that the proper fields exist.
-        Return a list of the missing requirements 
+        Returns
+        -------
+        List
+            a list of the missing requirements 
+
         """
-        raise NotImplementedError
+        violations = []
+        for req in self.validation_list:
+            if not self.cfg.seek(**req):
+                violations.append(req)
+
+
+        return violations
+
+
+
 
     def apply_guessing(self):
         """
@@ -471,7 +484,13 @@ class BaseRecordPackage:
     def generate_naive_config(self):
         """
         Create config dictionary from current chain. Move from lowest to
-        highest level to create config (highest level has highest precedence)
+        highest level to create config (highest level has highest precedence).
+
+        Overwrites self.cfg
+
+        Returns
+        -------
+        None
         """
         self.cfg = self.chain.naive_config()
 

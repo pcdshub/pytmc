@@ -407,9 +407,7 @@ class Configuration:
         
         for line in other.config:
             # handle config titles
-            print(line['title'])
             if line['title'] == self.cfg_header:
-                print("TRIPPED")
                 self.add_config_line(
                     title=self.cfg_header,
                     tag=title_base+line['tag'],
