@@ -437,7 +437,7 @@ class BaseRecordPackage:
         All subclasses should use super on their init method.
         """
         # Just fills in a default
-        self.cfg = Configuration(config={})
+        self.cfg = Configuration(config=[])
 
         self.chain = chain # TmcChain instance - so I could add methods there
         
@@ -457,22 +457,18 @@ class BaseRecordPackage:
     def apply_config_validation(self):
         """
         Apply the guessing module. Assert that the proper fields exist.
+        
         Returns
         -------
         List
             a list of the missing requirements 
-
         """
         violations = []
         for req in self.validation_list:
             if not self.cfg.seek(**req):
                 violations.append(req)
 
-
         return violations
-
-
-
 
     def apply_guessing(self):
         """
@@ -500,6 +496,53 @@ class BaseRecordPackage:
         return dict w/ filename as key for each entry in the iterable 
         """
         raise NotImplementedError
+
+    def as_dict(self):
+        """
+        Produce a jinja-template-compatible dictionary describing this
+        RecordPackage. 
+        
+        Returns
+        -------
+        dict
+            return a dict. Keys are the fields of the jinja template. Contains
+            special 'field' key where the value is a dictionary with f_name and
+            f_set as the key/value pairs respectively. 
+        """
+        cfg_dict = {}
+        for row in self.cfg.config:
+            if row['title'] == 'pv':
+                cfg_dict['pv'] = row['tag']
+            if row['title'] == 'type':
+                cfg_dict['type'] = row['tag']
+            if row['title'] == 'field':
+                cfg_dict.setdefault('field',{})
+                tag = row['tag']
+                cfg_dict['field'][tag['f_name']] = tag['f_set']
+
+
+        return cfg_dict  
+            
+
+
+
+    @staticmethod
+    def generate_files(records):
+        """
+        Parameters
+        ----------
+        records : list 
+            list of all incoming Record objects
+        
+        Returns
+        -------
+        str 
+            The Jinja-made output of the full resulting file.
+        """
+        raise NotImplementedError
+        
+
+
         
 
 class PvPackage:

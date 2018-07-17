@@ -384,7 +384,6 @@ def test_BaseRecordPackage_apply_config_validation(sample_TmcChain):
     for x in brp.cfg.config:
         print(x)
     
-    
     brp.validation_list = [
         {'path':[],'target':3},
     ]
@@ -398,6 +397,18 @@ def test_BaseRecordPackage_apply_config_validation(sample_TmcChain):
     ]
     assert len(brp.apply_config_validation()) == 0
 
+def test_BaseRecordPackage_standard_as_dict():
+    brp = BaseRecordPackage()
+    brp.cfg.add_config_line('pv','example_pv')
+    brp.cfg.add_config_line('type','ao')
+    brp.cfg.add_config_field('ABC','test 0')
+    assert brp.standard_as_dict() == {
+        'pv':'example_pv',
+        'type':'ao',
+        'field':{
+            'ABC':'test 0'
+        }
+    }
 
 
 
