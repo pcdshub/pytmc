@@ -13,6 +13,7 @@ from copy import deepcopy, copy
 from .xml_obj import BaseElement, Configuration
 from .beckhoff import beckhoff_types
 from functools import reduce
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 class ElementCollector(dict):
     '''
@@ -432,6 +433,8 @@ class BaseRecordPackage:
     variable. Overwrite/inherit features as necessary. 
 
     """
+    
+
     def __init__(self, chain=None, origin=None):
         """
         All subclasses should use super on their init method.
@@ -452,6 +455,17 @@ class BaseRecordPackage:
         # use form list of dicts,1st list has 1 entry per requirement
         # dict has form {'path':[],'target':n} where n is any variable
         self.validation_list = None
+
+        # Load jinja templates
+        self.jinja_env = Environment(
+            loader = PackageLoader("pytmc","templates"),
+            trim_blocks = True,
+            lstrip_blocks = True,
+        )
+        self.standard_template = self.jinja_env.get_template(
+            "asyn_standard_record.jinja2"
+        )
+        
         
 
     def apply_config_validation(self):
@@ -490,6 +504,19 @@ class BaseRecordPackage:
         """
         self.cfg = self.chain.naive_config()
 
+    def ID_type(self):
+        """
+        Distinguish special record types from one another such as a motor
+        record. Select from the available types of "standard" and "motor
+        record"
+        
+        Returns
+        -------
+        string
+            String name of type 
+        """
+        raise NotImplementedError
+
     def generate_record_entry(self):
         """
         apply all jinja functionality to create the template
@@ -497,7 +524,19 @@ class BaseRecordPackage:
         """
         raise NotImplementedError
 
-    def as_dict(self):
+    def motor_record_as_dict(self):
+        """
+        Produce a jinja-template-compatible dict describing this RecordPackage
+
+        Returns
+        -------
+        dict
+            return a dict. Keys are the fields of the jinja template. Contains
+            special 'field' key where the value is a dictionary with f_name and
+            f_set as the key/value pairs respectively. 
+        """
+
+    def standard_as_dict(self):
         """
         Produce a jinja-template-compatible dictionary describing this
         RecordPackage. 
@@ -520,11 +559,17 @@ class BaseRecordPackage:
                 tag = row['tag']
                 cfg_dict['field'][tag['f_name']] = tag['f_set']
 
+        return cfg_dict
 
-        return cfg_dict  
-            
-
-
+    def render_standard(self):
+        """
+        Returns
+        -------
+        string
+            Jinja rendered entry for this BaseRecordPackage
+        """
+        dict = self.standard_as_dict()
+        return self.standard_template.render(**dict)
 
     @staticmethod
     def generate_files(records):

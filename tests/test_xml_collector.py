@@ -1,5 +1,6 @@
 import pytest
 import logging
+import textwrap
 
 import xml.etree.ElementTree as ET
 
@@ -410,7 +411,30 @@ def test_BaseRecordPackage_standard_as_dict():
         }
     }
 
+def test_BaseRecordPackage_render_standard():
+    brp = BaseRecordPackage()
+    brp.cfg.add_config_line('pv','example_pv')
+    brp.cfg.add_config_line('type','ao')
+    brp.cfg.add_config_field("PINI","1")
+    brp.cfg.add_config_field('ABC','test 0')
+    target_response="""\
+    record(ao,"example_pv"){
+        field(PINI, "1")
+        field(ABC, "test 0")
+    }\
+    """
+    target_response = textwrap.dedent(target_response).strip()
+    #print(target_response)
+    #print(brp.render_standard())
+    for c in target_response:
+        print(ord(c),end=" ")
+    print("")
+    for c in brp.render_standard():
+        print(ord(c),end=" ")
 
+    assert target_response == brp.render_standard()
+    
+    
 
 
 

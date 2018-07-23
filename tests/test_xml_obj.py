@@ -728,6 +728,7 @@ def test_Configuration__eq__(leaf_bool_pragma_string):
     cfg_A.add_config_line("a","b")
     assert cfg_A != cfg_B
 
+
 def test_Configuration_concat(branch_connection_pragma_string,
             branch_bool_pragma_string): 
     cfg_A = Configuration(branch_connection_pragma_string)
@@ -740,6 +741,7 @@ def test_Configuration_concat(branch_connection_pragma_string,
         {'title':'pv', 'tag':'MIDDLE:FIRST'},
         {'title':'aux', 'tag':'nothing'},
     ]
+
 
 def test_Configuration_seek():
     c = Configuration(config=[])
