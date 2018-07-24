@@ -515,7 +515,13 @@ class BaseRecordPackage:
         string
             String name of type 
         """
-        raise NotImplementedError
+        # Instantly remove list formatting if this is len(1) list, leaves dict
+        [type_search] = self.cfg.seek(['title'], 'type')
+        if type_search['tag'] == 'motor':
+            return 'motor'
+        else:
+            return 'standard'
+
 
     def generate_record_entry(self):
         """
