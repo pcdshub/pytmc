@@ -508,7 +508,8 @@ class BaseRecordPackage:
         """
         Distinguish special record types from one another such as a motor
         record. Select from the available types of "standard" and "motor
-        record"
+        record." Should always return a value. No guessing should be required
+        to use this method 
         
         Returns
         -------
@@ -521,7 +522,6 @@ class BaseRecordPackage:
             return 'motor'
         else:
             return 'standard'
-
 
     def generate_record_entry(self):
         """
