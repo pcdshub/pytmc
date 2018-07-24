@@ -398,7 +398,20 @@ class Configuration:
 
     def concat(self, other, cc_symbol = ":"):
         """
-        Only works for singular or empty Configurations
+        Using configs from an object and its encapsulated data, string the two
+        together concatenating the PV and using the outside (self) config to
+        assume any unfilled entries in the interior (other) config. Only works
+        for singular or empty Configurations.
+
+        Parameters
+        ----------
+        other : Configuration
+            This configuration will be added onto the tail of this
+            configuration. 'other' represents the interanal configuration.
+
+        cc_symbol : str, optional
+            When concatenating the PV. Add this seperator between individual
+            PV's. Defaults to ":". 
         """
         if not self.config_names():
             title_base = ""
