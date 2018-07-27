@@ -1,13 +1,20 @@
-Using the pragmas
-=================
+Annotating a TwinCAT3 project 
+=============================
 
-Declaring top level variables
-''''''''''''''''''''''''''''''
-With a pragma, a variable declaration in a main program will appear similar to
-the following:
+Pytmc is capable of generating most of the DB file but some settings require
+human direction. Developers set this configuration by adding an attribute
+pragma to TwinCAT3 variables when they're declared. These pragmas can be
+appended to variables in project files and library files.
+
+
+Pragma syntax
+'''''''''''''
+
+At a minimum, developers must specify a PV name and an IO direction for each
+field. This would look like the following:
 
 .. code-block:: none 
-
+   
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
        type: ai
@@ -17,6 +24,43 @@ the following:
        str: %f
    '}
    scale : LREAL := 0.0;
+
+The ``{attribute 'pytmc' := '`` and ``'}`` specify the beginning and end of the
+pragma that pytmc will recognize. The middle two lines specify the
+configuration for this variable.
+
+Pytmc uses a custom system of configuration where newlines and white space in
+a line is important. All lines begin with a title and the title ends before the
+colon. All parts thereafter are the 'tag' or the configuration state for this
+setting. 
+
+
+Declaring top level variables
+''''''''''''''''''''''''''''''
+This is an example of the simplest configuration a developer can provide to
+instantiate a variable.
+
+.. code-block:: none 
+
+   {attribute 'pytmc' := '
+       pv: TEST:MAIN:SCALE
+       io: input
+   '}
+   scale : LREAL := 0.0;
+
+
+The developer must specify the PV name (``pv:`` line) and the direction of the
+data (``io:`` line). 
+
+Pytmc needs no additional information but users have the option to override
+default settings manually. For example a developer can specify ``scan:`` field
+(configures how and when the value is updated) even though this is not
+required. For additional information on all the pragma fields, consult the 
+
+A link-  :ref:`Pragma fields`
+
+like `Pragma fields`_.
+
 
 Declaring encapsulated variables
 ''''''''''''''''''''''''''''''''
@@ -48,6 +92,7 @@ following:
    value_d : DINT; 
 
 
+
 When combined, the PV specified at the instantiation of the user-defined data
 type will be appended to the beginning of the PV for all data types defined
 within. The final PV will be ``TEST:MAIN:COUNTER_B:VALUE_F_R``. The colons are
@@ -57,6 +102,13 @@ Information other than the PV name should be specified at the level of the
 specific variable, not where the data type is instantiated.
 
 This can be recursively applied to data types containing data types.
+
+Declaring multiple PVs at once
+''''''''''''''''''''''''''''''
+The `pv` tag is unique. A single variable can have multiple pv tags. The
+following settings are each associated with the nearest pv *above* it. 
+
+
 
 Declaring bidirectional PVs
 '''''''''''''''''''''''''''
@@ -85,6 +137,8 @@ When specifying multiple PVs, the configuration lines all apply to the nearest,
 previous ``pv`` line. For example in the code snippet above, ``type: ai`` will
 be applied to the ``TEST:MAIN:ULIMIT_R`` pv and the ``type: ao`` will be
 applied to ``TEST:MAIN:ULIMT_W``. 
+
+.. _Pragma fields:
 
 Pragma fields
 '''''''''''''
