@@ -18,15 +18,9 @@ Pytmc is developed with these `guidelines
 <https://pcdshub.github.io/development.html>`_ in mind.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: Contents:
 
    user_guide.rst
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
