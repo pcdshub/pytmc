@@ -6,12 +6,31 @@ human direction. Developers set this configuration by adding an attribute
 pragma to TwinCAT3 variables when they're declared. These pragmas can be
 appended to variables in project files and library files.
 
-
 Pragma syntax
 '''''''''''''
 
 At a minimum, developers must specify a PV name and an IO direction for each
 field. This would look like the following:
+
+.. code-block:: none 
+   
+   {attribute 'pytmc' := '
+       pv: TEST:MAIN:SCALE
+       io: input
+   '}
+   scale : LREAL := 0.0;
+
+The ``{attribute 'pytmc' := '`` and ``'}`` specify the beginning and end of the
+pragma that pytmc will recognize. The middle two lines specify the
+configuration for this variable.
+
+Pytmc uses a custom system of configuration where newlines and white space in
+a line is important. All lines begin with a title and the title ends before the
+colon. All parts thereafter are the 'tag' or the configuration state for this
+setting. Some title types such as `field` can have multiple settings for a
+single PV.
+
+A pragma with more specification might look like the following:
 
 .. code-block:: none 
    
@@ -24,15 +43,6 @@ field. This would look like the following:
        str: %f
    '}
    scale : LREAL := 0.0;
-
-The ``{attribute 'pytmc' := '`` and ``'}`` specify the beginning and end of the
-pragma that pytmc will recognize. The middle two lines specify the
-configuration for this variable.
-
-Pytmc uses a custom system of configuration where newlines and white space in
-a line is important. All lines begin with a title and the title ends before the
-colon. All parts thereafter are the 'tag' or the configuration state for this
-setting. 
 
 
 Declaring top level variables
@@ -56,18 +66,17 @@ Pytmc needs no additional information but users have the option to override
 default settings manually. For example a developer can specify ``scan:`` field
 (configures how and when the value is updated) even though this is not
 required. For additional information on all the pragma fields, consult the 
-
-A link-  :ref:`Pragma fields`
-
-like `Pragma fields`_.
+`Pragma fields`_ section.
 
 
 Declaring encapsulated variables
 ''''''''''''''''''''''''''''''''
-Variables declared inside of data structures can be processed by pytmc so
-long as each level of encapsulation is marked for pytmc. 
+Variables declared inside of data structures can be processed by pytmc so long
+as each level of encapsulation, all the way down to the first level, is marked
+for pytmc. 
 
-The top level instantiation of a function block could resemble the following:
+The instantiation of encapsulating data types only needs the ``pv:`` line. The
+instantiation of a function block could resemble the following:
 
 .. code-block:: none 
 
@@ -76,8 +85,54 @@ The top level instantiation of a function block could resemble the following:
    '}
    counter_b : counter;
 
-A variable declaration within the ``counter`` function block could resemble the
+A variable declared within the ``counter`` function block could resemble the
 following:
+
+.. code-block:: none
+  
+   {attribute 'pytmc' := '
+       pv: VALUE
+       io: input
+   '}  
+   value_d : DINT; 
+
+
+When combined, the PV specified at the instantiation of the user-defined data
+type will be appended to the beginning of the PV for all data types defined
+within. Each step further into a data structure can add an additional section
+to the PV. In the example above the final PV will be
+``TEST:MAIN:COUNTER_B:VALUE``. The colons are automatically included. 
+
+This can be recursively applied to data types containing data types.
+
+If you want PVs to be produced by a data type but don't wish to add an
+additional term to the PV, you can use the following syntax.
+
+.. code-block:: none 
+
+   {attribute 'pytmc' := '
+       pv: 
+   '}
+   counter_b : counter;
+
+
+Information other than the PV name name can be specified at the datatype
+instantiation if you wish to make generalizations about the variables
+contained inside. These generalizations are overridden if the same field is
+specified either on a contained datatype or variable.
+
+For example the following code block will assign a ``field:`` of ``SCAN 1
+second`` to all the variables and datatypes that it contains unless they
+specify their own version of the  
+
+.. code-block:: none 
+
+   {attribute 'pytmc' := '
+       pv: 
+       field: SCAN 1 second
+   '}
+   counter_b : counter;
+
 
 .. code-block:: none
   
@@ -90,24 +145,6 @@ following:
        str: %d
    '}  
    value_d : DINT; 
-
-
-
-When combined, the PV specified at the instantiation of the user-defined data
-type will be appended to the beginning of the PV for all data types defined
-within. The final PV will be ``TEST:MAIN:COUNTER_B:VALUE_F_R``. The colons are
-automatically included. 
-
-Information other than the PV name should be specified at the level of the
-specific variable, not where the data type is instantiated.
-
-This can be recursively applied to data types containing data types.
-
-Declaring multiple PVs at once
-''''''''''''''''''''''''''''''
-The `pv` tag is unique. A single variable can have multiple pv tags. The
-following settings are each associated with the nearest pv *above* it. 
-
 
 
 Declaring bidirectional PVs
@@ -136,9 +173,7 @@ a single TwinCAT variable.
 When specifying multiple PVs, the configuration lines all apply to the nearest,
 previous ``pv`` line. For example in the code snippet above, ``type: ai`` will
 be applied to the ``TEST:MAIN:ULIMIT_R`` pv and the ``type: ao`` will be
-applied to ``TEST:MAIN:ULIMT_W``. 
-
-.. _Pragma fields:
+applied to ``TEST:MAIN:ULIMT_W``.
 
 Pragma fields
 '''''''''''''
@@ -147,7 +182,7 @@ section contains more specific descriptions of each of the configuration lines.
 
 pv
 ..
-This specifies the PV name that will represent this variable  in EPICS. This
+This constructs the PV name that will represent this variable in EPICS. This
 line can be used on specific variables as well as the instantiations of data
 types. When used on variables declared in the main scope, the PV for the
 variable will be generated verbatim. When used on instantiations, this string
@@ -164,18 +199,24 @@ ao.
 
 field
 .....
-This specifies the lines that will be placed in the epics db as 'fields'. These
-lines determine the PV's behaviors such as alarm limits and scanning frequency.
-Each field specified in the db corresponds to a field line in the pragma.
-Almost all PVs will have multiple fields and hence multiple field lines in the
-pragma. The field line has two sections, the field type and the argument. The
-field type is the first string of characters up until the first character of
-whitespace. It us usually an all-caps abbreviation like RVAL, DTYP or EGU. This
-determines the type of field being set. All characters after the first space
-are treated as the argument to the field. The argument can include any
-characters including spaces and is only broken on a new line. The INP and OUT
-fields are generated automatically so there is no need to manually include
-them.
+This specifies the lines that will be placed in the epics db as 'fields'.
+Multiple field lines are acceptable. These lines determine the PV's behaviors
+such as alarm limits and scanning frequency.  Each field specified in the db
+corresponds to a field line in the pragma.  Almost all PVs will have multiple
+fields and hence multiple field lines in the pragma. The field line has two
+sections, the field type and the argument. The field type is the first string
+of characters up until the first character of whitespace. It us usually an
+all-caps abbreviation like RVAL, DTYP or EGU. This determines the type of field
+being set. All characters after the first space are treated as the argument to
+the field. The argument can include any characters including spaces and is only
+broken on a new line. The INP and OUT fields are generated automatically so
+there is no need to manually include them.
+
+SCAN field
+""""""""""
+The ``SCAN`` field is special. Pytmc will guess a scan field if not provided
+but like ``io`` and ``pv``, the correct setting may be subjective. We would
+encourage developers to be aware of this setting. 
 
 io
 ..
@@ -195,14 +236,3 @@ that the initial value of the writable value should be initialized as the
 current value read from this PV. The init line should be attached to the output
 PV. Given that the ADS driver is moving away from using the proto file, this
 field may be deprecated soon. 
-
-Automatic lines
-'''''''''''''''
-The goal of pytmc is to make IOC creation much faster and less error prone.
-Makerecord's goal is to guess as many of the configuration lines as possible.
-To allow pytmc to guess the lines, do not include them in the pragma. If you
-wish to override a value that is normally guessed, write the line into the
-pragma. Pytmc is still in development and this list will grow with time. The
-latest version of pytmc can guess the following lines:
-
- - INP and OUT fields 
