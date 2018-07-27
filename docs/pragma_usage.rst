@@ -200,7 +200,7 @@ ao.
 field
 .....
 This specifies the lines that will be placed in the epics db as 'fields'.
-Multiple field lines are acceptable. These lines determine the PV's behaviors
+Multiple field lines are allowed. These lines determine the PV's behaviors
 such as alarm limits and scanning frequency.  Each field specified in the db
 corresponds to a field line in the pragma.  Almost all PVs will have multiple
 fields and hence multiple field lines in the pragma. The field line has two
