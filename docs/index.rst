@@ -22,8 +22,6 @@ Pytmc is developed with these `guidelines
    :caption: Contents:
 
    user_guide.rst
-   source_docs.rst
-   dev_notes.rst
 
 
 Indices and tables

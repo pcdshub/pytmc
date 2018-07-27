@@ -216,7 +216,8 @@ SCAN field
 """"""""""
 The ``SCAN`` field is special. Pytmc will guess a scan field if not provided
 but like ``io`` and ``pv``, the correct setting may be subjective. We would
-encourage developers to be aware of this setting. 
+encourage developers to be aware of this setting. Binary fields default to  
+``I/O Intr``. All others default to a polling period of ``.5 second``.
 
 io
 ..
