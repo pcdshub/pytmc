@@ -510,6 +510,7 @@ class BaseElement:
         #    self.suffixes = suffixes
 
         #self._pragma = None
+        self._cached_name = None
         
         # This is to allow testing without actual tmc elements 
         if element is None:
@@ -739,7 +740,24 @@ class BaseElement:
         str
             The name of the variable
         '''
-        return self._get_subfield("Name").text
+        if self._cached_name is None:
+            return self._get_subfield("Name").text
+        else:
+            return self._cached_name
+
+    @name.setter
+    def name(self, name):
+        """
+        Allow the name to be set for testing purposes
+        Paramters
+        ---------
+        value : any
+            Henceforth, return this value instead of the name derived from a
+            tmc file.  Setting value to None causes normal derivation of name
+            to resume.
+        """
+        self._cached_name = name
+
 
     # refactored
 #    def extract_from_pragma(self, title, pv=None):

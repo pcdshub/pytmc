@@ -424,6 +424,22 @@ class TmcChain:
         
         return new_config
 
+    @property
+    def name_list(self):
+        """
+        Produce list of the names of the elements in the chain. This name list
+        should be usable by ADS to access the variable.
+
+        Returns
+        -------
+        list
+            
+        """
+        result = []
+        for entry in self.chain:
+            result.append(entry.name)
+
+        return result
 
 class BaseRecordPackage:
     """
@@ -541,6 +557,7 @@ class BaseRecordPackage:
             special 'field' key where the value is a dictionary with f_name and
             f_set as the key/value pairs respectively. 
         """
+        raise NotImplementedError
 
     def standard_as_dict(self):
         """

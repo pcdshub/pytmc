@@ -333,6 +333,7 @@ def test_TmcChain_build_singular_chains(generic_tmc_path,
         ['TEST:MAIN:NEW_VAR_IN'],
     ]
 
+
 @pytest.fixture(scope='function')
 def sample_TmcChain(generic_tmc_path, 
             leaf_bool_pragma_string, branch_bool_pragma_string,
@@ -350,6 +351,7 @@ def sample_TmcChain(generic_tmc_path,
     
     return chain
 
+
 def test_TmcChain_naive_config(sample_TmcChain):
     with pytest.raises(ChainNotSingularError):
         sample_TmcChain.naive_config()
@@ -366,6 +368,20 @@ def test_TmcChain_naive_config(sample_TmcChain):
     ]
 
 
+def test_TmcChain_name_list():
+    stem = BaseElement(element=None)
+    stem.name = "stem"
+    branch = BaseElement(element=None)
+    branch.name = "branch"
+    leaf = BaseElement(element=None)
+    leaf.name = "leaf"
+
+    chain = TmcChain(
+        [stem, branch, leaf]
+    )
+    assert chain.name_list == ["stem", "branch", "leaf"]
+
+
 # BaseRecordPackage tests
 
 def test_BaseRecordPackage_generate_naive_config(sample_TmcChain):
@@ -377,6 +393,7 @@ def test_BaseRecordPackage_generate_naive_config(sample_TmcChain):
         {'title':'aux', 'tag':'nothing'},
         {'title':'type', 'tag':'bo'},
     ]
+
 
 def test_BaseRecordPackage_apply_config_validation(sample_TmcChain):
     test_chain = sample_TmcChain.build_singular_chains()[0]
@@ -398,6 +415,7 @@ def test_BaseRecordPackage_apply_config_validation(sample_TmcChain):
     ]
     assert len(brp.apply_config_validation()) == 0
 
+
 def test_BaseRecordPackage_standard_as_dict():
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv','example_pv')
@@ -410,6 +428,7 @@ def test_BaseRecordPackage_standard_as_dict():
             'ABC':'test 0'
         }
     }
+
 
 def test_BaseRecordPackage_render_standard():
     brp = BaseRecordPackage()
@@ -425,7 +444,8 @@ def test_BaseRecordPackage_render_standard():
     """
     target_response = textwrap.dedent(target_response).strip()
     assert target_response == brp.render_standard()
-    
+
+
 def test_BaseRecordPackage_ID_type():
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv','example_pv')
