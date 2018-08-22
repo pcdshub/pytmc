@@ -4,6 +4,7 @@ xml_collector.py
 This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation
 """
+import typing 
 import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
@@ -449,8 +450,6 @@ class BaseRecordPackage:
     variable. Overwrite/inherit features as necessary. 
 
     """
-    
-
     def __init__(self, chain=None, origin=None):
         """
         All subclasses should use super on their init method.
@@ -482,8 +481,6 @@ class BaseRecordPackage:
             "asyn_standard_record.jinja2"
         )
         
-        
-
     def apply_config_validation(self):
         """
         Apply the guessing module. Assert that the proper fields exist.
@@ -609,9 +606,63 @@ class BaseRecordPackage:
         """
         raise NotImplementedError
         
+    def guess_common(self):
+        """
+        Add fields that are common to all records (PINI, TSE)
+        """
+        self.cfg.add_config_field("PINI", '"1"')
+        self.cfg.add_config_field("TSE", "-2")
 
+    def guess_type(self):
+        """
+        Add field indicationg record type (e.g. ai, bo, waveform, etc.) 
+        """
+        raise NotImplementedError
 
-        
+    def guess_DTYP(self):
+        """
+        Add field for DTYP field
+        """
+        raise NotImplementedError
+
+    def guess_INOUT(self):
+        """
+        Construct, add, INP/OUT field
+        """
+        raise NotImplementedError
+
+    def guess_SCAN(self):
+        """
+        add field for SCAN field
+        """
+        raise NotImplementedError
+    
+    ### guess lines below this comment are not always used (context specific)
+
+    def guess_OZ_NAM(self):
+        """
+        Add fields for undescribed booleans
+        """
+        raise NotImplementedError
+
+    def guess_PREC(self):
+        """
+        Add precision field (ai/ao only?)
+        """
+        raise NotImplementedError
+
+    def guess_FTVL(self):
+        """
+        Add datatype specification field for waveforms
+        """
+        raise NotImplementedError
+
+    def guess_NELM(self):
+        """
+        Add data length secification for waveforms
+        """
+        raise NotImplementedError
+
 
 class PvPackage:
     '''

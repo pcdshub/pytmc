@@ -12,3 +12,20 @@ ElementCollector
 ++++++++++++++++
 .. autoclass:: pytmc.xml_collector.ElementCollector
    :members:
+
+TmcChain
+++++++++
+.. autoclass:: pytmc.xml_collector.TmcChain
+   :members:
+
+BaseRecordPackage
++++++++++++++++++
+.. autoclass:: pytmc.xml_collector.BaseRecordPackage
+   :members:
+
+TEST_METHOD
++++++++++++
+.. autofunction:: pytmc.xml_collector.TEST_METHOD
+
+
+

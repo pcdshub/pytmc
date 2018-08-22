@@ -395,7 +395,7 @@ def test_BaseRecordPackage_generate_naive_config(sample_TmcChain):
     ]
 
 
-def test_BaseRecordPackage_apply_config_validation(sample_TmcChain):
+def test_BaseRecordPackage_apply_config_valid(sample_TmcChain):
     test_chain = sample_TmcChain.build_singular_chains()[0]
     brp = BaseRecordPackage(test_chain)
     brp.generate_naive_config()
@@ -445,7 +445,7 @@ def test_BaseRecordPackage_render_standard():
     target_response = textwrap.dedent(target_response).strip()
     assert target_response == brp.render_standard()
 
-
+@pytest.mark.skip(reason="Feature pending")
 def test_BaseRecordPackage_ID_type():
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv','example_pv')
@@ -459,8 +459,14 @@ def test_BaseRecordPackage_ID_type():
     brp.cfg.add_config_field("PINI","1")
     assert brp.ID_type() == 'motor'
 
-
-    
+def test_BaseRecordPackage_guess_common():
+    brp = BaseRecordPackage()
+    brp.guess_common()
+    print(brp.cfg.config)
+    [pini] = brp.cfg.get_config_fields('PINI')
+    assert pini['tag']['f_set'] == '"1"'
+    [tse] = brp.cfg.get_config_fields('TSE')
+    assert tse['tag']['f_set'] == '-2'
 
 
 
