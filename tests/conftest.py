@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import os
 
 from pytmc import SingleRecordData, TmcFile, TmcExplorer
-
+from pytmc.xml_collector import BaseElement, Configuration, TmcChain
 logger = logging.getLogger(__name__)
 
 def load_generic_tmc():
@@ -79,6 +79,18 @@ def leaf_bool_pragma_string():
     return str
 
 @pytest.fixture(scope='function')
+def light_leaf_bool_pragma_string():
+    str = """
+                     pv: TEST:MAIN:NEW_VAR_OUT
+                     io: o
+                     pv: TEST:MAIN:NEW_VAR_IN
+                     io: i
+    """
+    return str
+
+
+
+@pytest.fixture(scope='function')
 def branch_bool_pragma_string():
     str = """
             pv: FIRST
@@ -100,4 +112,19 @@ def branch_skip_pragma_string():
             skip:
     """
     return str
-    
+
+@pytest.fixture(scope='function')
+def example_singular_tmc_chains(light_leaf_bool_pragma_string,
+            branch_bool_pragma_string, 
+            branch_connection_pragma_string):
+    stem = BaseElement(element=None)
+    stem.pragma = Configuration(branch_connection_pragma_string) 
+    leaf_a = BaseElement(element=None)
+    leaf_a.pragma = Configuration(branch_bool_pragma_string)
+    leaf_b = BaseElement(element=None)
+    leaf_b.pragma = Configuration(light_leaf_bool_pragma_string)
+
+    chain = TmcChain(
+        [stem, leaf_a, leaf_b]
+    )
+    return chain.build_singular_chains()

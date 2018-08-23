@@ -424,6 +424,19 @@ class TmcChain:
             new_config.concat(entry.pragma, cc_symbol = cc_symbol)
         
         return new_config
+   
+    @property 
+    def last(self):
+        """
+        Return the last element in the chain.
+        
+        Returns
+        -------
+        BaseElement, Symbol, or SubItem
+            The instance (of whetever class) that represents the target
+            variable.
+        """
+        return self.chain[-1]
 
     @property
     def name_list(self):
@@ -439,8 +452,8 @@ class TmcChain:
         result = []
         for entry in self.chain:
             result.append(entry.name)
-
         return result
+
 
 class BaseRecordPackage:
     """
@@ -617,7 +630,8 @@ class BaseRecordPackage:
         """
         Add field indicationg record type (e.g. ai, bo, waveform, etc.) 
         """
-        raise NotImplementedError
+        pass
+        #raise NotImplementedError
 
     def guess_DTYP(self):
         """

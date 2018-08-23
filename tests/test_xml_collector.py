@@ -1,7 +1,7 @@
 import pytest
 import logging
 import textwrap
-
+from copy import deepcopy
 import xml.etree.ElementTree as ET
 
 from pytmc import Symbol, DataType, SubItem
@@ -445,6 +445,7 @@ def test_BaseRecordPackage_render_standard():
     target_response = textwrap.dedent(target_response).strip()
     assert target_response == brp.render_standard()
 
+
 @pytest.mark.skip(reason="Feature pending")
 def test_BaseRecordPackage_ID_type():
     brp = BaseRecordPackage()
@@ -459,6 +460,7 @@ def test_BaseRecordPackage_ID_type():
     brp.cfg.add_config_field("PINI","1")
     assert brp.ID_type() == 'motor'
 
+
 def test_BaseRecordPackage_guess_common():
     brp = BaseRecordPackage()
     brp.guess_common()
@@ -469,6 +471,23 @@ def test_BaseRecordPackage_guess_common():
     assert tse['tag']['f_set'] == '-2'
 
 
+def test_BaseRecordPackage_guess_type( example_singular_tmc_chains):
+    BOOL_record = BaseRecordPackage(example_singular_tmc_chains[0])
+    # tc_type is assignable because it isn't implemented in BaseElement
+    # this field must be added because it is typically derived from the .tmc
+    BOOL_record.chain.last.tc_type = "BOOL"
+    BOOL_record.guess_type()
+    [BOOL_field] = BOOL_record.cfg.get_config_lines('ai')
+    assert BOOL_field['tag'] == 'bo' 
+
+    """
+    INT_record = deepcopy(BOOL_record)
+    INT_record.chain.last.tc_type = "INT"
+    LREAL_record = deepcopy(c)
+    LREAL_record.chain.last.tc_type = "LREAL"
+    STRING_record = deepcopy(c)
+    STRING_record.chain.last.tc_type = "STRING"
+    """
 
 # PvPackage tests
 

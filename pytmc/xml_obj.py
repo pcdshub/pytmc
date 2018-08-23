@@ -346,9 +346,7 @@ class Configuration:
 
         results_list = []
 
-        print(config)
         for line in config:
-            print(line)
             if line['title'] == title:
                 results_list.append(line)
 

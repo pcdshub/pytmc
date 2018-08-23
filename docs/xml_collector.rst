@@ -23,9 +23,5 @@ BaseRecordPackage
 .. autoclass:: pytmc.xml_collector.BaseRecordPackage
    :members:
 
-TEST_METHOD
-+++++++++++
-.. autofunction:: pytmc.xml_collector.TEST_METHOD
-
 
 
