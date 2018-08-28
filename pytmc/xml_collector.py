@@ -630,8 +630,38 @@ class BaseRecordPackage:
         """
         Add field indicationg record type (e.g. ai, bo, waveform, etc.) 
         """
-        pass
         #raise NotImplementedError
+        bi_bo_set = {
+            "BOOL"
+        }
+        if self.chain.last.tc_type in bi_bo_set:
+            [io] =  self.cfg.get_config_lines('io')
+            if 'i' in io['tag']:
+                self.cfg.add_config_line("type","bi")
+            if 'o' in io['tag']:
+                self.cfg.add_config_line("type","bo")
+        
+        ai_ao_set = {
+            "INT",
+            "LREAL",
+        }
+        if self.chain.last.tc_type in ai_ao_set:
+            [io] =  self.cfg.get_config_lines('io')
+            if 'i' in io['tag']:
+                self.cfg.add_config_line("type","ai")
+            if 'o' in io['tag']:
+                self.cfg.add_config_line("type","ao")
+
+        waveform_set = {
+            "STRING",
+        }
+        if self.chain.last.tc_type in waveform_set:
+            [io] =  self.cfg.get_config_lines('io')
+            if 'i' in io['tag']:
+                self.cfg.add_config_line("type","waveform")
+            if 'o' in io['tag']:
+                self.cfg.add_config_line("type","waveform")
+
 
     def guess_DTYP(self):
         """

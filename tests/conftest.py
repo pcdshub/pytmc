@@ -89,7 +89,6 @@ def light_leaf_bool_pragma_string():
     return str
 
 
-
 @pytest.fixture(scope='function')
 def branch_bool_pragma_string():
     str = """

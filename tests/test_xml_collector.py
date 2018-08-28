@@ -470,17 +470,31 @@ def test_BaseRecordPackage_guess_common():
     [tse] = brp.cfg.get_config_fields('TSE')
     assert tse['tag']['f_set'] == '-2'
 
-
-def test_BaseRecordPackage_guess_type( example_singular_tmc_chains):
-    BOOL_record = BaseRecordPackage(example_singular_tmc_chains[0])
+@pytest.mark.parametrize("tc_type, sing_index, final_type",[
+        ("BOOL", 0, 'bo'),
+        ("BOOL", 2, 'bi'),
+        ("INT", 0, 'ao'),
+        ("INT", 2, 'ai'),
+        ("LREAL", 0, 'ao'),
+        ("LREAL", 2, 'ai'),
+        ("STRING", 0, 'waveform'),
+        ("STRING", 2, 'waveform'),
+])
+def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
+            tc_type, sing_index, final_type):
+    # chain must be broken into singular
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    print(record.chain.last.pragma.config)
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
-    BOOL_record.chain.last.tc_type = "BOOL"
-    BOOL_record.guess_type()
-    [BOOL_field] = BOOL_record.cfg.get_config_lines('ai')
-    assert BOOL_field['tag'] == 'bo' 
+    record.chain.last.tc_type = tc_type
+    record.generate_naive_config()
+    record.guess_type()
+    [field] = record.cfg.get_config_lines('type')
+    assert field['tag'] == final_type 
+    
 
-    """
+    """ 
     INT_record = deepcopy(BOOL_record)
     INT_record.chain.last.tc_type = "INT"
     LREAL_record = deepcopy(c)
