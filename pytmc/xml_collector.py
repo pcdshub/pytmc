@@ -628,12 +628,12 @@ class BaseRecordPackage:
 
     def guess_type(self):
         """
-        Add field indicationg record type (e.g. ai, bo, waveform, etc.)
+        Add information indicationg record type (e.g. ai, bo, waveform, etc.)
 
         Returns
         -------
         bool
-            Return a boolean that is true if a change has been made.
+            Return a boolean that is true iff a change has been made.
         """
         #raise NotImplementedError
         bi_bo_set = {
@@ -677,7 +677,18 @@ class BaseRecordPackage:
 
     def guess_DTYP(self):
         """
-        Add field for DTYP field
+        Add field specifying DTYP.
+        
+        The following is taken from the EPICS wiki: "This field specifies the
+        device type for the record. Each record type has its own set of device
+        support routines which are specified in devSup.ASCII. If a record type
+        does not have any associated device support, DTYP and DSET are
+        meaningless."
+    
+        Returns
+        -------
+        bool 
+            Return a boolean that is True iff a change has been made.
         """
         print(self.chain.last.tc_type)
         asynint32_set = {
