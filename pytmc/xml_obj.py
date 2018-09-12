@@ -471,7 +471,6 @@ class Configuration:
                 results.append(line)
 
         return results
-    
 
 
 class BaseElement:

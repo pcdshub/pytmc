@@ -14,7 +14,7 @@ from copy import deepcopy, copy
 from .xml_obj import BaseElement, Configuration
 from .beckhoff import beckhoff_types
 from functools import reduce
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader
 
 class ElementCollector(dict):
     '''
@@ -76,6 +76,16 @@ class TmcFile:
     all_SubItems : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all SubItems in the document. Must be initialized with
         :func:`~isolate_SubItems`.
+    
+    all_TmcChains : list
+        Collection of all TmcChains in the document. Must be initialized with
+        :func:`~create_chains`. These chains are NOT SINGULAR.
+    
+    all_singular TmcChains : list
+        Collection of all singularized TmcChains in the document. Must be
+        initialized with :func:`~isolate_chains`.
+
+    
     '''
     def __init__(self, filename):
         self.filename = filename
@@ -88,6 +98,7 @@ class TmcFile:
         self.isolate_all()
         
         self.all_TmcChains = []
+        self.all_singular_TmcChains = []
         self.all_RecordPackages = []
 
     def isolate_Symbols(self):
@@ -258,6 +269,18 @@ class TmcFile:
         for row in full_list:
             self.all_TmcChains.append(TmcChain(row))
     
+    def isolate_chains(self):
+        """
+        Populate the self.all_Singular_TmcChains with singularized versions of
+        the the entries in self.all_TmcChains. Requires create_chains to have
+        been run first.
+        """
+        for non_singular in self.all_TmcChains:
+            new_singular_chains = non_singular.build_singular_chains()
+            for chain in new_singular_chains:
+                self.all_singular_TmcChains.append(chain)
+
+
     def create_packages(self):
         """
         Add all new TmcChains to this object instance's all_TmcChains variable
@@ -454,6 +477,8 @@ class TmcChain:
             result.append(entry.name)
         return result
 
+    def __str__(self):
+        return "TmcChain: " + str(self.name_list)
 
 class BaseRecordPackage:
     """
@@ -716,7 +741,7 @@ class BaseRecordPackage:
         return False
 
 
-    def guess_INOUT(self):
+    def guess_INP_OUT(self):
         """
         Construct, add, INP/OUT field
         """

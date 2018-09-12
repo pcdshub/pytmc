@@ -189,7 +189,6 @@ def test_TmcFile_recursive_list_SubItems(generic_tmc_path):
 def test_TmcFile_create_chains(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.create_chains()
-
     target = [tmc.all_Symbols['MAIN.ulimit']]
     accept = False
     for row in tmc.all_TmcChains:
@@ -210,6 +209,30 @@ def test_TmcFile_create_chains(generic_tmc_path):
             accept = True
             break
     assert accept
+
+def test_TmcFile_isolate_chains(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    
+    tmc.create_chains()
+    tmc.isolate_chains()
+    print(len(tmc.all_TmcChains))
+    print(len(tmc.all_singular_TmcChains))
+    
+    target = [
+        tmc.all_Symbols['MAIN.test_iterator'],
+        tmc.all_SubItems['iterator']['extra1'],
+        tmc.all_SubItems['DUT_STRUCT']['struct_var']
+    ]
+    accept = False
+    count = 0
+    for row in tmc.all_singular_TmcChains:
+        if row.chain[0].name == 'MAIN.container_struct':
+            if row.chain[1].name == 'dtype_samples_iter_array':
+                if row.chain[2].name == 'extra1':
+                     if row.chain[3].name == 'struct_var':
+                        count += 1
+
+    assert count == 4
 
 
 def test_TmcFile_create_packages(generic_tmc_path):
@@ -484,7 +507,7 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
             tc_type, sing_index, final_type):
     # chain must be broken into singular
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
-    print(record.chain.last.pragma.config)
+    logger.debug(str(record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
@@ -507,15 +530,28 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
             tc_type, sing_index, final_DTYP):
     # chain must be broken into singular
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
-    print(record.chain.last.pragma.config)
+    logger.debug((record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
-    print(record.guess_DTYP())
-    print(record.cfg.config)
+    logger.debug(record.guess_DTYP())
+    logger.debug((record.cfg.config))
     [field] = record.cfg.get_config_fields('DTYP')
     assert field['tag']['f_set'] == final_DTYP 
+
+def test_BaseRecordPackage_generate_guess_INP_OUT(example_singular_tmc_chains,
+            tc_type, sing_index, final_DTYP):
+    # chain must be broken into singular
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    # tc_type is assignable because it isn't implemented in BaseElement
+    # this field must be added because it is typically derived from the .tmc
+    record.chain.last.tc_type = tc_type
+    record.generate_naive_config()
+    record.guess_INP_OUT()
+    # [field] = record.cfg.get_config_fields('DTYP')
+    # assert field['tag']['f_set'] == final_DTYP 
+    
 
 # PvPackage tests
 
