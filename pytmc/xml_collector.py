@@ -628,7 +628,12 @@ class BaseRecordPackage:
 
     def guess_type(self):
         """
-        Add field indicationg record type (e.g. ai, bo, waveform, etc.) 
+        Add field indicationg record type (e.g. ai, bo, waveform, etc.)
+
+        Returns
+        -------
+        bool
+            Return a boolean that is true if a change has been made.
         """
         #raise NotImplementedError
         bi_bo_set = {
@@ -638,8 +643,10 @@ class BaseRecordPackage:
             [io] =  self.cfg.get_config_lines('io')
             if 'i' in io['tag']:
                 self.cfg.add_config_line("type","bi")
+                return True
             if 'o' in io['tag']:
                 self.cfg.add_config_line("type","bo")
+                return True
         
         ai_ao_set = {
             "INT",
@@ -649,8 +656,10 @@ class BaseRecordPackage:
             [io] =  self.cfg.get_config_lines('io')
             if 'i' in io['tag']:
                 self.cfg.add_config_line("type","ai")
+                return True
             if 'o' in io['tag']:
                 self.cfg.add_config_line("type","ao")
+                return True
 
         waveform_set = {
             "STRING",
@@ -659,15 +668,42 @@ class BaseRecordPackage:
             [io] =  self.cfg.get_config_lines('io')
             if 'i' in io['tag']:
                 self.cfg.add_config_line("type","waveform")
+                return True
             if 'o' in io['tag']:
                 self.cfg.add_config_line("type","waveform")
+                return True
 
+        return False
 
     def guess_DTYP(self):
         """
         Add field for DTYP field
         """
-        raise NotImplementedError
+        print(self.chain.last.tc_type)
+        asynint32_set = {
+            "BOOL",
+            "INT"
+        }
+        if self.chain.last.tc_type in asynint32_set:
+            self.cfg.add_config_field("DTYP", "asynInt32")
+            return True
+        
+        asynfloat64_set = {
+            "LREAL",
+        }
+        if self.chain.last.tc_type in asynfloat64_set:
+            self.cfg.add_config_field("DTYP", "asynFloat64")
+            return True
+
+        asynInt8ArrayOut_set = {
+            "STRING",
+        }
+        if self.chain.last.tc_type in asynInt8ArrayOut_set:
+            self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
+            return True
+
+        return False
+
 
     def guess_INOUT(self):
         """

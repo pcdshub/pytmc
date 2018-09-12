@@ -493,15 +493,29 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     [field] = record.cfg.get_config_lines('type')
     assert field['tag'] == final_type 
     
-
-    """ 
-    INT_record = deepcopy(BOOL_record)
-    INT_record.chain.last.tc_type = "INT"
-    LREAL_record = deepcopy(c)
-    LREAL_record.chain.last.tc_type = "LREAL"
-    STRING_record = deepcopy(c)
-    STRING_record.chain.last.tc_type = "STRING"
-    """
+@pytest.mark.parametrize("tc_type, sing_index, final_DTYP",[
+        ("BOOL", 0, 'asynInt32'),
+        ("BOOL", 2, 'asynInt32'),
+        ("INT", 0, 'asynInt32'),
+        ("INT", 2, 'asynInt32'),
+        ("LREAL", 0, 'asynFloat64'),
+        ("LREAL", 2, 'asynFloat64'),
+        ("STRING", 0, 'asynInt8ArrayOut'),
+        ("STRING", 2, 'asynInt8ArrayOut'),
+])
+def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
+            tc_type, sing_index, final_DTYP):
+    # chain must be broken into singular
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    print(record.chain.last.pragma.config)
+    # tc_type is assignable because it isn't implemented in BaseElement
+    # this field must be added because it is typically derived from the .tmc
+    record.chain.last.tc_type = tc_type
+    record.generate_naive_config()
+    print(record.guess_DTYP())
+    print(record.cfg.config)
+    [field] = record.cfg.get_config_fields('DTYP')
+    assert field['tag']['f_set'] == final_DTYP 
 
 # PvPackage tests
 
