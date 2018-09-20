@@ -210,6 +210,7 @@ def test_TmcFile_create_chains(generic_tmc_path):
             break
     assert accept
 
+
 def test_TmcFile_isolate_chains(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     
@@ -524,7 +525,7 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
         ("LREAL", 0, 'asynFloat64'),
         ("LREAL", 2, 'asynFloat64'),
         ("STRING", 0, 'asynInt8ArrayOut'),
-        ("STRING", 2, 'asynInt8ArrayOut'),
+        ("STRING", 2, 'asynInt8ArrayIn'),
 ])
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
             tc_type, sing_index, final_DTYP):
@@ -550,7 +551,32 @@ def test_BaseRecordPackage_generate_guess_INP_OUT(example_singular_tmc_chains,
     record.generate_naive_config()
     record.guess_INP_OUT()
     # [field] = record.cfg.get_config_fields('DTYP')
-    # assert field['tag']['f_set'] == final_DTYP 
+    # assert field['tag']['f_set'] == final_DTYP
+
+@pytest.mark.parametrize("tc_type, sing_index, final_SCAN",[
+        ("BOOL", 0, 'Passive'),
+        ("BOOL", 2, 'I/O Intr'),
+        ("INT", 0, 'Passive'),
+        ("INT", 2, '.5 second'),
+        ("LREAL", 0, 'Passive'),
+        ("LREAL", 2, '.5 second'),
+        ("STRING", 0, 'Passive'),
+        ("STRING", 2, '.5 second'),
+])
+def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
+            tc_type, sing_index, final_SCAN):
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    logger.debug((record.chain.last.pragma.config))
+    # tc_type is assignable because it isn't implemented in BaseElement
+    # this field must be added because it is typically derived from the .tmc
+    record.chain.last.tc_type = tc_type
+    record.generate_naive_config()
+    
+    logger.debug(str(record.guess_SCAN()))
+    logger.debug(str(record.cfg.config))
+    [field] = record.cfg.get_config_fields('SCAN')
+    assert field['tag']['f_set'] == final_SCAN 
+    
     
 
 # PvPackage tests

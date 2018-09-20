@@ -280,7 +280,6 @@ class TmcFile:
             for chain in new_singular_chains:
                 self.all_singular_TmcChains.append(chain)
 
-
     def create_packages(self):
         """
         Add all new TmcChains to this object instance's all_TmcChains variable
@@ -479,6 +478,7 @@ class TmcChain:
 
     def __str__(self):
         return "TmcChain: " + str(self.name_list)
+
 
 class BaseRecordPackage:
     """
@@ -735,11 +735,14 @@ class BaseRecordPackage:
             "STRING",
         }
         if self.chain.last.tc_type in asynInt8ArrayOut_set:
-            self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
-            return True
-
-        return False
-
+            [io] =  self.cfg.get_config_lines('io')
+            if 'i' in io['tag']:
+                self.cfg.add_config_field("DTYP", "asynInt8ArrayIn")
+                return True
+            if 'o' in io['tag']:
+                self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
+                return True
+        return False 
 
     def guess_INP_OUT(self):
         """
@@ -751,7 +754,23 @@ class BaseRecordPackage:
         """
         add field for SCAN field
         """
-        raise NotImplementedError
+        print(self.cfg.config)
+        [io] =  self.cfg.get_config_lines('io')
+        if 'i' in io['tag']:
+            fast_i_set = {'BOOL'}
+            if self.chain.last.tc_type in fast_i_set:
+                self.cfg.add_config_field("SCAN", "I/O Intr")
+                return True
+            else: 
+                self.cfg.add_config_field("SCAN", ".5 second")
+                return True
+        if 'o' in io['tag']:
+            self.cfg.add_config_field("SCAN", "Passive")
+            return True
+
+
+        return False
+        #raise NotImplementedError
     
     ### guess lines below this comment are not always used (context specific)
 
