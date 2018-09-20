@@ -568,14 +568,18 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     assert field['tag']['f_set'] == final_DTYP 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_INP_OUT",[
-        ("BOOL", 0, 'Passive'),
-        ("BOOL", 2, 'I/O Intr'),
-        ("INT", 0, 'Passive'),
-        ("INT", 2, '.5 second'),
-        ("LREAL", 0, 'Passive'),
-        ("LREAL", 2, '.5 second'),
-        ("STRING", 0, 'Passive'),
-        ("STRING", 2, '.5 second'),
+        ("BOOL", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("BOOL", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("BOOL", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("INT", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("INT", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("INT", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("LREAL", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("LREAL", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("LREAL", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("STRING", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("STRING", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("STRING", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
 ])
 def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
             tc_type, sing_index, final_INP_OUT):
@@ -584,16 +588,25 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
+    for element, idx in zip(record.chain.chain,range(3)):
+        element.name = chr(97+idx)
     record.generate_naive_config()
-    logging.debug(str(record.guess_INP_OUT()))
+    record.guess_io()
+    assert True == record.guess_INP_OUT()
+    print(record.cfg.config)
+    # Set (output)
     if sing_index == 0:
         [field] = record.cfg.get_config_fields('OUT')
         assert record.cfg.get_config_fields('INP') == []
+    # Get (input)
     if sing_index == 2:
         [field] = record.cfg.get_config_fields('INP')
         assert record.cfg.get_config_fields('OUT') == []
-    assert field['tag']['f_set'] == final_DTYP
-    # assert False
+    # Set_RB (IO)
+    if sing_index == 6:
+        [field] = record.cfg.get_config_fields('OUT')
+        assert record.cfg.get_config_fields('INP') == []
+    assert field['tag']['f_set'] == final_INP_OUT
 
 @pytest.mark.parametrize("tc_type, sing_index, final_SCAN",[
         ("BOOL", 0, 'Passive'),

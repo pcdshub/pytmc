@@ -518,6 +518,8 @@ class BaseRecordPackage:
         self.standard_template = self.jinja_env.get_template(
             "asyn_standard_record.jinja2"
         )
+
+        self.ads_port = 851
         
     def apply_config_validation(self):
         """
@@ -770,8 +772,34 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
-        #[io] =  self.cfg.get_config_lines('io')
-        raise NotImplementedError
+        [io] =  self.cfg.get_config_lines('io')
+        io = io['tag']
+        name_list = self.chain.name_list
+        name = '.'.join(name_list)
+        assign_symbol = ""
+        field_type = ""
+        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
+        if 'i' in io and 'o' in io:
+            assign_symbol = "?"
+            field_type = 'OUT'
+        elif 'i' in io:
+            assign_symbol = "?"
+            field_type = 'INP'
+        elif 'o' in io:
+            assign_symbol = "="
+            field_type = 'OUT'
+
+        str_template = "@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"
+
+        final_str = str_template.format(
+            port = self.ads_port,
+            name = name,
+            symbol = assign_symbol,
+        )
+
+        self.cfg.add_config_field(field_type, final_str)
+        return True
+
 
     def guess_SCAN(self):
         """
