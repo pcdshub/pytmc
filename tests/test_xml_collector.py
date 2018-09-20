@@ -498,12 +498,16 @@ def test_BaseRecordPackage_guess_common():
 @pytest.mark.parametrize("tc_type, sing_index, final_type",[
         ("BOOL", 0, 'bo'),
         ("BOOL", 2, 'bi'),
+        ("BOOL", 4, 'bo'),
         ("INT", 0, 'ao'),
         ("INT", 2, 'ai'),
+        ("INT", 4, 'ao'),
         ("LREAL", 0, 'ao'),
         ("LREAL", 2, 'ai'),
+        ("LREAL", 4, 'ao'),
         ("STRING", 0, 'waveform'),
         ("STRING", 2, 'waveform'),
+        ("STRING", 4, 'waveform'),
 ])
 def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
             tc_type, sing_index, final_type):

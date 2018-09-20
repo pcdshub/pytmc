@@ -679,10 +679,13 @@ class BaseRecordPackage:
         }
         if self.chain.last.tc_type in bi_bo_set:
             [io] =  self.cfg.get_config_lines('io')
-            if 'i' in io['tag']:
+            if 'i' in io['tag'] and 'o' in io['tag']:
+                self.cfg.add_config_line("type", "bo")
+                return True
+            elif 'i' in io['tag']:
                 self.cfg.add_config_line("type","bi")
                 return True
-            if 'o' in io['tag']:
+            elif 'o' in io['tag']:
                 self.cfg.add_config_line("type","bo")
                 return True
         
@@ -692,10 +695,13 @@ class BaseRecordPackage:
         }
         if self.chain.last.tc_type in ai_ao_set:
             [io] =  self.cfg.get_config_lines('io')
-            if 'i' in io['tag']:
+            if 'i' in io['tag'] and 'o' in io['tag']:
+                self.cfg.add_config_line("type", "ao")
+                return True
+            elif 'i' in io['tag']:
                 self.cfg.add_config_line("type","ai")
                 return True
-            if 'o' in io['tag']:
+            elif 'o' in io['tag']:
                 self.cfg.add_config_line("type","ao")
                 return True
 
@@ -704,10 +710,13 @@ class BaseRecordPackage:
         }
         if self.chain.last.tc_type in waveform_set:
             [io] =  self.cfg.get_config_lines('io')
-            if 'i' in io['tag']:
+            if 'i' in io['tag'] and 'o' in io['tag']:
+                self.cfg.add_config_line("type", "waveform")
+                return True
+            elif 'i' in io['tag']:
                 self.cfg.add_config_line("type","waveform")
                 return True
-            if 'o' in io['tag']:
+            elif 'o' in io['tag']:
                 self.cfg.add_config_line("type","waveform")
                 return True
 
