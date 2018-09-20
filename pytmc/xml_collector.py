@@ -771,10 +771,13 @@ class BaseRecordPackage:
         }
         if self.chain.last.tc_type in asynInt8ArrayOut_set:
             [io] =  self.cfg.get_config_lines('io')
-            if 'i' in io['tag']:
+            if 'i' in io['tag'] and 'o' in io['tag']:
+                self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
+                return True
+            elif 'i' in io['tag']:
                 self.cfg.add_config_field("DTYP", "asynInt8ArrayIn")
                 return True
-            if 'o' in io['tag']:
+            elif 'o' in io['tag']:
                 self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
                 return True
 

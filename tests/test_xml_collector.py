@@ -555,6 +555,7 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
         ("LREAL", 2, 'asynFloat64'),
         ("STRING", 0, 'asynInt8ArrayOut'),
         ("STRING", 2, 'asynInt8ArrayIn'),
+        ("STRING", 4, 'asynInt8ArrayOut'),
 ])
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
             tc_type, sing_index, final_DTYP):
