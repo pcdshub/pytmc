@@ -650,8 +650,14 @@ class BaseRecordPackage:
         """
         Add fields that are common to all records (PINI, TSE)
         """
-        self.cfg.add_config_field("PINI", '"1"')
-        self.cfg.add_config_field("TSE", "-2")
+        try:
+            [pini] = self.cfg.get_config_fields('PINI')
+            [tse] = self.cfg.get_config_fields('TSE')
+            return False
+        except ValueError:
+            self.cfg.add_config_field("PINI", '"1"')
+            self.cfg.add_config_field("TSE", "-2")
+            return True
 
     def guess_type(self):
         """
@@ -662,7 +668,12 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
-        #raise NotImplementedError
+        try:
+            [pini] = self.cfg.get_config_lines('type')
+            return False
+        except ValueError:
+            pass
+
         bi_bo_set = {
             "BOOL"
         }
@@ -734,7 +745,12 @@ class BaseRecordPackage:
         bool 
             Return a boolean that is True iff a change has been made.
         """
-        print(self.chain.last.tc_type)
+        try:
+            [io] =  self.cfg.get_config_fields('DTYP')
+            return False
+        except ValueError:
+            pass
+        
         asynint32_set = {
             "BOOL",
             "INT"
@@ -761,6 +777,7 @@ class BaseRecordPackage:
             if 'o' in io['tag']:
                 self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
                 return True
+
         return False 
 
     def guess_INP_OUT(self):
@@ -772,6 +789,7 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
+
         [io] =  self.cfg.get_config_lines('io')
         io = io['tag']
         name_list = self.chain.name_list
@@ -796,10 +814,15 @@ class BaseRecordPackage:
             name = name,
             symbol = assign_symbol,
         )
+        
+        try:
+            [res] =  self.cfg.get_config_fields(field_type)
+            return False
+        except ValueError:
+            pass
 
         self.cfg.add_config_field(field_type, final_str)
         return True
-
 
     def guess_SCAN(self):
         """
@@ -810,7 +833,12 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
-        print(self.cfg.config)
+
+        try:
+            [res] =  self.cfg.get_config_fields("SCAN")
+            return False
+        except ValueError:
+            pass
         [io] =  self.cfg.get_config_lines('io')
         if 'i' in io['tag']:
             fast_i_set = {'BOOL'}

@@ -487,12 +487,13 @@ def test_BaseRecordPackage_ID_type():
 
 def test_BaseRecordPackage_guess_common():
     brp = BaseRecordPackage()
-    brp.guess_common()
+    assert True == brp.guess_common()
     print(brp.cfg.config)
     [pini] = brp.cfg.get_config_fields('PINI')
     assert pini['tag']['f_set'] == '"1"'
     [tse] = brp.cfg.get_config_fields('TSE')
     assert tse['tag']['f_set'] == '-2'
+
 
 @pytest.mark.parametrize("tc_type, sing_index, final_type",[
         ("BOOL", 0, 'bo'),
@@ -519,9 +520,10 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
-    record.guess_type()
+    assert True == record.guess_type()
     [field] = record.cfg.get_config_lines('type')
     assert field['tag'] == final_type 
+
 
 @pytest.mark.parametrize("tc_type, sing_index, final_io",[
         ("BOOL", 6, 'io'),
@@ -538,11 +540,12 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
-    logger.debug(str(record.guess_io()))
+    assert True == record.guess_io()
     print(record.cfg.config)
     [field] = record.cfg.get_config_lines('io')
     assert field['tag'] == final_io 
-    
+
+
 @pytest.mark.parametrize("tc_type, sing_index, final_DTYP",[
         ("BOOL", 0, 'asynInt32'),
         ("BOOL", 2, 'asynInt32'),
@@ -562,10 +565,11 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
-    logger.debug(record.guess_DTYP())
+    assert True == record.guess_DTYP()
     logger.debug((record.cfg.config))
     [field] = record.cfg.get_config_fields('DTYP')
     assert field['tag']['f_set'] == final_DTYP 
+
 
 @pytest.mark.parametrize("tc_type, sing_index, final_INP_OUT",[
         ("BOOL", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
@@ -608,6 +612,7 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
         assert record.cfg.get_config_fields('INP') == []
     assert field['tag']['f_set'] == final_INP_OUT
 
+
 @pytest.mark.parametrize("tc_type, sing_index, final_SCAN",[
         ("BOOL", 0, 'Passive'),
         ("BOOL", 2, 'I/O Intr'),
@@ -627,11 +632,12 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
     
-    logger.debug(str(record.guess_SCAN()))
+    assert True == record.guess_SCAN()
     logger.debug(str(record.cfg.config))
     [field] = record.cfg.get_config_fields('SCAN')
     assert field['tag']['f_set'] == final_SCAN 
-    
+
+
     
 
 # PvPackage tests
