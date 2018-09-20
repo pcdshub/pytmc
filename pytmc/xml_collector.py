@@ -653,7 +653,7 @@ class BaseRecordPackage:
 
     def guess_type(self):
         """
-        Add information indicationg record type (e.g. ai, bo, waveform, etc.)
+        Add information indicating record type (e.g. ai, bo, waveform, etc.)
 
         Returns
         -------
@@ -699,6 +699,23 @@ class BaseRecordPackage:
                 return True
 
         return False
+
+    def guess_io(self):
+        """
+        Add information indicating io direction if it is not provided.
+        
+        Returns
+        -------
+        bool
+            Return a boolean that is true iff a change has been made.
+    
+        """
+        try:
+            [io] =  self.cfg.get_config_lines('io')
+            return False
+        except ValueError:
+            self.cfg.add_config_line("io","io")
+            return True
 
     def guess_DTYP(self):
         """
@@ -747,12 +764,23 @@ class BaseRecordPackage:
     def guess_INP_OUT(self):
         """
         Construct, add, INP/OUT field
+        
+        Returns
+        -------
+        bool
+            Return a boolean that is true iff a change has been made.
         """
+        #[io] =  self.cfg.get_config_lines('io')
         raise NotImplementedError
 
     def guess_SCAN(self):
         """
         add field for SCAN field
+        
+        Returns
+        -------
+        bool
+            Return a boolean that is true iff a change has been made.
         """
         print(self.cfg.config)
         [io] =  self.cfg.get_config_lines('io')
@@ -770,7 +798,6 @@ class BaseRecordPackage:
 
 
         return False
-        #raise NotImplementedError
     
     ### guess lines below this comment are not always used (context specific)
 

@@ -507,6 +507,12 @@ def test_BaseRecordPackage_guess_common():
 def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
             tc_type, sing_index, final_type):
     # chain must be broken into singular
+    # for x in example_singular_tmc_chains:
+    #     z = BaseRecordPackage(x)
+    #     print(z.cfg.config)
+    #     z.generate_naive_config()
+    #     print(z.cfg.config)
+    # assert False
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
     logger.debug(str(record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
@@ -516,6 +522,26 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     record.guess_type()
     [field] = record.cfg.get_config_lines('type')
     assert field['tag'] == final_type 
+
+@pytest.mark.parametrize("tc_type, sing_index, final_io",[
+        ("BOOL", 6, 'io'),
+        ("INT", 6, 'io'),
+        ("LREAL", 6, 'io'),
+        ("STRING", 6, 'io'),
+])
+def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
+            tc_type, sing_index, final_io):
+    # chain must be broken into singular
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    logger.debug(str(record.chain.last.pragma.config))
+    # tc_type is assignable because it isn't implemented in BaseElement
+    # this field must be added because it is typically derived from the .tmc
+    record.chain.last.tc_type = tc_type
+    record.generate_naive_config()
+    logger.debug(str(record.guess_io()))
+    print(record.cfg.config)
+    [field] = record.cfg.get_config_lines('io')
+    assert field['tag'] == final_io 
     
 @pytest.mark.parametrize("tc_type, sing_index, final_DTYP",[
         ("BOOL", 0, 'asynInt32'),
@@ -541,17 +567,33 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     [field] = record.cfg.get_config_fields('DTYP')
     assert field['tag']['f_set'] == final_DTYP 
 
-def test_BaseRecordPackage_generate_guess_INP_OUT(example_singular_tmc_chains,
-            tc_type, sing_index, final_DTYP):
+@pytest.mark.parametrize("tc_type, sing_index, final_INP_OUT",[
+        ("BOOL", 0, 'Passive'),
+        ("BOOL", 2, 'I/O Intr'),
+        ("INT", 0, 'Passive'),
+        ("INT", 2, '.5 second'),
+        ("LREAL", 0, 'Passive'),
+        ("LREAL", 2, '.5 second'),
+        ("STRING", 0, 'Passive'),
+        ("STRING", 2, '.5 second'),
+])
+def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
+            tc_type, sing_index, final_INP_OUT):
     # chain must be broken into singular
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
-    record.guess_INP_OUT()
-    # [field] = record.cfg.get_config_fields('DTYP')
-    # assert field['tag']['f_set'] == final_DTYP
+    logging.debug(str(record.guess_INP_OUT()))
+    if sing_index == 0:
+        [field] = record.cfg.get_config_fields('OUT')
+        assert record.cfg.get_config_fields('INP') == []
+    if sing_index == 2:
+        [field] = record.cfg.get_config_fields('INP')
+        assert record.cfg.get_config_fields('OUT') == []
+    assert field['tag']['f_set'] == final_DTYP
+    # assert False
 
 @pytest.mark.parametrize("tc_type, sing_index, final_SCAN",[
         ("BOOL", 0, 'Passive'),

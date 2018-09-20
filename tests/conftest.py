@@ -11,7 +11,6 @@ def load_generic_tmc():
     f = open("generic.tmc","r")
     return f
 
-
 @pytest.fixture(scope='function')
 def generic_tmc_root():
     directory = os.path.dirname(os.path.realpath(__file__))
@@ -20,13 +19,11 @@ def generic_tmc_root():
     root = tree.getroot()
     return root
 
-
 @pytest.fixture(scope='function')
 def generic_tmc_path():
     directory = os.path.dirname(os.path.realpath(__file__))
     test_path = os.path.join(directory, "generic_w_pragmas180426.tmc")
     return test_path
-
 
 @pytest.fixture(scope='function')
 def safe_record_factory():
@@ -42,13 +39,11 @@ def safe_record_factory():
     )
     return rec 
 
-
 @pytest.fixture(scope='function')
 def generic_file():
     directory = os.path.dirname(os.path.realpath(__file__))
     test_path = os.path.join(directory, "generic.tmc")
     return TmcFile(test_path)
-
 
 @pytest.fixture(scope='function')
 def generic_explorer():
@@ -85,9 +80,11 @@ def light_leaf_bool_pragma_string():
                      io: o
                      pv: TEST:MAIN:NEW_VAR_IN
                      io: i
+                     pv: TEST:MAIN:NEW_VAR_IO
+                     io: io
+                     pv: TEST:MAIN:NEW_VAR_SIMPLE
     """
     return str
-
 
 @pytest.fixture(scope='function')
 def branch_bool_pragma_string():
