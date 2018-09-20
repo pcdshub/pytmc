@@ -840,7 +840,11 @@ class BaseRecordPackage:
         except ValueError:
             pass
         [io] =  self.cfg.get_config_lines('io')
-        if 'i' in io['tag']:
+        if 'i' in io['tag'] and 'o' in io['tag']:
+            self.cfg.add_config_field("SCAN", "Passive")
+            return True
+            
+        elif 'i' in io['tag']:
             fast_i_set = {'BOOL'}
             if self.chain.last.tc_type in fast_i_set:
                 self.cfg.add_config_field("SCAN", "I/O Intr")
@@ -848,7 +852,7 @@ class BaseRecordPackage:
             else: 
                 self.cfg.add_config_field("SCAN", ".5 second")
                 return True
-        if 'o' in io['tag']:
+        elif 'o' in io['tag']:
             self.cfg.add_config_field("SCAN", "Passive")
             return True
 

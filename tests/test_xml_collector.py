@@ -616,12 +616,16 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
 @pytest.mark.parametrize("tc_type, sing_index, final_SCAN",[
         ("BOOL", 0, 'Passive'),
         ("BOOL", 2, 'I/O Intr'),
+        ("BOOL", 6, 'Passive'),
         ("INT", 0, 'Passive'),
         ("INT", 2, '.5 second'),
+        ("INT", 6, 'Passive'),
         ("LREAL", 0, 'Passive'),
         ("LREAL", 2, '.5 second'),
+        ("LREAL", 6, 'Passive'),
         ("STRING", 0, 'Passive'),
         ("STRING", 2, '.5 second'),
+        ("STRING", 6, 'Passive'),
 ])
 def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
             tc_type, sing_index, final_SCAN):
@@ -631,12 +635,30 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
-    
+    record.guess_io()
     assert True == record.guess_SCAN()
     logger.debug(str(record.cfg.config))
     [field] = record.cfg.get_config_fields('SCAN')
     assert field['tag']['f_set'] == final_SCAN 
 
+@pytest.mark.skip("test not complete")
+@pytest.mark.parametrize("tc_type, sing_index, final_SCAN",[
+        ("BOOL", 0, 'Passive'),
+        ("BOOL", 2, 'I/O Intr'),
+        ("BOOL", 6, 'Passive'),
+        ("INT", 0, 'Passive'),
+        ("INT", 2, '.5 second'),
+        ("INT", 6, 'Passive'),
+        ("LREAL", 0, 'Passive'),
+        ("LREAL", 2, '.5 second'),
+        ("LREAL", 6, 'Passive'),
+        ("STRING", 0, 'Passive'),
+        ("STRING", 2, '.5 second'),
+        ("STRING", 6, 'Passive'),
+])
+def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
+            tc_type, sing_index, final_SCAN):
+    assert False
 
     
 
