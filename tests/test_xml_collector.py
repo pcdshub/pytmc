@@ -646,26 +646,25 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
     [field] = record.cfg.get_config_fields('SCAN')
     assert field['tag']['f_set'] == final_SCAN 
 
-@pytest.mark.skip("test not complete")
-@pytest.mark.parametrize("tc_type, sing_index, final_SCAN",[
-        ("BOOL", 0, 'Passive'),
-        ("BOOL", 2, 'I/O Intr'),
-        ("BOOL", 6, 'Passive'),
-        ("INT", 0, 'Passive'),
-        ("INT", 2, '.5 second'),
-        ("INT", 6, 'Passive'),
-        ("LREAL", 0, 'Passive'),
-        ("LREAL", 2, '.5 second'),
-        ("LREAL", 6, 'Passive'),
-        ("STRING", 0, 'Passive'),
-        ("STRING", 2, '.5 second'),
-        ("STRING", 6, 'Passive'),
+@pytest.mark.parametrize("tc_type, sing_index, final_ZNAM, final_ONAM, ret",[
+        ("BOOL", 0, 'Zero', "One", True),
+        ("STRING", 0, None, None, False),
 ])
 def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
-            tc_type, sing_index, final_SCAN):
-    assert False
-
-    
+            tc_type, sing_index, final_ZNAM, final_ONAM, ret):
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record.chain.last.tc_type = tc_type
+    assert ret == record.guess_OZ_NAM()
+    o = record.cfg.get_config_fields('ONAM')
+    z = record.cfg.get_config_fields('ZNAM')
+    if final_ONAM is not None:
+        assert o[0]['tag']['f_set'] == final_ONAM
+    else:
+        assert len(o) == 0
+    if final_ZNAM is not None:
+        assert z[0]['tag']['f_set'] == final_ZNAM 
+    else :
+        assert len(z) == 0
 
 # PvPackage tests
 

@@ -877,7 +877,20 @@ class BaseRecordPackage:
         """
         Add fields for undescribed booleans
         """
-        raise NotImplementedError
+        try:
+            [res] =  self.cfg.get_config_fields("ONAM")
+            [res] =  self.cfg.get_config_fields("ZNAM")
+            return False
+        except ValueError:
+            pass
+
+        if 'BOOL' == self.chain.last.tc_type:
+            self.cfg.add_config_field("ONAM", "One")
+            self.cfg.add_config_field("ZNAM", "Zero")
+            return True
+
+        return False
+        
 
     def guess_PREC(self):
         """
