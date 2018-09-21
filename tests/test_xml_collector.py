@@ -666,6 +666,28 @@ def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
     else :
         assert len(z) == 0
 
+@pytest.mark.parametrize("tc_type, sing_index, final_PREC, ret",[
+        ("LREAL", 0, '3', True),
+        ("STRING", 0, None, False),
+])
+def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
+            tc_type, sing_index, final_PREC, ret):
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record.chain.last.tc_type = tc_type
+    record.generate_naive_config()
+    print(record.cfg.config)
+    record.guess_type()
+    if final_PREC is None:
+        assert False == record.guess_PREC()
+        with pytest.raises(ValueError):
+            [out] = record.cfg.get_config_fields("PREC")
+    else:
+        assert True == record.guess_PREC()
+        [out] = record.cfg.get_config_fields("PREC")
+        assert out['tag']['f_set'] == "3" 
+        
+        
+
 # PvPackage tests
 
 @pytest.mark.skip(reason="PvPackage pending deprecation")

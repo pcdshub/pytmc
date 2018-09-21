@@ -296,6 +296,8 @@ class TmcFile:
 class ChainNotSingularError(Exception):
     pass
 
+class MissingConfigError(Exception):
+    pass
 
 class TmcChain:
     """
@@ -875,7 +877,12 @@ class BaseRecordPackage:
 
     def guess_OZ_NAM(self):
         """
-        Add fields for undescribed booleans
+        Add ONAM and ZNAM fields for booleans
+        
+        Returns
+        -------
+        bool
+            Return a boolean that is true iff a change has been made.
         """
         try:
             [res] =  self.cfg.get_config_fields("ONAM")
@@ -894,9 +901,31 @@ class BaseRecordPackage:
 
     def guess_PREC(self):
         """
-        Add precision field (ai/ao only?)
+        Add precision field for the ai/ao type
+        
+        Returns
+        -------
+        bool
+            Return a boolean that is true iff a change has been made.
         """
-        raise NotImplementedError
+        try:
+            [out] =  self.cfg.get_config_fields("PREC")
+            return False
+        except ValueError:
+            pass
+        
+        try:
+            [epics_type] = self.cfg.get_config_lines("type")
+        except ValueError:
+            #raise MissingConfigError
+            return False
+
+        float_set ={'ai','ao'}
+        if epics_type['tag'] in float_set:
+            self.cfg.add_config_field("PREC", "3")
+            return True
+
+        return False
 
     def guess_FTVL(self):
         """
