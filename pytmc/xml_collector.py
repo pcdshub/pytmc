@@ -851,13 +851,19 @@ class BaseRecordPackage:
         "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
         if 'i' in io and 'o' in io:
             assign_symbol = "?"
-            field_type = 'OUT'
+            if self.chain.last.is_array or self.chain.last.is_str:
+                field_type = 'INP'
+            else:    
+                field_type = 'OUT'
         elif 'i' in io:
             assign_symbol = "?"
             field_type = 'INP'
         elif 'o' in io:
             assign_symbol = "="
-            field_type = 'OUT'
+            if self.chain.last.is_array or self.chain.last.is_str:
+                field_type = 'INP'
+            else:    
+                field_type = 'OUT'
 
         str_template = "@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"
 
@@ -1006,6 +1012,20 @@ class BaseRecordPackage:
             return True
 
         return False
+
+    def add_quotes(self):
+        """
+        Add additional quotations to the necessary fields. This is required for
+        some DB records fields
+        """
+        raise NotImplementedError
+
+    def render_to_string(self):
+        """
+        Create the individual record to be inserted in the DB file. To be
+        returned as a string. 
+        """
+        raise NotImplementedError
 
 
 

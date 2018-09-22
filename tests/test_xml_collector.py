@@ -576,33 +576,47 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     assert field['tag']['f_set'] == final_DTYP 
 
 
-@pytest.mark.parametrize("tc_type, sing_index, final_INP_OUT",[
-        ("BOOL", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("BOOL", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("BOOL", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("INT", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("INT", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("INT", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("LREAL", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("LREAL", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("LREAL", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("STRING", 0, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("STRING", 2, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("STRING", 6, '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+@pytest.mark.parametrize("tc_type, sing_index, field_type, final_INP_OUT",[
+        ("BOOL", 0, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("BOOL", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("BOOL", 6, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("INT", 0, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("INT", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("INT", 6, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("LREAL", 0, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("LREAL", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("LREAL", 6, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("STRING", 0, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
+        ("STRING", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("STRING", 6, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
 ])
 def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
-            tc_type, sing_index, final_INP_OUT):
+            tc_type, sing_index, field_type, final_INP_OUT):
     # chain must be broken into singular
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
+    if tc_type == "STRING":
+        record.chain.last.is_str = True
     for element, idx in zip(record.chain.chain,range(3)):
         element.name = chr(97+idx)
     record.generate_naive_config()
     record.guess_io()
     assert True == record.guess_INP_OUT()
     print(record.cfg.config)
+    
+    
+    
+    [field] = record.cfg.get_config_fields(field_type)
+    if field_type == "OUT":
+        assert record.cfg.get_config_fields('INP') == []
+    if field_type == "INP":
+        assert record.cfg.get_config_fields('OUT') == []
+    
+
+
+    '''
     # Set (output)
     if sing_index == 0:
         [field] = record.cfg.get_config_fields('OUT')
@@ -615,6 +629,10 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     if sing_index == 6:
         [field] = record.cfg.get_config_fields('OUT')
         assert record.cfg.get_config_fields('INP') == []
+    '''
+
+
+
     assert field['tag']['f_set'] == final_INP_OUT
 
 
