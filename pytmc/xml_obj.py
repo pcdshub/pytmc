@@ -491,6 +491,11 @@ class BaseElement:
     def __init__(self, element, base=None, suffixes=None):
         if type(element) != ET.Element and element is not None:
             raise TypeError("ElementTree.Element required")
+        self.is_array_ = None
+        self._string_info_ = None
+        self.is_str_ = None
+        self.iterable_length_ = None
+        
         self.element = element
         #self.registered_pragmas = []
         #self.freeze_config = False
@@ -523,11 +528,7 @@ class BaseElement:
             self.pragma = None
         else:
             self.pragma = Configuration(self.raw_config)
-
-        self.is_array_ = None
-        self._string_info_ = None
-        self.is_str_ = None
-        self.iterable_length_ = None
+        
 
     def _get_raw_properties(self):
         """
