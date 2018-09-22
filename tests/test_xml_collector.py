@@ -687,10 +687,10 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
         ("INT", 0, False, False, None),
         pytest.mark.skip(
-            ("INT", 0, False, True, "FINISH"),
+            ("INT", 0, False, True, '"FINISH"'),
             reason="feature pending"),
-        ("LREAL", 0, False, True, "DOUBLE"),
-        ("STRING", 0, True, False, "CHAR"),
+        ("LREAL", 0, False, True, '"DOUBLE"'),
+        ("STRING", 0, True, False, '"CHAR"'),
 ])
 def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
             tc_type, sing_index, is_str, is_arr, final_FTVL):

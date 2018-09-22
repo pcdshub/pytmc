@@ -993,14 +993,14 @@ class BaseRecordPackage:
 
         if self.chain.last.is_array:
             if self.chain.last.tc_type == "LREAL":
-                self.cfg.add_config_field("FTVL", "DOUBLE")
+                self.cfg.add_config_field("FTVL", '"DOUBLE"')
                 return True
             if self.chain.last.tc_type == "BOOL":
-                self.cfg.add_config_field("FTVL", "CHAR")
+                self.cfg.add_config_field("FTVL", '"CHAR"')
                 return True
 
         if self.chain.last.is_str:
-            self.cfg.add_config_field("FTVL", "CHAR")
+            self.cfg.add_config_field("FTVL", '"CHAR"')
             return True
 
         return False
