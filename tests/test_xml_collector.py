@@ -551,15 +551,15 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_DTYP",[
-        ("BOOL", 0, 'asynInt32'),
-        ("BOOL", 2, 'asynInt32'),
-        ("INT", 0, 'asynInt32'),
-        ("INT", 2, 'asynInt32'),
-        ("LREAL", 0, 'asynFloat64'),
-        ("LREAL", 2, 'asynFloat64'),
-        ("STRING", 0, 'asynInt8ArrayOut'),
-        ("STRING", 2, 'asynInt8ArrayIn'),
-        ("STRING", 4, 'asynInt8ArrayOut'),
+        ("BOOL", 0, '"asynInt32"'),
+        ("BOOL", 2, '"asynInt32"'),
+        ("INT", 0, '"asynInt32"'),
+        ("INT", 2, '"asynInt32"'),
+        ("LREAL", 0, '"asynFloat64"'),
+        ("LREAL", 2, '"asynFloat64"'),
+        ("STRING", 0, '"asynInt8ArrayOut"'),
+        ("STRING", 2, '"asynInt8ArrayIn"'),
+        ("STRING", 4, '"asynInt8ArrayOut"'),
 ])
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
             tc_type, sing_index, final_DTYP):
@@ -614,25 +614,6 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     if field_type == "INP":
         assert record.cfg.get_config_fields('OUT') == []
     
-
-
-    '''
-    # Set (output)
-    if sing_index == 0:
-        [field] = record.cfg.get_config_fields('OUT')
-        assert record.cfg.get_config_fields('INP') == []
-    # Get (input)
-    if sing_index == 2:
-        [field] = record.cfg.get_config_fields('INP')
-        assert record.cfg.get_config_fields('OUT') == []
-    # Set_RB (IO)
-    if sing_index == 6:
-        [field] = record.cfg.get_config_fields('OUT')
-        assert record.cfg.get_config_fields('INP') == []
-    '''
-
-
-
     assert field['tag']['f_set'] == final_INP_OUT
 
 
@@ -707,7 +688,9 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
 
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
         ("INT", 0, False, False, None),
-        ("INT", 0, False, True, "FINISH"),
+        pytest.mark.skip(
+            ("INT", 0, False, True, "FINISH"),
+            reason="feature pending"),
         ("LREAL", 0, False, True, "DOUBLE"),
         ("STRING", 0, True, False, "CHAR"),
 ])
@@ -756,6 +739,28 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
         assert out['tag']['f_set'] == final_NELM
         
 
+@pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM",[
+        ("INT", 0, False, False, None),
+        ("INT", 0, False, True, 3),
+        ("LREAL", 0, False, True, 9),
+        ("STRING", 0, True, False, 12),
+])
+def test_BaseRecordPackage_add_quotes(example_singular_tmc_chains,
+            tc_type, sing_index, is_str, is_arr, final_NELM):
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_arr
+    record.chain.last.is_str = is_str
+    record.chain.last.iterable_length = final_NELM
+    for element, idx in zip(record.chain.chain,range(len(record.chain.chain))):
+        element.name = chr(97+idx)
+    record.generate_naive_config()
+    record.guess_all()
+    for ln in record.cfg.config:
+        print(ln)
+    #print(record.cfg.config)
+    record.add_quotes()
+    #assert False
 # PvPackage tests
 
 @pytest.mark.skip(reason="PvPackage pending deprecation")

@@ -505,7 +505,18 @@ class BaseRecordPackage:
         # Will continue without this for now 
 
         # List of methods defined in the class 
-        self.guess_methods_list = None
+        self.guess_methods_list = [
+            self.guess_common,
+            self.guess_type,
+            self.guess_io,
+            self.guess_DTYP,
+            self.guess_INP_OUT,
+            self.guess_SCAN,
+            self.guess_OZ_NAM,
+            self.guess_PREC,
+            self.guess_FTVL,
+            self.guess_NELM,
+        ]
         
         # use form list of dicts,1st list has 1 entry per requirement
         # dict has form {'path':[],'target':n} where n is any variable
@@ -783,36 +794,36 @@ class BaseRecordPackage:
             "INT"
         }
         if self.chain.last.tc_type in asynint32_set:
-            base = "asynInt32"
+            base = '"asynInt32'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",base+"ArrayIN")
+                    self.cfg.add_config_field("DTYP",base+'ArrayIN"')
                     return True
                 elif 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
-            self.cfg.add_config_field("DTYP", base)
+            self.cfg.add_config_field("DTYP", base+'"')
             return True
         
         asynfloat64_set = {
             "LREAL",
         }
         if self.chain.last.tc_type in asynfloat64_set:
-            base = "asynFloat64"
+            base = '"asynFloat64'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",base+"ArrayIN")
+                    self.cfg.add_config_field("DTYP",base+'ArrayIN"')
                     return True
                 elif 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
-            self.cfg.add_config_field("DTYP", base)
+            self.cfg.add_config_field("DTYP", base+'"')
             return True
 
         asynInt8ArrayOut_set = {
@@ -821,13 +832,13 @@ class BaseRecordPackage:
         if self.chain.last.tc_type in asynInt8ArrayOut_set:
             [io] =  self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
-                self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
+                self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
                 return True
             elif 'i' in io['tag']:
-                self.cfg.add_config_field("DTYP", "asynInt8ArrayIn")
+                self.cfg.add_config_field("DTYP", '"asynInt8ArrayIn"')
                 return True
             elif 'o' in io['tag']:
-                self.cfg.add_config_field("DTYP", "asynInt8ArrayOut")
+                self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
                 return True
 
         return False 
@@ -981,7 +992,6 @@ class BaseRecordPackage:
             pass
 
         if self.chain.last.is_array:
-            print("AAAA")
             if self.chain.last.tc_type == "LREAL":
                 self.cfg.add_config_field("FTVL", "DOUBLE")
                 return True
@@ -990,7 +1000,6 @@ class BaseRecordPackage:
                 return True
 
         if self.chain.last.is_str:
-            print("BBBB")
             self.cfg.add_config_field("FTVL", "CHAR")
             return True
 
@@ -1012,6 +1021,19 @@ class BaseRecordPackage:
             return True
 
         return False
+
+    def guess_all(self):
+        """
+        Cycle through guessing methods until none can be applied.
+        guessing methods is a list of functions. 
+        """
+        complete = False
+        while not complete:
+            complete = True
+            for method in self.guess_methods_list:
+                if method() == True:
+                    complete = False
+
 
     def add_quotes(self):
         """

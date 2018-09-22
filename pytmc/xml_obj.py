@@ -696,6 +696,8 @@ class BaseElement:
             the element is not found None or [] is returned for single-find or
             find-all respectively.
         """
+        if self.element is None:
+            return None
         if get_all:
             target_element = self.element.findall("./"+field_target)
         else:
