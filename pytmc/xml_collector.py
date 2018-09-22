@@ -676,6 +676,19 @@ class BaseRecordPackage:
         except ValueError:
             pass
 
+        # must be tested first, arrays will have the tc_type of the iterable:
+        if self.chain.last.is_array:
+            [io] =  self.cfg.get_config_lines('io')
+            if 'i' in io['tag'] and 'o' in io['tag']:
+                self.cfg.add_config_line("type", "waveform")
+                return True
+            elif 'i' in io['tag']:
+                self.cfg.add_config_line("type","waveform")
+                return True
+            elif 'o' in io['tag']:
+                self.cfg.add_config_line("type","waveform")
+                return True
+
         bi_bo_set = {
             "BOOL"
         }
@@ -757,24 +770,49 @@ class BaseRecordPackage:
             Return a boolean that is True iff a change has been made.
         """
         try:
-            [io] =  self.cfg.get_config_fields('DTYP')
+            [dtyp] =  self.cfg.get_config_fields('DTYP')
             return False
         except ValueError:
             pass
         
+        [io] =  self.cfg.get_config_lines('io')
+        
+
         asynint32_set = {
             "BOOL",
             "INT"
         }
         if self.chain.last.tc_type in asynint32_set:
-            self.cfg.add_config_field("DTYP", "asynInt32")
+            base = "asynInt32"
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",base+"ArrayIN")
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    return True
+            self.cfg.add_config_field("DTYP", base)
             return True
         
         asynfloat64_set = {
             "LREAL",
         }
         if self.chain.last.tc_type in asynfloat64_set:
-            self.cfg.add_config_field("DTYP", "asynFloat64")
+            base = "asynFloat64"
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",base+"ArrayIN")
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+"ArrayOut")
+                    return True
+            self.cfg.add_config_field("DTYP", base)
             return True
 
         asynInt8ArrayOut_set = {

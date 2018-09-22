@@ -707,6 +707,8 @@ class BaseElement:
         Bool
             is true if this twincat element is an array
         """
+        if self.element is None:
+            return False
         if None != self._get_subfield('ArrayInfo'):
             return True
         return False
@@ -743,7 +745,7 @@ class BaseElement:
         Returns
         -------
         int or None
-            Return the lenght of the string/array if the element is a string or
+            Return the length of the string/array if the element is a string or
             an array. Otherwise return None
         """
         if self.is_str:
@@ -764,6 +766,8 @@ class BaseElement:
         Bool
             is true if this twincat element is an string
         """
+        if self.element is None:
+            return False
         is_str, str_len = self._string_info()
         return is_str
         
