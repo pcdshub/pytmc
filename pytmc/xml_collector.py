@@ -550,13 +550,6 @@ class BaseRecordPackage:
 
         return violations
 
-    def apply_guessing(self):
-        """
-        Cycle through guessing methods until none can be applied.
-        guessing methods is a list of functions. 
-        """
-        raise NotImplementedError
-
     def generate_naive_config(self):
         """
         Create config dictionary from current chain. Move from lowest to
@@ -681,12 +674,20 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
+        print("guess_type")
         try:
-            [pini] = self.cfg.get_config_lines('type')
+            [ty] = self.cfg.get_config_lines('type')
             return False
         except ValueError:
             pass
-
+            
+        print("guess_type1")
+        try:    
+            [io] = self.cfg.get_config_lines('io')
+        except ValueError:
+            return False
+    
+        print("guess_type2")
         # must be tested first, arrays will have the tc_type of the iterable:
         if self.chain.last.is_array:
             [io] =  self.cfg.get_config_lines('io')
@@ -976,7 +977,7 @@ class BaseRecordPackage:
 
         float_set ={'ai','ao'}
         if epics_type['tag'] in float_set:
-            self.cfg.add_config_field("PREC", "3")
+            self.cfg.add_config_field("PREC", '"3"')
             return True
 
         return False
@@ -1034,13 +1035,6 @@ class BaseRecordPackage:
                 if method() == True:
                     complete = False
 
-
-    def add_quotes(self):
-        """
-        Add additional quotations to the necessary fields. This is required for
-        some DB records fields
-        """
-        raise NotImplementedError
 
     def render_to_string(self):
         """

@@ -664,7 +664,7 @@ def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
         assert len(z) == 0
 
 @pytest.mark.parametrize("tc_type, sing_index, final_PREC, ret",[
-        ("LREAL", 0, '3', True),
+        ("LREAL", 0, '"3"', True),
         ("STRING", 0, None, False),
 ])
 def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
@@ -681,7 +681,7 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
     else:
         assert True == record.guess_PREC()
         [out] = record.cfg.get_config_fields("PREC")
-        assert out['tag']['f_set'] == "3" 
+        assert out['tag']['f_set'] == '"3"' 
 
 
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
@@ -737,14 +737,17 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
         assert out['tag']['f_set'] == final_NELM
         
 
-@pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM",[
-        ("INT", 0, False, False, None),
-        ("INT", 0, False, True, 3),
-        ("LREAL", 0, False, True, 9),
-        ("STRING", 0, True, False, 12),
+@pytest.mark.parametrize(
+    "tc_type, sing_index, is_str, is_arr, final_NELM, spot_check, result",[
+        ("INT", 6, False, False, None, "DTYP", '"asynInt32"'),
+        ("INT", 2, False, False, None, "SCAN", '".5 second"'),
+        ("LREAL", 2, False, False, None, "PREC", '"3"'),
+        ("INT", 0, False, True, 3, "NELM", 3),
+        ("LREAL", 0, False, True, 9, "FTVL",'"DOUBLE"'),
+        ("STRING", 0, True, False, 12,"FTVL",'"CHAR"'),
 ])
-def test_BaseRecordPackage_add_quotes(example_singular_tmc_chains,
-            tc_type, sing_index, is_str, is_arr, final_NELM):
+def test_BaseRecordPackage_guess_all(example_singular_tmc_chains, tc_type, 
+            sing_index, is_str, is_arr, final_NELM, spot_check, result):
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
@@ -757,7 +760,8 @@ def test_BaseRecordPackage_add_quotes(example_singular_tmc_chains,
     for ln in record.cfg.config:
         print(ln)
     #print(record.cfg.config)
-    record.add_quotes()
+    [out] = record.cfg.get_config_fields(spot_check)
+    assert out['tag']['f_set'] == result
     #assert False
 # PvPackage tests
 
