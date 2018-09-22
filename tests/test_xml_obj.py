@@ -466,6 +466,29 @@ def test_BaseElement_is_array(generic_tmc_root):
     subitem_element = SubItem(item_xml)
     assert subitem_element.is_array
 
+
+def test_BaseElement_iterable_length(string_tmc_root):
+    root = string_tmc_root
+    non_iter_symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    non_iter_symbol_element = Symbol(non_iter_symbol_xml)
+    assert non_iter_symbol_element.iterable_length is None
+    array_symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    array_symbol_element = BaseElement(array_symbol_xml)
+    assert array_symbol_element.iterable_length == 5
+
+    str_symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.StringTest']"
+    ) 
+    str_symbol_element = BaseElement(str_symbol_xml)
+    assert str_symbol_element.iterable_length == 55
+
+
 def test_BaseElement_is_string(string_tmc_root):
     root = string_tmc_root
     symbol_xml = root.find(
@@ -481,10 +504,6 @@ def test_BaseElement_is_string(string_tmc_root):
     ) 
     str_symbol_element = BaseElement(symbol_xml)
     assert str_symbol_element.is_str == True
-    
-
-
-
 
 
 @pytest.mark.skip(reason="pragma features moved to Configuration object")

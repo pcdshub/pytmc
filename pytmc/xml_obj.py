@@ -711,40 +711,29 @@ class BaseElement:
         base_type_str = base_type.text
 
         finder = re.compile(r"(?P<type>STRING)\((?P<count>[0-9]+)\)")
-        print(base_type_str)
         result = finder.search(base_type_str)
         #result = [ m.groupdict() for m in finder.finditer(base_type)]
-        print(result)
         if result is None:
             return False, None
         if result['type'] == "STRING":
-            return True, result['count']
+            return True, int(result['count'])
         
-    
-    
-    
+   
+    @property
+    def iterable_length(self):
+        if self.is_str:
+            is_str, str_len = self._string_info()
+            return str_len
+        if self.is_array:
+            response_string = self._get_subfield('ArrayInfo/Elements')
+            print("text:",response_string.text)
+            return int(response_string.text)
+
     @property
     def is_str(self):
         is_str, str_len = self._string_info()
         return is_str
         
-#        base_type = self._get_subfield('BaseType')
-#        if base_type is None:
-#            return False
-#
-#        base_type_str = base_type.text
-#
-#        finder = re.compile(r"(?P<type>STRING)\((?P<count>[0-9]+)\)")
-#        print(base_type_str)
-#        result = finder.search(base_type_str)
-#        #result = [ m.groupdict() for m in finder.finditer(base_type)]
-#        print(result)
-#        if result is None:
-#            return False
-#        if result['type'] == "STRING":
-#            return True
-
-
 
     def __eq__(self, other):
         '''
