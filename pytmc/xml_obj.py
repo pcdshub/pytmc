@@ -699,12 +699,29 @@ class BaseElement:
 
     @property
     def is_array(self):
+        """
+        This property is true if this twincat element is an array.
+        
+        Returns
+        -------
+        Bool
+            is true if this twincat element is an array
+        """
         if None != self._get_subfield('ArrayInfo'):
             return True
         return False
 
     
     def _string_info(self):
+        """
+        Internal method for getting stats on strings
+        
+        Returns
+        -------
+            Bool, int or None
+            The bool indicates whether or not this is a string. The Int will
+            return the lenght or a None if it is not a string.
+        """
         base_type = self._get_subfield('BaseType')
         if base_type is None:
             return False, None
@@ -712,7 +729,6 @@ class BaseElement:
 
         finder = re.compile(r"(?P<type>STRING)\((?P<count>[0-9]+)\)")
         result = finder.search(base_type_str)
-        #result = [ m.groupdict() for m in finder.finditer(base_type)]
         if result is None:
             return False, None
         if result['type'] == "STRING":
@@ -721,6 +737,15 @@ class BaseElement:
    
     @property
     def iterable_length(self):
+        """
+        Obtain the length of an iterable type.
+
+        Returns
+        -------
+        int or None
+            Return the lenght of the string/array if the element is a string or
+            an array. Otherwise return None
+        """
         if self.is_str:
             is_str, str_len = self._string_info()
             return str_len
@@ -731,6 +756,14 @@ class BaseElement:
 
     @property
     def is_str(self):
+        """
+        This property is true if this twincat element is a string.
+        
+        Returns
+        -------
+        Bool
+            is true if this twincat element is an string
+        """
         is_str, str_len = self._string_info()
         return is_str
         
