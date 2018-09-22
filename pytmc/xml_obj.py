@@ -697,6 +697,7 @@ class BaseElement:
 
         return target_element
 
+
     @property
     def is_array(self):
         """
@@ -712,8 +713,17 @@ class BaseElement:
         if None != self._get_subfield('ArrayInfo'):
             return True
         return False
+    
+    @is_array.setter
+    def is_array(self, new_data):
+        """
+        Make setable for tests
+        """
+        self.is_array = new_data
 
     
+
+    @property
     def _string_info(self):
         """
         Internal method for getting stats on strings
@@ -735,6 +745,14 @@ class BaseElement:
             return False, None
         if result['type'] == "STRING":
             return True, int(result['count'])
+    
+    @_string_info.setter
+    def _string_info(self, new_data):
+        """
+        Make setable for tests
+        """
+        self._string_info = new_data
+
         
    
     @property
@@ -749,12 +767,20 @@ class BaseElement:
             an array. Otherwise return None
         """
         if self.is_str:
-            is_str, str_len = self._string_info()
+            is_str, str_len = self._string_info
             return str_len
         if self.is_array:
             response_string = self._get_subfield('ArrayInfo/Elements')
             print("text:",response_string.text)
             return int(response_string.text)
+    
+    @iterable_length.setter
+    def iterable_length(self, new_data):
+        """
+        Make setable for tests
+        """
+        self.iterable_length = new_data
+    
 
     @property
     def is_str(self):
@@ -768,8 +794,15 @@ class BaseElement:
         """
         if self.element is None:
             return False
-        is_str, str_len = self._string_info()
+        is_str, str_len = self._string_info
         return is_str
+    
+    @is_str.setter
+    def is_str(self, new_data):
+        """
+        Make setable for tests
+        """
+        self.is_str = new_data
         
 
     def __eq__(self, other):
