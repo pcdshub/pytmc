@@ -686,6 +686,7 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
         [out] = record.cfg.get_config_fields("PREC")
         assert out['tag']['f_set'] == "3" 
 
+
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
         ("INT", 0, False, False, None),
         ("INT", 0, False, True, "FINISH"),
@@ -709,7 +710,32 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
         assert True == result
         [out] = record.cfg.get_config_fields("FTVL")
         assert out['tag']['f_set'] == final_FTVL
-        
+
+
+@pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM",[
+        ("INT", 0, False, False, None),
+        ("INT", 0, False, True, 3),
+        ("LREAL", 0, False, True, 9),
+        ("STRING", 0, True, False, 12),
+])
+def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
+            tc_type, sing_index, is_str, is_arr, final_NELM):
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_arr
+    record.chain.last.is_str = is_str
+    record.chain.last.iterable_length = final_NELM
+    record.generate_naive_config()
+    result = record.guess_NELM()
+    print(record.cfg.config)
+    if final_NELM is None:
+        assert False == result
+        with pytest.raises(ValueError):
+            [out] = record.cfg.get_config_fields("NELM")
+    else:
+        assert True == result
+        [out] = record.cfg.get_config_fields("NELM")
+        assert out['tag']['f_set'] == final_NELM
         
 
 # PvPackage tests

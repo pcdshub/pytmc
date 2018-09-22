@@ -974,8 +974,6 @@ class BaseRecordPackage:
         except ValueError:
             pass
 
-        print("is_arr ", self.chain.last.is_array)
-        print("is_str ", self.chain.last.is_str)
         if self.chain.last.is_array:
             print("AAAA")
             if self.chain.last.tc_type == "LREAL":
@@ -984,11 +982,6 @@ class BaseRecordPackage:
             if self.chain.last.tc_type == "BOOL":
                 self.cfg.add_config_field("FTVL", "CHAR")
                 return True
-
-            
-        print("is_arr ", self.chain.last.is_array)
-        print("is_str ", self.chain.last.is_str)
-
 
         if self.chain.last.is_str:
             print("BBBB")
@@ -1001,7 +994,19 @@ class BaseRecordPackage:
         """
         Add data length secification for waveforms
         """
-        raise NotImplementedError
+        try:
+            [nelm] =  self.cfg.get_config_fields("NELM")
+            return False
+        except ValueError:
+            pass
+        
+        if self.chain.last.is_array or self.chain.last.is_str:
+            length = self.chain.last.iterable_length 
+            self.cfg.add_config_field("NELM", length)
+            return True
+
+        return False
+
 
 
 class PvPackage:
