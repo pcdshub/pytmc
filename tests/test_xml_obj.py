@@ -466,6 +466,26 @@ def test_BaseElement_is_array(generic_tmc_root):
     subitem_element = SubItem(item_xml)
     assert subitem_element.is_array
 
+def test_BaseElement_is_string(string_tmc_root):
+    root = string_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    nonstr_symbol_element = BaseElement(symbol_xml)
+    assert nonstr_symbol_element.is_str == False
+
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.StringTest']"
+    ) 
+    str_symbol_element = BaseElement(symbol_xml)
+    assert str_symbol_element.is_str == True
+    
+
+
+
+
 
 @pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_BaseElement_all_pvs(generic_tmc_root):
