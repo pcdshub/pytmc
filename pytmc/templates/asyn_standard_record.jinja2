@@ -1,5 +1,5 @@
 record({{type}},"{{pv}}"){
 {% for f in field%}
-    field({{f}}, "{{field[f]}}")
+  field({{f}}, {{field[f]}})
 {% endfor %}
 }

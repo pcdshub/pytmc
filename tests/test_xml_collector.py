@@ -440,12 +440,12 @@ def test_BaseRecordPackage_apply_config_valid(sample_TmcChain):
     assert len(brp.apply_config_validation()) == 0
 
 
-def test_BaseRecordPackage_standard_as_dict():
+def test_BaseRecordPackage_cfg_as_dict():
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv','example_pv')
     brp.cfg.add_config_line('type','ao')
     brp.cfg.add_config_field('ABC','test 0')
-    assert brp.standard_as_dict() == {
+    assert brp.cfg_as_dict() == {
         'pv':'example_pv',
         'type':'ao',
         'field':{
@@ -458,16 +458,18 @@ def test_BaseRecordPackage_render_standard():
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv','example_pv')
     brp.cfg.add_config_line('type','ao')
-    brp.cfg.add_config_field("PINI","1")
-    brp.cfg.add_config_field('ABC','test 0')
+    brp.cfg.add_config_field("PINI",'"1"')
+    brp.cfg.add_config_field("NELM", 3)
+    brp.cfg.add_config_field('ABC','"test 0"')
     target_response="""\
     record(ao,"example_pv"){
-        field(PINI, "1")
-        field(ABC, "test 0")
+      field(PINI, "1")
+      field(NELM, 3)
+      field(ABC, "test 0")
     }\
     """
     target_response = textwrap.dedent(target_response).strip()
-    assert target_response == brp.render_standard()
+    assert target_response == brp.render_record()
 
 
 @pytest.mark.skip(reason="Feature pending")

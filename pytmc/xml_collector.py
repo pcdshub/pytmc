@@ -528,8 +528,11 @@ class BaseRecordPackage:
             trim_blocks = True,
             lstrip_blocks = True,
         )
-        self.standard_template = self.jinja_env.get_template(
+        self.record_template = self.jinja_env.get_template(
             "asyn_standard_record.jinja2"
+        )
+        self.file_template = self.jinja_env.get_template(
+            "asyn_standard_file.jinja2"
         )
 
         self.ads_port = 851
@@ -602,7 +605,7 @@ class BaseRecordPackage:
         """
         raise NotImplementedError
 
-    def standard_as_dict(self):
+    def cfg_as_dict(self):
         """
         Produce a jinja-template-compatible dictionary describing this
         RecordPackage. 
@@ -627,15 +630,15 @@ class BaseRecordPackage:
 
         return cfg_dict
 
-    def render_standard(self):
+    def render_record(self):
         """
         Returns
         -------
         string
             Jinja rendered entry for this BaseRecordPackage
         """
-        dict = self.standard_as_dict()
-        return self.standard_template.render(**dict)
+        dict = self.cfg_as_dict()
+        return self.record_template.render(**dict)
 
     @staticmethod
     def generate_files(records):
