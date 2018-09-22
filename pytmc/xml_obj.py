@@ -524,6 +524,11 @@ class BaseElement:
         else:
             self.pragma = Configuration(self.raw_config)
 
+        self.is_array_ = None
+        self._string_info_ = None
+        self.is_str_ = None
+        self.iterable_length_ = None
+
     def _get_raw_properties(self):
         """
         Obtain all elements contained in the 'Properties' element. Intended for
@@ -697,7 +702,6 @@ class BaseElement:
 
         return target_element
 
-
     @property
     def is_array(self):
         """
@@ -708,6 +712,8 @@ class BaseElement:
         Bool
             is true if this twincat element is an array
         """
+        if self.is_array_ is not None:
+            return self.is_array_
         if self.element is None:
             return False
         if None != self._get_subfield('ArrayInfo'):
@@ -719,9 +725,7 @@ class BaseElement:
         """
         Make setable for tests
         """
-        self.is_array = new_data
-
-    
+        self.is_array_ = new_data
 
     @property
     def _string_info(self):
@@ -734,6 +738,9 @@ class BaseElement:
             The bool indicates whether or not this is a string. The Int will
             return the lenght or a None if it is not a string.
         """
+        if self._string_info_ is not None:
+            return self._string_info_
+        
         base_type = self._get_subfield('BaseType')
         if base_type is None:
             return False, None
@@ -751,10 +758,8 @@ class BaseElement:
         """
         Make setable for tests
         """
-        self._string_info = new_data
-
+        self._string_info_ = new_data
         
-   
     @property
     def iterable_length(self):
         """
@@ -766,6 +771,8 @@ class BaseElement:
             Return the length of the string/array if the element is a string or
             an array. Otherwise return None
         """
+        if self.iterable_length_ is not None:
+            return self.iterable_length_
         if self.is_str:
             is_str, str_len = self._string_info
             return str_len
@@ -779,9 +786,8 @@ class BaseElement:
         """
         Make setable for tests
         """
-        self.iterable_length = new_data
+        self.iterable_length_ = new_data
     
-
     @property
     def is_str(self):
         """
@@ -792,6 +798,8 @@ class BaseElement:
         Bool
             is true if this twincat element is an string
         """
+        if self.is_str_ is not None:
+            return self.is_str_
         if self.element is None:
             return False
         is_str, str_len = self._string_info
@@ -802,8 +810,7 @@ class BaseElement:
         """
         Make setable for tests
         """
-        self.is_str = new_data
-        
+        self.is_str_ = new_data
 
     def __eq__(self, other):
         '''

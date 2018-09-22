@@ -685,6 +685,30 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
         assert True == record.guess_PREC()
         [out] = record.cfg.get_config_fields("PREC")
         assert out['tag']['f_set'] == "3" 
+
+@pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
+        ("INT", 0, False, False, None),
+        ("INT", 0, False, True, "FINISH"),
+        ("LREAL", 0, False, True, "DOUBLE"),
+        ("STRING", 0, True, False, "CHAR"),
+])
+def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
+            tc_type, sing_index, is_str, is_arr, final_FTVL):
+    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_arr
+    record.chain.last.is_str = is_str
+    record.generate_naive_config()
+    result = record.guess_FTVL()
+    print(record.cfg.config)
+    if final_FTVL is None:
+        assert False == result
+        with pytest.raises(ValueError):
+            [out] = record.cfg.get_config_fields("FTVL")
+    else:
+        assert True == result
+        [out] = record.cfg.get_config_fields("FTVL")
+        assert out['tag']['f_set'] == final_FTVL
         
         
 

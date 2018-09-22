@@ -936,7 +936,6 @@ class BaseRecordPackage:
 
         return False
         
-
     def guess_PREC(self):
         """
         Add precision field for the ai/ao type
@@ -969,7 +968,34 @@ class BaseRecordPackage:
         """
         Add datatype specification field for waveforms
         """
-        raise NotImplementedError
+        try:
+            [ftvl] =  self.cfg.get_config_fields("FTVL")
+            return False
+        except ValueError:
+            pass
+
+        print("is_arr ", self.chain.last.is_array)
+        print("is_str ", self.chain.last.is_str)
+        if self.chain.last.is_array:
+            print("AAAA")
+            if self.chain.last.tc_type == "LREAL":
+                self.cfg.add_config_field("FTVL", "DOUBLE")
+                return True
+            if self.chain.last.tc_type == "BOOL":
+                self.cfg.add_config_field("FTVL", "CHAR")
+                return True
+
+            
+        print("is_arr ", self.chain.last.is_array)
+        print("is_str ", self.chain.last.is_str)
+
+
+        if self.chain.last.is_str:
+            print("BBBB")
+            self.cfg.add_config_field("FTVL", "CHAR")
+            return True
+
+        return False
 
     def guess_NELM(self):
         """
