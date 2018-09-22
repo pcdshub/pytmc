@@ -910,19 +910,19 @@ class BaseRecordPackage:
             pass
         [io] =  self.cfg.get_config_lines('io')
         if 'i' in io['tag'] and 'o' in io['tag']:
-            self.cfg.add_config_field("SCAN", "Passive")
+            self.cfg.add_config_field("SCAN", '"Passive"')
             return True
             
         elif 'i' in io['tag']:
             fast_i_set = {'BOOL'}
             if self.chain.last.tc_type in fast_i_set:
-                self.cfg.add_config_field("SCAN", "I/O Intr")
+                self.cfg.add_config_field("SCAN", '"I/O Intr"')
                 return True
             else: 
-                self.cfg.add_config_field("SCAN", ".5 second")
+                self.cfg.add_config_field("SCAN", '".5 second"')
                 return True
         elif 'o' in io['tag']:
-            self.cfg.add_config_field("SCAN", "Passive")
+            self.cfg.add_config_field("SCAN", '"Passive"')
             return True
 
 
