@@ -577,18 +577,18 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
 
 
 @pytest.mark.parametrize("tc_type, sing_index, field_type, final_INP_OUT",[
-        ("BOOL", 0, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("BOOL", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("BOOL", 6, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("INT", 0, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("INT", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("INT", 6, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("LREAL", 0, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("LREAL", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("LREAL", 6, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("STRING", 0, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-        ("STRING", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
-        ("STRING", 6, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?'),
+        ("BOOL", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+        ("BOOL", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+        ("BOOL", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+        ("INT", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+        ("INT", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+        ("INT", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+        ("LREAL", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+        ("LREAL", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+        ("LREAL", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+        ("STRING", 0, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+        ("STRING", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+        ("STRING", 6, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
 ])
 def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
             tc_type, sing_index, field_type, final_INP_OUT):
@@ -605,8 +605,6 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     record.guess_io()
     assert True == record.guess_INP_OUT()
     print(record.cfg.config)
-    
-    
     
     [field] = record.cfg.get_config_fields(field_type)
     if field_type == "OUT":

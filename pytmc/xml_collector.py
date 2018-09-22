@@ -845,7 +845,7 @@ class BaseRecordPackage:
 
     def guess_INP_OUT(self):
         """
-        Construct, add, INP/OUT field
+        Construct, add, INP or OUT field
         
         Returns
         -------
@@ -876,7 +876,7 @@ class BaseRecordPackage:
             else:    
                 field_type = 'OUT'
 
-        str_template = "@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"
+        str_template = '"@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"'
 
         final_str = str_template.format(
             port = self.ads_port,
