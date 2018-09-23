@@ -306,14 +306,26 @@ class TmcFile:
             #brp = BaseRecordPackage(chain=singular_chain, origin=chain)
             self.all_RecordPackages.append(brp)
 
-
     def configure_packages(self):
         """
         Apply guessing methods to self.all_RecordPackages.
         """
-        for pack in self.all_RecordPackages:
-            pack.generate_naive_config()
-            pack.guess_all()
+        removal_list = []
+        for idx, pack in enumerate(self.all_RecordPackages):
+            try:
+                pack.generate_naive_config()
+                pack.guess_all()
+            except ChainNotSingularError:
+                removal_list.append(idx)
+
+        logger.debug("Invalid RecordPackages: " + str(len(removal_list)))
+        #must remove highest index first so not to disturb index/entry mapping
+        '''
+        removal_list.reverse()
+        for idx in removal_list():
+            self.all_RecordPackages.pop(idx)
+        ''' 
+
 
     def render(self):
         """
@@ -975,20 +987,24 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
-        try:
-            [res] =  self.cfg.get_config_fields("ONAM")
-            [res] =  self.cfg.get_config_fields("ZNAM")
-            return False
-        except ValueError:
-            pass
+        print("~~~~~~~~~~~~~~~~~~~~~~")
+        print(self.cfg.get_config_fields("ONAM"))
+        print(self.cfg.get_config_fields("ZNAM"))
+       
+        result = False 
+        o =  self.cfg.get_config_fields("ONAM")
+        z =  self.cfg.get_config_fields("ZNAM")
+        one_zero_set = {"BOOL"}
+        if self.chain.last.tc_type in one_zero_set:
+            if len(o) < 1:
+                self.cfg.add_config_field("ONAM", "One")
+                result = result or True
+            if len(z) < 1:
+                self.cfg.add_config_field("ZNAM","Zero")
+                result = result or True
+    
+        return result
 
-        if 'BOOL' == self.chain.last.tc_type:
-            self.cfg.add_config_field("ONAM", "One")
-            self.cfg.add_config_field("ZNAM", "Zero")
-            return True
-
-        return False
-        
     def guess_PREC(self):
         """
         Add precision field for the ai/ao type
@@ -1064,10 +1080,14 @@ class BaseRecordPackage:
         guessing methods is a list of functions. 
         """
         complete = False
+        count = 0
         while not complete:
+            count += 1 
+            assert count < 20
             complete = True
             for method in self.guess_methods_list:
                 if method() == True:
+                    print(method)
                     complete = False
 
     def render_to_string(self):

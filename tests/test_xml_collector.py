@@ -305,6 +305,13 @@ def test_TmcFile_configure_packages(example_singular_tmc_chains):
         assert check.cfg.config == rec.cfg.config
         assert check.chain.chain == rec.chain.chain
     
+def test_TmcFile_fullbuild(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    tmc.create_chains()
+    tmc.isolate_chains()
+    tmc.create_packages()
+    tmc.configure_packages()
+    tmc.render()
 
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)
@@ -754,6 +761,7 @@ def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
     assert ret == record.guess_OZ_NAM()
     o = record.cfg.get_config_fields('ONAM')
     z = record.cfg.get_config_fields('ZNAM')
+    logger.debug(str(record.cfg.config))
     if final_ONAM is not None:
         assert o[0]['tag']['f_set'] == final_ONAM
     else:

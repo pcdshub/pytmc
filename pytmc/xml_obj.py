@@ -347,7 +347,6 @@ class Configuration:
             config = self.config
 
         results_list = []
-
         for line in config:
             if line['title'] == title:
                 results_list.append(line)
