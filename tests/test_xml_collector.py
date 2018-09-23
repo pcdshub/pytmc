@@ -257,17 +257,6 @@ def test_TmcFile_create_packages(example_singular_tmc_chains):
         logger.debug(str(rec.chain.last.pragma.config))
         check_list.append(rec)
     
-    
-
-    '''
-    # tc_type is assignable because it isn't implemented in BaseElement
-    # this field must be added because it is typically derived from the .tmc
-    record.generate_naive_config()
-    assert True == record.guess_io()
-    print(record.cfg.config)
-    [field] = record.cfg.get_config_lines('io')
-    assert field['tag'] == final_io 
-    '''
     tmc.create_chains()
     logger.debug("all_TmcChains: ")
     for x in tmc.all_TmcChains:
@@ -285,6 +274,37 @@ def test_TmcFile_create_packages(example_singular_tmc_chains):
     for check, rec in zip(check_list, tmc.all_RecordPackages):
         assert check.cfg.config == rec.cfg.config
         assert check.chain.chain == rec.chain.chain
+
+def test_TmcFile_configure_packages(example_singular_tmc_chains):
+    tmc = TmcFile(None)
+    check_list = []
+    # build artificial tmcChains and generate fake names
+    for idx, tc_type in zip([0,2,4,6],["BOOL","INT","LREAL","STRING"]):
+        cn = example_singular_tmc_chains[idx]
+        for element, ix in zip(cn.chain,range(len(cn.chain))):
+            element.name = chr(97+ix)
+        
+        cn.last.tc_type = tc_type 
+        
+        tmc.all_TmcChains.append(cn)
+        
+        # create the check_set
+        rec = BaseRecordPackage(cn)
+        rec.generate_naive_config()
+        rec.guess_all()
+        logger.debug(str(rec.chain.last.pragma.config))
+        check_list.append(rec)
+    
+    tmc.create_chains()
+    tmc.isolate_chains()
+    tmc.create_packages()
+    tmc.configure_packages()
+    
+    assert len(tmc.all_RecordPackages) == 4
+    for check, rec in zip(check_list, tmc.all_RecordPackages):
+        assert check.cfg.config == rec.cfg.config
+        assert check.chain.chain == rec.chain.chain
+    
 
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)

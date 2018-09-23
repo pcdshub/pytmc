@@ -299,7 +299,7 @@ class TmcFile:
     def create_packages(self):
         """
         Populate the the self.all_RecordPackages list with no-guessing-applied
-        packages.
+        packages. requires self.all_singular_TmcChains to be populated.
         """
         for singular_chain in self.all_singular_TmcChains:
             brp = BaseRecordPackage(chain=singular_chain)
@@ -309,9 +309,12 @@ class TmcFile:
 
     def configure_packages(self):
         """
+        Apply guessing methods to self.all_RecordPackages.
         """
-        raise NotImplementedError
-    
+        for pack in self.all_RecordPackages:
+            pack.generate_naive_config()
+            pack.guess_all()
+
     def render(self):
         """
         Produce .db file as string
