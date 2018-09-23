@@ -780,7 +780,7 @@ class BaseElement:
             return str_len
         if self.is_array:
             response_string = self._get_subfield('ArrayInfo/Elements')
-            print("text:",response_string.text)
+            logger.debug("text:" + str(response_string.text))
             return int(response_string.text)
     
     @iterable_length.setter

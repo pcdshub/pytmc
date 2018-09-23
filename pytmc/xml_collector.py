@@ -320,12 +320,9 @@ class TmcFile:
 
         logger.debug("Invalid RecordPackages: " + str(len(removal_list)))
         #must remove highest index first so not to disturb index/entry mapping
-        '''
         removal_list.reverse()
-        for idx in removal_list():
+        for idx in removal_list:
             self.all_RecordPackages.pop(idx)
-        ''' 
-
 
     def render(self):
         """
@@ -684,8 +681,16 @@ class BaseRecordPackage:
         string
             Jinja rendered entry for this BaseRecordPackage
         """
-        dict = self.cfg_as_dict()
-        return self.record_template.render(**dict)
+        simple_dict = self.cfg_as_dict()
+        try:
+            if simple_dict['pv'] == "":
+                print(self.cfg.config)
+                print(self.chain)
+        except KeyError:
+            print(self.cfg.config)
+            print(self.chain)
+            
+        return self.record_template.render(**simple_dict)
 
     @staticmethod
     def generate_files(records):
@@ -987,10 +992,6 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
-        print("~~~~~~~~~~~~~~~~~~~~~~")
-        print(self.cfg.get_config_fields("ONAM"))
-        print(self.cfg.get_config_fields("ZNAM"))
-       
         result = False 
         o =  self.cfg.get_config_fields("ONAM")
         z =  self.cfg.get_config_fields("ZNAM")
@@ -1087,7 +1088,6 @@ class BaseRecordPackage:
             complete = True
             for method in self.guess_methods_list:
                 if method() == True:
-                    print(method)
                     complete = False
 
     def render_to_string(self):

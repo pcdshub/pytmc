@@ -311,7 +311,8 @@ def test_TmcFile_fullbuild(generic_tmc_path):
     tmc.isolate_chains()
     tmc.create_packages()
     tmc.configure_packages()
-    tmc.render()
+    z = tmc.render()
+    print(z)
 
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)
