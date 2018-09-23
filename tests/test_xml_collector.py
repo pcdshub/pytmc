@@ -305,8 +305,8 @@ def test_TmcFile_configure_packages(example_singular_tmc_chains):
         assert check.cfg.config == rec.cfg.config
         assert check.chain.chain == rec.chain.chain
     
-def test_TmcFile_fullbuild(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
+def test_TmcFile_fullbuild(string_tmc_path):
+    tmc = TmcFile(string_tmc_path)
     tmc.create_chains()
     tmc.isolate_chains()
     tmc.create_packages()
