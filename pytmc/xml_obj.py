@@ -1053,6 +1053,9 @@ class Symbol(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
+
+        if self.is_str:
+            return "STRING"
         name_field = self._get_subfield("BaseType")
         return name_field.text
 

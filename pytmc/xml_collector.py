@@ -671,7 +671,10 @@ class BaseRecordPackage:
                 cfg_dict.setdefault('field',{})
                 tag = row['tag']
                 cfg_dict['field'][tag['f_name']] = tag['f_set']
-
+            if row['title'] == 'info':
+                cfg_dict['info'] = True
+        
+        cfg_dict.setdefault('info',False)
         return cfg_dict
 
     def render_record(self):
@@ -840,7 +843,7 @@ class BaseRecordPackage:
             pass
         
         [io] =  self.cfg.get_config_lines('io')
-        
+        io = io['tag'] 
 
         asynint32_set = {
             "BOOL",
@@ -853,7 +856,7 @@ class BaseRecordPackage:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayIN"')
+                    self.cfg.add_config_field("DTYP",base+'ArrayIn"')
                     return True
                 elif 'o' in io:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
@@ -871,7 +874,7 @@ class BaseRecordPackage:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayIN"')
+                    self.cfg.add_config_field("DTYP",base+'ArrayIn"')
                     return True
                 elif 'o' in io:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
@@ -964,6 +967,7 @@ class BaseRecordPackage:
         [io] =  self.cfg.get_config_lines('io')
         if 'i' in io['tag'] and 'o' in io['tag']:
             self.cfg.add_config_field("SCAN", '"Passive"')
+            self.cfg.add_config_line("info",True)
             return True
             
         elif 'i' in io['tag']:
@@ -1144,7 +1148,7 @@ class PvPackage:
         The full PV for this variable concatenating all encapsulating PVs and
         the target PV. 
 
-    proto_name : str, None
+    proto_name : str, Non
         Identical to proto_name parameter.
 
     proto_file_name : str, None
