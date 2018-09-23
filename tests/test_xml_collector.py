@@ -235,13 +235,50 @@ def test_TmcFile_isolate_chains(generic_tmc_path):
 
     assert count == 4
 
-
+@pytest.mark.skip(reason="Feature pending")
 def test_TmcFile_create_packages(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.create_chains()
     tmc.create_packages()
     assert False
 
+def test_TmcFile_render(generic_tmc_path):
+    tmc = TmcFile(None)
+    #tmc.isolate_all()
+    #tmc.create_chains()
+    #tmc.isolate_chains()
+    brp1 = BaseRecordPackage()
+    brp1.cfg.add_config_line('pv','example_pv')
+    brp1.cfg.add_config_line('type','ao')
+    brp1.cfg.add_config_field("PINI",'"VX"')
+    brp1.cfg.add_config_field("NELM", 3)
+    brp1.cfg.add_config_field('ABC','"test 0"')
+    brp2 = BaseRecordPackage()
+    brp2.cfg.add_config_line('pv','example_pv2')
+    brp2.cfg.add_config_line('type','bi')
+    brp2.cfg.add_config_field("PINI",'"1"')
+    brp2.cfg.add_config_field("NELM", 2)
+    brp2.cfg.add_config_field('ABC','"test k"')
+
+    tmc.all_RecordPackages.append(brp1)
+    tmc.all_RecordPackages.append(brp2)
+    
+    target_response="""\
+    record(ao,"example_pv"){
+      field(PINI, "VX")
+      field(NELM, 3)
+      field(ABC, "test 0")
+    }
+
+    record(bi,"example_pv2"){
+      field(PINI, "1")
+      field(NELM, 2)
+      field(ABC, "test k")
+    }
+    
+    """
+    target_response = textwrap.dedent(target_response)
+    assert target_response == tmc.render()
 
 
 # TmcChain tests
@@ -454,7 +491,7 @@ def test_BaseRecordPackage_cfg_as_dict():
     }
 
 
-def test_BaseRecordPackage_render_standard():
+def test_BaseRecordPackage_render_record():
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv','example_pv')
     brp.cfg.add_config_line('type','ao')

@@ -89,17 +89,33 @@ class TmcFile:
     '''
     def __init__(self, filename):
         self.filename = filename
-        self.tree = ET.parse(self.filename)
-        self.root = self.tree.getroot()
+        if self.filename is not None:
+            self.tree = ET.parse(self.filename)
+            self.root = self.tree.getroot()
+        else:
+            self.tree = None
+            self.root = None
 
         self.all_Symbols = ElementCollector()
         self.all_DataTypes = ElementCollector()
         self.all_SubItems = defaultdict(ElementCollector) 
-        self.isolate_all()
+        if self.filename is not None:
+            self.isolate_all()
         
         self.all_TmcChains = []
         self.all_singular_TmcChains = []
         self.all_RecordPackages = []
+        
+        # Load jinja templates
+        self.jinja_env = Environment(
+            loader = PackageLoader("pytmc","templates"),
+            trim_blocks = True,
+            lstrip_blocks = True,
+        )
+        
+        self.file_template = self.jinja_env.get_template(
+            "asyn_standard_file.jinja2"
+        )
 
     def isolate_Symbols(self):
         '''
@@ -289,8 +305,20 @@ class TmcFile:
             for singular_chain in singulars:
                 self.all_RecordPackages.append(
                     # Intentionally leaving this broken -- version must go here
-                    RecordPackage(chain=singular_chain, origin=chain)
+                    BaseRecordPackage(chain=singular_chain, origin=chain)
                 )
+    
+    def render(self):
+        """
+        Produce .db file as string
+        """
+        rec_list = []
+        for pack in self.all_RecordPackages:
+            record_str = pack.render_record()
+            rec_list.append(record_str)
+
+        return self.file_template.render(records=rec_list)
+        
 
 
 class ChainNotSingularError(Exception):
@@ -1038,11 +1066,11 @@ class BaseRecordPackage:
                 if method() == True:
                     complete = False
 
-
     def render_to_string(self):
         """
         Create the individual record to be inserted in the DB file. To be
         returned as a string. 
+        redundant?
         """
         raise NotImplementedError
 
