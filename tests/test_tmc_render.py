@@ -119,6 +119,7 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_create_intf(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc,'file.proto')
@@ -195,6 +196,7 @@ def test_TmcExplorer_create_intf(generic_tmc_path):
     logging.debug(str(rejects))
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_SingleRecordData_from_element(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
@@ -249,6 +251,7 @@ def test_SingleRecordData_from_element(generic_tmc_path):
     ] 
    
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
     '''Explore single level Datatype (Datatype doesn't contain others)
     '''
@@ -276,6 +279,7 @@ def test_TmcExplorer_exp_DataType(generic_tmc_path):
     assert len(exp.all_records) == 2
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_DataType_recursive(generic_tmc_path):
     '''Explore multi level Datatype (Datatype contains others)
     '''
@@ -304,6 +308,7 @@ def test_TmcExplorer_exp_DataType_recursive(generic_tmc_path):
     assert len(exp.all_records) == 7
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc,'file.proto')
@@ -340,6 +345,7 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     assert len(exp.all_records) == 5
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc,'file.proto')
@@ -381,6 +387,7 @@ def test_TmcExplorer_read_ini(generic_tmc_path):
     exp = TmcExplorer(tmc)
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_FullRender_instantiation(generic_tmc_path):
     fr = FullRender(generic_tmc_path,'TEST')
 
@@ -437,6 +444,7 @@ def test_SingleProtoData_has_init(generic_tmc_path):
     assert proto.has_init == False 
     
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_SingleProtoData_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)

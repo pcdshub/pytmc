@@ -554,6 +554,7 @@ def test_BaseRecordPackage_cfg_as_dict():
     assert brp.cfg_as_dict() == {
         'pv':'example_pv',
         'type':'ao',
+        'info': False,
         'field':{
             'ABC':'test 0'
         }
