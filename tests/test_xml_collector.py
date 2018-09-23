@@ -235,18 +235,59 @@ def test_TmcFile_isolate_chains(generic_tmc_path):
 
     assert count == 4
 
-@pytest.mark.skip(reason="Feature pending")
-def test_TmcFile_create_packages(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
+
+def test_TmcFile_create_packages(example_singular_tmc_chains):
+    
+    tmc = TmcFile(None)
+    check_list = []
+    # build artificial tmcChains and generate fake names
+    for idx, tc_type in zip([0,2,4,6],["BOOL","INT","LREAL","STRING"]):
+        cn = example_singular_tmc_chains[idx]
+        for element, ix in zip(cn.chain,range(len(cn.chain))):
+            element.name = chr(97+ix)
+        
+        cn.last.tc_type = tc_type 
+        
+        tmc.all_TmcChains.append(cn)
+        
+        # create the check_set
+        rec = BaseRecordPackage(cn)
+        #rec.naive_config()
+        #rec.guess_all()
+        logger.debug(str(rec.chain.last.pragma.config))
+        check_list.append(rec)
+    
+    
+
+    '''
+    # tc_type is assignable because it isn't implemented in BaseElement
+    # this field must be added because it is typically derived from the .tmc
+    record.generate_naive_config()
+    assert True == record.guess_io()
+    print(record.cfg.config)
+    [field] = record.cfg.get_config_lines('io')
+    assert field['tag'] == final_io 
+    '''
     tmc.create_chains()
+    logger.debug("all_TmcChains: ")
+    for x in tmc.all_TmcChains:
+        logger.debug(x)
+    tmc.isolate_chains()
+    logger.debug("all_singular_TmcChains: ")
+    for x in tmc.all_singular_TmcChains:
+        logger.debug(x)
     tmc.create_packages()
-    assert False
+    logger.debug("all_RecordPackages: ")
+    for x in tmc.all_RecordPackages:
+        logger.debug(x.chain.name_list)
+    
+    assert len(tmc.all_RecordPackages) == 4
+    for check, rec in zip(check_list, tmc.all_RecordPackages):
+        assert check.cfg.config == rec.cfg.config
+        assert check.chain.chain == rec.chain.chain
 
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)
-    #tmc.isolate_all()
-    #tmc.create_chains()
-    #tmc.isolate_chains()
     brp1 = BaseRecordPackage()
     brp1.cfg.add_config_line('pv','example_pv')
     brp1.cfg.add_config_line('type','ao')
@@ -798,10 +839,9 @@ def test_BaseRecordPackage_guess_all(example_singular_tmc_chains, tc_type,
     record.guess_all()
     for ln in record.cfg.config:
         print(ln)
-    #print(record.cfg.config)
     [out] = record.cfg.get_config_fields(spot_check)
     assert out['tag']['f_set'] == result
-    #assert False
+
 # PvPackage tests
 
 @pytest.mark.skip(reason="PvPackage pending deprecation")

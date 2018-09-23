@@ -81,7 +81,7 @@ class TmcFile:
         Collection of all TmcChains in the document. Must be initialized with
         :func:`~create_chains`. These chains are NOT SINGULAR.
     
-    all_singular TmcChains : list
+    all_singular_TmcChains : list
         Collection of all singularized TmcChains in the document. Must be
         initialized with :func:`~isolate_chains`.
 
@@ -298,15 +298,19 @@ class TmcFile:
 
     def create_packages(self):
         """
-        Add all new TmcChains to this object instance's all_TmcChains variable
+        Populate the the self.all_RecordPackages list with no-guessing-applied
+        packages.
         """
-        for chain in self.all_TmcChains:
-            singulars = chain.build_singular_chains()
-            for singular_chain in singulars:
-                self.all_RecordPackages.append(
-                    # Intentionally leaving this broken -- version must go here
-                    BaseRecordPackage(chain=singular_chain, origin=chain)
-                )
+        for singular_chain in self.all_singular_TmcChains:
+            brp = BaseRecordPackage(chain=singular_chain)
+            #brp = BaseRecordPackage(chain=singular_chain, origin=chain)
+            self.all_RecordPackages.append(brp)
+
+
+    def configure_packages(self):
+        """
+        """
+        raise NotImplementedError
     
     def render(self):
         """
@@ -705,20 +709,17 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
-        print("guess_type")
         try:
             [ty] = self.cfg.get_config_lines('type')
             return False
         except ValueError:
             pass
             
-        print("guess_type1")
         try:    
             [io] = self.cfg.get_config_lines('io')
         except ValueError:
             return False
     
-        print("guess_type2")
         # must be tested first, arrays will have the tc_type of the iterable:
         if self.chain.last.is_array:
             [io] =  self.cfg.get_config_lines('io')
