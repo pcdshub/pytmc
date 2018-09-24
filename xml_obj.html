@@ -353,112 +353,6 @@ format.</p>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.config">
-<code class="descname">config</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cleanly formatted python representation of the config statement</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">this list contains dictionaries for each line of the config
-statement</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.config_by_pv">
-<code class="descname">config_by_pv</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.config_by_pv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse the pytmc pragma into groups, one for each PV to be made from the
-variable.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This list contains a list for each unique PV. These lists contain
-dictionaries, one for each row of the pragma.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.config_lines">
-<code class="descname">config_lines</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.config_lines" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read in a rudimentary python representation of the config statement.
-Use <a class="reference internal" href="#pytmc.xml_obj.BaseElement.config" title="pytmc.xml_obj.BaseElement.config"><code class="xref py py-func docutils literal"><span class="pre">config()</span></code></a> to access a more cleanly formatted version of this
-information.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">this list contains dictionaries for each line of the config
-statement</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.dtname">
-<code class="descname">dtname</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.dtname" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the config line specifying a name for this datatype.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">See <code class="xref py py-func docutils literal"><span class="pre">extract_pragmas()</span></code> for details.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str, list of str, or None</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.fields">
-<code class="descname">fields</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.fields" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the config line specifying db fields for this entity.
-:returns: See <code class="xref py py-func docutils literal"><span class="pre">extract_pragmas()</span></code> for details.
-:rtype: str, list of str, or None</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pytmc.xml_obj.BaseElement.get_subfield">
-<code class="descname">get_subfield</code><span class="sig-paren">(</span><em>field_target</em>, <em>get_all=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_obj.BaseElement.get_subfield" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produce element(s) within the class instance’s target element. If
-seeking only a single element, return the first one encountered.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>field_target</strong> (<em>str</em>) – The tag name of the contained field</li>
-<li><strong>get_all</strong> (<em>bool</em>) – If True, seek all elements, otherwise return only the first
-encountered</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Return the first element found, the list of all elements found. If
-the element is not found None or [] is returned for single-find or
-find-all respectively.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">xml.etree.ElementTree.Element or list(xml…Element) or None</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="pytmc.xml_obj.BaseElement.has_config">
 <code class="descname">has_config</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.has_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shortcut for determining if this element has pragmas.</p>
@@ -475,17 +369,49 @@ find-all respectively.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.io">
-<code class="descname">io</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.io" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the confic line specifying data direction for this
-entity.</p>
+<dt id="pytmc.xml_obj.BaseElement.is_array">
+<code class="descname">is_array</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.is_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>This property is true if this twincat element is an array.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">See <code class="xref py py-func docutils literal"><span class="pre">extract_pragmas()</span></code> for details.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">is true if this twincat element is an array</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str, list of str, or None</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.xml_obj.BaseElement.is_str">
+<code class="descname">is_str</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.is_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>This property is true if this twincat element is a string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">is true if this twincat element is an string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.xml_obj.BaseElement.iterable_length">
+<code class="descname">iterable_length</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.iterable_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the length of an iterable type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return the length of the string/array if the element is a string or
+an array. Otherwise return None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int or None</td>
 </tr>
 </tbody>
 </table>
@@ -504,50 +430,6 @@ field sub-element.</p>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The name of the variable</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pytmc.xml_obj.BaseElement.neaten_field">
-<code class="descname">neaten_field</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_obj.BaseElement.neaten_field" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for formatting the ‘field’ line</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>string</strong> (<em>str</em>) – This is the string to be broken into field name and field setting</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Keys are f_name for the field name and f_set for the
-corresponding setting.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="pytmc.xml_obj.BaseElement.parse_pragma">
-<em class="property">static </em><code class="descname">parse_pragma</code><span class="sig-paren">(</span><em>title</em>, <em>cfg</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_obj.BaseElement.parse_pragma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the designated configuration line(s) from the config pragma.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>title</strong> (<em>str</em>) – title of the config line searched for</li>
-<li><strong>cfg</strong> (<em>list</em>) – The list of pragma lines to be searched</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">If there is only one name for the datatype, return a string, if
-there are multiple, list each name, returns None if none are found.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str, list of str or None</p>
-</td>
 </tr>
 </tbody>
 </table>
@@ -573,22 +455,6 @@ values found in the xml</td>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.pv">
-<code class="descname">pv</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.pv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the config line specifying pv name for this entity.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">See <code class="xref py py-func docutils literal"><span class="pre">extract_pragmas()</span></code> for details.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str, list of str, or None</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="pytmc.xml_obj.BaseElement.raw_config">
 <code class="descname">raw_config</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.raw_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce a stripped-down set of properties including only those that are
@@ -601,40 +467,6 @@ recognized as pragmas intended for pytmc’s consumption.</p>
 such pragma can be found</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.rec_type">
-<code class="descname">rec_type</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.rec_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the confic line specifying record type (i.e. ao,ai) for this
-entity.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">See <code class="xref py py-func docutils literal"><span class="pre">extract_pragmas()</span></code> for details.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str, list of str, or None</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pytmc.xml_obj.BaseElement.str_f">
-<code class="descname">str_f</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.str_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the confic line specifying in-proto data format for this
-entity.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">See <code class="xref py py-func docutils literal"><span class="pre">extract_pragmas()</span></code> for details.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str, list of str, or None</td>
 </tr>
 </tbody>
 </table>

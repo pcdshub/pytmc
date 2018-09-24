@@ -164,6 +164,7 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
@@ -180,13 +181,19 @@
 </li>
       <li><a href="xml_collector.html#pytmc.TmcFile.all_DataTypes">all_DataTypes (pytmc.TmcFile attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tmc_render.html#pytmc.TmcExplorer.tmc.all_records">all_records (pytmc.TmcExplorer.tmc attribute)</a>
 </li>
+      <li><a href="xml_collector.html#pytmc.TmcFile.all_singular_TmcChains">all_singular_TmcChains (pytmc.TmcFile attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xml_collector.html#pytmc.TmcFile.all_SubItems">all_SubItems (pytmc.TmcFile attribute)</a>
 </li>
       <li><a href="xml_collector.html#pytmc.TmcFile.all_Symbols">all_Symbols (pytmc.TmcFile attribute)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.TmcFile.all_TmcChains">all_TmcChains (pytmc.TmcFile attribute)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.apply_config_validation">apply_config_validation() (pytmc.xml_collector.BaseRecordPackage method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -197,22 +204,30 @@
       <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement">BaseElement (class in pytmc.xml_obj)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage">BaseRecordPackage (class in pytmc.xml_collector)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.TmcChain.build_singular_chains">build_singular_chains() (pytmc.xml_collector.TmcChain method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.cfg_as_dict">cfg_as_dict() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
       <li><a href="xml_obj.html#pytmc.DataType.children">children (pytmc.DataType attribute)</a>
 </li>
       <li><a href="tmc_render.html#pytmc.SingleRecordData.comment">comment (pytmc.SingleRecordData attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.config">config (pytmc.xml_obj.BaseElement attribute)</a>
+      <li><a href="xml_collector.html#pytmc.TmcFile.configure_packages">configure_packages() (pytmc.TmcFile method)</a>
 </li>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.config_by_pv">config_by_pv (pytmc.xml_obj.BaseElement attribute)</a>
+      <li><a href="xml_collector.html#pytmc.TmcFile.create_chains">create_chains() (pytmc.TmcFile method)</a>
 </li>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.config_lines">config_lines (pytmc.xml_obj.BaseElement attribute)</a>
+      <li><a href="xml_collector.html#pytmc.TmcFile.create_packages">create_packages() (pytmc.TmcFile method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -222,13 +237,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xml_obj.html#pytmc.DataType">DataType (class in pytmc)</a>
 </li>
-      <li><a href="xml_obj.html#pytmc.DataType.datatype">datatype (pytmc.DataType attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="tmc_render.html#pytmc.DbRenderAgent">DbRenderAgent (class in pytmc)</a>
+      <li><a href="xml_obj.html#pytmc.DataType.datatype">datatype (pytmc.DataType attribute)</a>
 </li>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.dtname">dtname (pytmc.xml_obj.BaseElement attribute)</a>
+      <li><a href="tmc_render.html#pytmc.DbRenderAgent">DbRenderAgent (class in pytmc)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -239,19 +252,21 @@
       <li><a href="xml_collector.html#pytmc.xml_collector.ElementCollector">ElementCollector (class in pytmc.xml_collector)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.TmcFile.explore_all">explore_all() (pytmc.TmcFile method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tmc_render.html#pytmc.SingleRecordData.fields">fields (pytmc.SingleRecordData attribute)</a>
-
-      <ul>
-        <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.fields">(pytmc.xml_obj.BaseElement attribute)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.TmcChain.forkmap">forkmap() (pytmc.xml_collector.TmcChain method)</a>
+</li>
       <li><a href="tmc_render.html#pytmc.FullRender">FullRender (class in pytmc)</a>
 </li>
   </ul></td>
@@ -260,7 +275,35 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.get_subfield">get_subfield() (pytmc.xml_obj.BaseElement method)</a>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.generate_files">generate_files() (pytmc.xml_collector.BaseRecordPackage static method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.generate_naive_config">generate_naive_config() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.generate_record_entry">generate_record_entry() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_all">guess_all() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_common">guess_common() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_DTYP">guess_DTYP() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_FTVL">guess_FTVL() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_INP_OUT">guess_INP_OUT() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_io">guess_io() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_NELM">guess_NELM() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_OZ_NAM">guess_OZ_NAM() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_PREC">guess_PREC() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_SCAN">guess_SCAN() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.guess_type">guess_type() (pytmc.xml_collector.BaseRecordPackage method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -276,21 +319,39 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.ID_type">ID_type() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
       <li><a href="tmc_render.html#pytmc.SingleProtoData.in_field">in_field (pytmc.SingleProtoData attribute)</a>
 </li>
       <li><a href="tmc_render.html#pytmc.SingleProtoData.init">init (pytmc.SingleProtoData attribute)</a>
 </li>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.io">io (pytmc.xml_obj.BaseElement attribute)</a>
+      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.is_array">is_array (pytmc.xml_obj.BaseElement attribute)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.TmcChain.is_singular">is_singular() (pytmc.xml_collector.TmcChain method)</a>
+</li>
+      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.is_str">is_str (pytmc.xml_obj.BaseElement attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xml_collector.html#pytmc.TmcFile.isolate_all">isolate_all() (pytmc.TmcFile method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.TmcFile.isolate_chains">isolate_chains() (pytmc.TmcFile method)</a>
 </li>
       <li><a href="xml_collector.html#pytmc.TmcFile.isolate_DataTypes">isolate_DataTypes() (pytmc.TmcFile method)</a>
 </li>
       <li><a href="xml_collector.html#pytmc.TmcFile.isolate_SubItems">isolate_SubItems() (pytmc.TmcFile method)</a>
 </li>
       <li><a href="xml_collector.html#pytmc.TmcFile.isolate_Symbols">isolate_Symbols() (pytmc.TmcFile method)</a>
+</li>
+      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.iterable_length">iterable_length (pytmc.xml_obj.BaseElement attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.TmcChain.last">last (pytmc.xml_collector.TmcChain attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -307,11 +368,17 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.motor_record_as_dict">motor_record_as_dict() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.TmcChain.naive_config">naive_config() (pytmc.xml_collector.TmcChain method)</a>
+</li>
       <li><a href="tmc_render.html#pytmc.SingleProtoData.name">name (pytmc.SingleProtoData attribute)</a>
 
       <ul>
@@ -320,7 +387,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.neaten_field">neaten_field() (pytmc.xml_obj.BaseElement method)</a>
+      <li><a href="xml_collector.html#pytmc.xml_collector.TmcChain.name_list">name_list (pytmc.xml_collector.TmcChain attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -338,8 +405,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xml_obj.html#pytmc.SubItem.parent">parent (pytmc.SubItem attribute)</a>
 </li>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.parse_pragma">parse_pragma() (pytmc.xml_obj.BaseElement static method)</a>
-</li>
       <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.properties">properties (pytmc.xml_obj.BaseElement attribute)</a>
 </li>
       <li><a href="tmc_render.html#pytmc.ProtoRenderAgent">ProtoRenderAgent (class in pytmc)</a>
@@ -347,11 +412,7 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tmc_render.html#pytmc.SingleRecordData.pv">pv (pytmc.SingleRecordData attribute)</a>
-
-      <ul>
-        <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.pv">(pytmc.xml_obj.BaseElement attribute)</a>
 </li>
-      </ul></li>
       <li><a href="tmc_render.html#module-pytmc.tmc_render">pytmc.tmc_render (module)</a>
 </li>
       <li><a href="xml_collector.html#module-pytmc.xml_collector">pytmc.xml_collector (module)</a>
@@ -367,14 +428,20 @@
       <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.raw_config">raw_config (pytmc.xml_obj.BaseElement attribute)</a>
 </li>
       <li><a href="tmc_render.html#pytmc.SingleRecordData.rec_type">rec_type (pytmc.SingleRecordData attribute)</a>
-
-      <ul>
-        <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.rec_type">(pytmc.xml_obj.BaseElement attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="xml_collector.html#pytmc.TmcFile.recursive_explore">recursive_explore() (pytmc.TmcFile method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.TmcFile.recursive_list_SubItems">recursive_list_SubItems() (pytmc.TmcFile method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xml_collector.html#pytmc.xml_collector.ElementCollector.registered">registered (pytmc.xml_collector.ElementCollector attribute)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.TmcFile.render">render() (pytmc.TmcFile method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.render_record">render_record() (pytmc.xml_collector.BaseRecordPackage method)</a>
+</li>
+      <li><a href="xml_collector.html#pytmc.xml_collector.BaseRecordPackage.render_to_string">render_to_string() (pytmc.xml_collector.BaseRecordPackage method)</a>
 </li>
       <li><a href="tmc_render.html#pytmc.tmc_render.RenderAgent">RenderAgent (class in pytmc.tmc_render)</a>
 </li>
@@ -390,8 +457,6 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="xml_obj.html#pytmc.xml_obj.BaseElement.str_f">str_f (pytmc.xml_obj.BaseElement attribute)</a>
-</li>
       <li><a href="xml_obj.html#pytmc.SubItem">SubItem (class in pytmc)</a>
 </li>
       <li><a href="xml_obj.html#pytmc.Symbol">Symbol (class in pytmc)</a>
@@ -412,6 +477,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xml_collector.html#pytmc.xml_collector.TmcChain">TmcChain (class in pytmc.xml_collector)</a>
+</li>
       <li><a href="tmc_render.html#pytmc.TmcExplorer">TmcExplorer (class in pytmc)</a>
 </li>
       <li><a href="xml_collector.html#pytmc.TmcFile">TmcFile (class in pytmc)</a>

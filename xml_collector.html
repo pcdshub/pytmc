@@ -95,6 +95,8 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">xml_collector.py</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#tmcfile">TmcFile</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#elementcollector">ElementCollector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tmcchain">TmcChain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#baserecordpackage">BaseRecordPackage</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tmc_render.html">tmc_render.py</a></li>
@@ -198,6 +200,59 @@ interpretations. Db Files can be produced from the interpretation</p>
 <a class="reference internal" href="#pytmc.TmcFile.isolate_SubItems" title="pytmc.TmcFile.isolate_SubItems"><code class="xref py py-func docutils literal"><span class="pre">isolate_SubItems()</span></code></a>.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="pytmc.TmcFile.all_TmcChains">
+<code class="descname">all_TmcChains</code><a class="headerlink" href="#pytmc.TmcFile.all_TmcChains" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – Collection of all TmcChains in the document. Must be initialized with
+<a class="reference internal" href="#pytmc.TmcFile.create_chains" title="pytmc.TmcFile.create_chains"><code class="xref py py-func docutils literal"><span class="pre">create_chains()</span></code></a>. These chains are NOT SINGULAR.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.TmcFile.all_singular_TmcChains">
+<code class="descname">all_singular_TmcChains</code><a class="headerlink" href="#pytmc.TmcFile.all_singular_TmcChains" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – Collection of all singularized TmcChains in the document. Must be
+initialized with <a class="reference internal" href="#pytmc.TmcFile.isolate_chains" title="pytmc.TmcFile.isolate_chains"><code class="xref py py-func docutils literal"><span class="pre">isolate_chains()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.TmcFile.configure_packages">
+<code class="descname">configure_packages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.configure_packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply guessing methods to self.all_RecordPackages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.TmcFile.create_chains">
+<code class="descname">create_chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.create_chains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add all new TmcChains to this object instance’s all_TmcChains variable</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.TmcFile.create_packages">
+<code class="descname">create_packages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.create_packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate the the self.all_RecordPackages list with no-guessing-applied
+packages. requires self.all_singular_TmcChains to be populated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.TmcFile.explore_all">
+<code class="descname">explore_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.explore_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of ALL paths to leaf-variables in the tmc file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">For every instantiated variable in the TmcFile, return a list
+documenting the path to that variable. This path starts at the
+global level instantiation and tracks through successive levels of
+encapsulation to find the final value itself. For each value, this
+list contains a single row.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="pytmc.TmcFile.isolate_DataTypes">
 <code class="descname">isolate_DataTypes</code><span class="sig-paren">(</span><em>process_subitems=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.isolate_DataTypes" title="Permalink to this definition">¶</a></dt>
@@ -244,6 +299,62 @@ representing each symbol in the .tmc file.</p>
 <a class="reference internal" href="#pytmc.TmcFile.isolate_DataTypes" title="pytmc.TmcFile.isolate_DataTypes"><code class="xref py py-func docutils literal"><span class="pre">isolate_DataTypes()</span></code></a></p>
 </dd></dl>
 
+<dl class="method">
+<dt id="pytmc.TmcFile.isolate_chains">
+<code class="descname">isolate_chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.isolate_chains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate the self.all_Singular_TmcChains with singularized versions of
+the the entries in self.all_TmcChains. Requires create_chains to have
+been run first.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.TmcFile.recursive_explore">
+<code class="descname">recursive_explore</code><span class="sig-paren">(</span><em>root_path</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.recursive_explore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a starting Symbol or SubItem, recursively explore the contents of
+the target and return a list for the path to each final leaf-item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>root_path</strong> (<em>list</em>) – This is a list leading to the initial item to explore from. The
+list is composed of <a class="reference internal" href="xml_obj.html#pytmc.Symbol" title="pytmc.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a> and <a class="reference internal" href="xml_obj.html#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>
+instances</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">This list contains a list for each leaf-item detected. The
+individual lists are the paths through the tree to each leaf-item
+charted by <a class="reference internal" href="xml_obj.html#pytmc.Symbol" title="pytmc.Symbol"><code class="xref py py-class docutils literal"><span class="pre">Symbol</span></code></a> and <a class="reference internal" href="xml_obj.html#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.TmcFile.recursive_list_SubItems">
+<code class="descname">recursive_list_SubItems</code><span class="sig-paren">(</span><em>root_DataType</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.recursive_list_SubItems" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given DataType, provide all of its SubItems including those
+derived from inherited DataTypes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>root_DataType</strong> (<a class="reference internal" href="xml_obj.html#pytmc.DataType" title="pytmc.DataType"><code class="xref py py-class docutils literal"><span class="pre">DataType</span></code></a>) – instance of the target datatype</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of <a class="reference internal" href="xml_obj.html#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal"><span class="pre">SubItem</span></code></a> of contained subItems</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.TmcFile.render">
+<code class="descname">render</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce .db file as string</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -288,6 +399,411 @@ comsumption with pragmas.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tmcchain">
+<h2>TmcChain<a class="headerlink" href="#tmcchain" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.xml_collector.TmcChain">
+<em class="property">class </em><code class="descclassname">pytmc.xml_collector.</code><code class="descname">TmcChain</code><span class="sig-paren">(</span><em>chain</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.TmcChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pointer to the tmc instances and track order. Leaf node is last.</p>
+<dl class="method">
+<dt id="pytmc.xml_collector.TmcChain.build_singular_chains">
+<code class="descname">build_singular_chains</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.TmcChain.build_singular_chains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate list of all acceptable configurations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of TmcChains. Each chain is bound to one of the possible paths
+given the configurations available at each step.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.TmcChain.forkmap">
+<code class="descname">forkmap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.TmcChain.forkmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a description of the branching hierarchy for entries with
+multiple Configurations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This list contains a list for each element contained in the chain.
+This interior list documents all configuration names held by that
+element in the chain.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.TmcChain.is_singular">
+<code class="descname">is_singular</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.TmcChain.is_singular" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether this TmcChain has only a single configuration for
+each element</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if all elements in this chain are singular</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.xml_collector.TmcChain.last">
+<code class="descname">last</code><a class="headerlink" href="#pytmc.xml_collector.TmcChain.last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the last element in the chain.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The instance (of whetever class) that represents the target
+variable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="xml_obj.html#pytmc.xml_obj.BaseElement" title="pytmc.xml_obj.BaseElement">BaseElement</a>, <a class="reference internal" href="xml_obj.html#pytmc.Symbol" title="pytmc.Symbol">Symbol</a>, or <a class="reference internal" href="xml_obj.html#pytmc.SubItem" title="pytmc.SubItem">SubItem</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.TmcChain.naive_config">
+<code class="descname">naive_config</code><span class="sig-paren">(</span><em>cc_symbol=':'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.TmcChain.naive_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>On chains of singular configs, stack up configurations from lowest to
+highest to generate a guess-free configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the configuration built from the existing pragmas in the
+chain.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Configuration</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.xml_collector.TmcChain.name_list">
+<code class="descname">name_list</code><a class="headerlink" href="#pytmc.xml_collector.TmcChain.name_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce list of the names of the elements in the chain. This name list
+should be usable by ADS to access the variable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="baserecordpackage">
+<h2>BaseRecordPackage<a class="headerlink" href="#baserecordpackage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.xml_collector.BaseRecordPackage">
+<em class="property">class </em><code class="descclassname">pytmc.xml_collector.</code><code class="descname">BaseRecordPackage</code><span class="sig-paren">(</span><em>chain=None</em>, <em>origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>BaseRecordPackage includes some basic funcionality that should be shared
+across most versions. This includes things like common methods so things
+like validation can be configured at the __init__ with an instance
+variable. Overwrite/inherit features as necessary.</p>
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.ID_type">
+<code class="descname">ID_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.ID_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distinguish special record types from one another such as a motor
+record. Select from the available types of “standard” and “motor
+record.” Should always return a value. No guessing should be required
+to use this method</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">String name of type</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.apply_config_validation">
+<code class="descname">apply_config_validation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.apply_config_validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the guessing module. Assert that the proper fields exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a list of the missing requirements</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">List</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.cfg_as_dict">
+<code class="descname">cfg_as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.cfg_as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a jinja-template-compatible dictionary describing this
+RecordPackage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">return a dict. Keys are the fields of the jinja template. Contains
+special ‘field’ key where the value is a dictionary with f_name and
+f_set as the key/value pairs respectively.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="pytmc.xml_collector.BaseRecordPackage.generate_files">
+<em class="property">static </em><code class="descname">generate_files</code><span class="sig-paren">(</span><em>records</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.generate_files" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>records</strong> (<em>list</em>) – list of all incoming Record objects</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The Jinja-made output of the full resulting file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.generate_naive_config">
+<code class="descname">generate_naive_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.generate_naive_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create config dictionary from current chain. Move from lowest to
+highest level to create config (highest level has highest precedence).</p>
+<p>Overwrites self.cfg</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.generate_record_entry">
+<code class="descname">generate_record_entry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.generate_record_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>apply all jinja functionality to create the template
+return dict w/ filename as key for each entry in the iterable</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_DTYP">
+<code class="descname">guess_DTYP</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_DTYP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add field specifying DTYP.</p>
+<p>The following is taken from the EPICS wiki: “This field specifies the
+device type for the record. Each record type has its own set of device
+support routines which are specified in devSup.ASCII. If a record type
+does not have any associated device support, DTYP and DSET are
+meaningless.”</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return a boolean that is True iff a change has been made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_FTVL">
+<code class="descname">guess_FTVL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_FTVL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add datatype specification field for waveforms</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_INP_OUT">
+<code class="descname">guess_INP_OUT</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_INP_OUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct, add, INP or OUT field</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return a boolean that is true iff a change has been made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_NELM">
+<code class="descname">guess_NELM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_NELM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add data length secification for waveforms</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_OZ_NAM">
+<code class="descname">guess_OZ_NAM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_OZ_NAM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add ONAM and ZNAM fields for booleans</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return a boolean that is true iff a change has been made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_PREC">
+<code class="descname">guess_PREC</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_PREC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add precision field for the ai/ao type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return a boolean that is true iff a change has been made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_SCAN">
+<code class="descname">guess_SCAN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_SCAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>add field for SCAN field</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return a boolean that is true iff a change has been made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_all">
+<code class="descname">guess_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cycle through guessing methods until none can be applied.
+guessing methods is a list of functions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_common">
+<code class="descname">guess_common</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_common" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add fields that are common to all records (PINI, TSE)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_io">
+<code class="descname">guess_io</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_io" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add information indicating io direction if it is not provided.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return a boolean that is true iff a change has been made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.guess_type">
+<code class="descname">guess_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add information indicating record type (e.g. ai, bo, waveform, etc.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Return a boolean that is true iff a change has been made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.motor_record_as_dict">
+<code class="descname">motor_record_as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.motor_record_as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a jinja-template-compatible dict describing this RecordPackage</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">return a dict. Keys are the fields of the jinja template. Contains
+special ‘field’ key where the value is a dictionary with f_name and
+f_set as the key/value pairs respectively.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.render_record">
+<code class="descname">render_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.render_record" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Jinja rendered entry for this BaseRecordPackage</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_collector.BaseRecordPackage.render_to_string">
+<code class="descname">render_to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.render_to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the individual record to be inserted in the DB file. To be
+returned as a string.
+redundant?</p>
 </dd></dl>
 
 </dd></dl>
