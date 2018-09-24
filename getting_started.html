@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Module Index &mdash; pytmc  documentation</title>
+  <title>Getting Started &mdash; pytmc  documentation</title>
   
 
   
@@ -36,9 +36,9 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="pytmc  documentation" href="index.html"/>
- 
-
-
+        <link rel="up" title="User Guide" href="user_guide.html"/>
+        <link rel="next" title="Installation" href="installation.html"/>
+        <link rel="prev" title="User Guide" href="user_guide.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -88,8 +88,19 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-usage">General Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#marking-the-twincat-project">Marking the TwinCAT project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-usage">Python Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Terminal Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pragma_usage.html">Annotating a TwinCAT3 project</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="source_code.html">Source Documentation</a></li>
 </ul>
 
@@ -135,12 +146,16 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Python Module Index</li>
+          <li><a href="user_guide.html">User Guide</a> &raquo;</li>
+        
+      <li>Getting Started</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -152,39 +167,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-
-   <h1>Python Module Index</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-p"><strong>p</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-p"><td></td><td>
-       <strong>p</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-       <td>
-       <code class="xref">pytmc</code></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="tmc_render.html#module-pytmc.tmc_render"><code class="xref">pytmc.tmc_render</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="xml_collector.html#module-pytmc.xml_collector"><code class="xref">pytmc.xml_collector</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="xml_obj.html#module-pytmc.xml_obj"><code class="xref">pytmc.xml_obj</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-usage">
+<h2>General Usage<a class="headerlink" href="#general-usage" title="Permalink to this headline">¶</a></h2>
+<p>Pytmc’s primary program can be invoked with the command <code class="docutils literal"><span class="pre">pytmc</span></code>. This utility
+takes the <code class="docutils literal"><span class="pre">*.tmc</span></code> file generated from a TwinCAT3 project and creates an epics
+DB file. In order for pytmc to work properly, the TwinCAT project and its
+libraries require annotation. The resulting IOC depends upon EPICS ADS driver. This
+driver is provided by the <a class="reference external" href="https://europeanspallationsource.se/">European Spallation Source</a> and is hosted on their <a class="reference external" href="https://bitbucket.org/europeanspallationsource/m-epics-twincat-ads">bitbucket page</a>.</p>
+</div>
+<div class="section" id="marking-the-twincat-project">
+<h2>Marking the TwinCAT project<a class="headerlink" href="#marking-the-twincat-project" title="Permalink to this headline">¶</a></h2>
+<p>Marking the TwinCAT project determines how the epics record will be generated.
+The marking process uses custom attribute pragmas to designate variables for
+pytmc to process. The pragma should be applied just above the declaration of
+the variable you wish to mark. You can read more about the TwinCAT pragma
+system <a class="reference external" href="https://infosys.beckhoff.com/english.php?content=../content/1033/tc3_plc_intro/9007201784297355.html&amp;id=">here</a>.</p>
+</div>
+<div class="section" id="python-usage">
+<h2>Python Usage<a class="headerlink" href="#python-usage" title="Permalink to this headline">¶</a></h2>
+<p>Once installed pytmc and its components can be imported into a python program
+or shell like any normal python package. Consult the source code documentation
+for specifics.</p>
+</div>
+</div>
 
 
            </div>
@@ -193,6 +200,15 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="user_guide.html" class="btn btn-neutral" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

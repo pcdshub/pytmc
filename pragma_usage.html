@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Annotating a TwinCAT3 project &mdash; pytmc  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pytmc  documentation" href="index.html"/>
+        <link rel="up" title="User Guide" href="user_guide.html"/>
+        <link rel="next" title="Source Documentation" href="source_code.html"/>
+        <link rel="prev" title="Terminal Usage" href="terminal_usage.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pytmc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Terminal Usage</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Annotating a TwinCAT3 project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pragma-syntax">Pragma syntax</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declaring-top-level-variables">Declaring top level variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declaring-bidirectional-pvs">Declaring bidirectional PVs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pragma-fields">Pragma fields</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pv">pv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#io">io</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#type">type</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fields">fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scan">SCAN</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">Source Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="user_guide.html">User Guide</a> &raquo;</li>
+        
+      <li>Annotating a TwinCAT3 project</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/pragma_usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="annotating-a-twincat3-project">
+<h1>Annotating a TwinCAT3 project<a class="headerlink" href="#annotating-a-twincat3-project" title="Permalink to this headline">¶</a></h1>
+<p>Pytmc is capable of generating most of the DB file but some settings require
+human direction. Developers set this configuration by adding an attribute
+pragma to TwinCAT3 variables when they’re declared. These pragmas can be
+appended to variables in project files and library files.</p>
+<p>Pytmc currently supports the following TwinCAT Datatypes.</p>
+<blockquote>
+<div><ul class="simple">
+<li>BOOL</li>
+<li>INT</li>
+<li>LREAL</li>
+<li>STRING</li>
+</ul>
+</div></blockquote>
+<div class="section" id="pragma-syntax">
+<h2>Pragma syntax<a class="headerlink" href="#pragma-syntax" title="Permalink to this headline">¶</a></h2>
+<p>At a minimum, developers must specify a PV. Specifying an IO direction for each
+field is recommended but not required. This would look like the following:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:SCALE
+    io: i
+&#39;}
+scale : LREAL := 0.0;
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">{attribute</span> <span class="pre">'pytmc'</span> <span class="pre">:=</span> <span class="pre">'</span></code> and <code class="docutils literal"><span class="pre">'}</span></code> specify the beginning and end of the
+pragma that pytmc will recognize. The middle two lines specify the
+configuration for this variable.</p>
+<p>Pytmc uses a custom system of configuration where newlines and white space in
+a line is important. All lines begin with a title and the title ends before the
+colon. All parts thereafter are the ‘tag’ or the configuration state for this
+setting. Some title types such as <cite>field</cite> can have multiple settings for a
+single PV.</p>
+<p>A pragma with more specification might look like the following:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:SCALE
+    type: ai
+    field: DTYP stream
+    field: SCAN 1 second
+    io: input
+    str: %f
+&#39;}
+scale : LREAL := 0.0;
+</pre></div>
+</div>
+</div>
+<div class="section" id="declaring-top-level-variables">
+<h2>Declaring top level variables<a class="headerlink" href="#declaring-top-level-variables" title="Permalink to this headline">¶</a></h2>
+<p>This is an example of the simplest configuration a developer can provide to
+instantiate a variable.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:SCALE
+    io: input
+&#39;}
+scale : LREAL := 0.0;
+</pre></div>
+</div>
+<p>The developer must specify the PV name (<code class="docutils literal"><span class="pre">pv:</span></code> line). All other fields are
+optional. We recommend that the user specif the direction of the
+data (<code class="docutils literal"><span class="pre">io:</span></code> line) however.</p>
+<p>Pytmc needs no additional information but users have the option to override
+default settings manually. For example a developer can specify <code class="docutils literal"><span class="pre">scan:</span></code> field
+(configures how and when the value is updated) even though this is not
+required. For additional information on all the pragma fields, consult the
+<a class="reference internal" href="#pragma-fields">Pragma fields</a> section.</p>
+</div>
+<div class="section" id="declaring-encapsulated-variables">
+<h2>Declaring encapsulated variables<a class="headerlink" href="#declaring-encapsulated-variables" title="Permalink to this headline">¶</a></h2>
+<p>Variables declared inside of data structures can be processed by pytmc so long
+as each level of encapsulation, all the way down to the first level, is marked
+for pytmc.</p>
+<p>The instantiation of encapsulating data types only needs the <code class="docutils literal"><span class="pre">pv:</span></code> line. The
+instantiation of a function block could resemble the following:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:COUNTER_B
+&#39;}
+counter_b : counter;
+</pre></div>
+</div>
+<p>A variable declared within the <code class="docutils literal"><span class="pre">counter</span></code> function block could resemble the
+following:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: VALUE
+    io: i
+&#39;}
+value_d : DINT;
+</pre></div>
+</div>
+<p>When combined, the PV specified at the instantiation of the user-defined data
+type will be appended to the beginning of the PV for all data types defined
+within. Each step further into a data structure can add an additional section
+to the PV. In the example above the final PV will be
+<code class="docutils literal"><span class="pre">TEST:MAIN:COUNTER_B:VALUE</span></code>. The colons are automatically included.</p>
+<p>This can be recursively applied to data types containing data types.</p>
+<p>Information other than the PV name name can be specified at the datatype
+instantiation if you wish to make generalizations about the variables
+contained inside. These generalizations are overridden if the same field is
+specified either on a contained datatype or variable.</p>
+<p>For example the following code block will assign a <code class="docutils literal"><span class="pre">field:</span></code> of <code class="docutils literal"><span class="pre">SCAN</span> <span class="pre">1</span>
+<span class="pre">second</span></code> to all the variables and datatypes that it contains unless they
+specify their own version of the</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: BASE
+    field: SCAN 1 second
+&#39;}
+counter_b : counter;
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: VALUE_F_R
+    type: ai
+    field: DTYP stream
+    field: SCAN 1 second
+    io: input
+    str: %d
+&#39;}
+value_d : DINT;
+</pre></div>
+</div>
+</div>
+<div class="section" id="declaring-bidirectional-pvs">
+<h2>Declaring bidirectional PVs<a class="headerlink" href="#declaring-bidirectional-pvs" title="Permalink to this headline">¶</a></h2>
+<p>In instances where a single TwinCAT variable should be able to be both written
+and read, multiple PVs can be specified. This allows multiple PVs to be tied to
+a single TwinCAT variable.</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:ULIMIT_R
+    io: io
+&#39;}
+upper_limit : DINT := 5000;
+</pre></div>
+</div>
+<p>When specifying multiple PVs, the configuration lines all apply to the nearest,
+previous <code class="docutils literal"><span class="pre">pv</span></code> line. For example in the code snippet above, <code class="docutils literal"><span class="pre">type:</span> <span class="pre">ai</span></code> will
+be applied to the <code class="docutils literal"><span class="pre">TEST:MAIN:ULIMIT_R</span></code> pv and the <code class="docutils literal"><span class="pre">type:</span> <span class="pre">ao</span></code> will be
+applied to <code class="docutils literal"><span class="pre">TEST:MAIN:ULIMT_W</span></code>.</p>
+</div>
+<div class="section" id="pragma-fields">
+<h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Permalink to this headline">¶</a></h2>
+<p>The lines of the pragma tell pytmc how to generate the db and proto. This
+section contains more specific descriptions of each of the configuration lines.
+Many are automatic with the exception of Pv</p>
+<div class="section" id="pv">
+<h3>pv<a class="headerlink" href="#pv" title="Permalink to this headline">¶</a></h3>
+<p>This constructs the PV name that will represent this variable in EPICS. It is
+the only mandatory configuration line. This line can be used on specific
+variables as well as the instantiations of data types. When used on variables
+declared in the main scope, the PV for the variable will be generated verbatim.
+When used on instantiations, this string will be appended to the front of any
+PVs that are declared within the data type.</p>
+</div>
+<div class="section" id="io">
+<h3>io<a class="headerlink" href="#io" title="Permalink to this headline">¶</a></h3>
+<p>This is a guessed field that defaults to ‘io’.Specify the whether the IOC is
+reading or writing this value. Values being sent from the PLC to the IOC should
+be marked as input with ‘i’ or ‘input’ and values being sent to the PLC from
+the IOC should be marked ‘o’ or ‘output’.  Bidirectional PVs can be specified
+with ‘io’.</p>
+</div>
+<div class="section" id="type">
+<h3>type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h3>
+<p>This is a guessed field and does not need manual specification. This specifies
+the EPICS record type. For more information about EPICS records, read this page
+from the <a class="reference external" href="https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14">EPICS wiki</a>.
+Due to the ADS driver records for variables that aren’t array-like are
+typically of type ai or ao.</p>
+</div>
+<div class="section" id="fields">
+<h3>fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h3>
+<p>This is a guessed field and does not need manual specification. This specifies
+the lines that will be placed in the epics db as ‘fields’.  Multiple field
+lines are allowed. These lines determine the PV’s behaviors such as alarm
+limits and scanning frequency.  Each field specified in the db corresponds to a
+field line in the pragma.  Almost all PVs will have multiple fields and hence
+multiple field lines in the pragma. The field line has two sections, the field
+type and the argument. The field type is the first string of characters up
+until the first character of whitespace. It us usually an all-caps abbreviation
+like RVAL, DTYP or EGU. This determines the type of field being set. All
+characters after the first space are treated as the argument to the field. The
+argument can include any characters including spaces and is only broken on a
+new line. The INP and OUT fields are generated automatically so there is no
+need to manually include them.</p>
+</div>
+<div class="section" id="scan">
+<h3>SCAN<a class="headerlink" href="#scan" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">SCAN</span></code> field is special. Pytmc will guess a scan field if not provided
+but like <code class="docutils literal"><span class="pre">io</span></code> and <code class="docutils literal"><span class="pre">pv</span></code>, the correct setting may be subjective. We would
+encourage developers to be aware of this setting. Binary fields default to
+<code class="docutils literal"><span class="pre">I/O</span> <span class="pre">Intr</span></code> for gets. All others default to a polling period of <code class="docutils literal"><span class="pre">.5</span> <span class="pre">second</span></code>
+for reads and <code class="docutils literal"><span class="pre">Passive</span></code> for gets.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="source_code.html" class="btn btn-neutral float-right" title="Source Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="terminal_usage.html" class="btn btn-neutral" title="Terminal Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

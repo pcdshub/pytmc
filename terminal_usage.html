@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Module Index &mdash; pytmc  documentation</title>
+  <title>Terminal Usage &mdash; pytmc  documentation</title>
   
 
   
@@ -36,9 +36,9 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="pytmc  documentation" href="index.html"/>
- 
-
-
+        <link rel="up" title="User Guide" href="user_guide.html"/>
+        <link rel="next" title="Annotating a TwinCAT3 project" href="pragma_usage.html"/>
+        <link rel="prev" title="Installation" href="installation.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -88,8 +88,18 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Terminal Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-pytmc">Using pytmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#command-line-arguments">Command line arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pragma_usage.html">Annotating a TwinCAT3 project</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="source_code.html">Source Documentation</a></li>
 </ul>
 
@@ -135,12 +145,16 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Python Module Index</li>
+          <li><a href="user_guide.html">User Guide</a> &raquo;</li>
+        
+      <li>Terminal Usage</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/terminal_usage.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -152,39 +166,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
+  <div class="section" id="terminal-usage">
+<h1>Terminal Usage<a class="headerlink" href="#terminal-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-pytmc">
+<h2>Using pytmc<a class="headerlink" href="#using-pytmc" title="Permalink to this headline">¶</a></h2>
+<p>Once pytmc has been installed in a virtual environment the <code class="docutils literal"><span class="pre">makerecord</span></code>
+command can be called from the command line to generate the .db file. The
+command uses two positional arguments. The first is the input specifying the
+location of the .tmc file to be processed. In most TwinCAT projects the .tmc
+file will be located in  <code class="docutils literal"><span class="pre">[solution</span> <span class="pre">folder]/[project</span> <span class="pre">folder]/[plc</span> <span class="pre">project]</span>
+<span class="pre">named</span> <span class="pre">[plc</span> <span class="pre">project].tmc</span></code>.</p>
+</div>
+<div class="section" id="command-line-arguments">
+<h2>Command line arguments<a class="headerlink" href="#command-line-arguments" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none"><div class="highlight"><pre><span></span>NAME
+   pytmc
+DESCRIPTION
+   usage: pytmc TMC_FILE [-o DB_FILE] [-h]
+OPTIONS
+   positional arguments:
+     INPUT       Path to interpreted .tmc file
+     OUTPUT      Path to output .db file
 
-   <h1>Python Module Index</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-p"><strong>p</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-p"><td></td><td>
-       <strong>p</strong></td><td></td></tr>
-     <tr>
-       <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-       <td>
-       <code class="xref">pytmc</code></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="tmc_render.html#module-pytmc.tmc_render"><code class="xref">pytmc.tmc_render</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="xml_collector.html#module-pytmc.xml_collector"><code class="xref">pytmc.xml_collector</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
-       <a href="xml_obj.html#module-pytmc.xml_obj"><code class="xref">pytmc.xml_obj</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+   optional arguments:
+     -h, --help  show this help message and exit
+</pre></div>
+</div>
+</div>
+</div>
 
 
            </div>
@@ -193,6 +202,15 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pragma_usage.html" class="btn btn-neutral float-right" title="Annotating a TwinCAT3 project" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
