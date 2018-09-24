@@ -6,17 +6,25 @@ human direction. Developers set this configuration by adding an attribute
 pragma to TwinCAT3 variables when they're declared. These pragmas can be
 appended to variables in project files and library files.
 
+Pytmc currently supports the following TwinCAT Datatypes.
+
+ - BOOL
+ - INT
+ - LREAL
+ - STRING 
+
+
 Pragma syntax
 '''''''''''''
 
-At a minimum, developers must specify a PV name and an IO direction for each
-field. This would look like the following:
+At a minimum, developers must specify a PV. Specifying an IO direction for each
+field is recommended but not required. This would look like the following:
 
 .. code-block:: none 
    
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
-       io: input
+       io: i
    '}
    scale : LREAL := 0.0;
 
@@ -59,8 +67,9 @@ instantiate a variable.
    scale : LREAL := 0.0;
 
 
-The developer must specify the PV name (``pv:`` line) and the direction of the
-data (``io:`` line). 
+The developer must specify the PV name (``pv:`` line). All other fields are
+optional. We recommend that the user specif the direction of the
+data (``io:`` line) however. 
 
 Pytmc needs no additional information but users have the option to override
 default settings manually. For example a developer can specify ``scan:`` field
@@ -92,7 +101,7 @@ following:
   
    {attribute 'pytmc' := '
        pv: VALUE
-       io: input
+       io: i
    '}  
    value_d : DINT; 
 
@@ -104,17 +113,6 @@ to the PV. In the example above the final PV will be
 ``TEST:MAIN:COUNTER_B:VALUE``. The colons are automatically included. 
 
 This can be recursively applied to data types containing data types.
-
-If you want PVs to be produced by a data type but don't wish to add an
-additional term to the PV, you can use the following syntax.
-
-.. code-block:: none 
-
-   {attribute 'pytmc' := '
-       pv: 
-   '}
-   counter_b : counter;
-
 
 Information other than the PV name name can be specified at the datatype
 instantiation if you wish to make generalizations about the variables
@@ -128,7 +126,7 @@ specify their own version of the
 .. code-block:: none 
 
    {attribute 'pytmc' := '
-       pv: 
+       pv: BASE 
        field: SCAN 1 second
    '}
    counter_b : counter;
@@ -157,16 +155,7 @@ a single TwinCAT variable.
 
    {attribute 'pytmc' := '
        pv: TEST:MAIN:ULIMIT_R
-       type: ai
-       field: DTYP stream
-       field: SCAN 1 second
-       io: input
-       str: %d
-       pv: TEST:MAIN:ULIMIT_W
-       type: ao
-       field: DTYP stream
-       io: out
-       str: %d
+       io: io
    '}  
    upper_limit : DINT := 5000;
 
@@ -175,65 +164,59 @@ previous ``pv`` line. For example in the code snippet above, ``type: ai`` will
 be applied to the ``TEST:MAIN:ULIMIT_R`` pv and the ``type: ao`` will be
 applied to ``TEST:MAIN:ULIMT_W``.
 
+
 Pragma fields
 '''''''''''''
 The lines of the pragma tell pytmc how to generate the db and proto. This
 section contains more specific descriptions of each of the configuration lines.
+Many are automatic with the exception of Pv
 
 pv
 ..
-This constructs the PV name that will represent this variable in EPICS. This
-line can be used on specific variables as well as the instantiations of data
-types. When used on variables declared in the main scope, the PV for the
-variable will be generated verbatim. When used on instantiations, this string
-will be appended to the front of any PVs that are declared within the data
-type. 
-
-type
-....
-This specifies the EPICS record type. For more information about EPICS records,
-read this page from the `EPICS wiki
-<https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14>`_. Due to the ADS
-driver records for variables that aren't array-like are typically of type ai or
-ao.
-
-field
-.....
-This specifies the lines that will be placed in the epics db as 'fields'.
-Multiple field lines are allowed. These lines determine the PV's behaviors
-such as alarm limits and scanning frequency.  Each field specified in the db
-corresponds to a field line in the pragma.  Almost all PVs will have multiple
-fields and hence multiple field lines in the pragma. The field line has two
-sections, the field type and the argument. The field type is the first string
-of characters up until the first character of whitespace. It us usually an
-all-caps abbreviation like RVAL, DTYP or EGU. This determines the type of field
-being set. All characters after the first space are treated as the argument to
-the field. The argument can include any characters including spaces and is only
-broken on a new line. The INP and OUT fields are generated automatically so
-there is no need to manually include them.
-
-SCAN field
-""""""""""
-The ``SCAN`` field is special. Pytmc will guess a scan field if not provided
-but like ``io`` and ``pv``, the correct setting may be subjective. We would
-encourage developers to be aware of this setting. Binary fields default to  
-``I/O Intr``. All others default to a polling period of ``.5 second``.
+This constructs the PV name that will represent this variable in EPICS. It is
+the only mandatory configuration line. This line can be used on specific
+variables as well as the instantiations of data types. When used on variables
+declared in the main scope, the PV for the variable will be generated verbatim.
+When used on instantiations, this string will be appended to the front of any
+PVs that are declared within the data type. 
 
 io
 ..
-Specify the whether the IOC is reading or writing this value. Values being sent
-from the PLC to the IOC should be marked as input with 'i' or 'input' and
-values being sent to the PLC from the IOC should be marked 'o' or 'output'.
+This is a guessed field that defaults to 'io'.Specify the whether the IOC is
+reading or writing this value. Values being sent from the PLC to the IOC should
+be marked as input with 'i' or 'input' and values being sent to the PLC from
+the IOC should be marked 'o' or 'output'.  Bidirectional PVs can be specified
+with 'io'.
 
-str
-...
-Specify how to format the data for the ADS interface. E.g. use ``%s``, ``%d``,
-and ``%f`` as if this were a C/C++ program.
-
-init
+type
 ....
-Variables with both read and write variables can use ``init: true`` to indicate
-that the initial value of the writable value should be initialized as the
-current value read from this PV. The init line should be attached to the output
-PV. Given that the ADS driver is moving away from using the proto file, this
-field may be deprecated soon. 
+This is a guessed field and does not need manual specification. This specifies
+the EPICS record type. For more information about EPICS records, read this page
+from the `EPICS wiki <https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14>`_.
+Due to the ADS driver records for variables that aren't array-like are
+typically of type ai or ao.
+
+fields
+......
+This is a guessed field and does not need manual specification. This specifies
+the lines that will be placed in the epics db as 'fields'.  Multiple field
+lines are allowed. These lines determine the PV's behaviors such as alarm
+limits and scanning frequency.  Each field specified in the db corresponds to a
+field line in the pragma.  Almost all PVs will have multiple fields and hence
+multiple field lines in the pragma. The field line has two sections, the field
+type and the argument. The field type is the first string of characters up
+until the first character of whitespace. It us usually an all-caps abbreviation
+like RVAL, DTYP or EGU. This determines the type of field being set. All
+characters after the first space are treated as the argument to the field. The
+argument can include any characters including spaces and is only broken on a
+new line. The INP and OUT fields are generated automatically so there is no
+need to manually include them.
+
+SCAN
+....
+The ``SCAN`` field is special. Pytmc will guess a scan field if not provided
+but like ``io`` and ``pv``, the correct setting may be subjective. We would
+encourage developers to be aware of this setting. Binary fields default to
+``I/O Intr`` for gets. All others default to a polling period of ``.5 second``
+for reads and ``Passive`` for gets.
+
