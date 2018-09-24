@@ -17,18 +17,18 @@ from Beckhoff's TwinCAT3 projects.
 Pytmc is developed with these `guidelines
 <https://pcdshub.github.io/development.html>`_ in mind.
 
+The source code is hosted on `github <https://github.com/slaclab/pytmc>`_.
+
+Issues and requests can be posted on the `github issue tracker
+<https://github.com/slaclab/pytmc/issues>`_. Use the ``bug`` tag for issues
+with intended features and the ``enhancement`` tag can be used for feature
+requests. The ``question`` tag will be treated like an 'enhancements' tag for
+the documentation but regular questions can be posted there as well. 
+
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: Contents:
 
    user_guide.rst
-   source_docs.rst
-   dev_notes.rst
+   source_code.rst
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
