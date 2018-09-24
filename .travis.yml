@@ -26,7 +26,8 @@ install:
   - conda info -a
   # Manage conda environment
   - conda create -n pytmc-env pip
-  - source activate pytmc-env 
+  - source activate pytmc-env
+  - pip install -U pip
   - pip install -r requirements.txt
   - pip install -e .
   - pip install coverage codecov

@@ -2,10 +2,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 import argparse
-from pytmc import FullRender
+from pytmc import TmcFile
 import pytmc
 
-description = """Tool for generating .db files (Currently in alpha)"""
+description = """\
+Commandline utility for generating epics records files from TwinCAT3 .tmc
+files. This program is designed to work in conjunction with ESSS'
+m-epics-twincat-ads driver."""
 
 parser = argparse.ArgumentParser(
     description = description,
@@ -13,18 +16,27 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    'input_file', metavar="INPUT", type=str, help='input file'
+    'tmc_file', metavar="INPUT", type=str, help='Path to interpreted .tmc file'
 )
 
 parser.add_argument(
-    'output_file', metavar="OUTPUT", type=str, help='output file'
+    'record_file', metavar="OUTPUT", type=str, help='Path to output .db file'
 )
 
 args = parser.parse_args()
 
 def main():
-    f = FullRender(args.input_file,args.output_file)
-    f.save()
+    tmc_file = open(args.tmc_file,'r')
+    tmc_obj = TmcFile(tmc_file)
+    tmc_obj.create_chains()
+    tmc_obj.isolate_chains()
+    tmc_obj.create_packages()
+    tmc_obj.configure_packages()
+    db_string = tmc_obj.render()
+    record_file = open(args.record_file,'w')
+    record_file.write(db_string)
+    tmc_file.close()
+    record_file.close()
 
 if __name__ == '__main__':
     main()

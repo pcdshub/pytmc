@@ -1,0 +1,8 @@
+record({{type}},"{{pv}}"){
+{% if info %}
+  info(asyn:READBACK,"1")
+{% endif %}
+{% for f in field%}
+  field({{f}}, {{field[f]}})
+{% endfor %}
+}

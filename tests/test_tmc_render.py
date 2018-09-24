@@ -10,7 +10,7 @@ from pytmc.xml_obj import BaseElement
 from pytmc import TmcFile
 from pytmc.xml_collector import ElementCollector
 from pytmc import (DbRenderAgent, SingleRecordData, TmcExplorer, FullRender,
-        SingleProtoData, ProtoRenderAgent)
+        SingleProtoData, ProtoRenderAgent, PvPackage)
 
 from collections import defaultdict
 
@@ -119,63 +119,84 @@ def test_TmcExplorer_instantiation(generic_tmc_path):
         pytest.fail("Instantiation of TmcExplorer should not generate errors")
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_create_intf(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc,'file.proto')
 
-    # Check for variable in MAIN scope
-    exp.create_intf([tmc.all_Symbols['MAIN.ulimit']])
-    records = SingleRecordData.from_element(
-        tmc.all_Symbols['MAIN.ulimit'],
-        proto_file = "file.proto",
-        names=['GetMAINulimit'])
-    protos = SingleProtoData.from_element_path(
-        [tmc.all_Symbols['MAIN.ulimit'],],
-        name='MAINulimit'
-    )
-    assert records[0] in exp.all_records
-    assert protos[0] in exp.all_protos
+    # Create intf for singular variable in MAIN scope
     
-    # Check for variable in encapsulated scope
-    exp.create_intf(
-        [
-            tmc.all_Symbols['MAIN.struct_base'],
-            tmc.all_SubItems['DUT_STRUCT']['struct_var']
-        ],
+    path = [tmc.all_Symbols['MAIN.ulimit']] 
+    exp.create_intf(path)
+    pv_packs = PvPackage.from_element_path(
+        target_path = path,
+        base_proto_name = 'MAINulimit',
+        proto_file_name = 'file.proto',
     )
-    records = SingleRecordData.from_element(
-        tmc.all_SubItems['DUT_STRUCT']['struct_var'],
-        proto_file = "file.proto",
-        prefix = tmc.all_Symbols['MAIN.struct_base'].pv,
-        names=['SetMAINstruct_basestruct_var']
-    )
-    protos = SingleProtoData.from_element_path(
-        [
-            tmc.all_Symbols['MAIN.struct_base'],
-            tmc.all_SubItems['DUT_STRUCT']['struct_var']
-        ],
-        name='MAINstruct_basestruct_var'
-    )
-    assert records[0] in exp.all_records
-    assert protos[0] in exp.all_protos
     
-    # t3
-    exp.create_intf([tmc.all_Symbols['MAIN.NEW_VAR']])
-    record_o, record_i = SingleRecordData.from_element(
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-        proto_file = 'file.proto',
-        names=['SetMAINNEW_VAR','GetMAINNEW_VAR']
+    for pack in pv_packs:
+        #logging.debug(str(pack.__dict__))
+        #logging.debug(str(exp.all_pvpacks[0].__dict__))
+        assert pack in exp.all_pvpacks
+
+    # create intf for variable in encapsulated scope
+    path = [
+        tmc.all_Symbols['MAIN.struct_base'],
+        tmc.all_SubItems['DUT_STRUCT']['struct_var']
+    ]
+    exp.create_intf(path)
+    pv_packs = PvPackage.from_element_path(
+        target_path = path,
+        base_proto_name = 'MAINstruct_basestruct_var',
+        proto_file_name = 'file.proto',
     )
-    proto_o, proto_i = SingleProtoData.from_element_path(
-        [tmc.all_Symbols['MAIN.NEW_VAR']],
-        name='MAINNEW_VAR'
-    )
-    assert record_o in exp.all_records
-    assert record_i in exp.all_records
-    assert proto_o in exp.all_protos
-    assert proto_i in exp.all_protos
+    
+    for pack in pv_packs:
+        #logging.debug(str(pack.__dict__))
+        #logging.debug(str(exp.all_pvpacks[1].__dict__))
+        assert pack in exp.all_pvpacks
 
 
+    # create intf for user-defined data structure instance 
+    path = [tmc.all_Symbols['MAIN.NEW_VAR']]
+    exp.create_intf(path)
+    pv_packs = PvPackage.from_element_path(
+        target_path = path,
+        base_proto_name = 'MAINNEW_VAR',
+        proto_file_name = 'file.proto',
+    )
+    #logging.debug(str(exp.all_pvpacks[2].__dict__))
+    #logging.debug(str(exp.all_pvpacks[3].__dict__))
+    for pack in pv_packs:
+        #logging.debug(str(pack.__dict__))
+        assert pack in exp.all_pvpacks
+
+    # create intf for basic array
+    path = [tmc.all_Symbols['MAIN.dtype_samples_int_array']]
+    exp.create_intf(path)
+    pv_packs = PvPackage.from_element_path(
+        target_path = path,
+        base_proto_name = 'MAINdtype_samples_int_array',
+        proto_file_name = 'file.proto',
+    )
+    for pack in pv_packs:
+        assert pack in exp.all_pvpacks
+    
+    # create intf for array of user-defined types
+    path = [tmc.all_Symbols['MAIN.dtype_samples_iter_array']]
+    exp.create_intf(path)
+    pv_packs, rejects = PvPackage.from_element_path(
+        target_path = path,
+        base_proto_name = 'MAINdtype_samples_iter_array',
+        proto_file_name = 'file.proto',
+        return_rejects = True,
+    )
+    for pack in pv_packs:
+        assert pack not in exp.all_pvpacks
+    logging.debug(str(rejects))
+
+
+@pytest.mark.skip(reason="Pending deprecation")
 def test_SingleRecordData_from_element(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)
@@ -230,6 +251,7 @@ def test_SingleRecordData_from_element(generic_tmc_path):
     ] 
    
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_DataType(generic_tmc_path):
     '''Explore single level Datatype (Datatype doesn't contain others)
     '''
@@ -257,6 +279,7 @@ def test_TmcExplorer_exp_DataType(generic_tmc_path):
     assert len(exp.all_records) == 2
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_DataType_recursive(generic_tmc_path):
     '''Explore multi level Datatype (Datatype contains others)
     '''
@@ -285,6 +308,7 @@ def test_TmcExplorer_exp_DataType_recursive(generic_tmc_path):
     assert len(exp.all_records) == 7
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc,'file.proto')
@@ -321,6 +345,7 @@ def test_TmcExplorer_exp_Symbols(generic_tmc_path):
     assert len(exp.all_records) == 5
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc,'file.proto')
@@ -354,12 +379,7 @@ def test_TmcExplorer_exp_Symbols_all(generic_tmc_path):
     )    
     assert records[0]in exp.all_records 
     
-    assert len(exp.all_records) == 24
-
-
-@pytest.mark.skip(reason="Not yet implemented")
-def test_TmcExplorer_generate_ads_line(generic_tmc_path):
-    pytest.fail("WIP")
+    assert len(exp.all_records) == 26
 
 
 def test_TmcExplorer_read_ini(generic_tmc_path):
@@ -367,6 +387,7 @@ def test_TmcExplorer_read_ini(generic_tmc_path):
     exp = TmcExplorer(tmc)
 
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_FullRender_instantiation(generic_tmc_path):
     fr = FullRender(generic_tmc_path,'TEST')
 
@@ -423,6 +444,7 @@ def test_SingleProtoData_has_init(generic_tmc_path):
     assert proto.has_init == False 
     
 
+@pytest.mark.skip(reason="Pending deprecation")
 def test_SingleProtoData_from_element_path(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     exp = TmcExplorer(tmc)

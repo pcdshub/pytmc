@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 #from pytmc.xml_obj import Symbol, DataType
 from pytmc import Symbol, DataType, SubItem
-from pytmc.xml_obj import BaseElement
+from pytmc.xml_obj import BaseElement, PvNotFrozenError, Configuration
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -96,7 +96,43 @@ def test_BaseElement_properties(generic_tmc_root):
                 'PouType':'FunctionBlock',
                 'iterator attr':'42',
                 'pytmc':'name: ITERATORNAME'}, "Incorrect properties found"
-   
+
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
+def test_BaseElement_extract_from_pragma(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    result = symbol_element.extract_from_pragma('pv')
+    assert result == [
+        "TEST:MAIN:NEW_VAR_OUT",
+        "TEST:MAIN:NEW_VAR_IN"
+    ]
+
+
+def test_BaseElement_pragma(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    base_element = BaseElement(symbol_xml)
+
+    base_element.pragma.fix_to_config_name('TEST:MAIN:NEW_VAR_OUT')
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init','tag':'True'},
+    ]
+
+    assert base_element.pragma.config == data 
+
 
 def test_Symbol_instantiation(generic_tmc_root):
     root = generic_tmc_root
@@ -319,6 +355,7 @@ def test_has_config(generic_tmc_root):
     assert symbol_element.has_config == False
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_config_lines(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -333,9 +370,10 @@ def test_config_lines(generic_tmc_root):
         {'title': 'io', 'tag': 'input'},
         {'title': 'str', 'tag': '%d'}
     ]
-    assert symbol_element.config_lines == data
+    assert symbol_element._config_lines == data
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_neaten_field(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -353,6 +391,7 @@ def test_neaten_field(generic_tmc_root):
     }
 
 
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
 def test_config(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
@@ -367,148 +406,17 @@ def test_config(generic_tmc_root):
         {'title': 'io', 'tag': 'input'},
         {'title': 'str', 'tag': '%d'}
     ]
-    assert symbol_element.config == data
+    assert symbol_element._config == data
 
 
-def test_all_dtname(generic_tmc_root):
-    root = generic_tmc_root
-    
-    element= root.find(
-        "./DataTypes/DataType/[Name='iterator']"
-    )
-    el = DataType(element)
-    assert el.dtname == 'ITERATORNAME'
-
-
-def test_all_fields(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.fields == [
-        {'f_name':'DTYP','f_set':'asynFloat64'},
-        {'f_name':'EGU','f_set':'mm'},
-    ] 
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert subitem_element.fields == [
-        {'f_name':'DTYP','f_set':'asynFloat64'},
-        {'f_name':'EGU','f_set':'mm'},
-    ] 
-
-
-def test_all_pv(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.pv == 'LIM'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.pv == 'TEST:MAIN:ULIMIT'
-    
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
+def test_BaseElement_config_by_pv(generic_tmc_root):
     root = generic_tmc_root
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
     ) 
     symbol_element = Symbol(symbol_xml)
-    assert symbol_element.pv == [
-        'TEST:MAIN:NEW_VAR_OUT','TEST:MAIN:NEW_VAR_IN'
-    ]
-
-
-def test_all_rec_type(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.rec_type == 'ao'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.rec_type == 'ai'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.rec_type == [
-        'bo','bi'
-    ]
-
-
-def test_all_str_f(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.str_f == '%d'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.str_f == '%d'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.str_f == [
-        '%d','%d'
-    ]
-
-
-def test_all_io(generic_tmc_root):
-    root = generic_tmc_root
-    subitem_xml = root.find(
-        "./DataTypes/DataType/[Name='iterator']/SubItem/[Name='lim']"
-    ) 
-    subitem_element = SubItem(subitem_xml)
-    assert subitem_element.io == 'o'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.ulimit']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.io == 'input'
-    
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    assert symbol_element.io == [
-        'o','i'
-    ]
-
-
-def test_all_config_by_pv(generic_tmc_root):
-    root = generic_tmc_root
-    symbol_xml = root.find(
-        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
-    ) 
-    symbol_element = Symbol(symbol_xml)
-    data = [
+    data_unfiltered = [
         [
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
             {'title': 'type', 'tag': 'bo'},
@@ -529,7 +437,357 @@ def test_all_config_by_pv(generic_tmc_root):
             {'title': 'io', 'tag': 'i'},
         ]
     ]
+    data_filtered = [data_unfiltered[1]]
 
-    assert symbol_element.config_by_pv == data
+    assert symbol_element.config_by_pv() == data_unfiltered
 
 
+def test_BaseElement_is_array(generic_tmc_root):
+    root = generic_tmc_root
+    
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.is_array
+    
+    datatype_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    assert symbol_element.is_array
+
+    item_xml = root.find(
+        "./DataTypes/DataType/[Name='DUT_CONTAINER']/SubItem/"
+        +"[Name='dtype_samples_iter_array']"
+    )
+    subitem_element = SubItem(item_xml)
+    assert subitem_element.is_array
+
+
+def test_BaseElement_iterable_length(string_tmc_root):
+    root = string_tmc_root
+    non_iter_symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    non_iter_symbol_element = Symbol(non_iter_symbol_xml)
+    assert non_iter_symbol_element.iterable_length is None
+    array_symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    array_symbol_element = BaseElement(array_symbol_xml)
+    assert array_symbol_element.iterable_length == 5
+
+    str_symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.StringTest']"
+    ) 
+    str_symbol_element = BaseElement(str_symbol_xml)
+    assert str_symbol_element.iterable_length == 55
+
+
+def test_BaseElement_is_string(string_tmc_root):
+    root = string_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.dtype_samples_int_array']"
+    ) 
+    nonstr_symbol_element = BaseElement(symbol_xml)
+    assert nonstr_symbol_element.is_str == False
+
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/"
+        +"[Name='MAIN.StringTest']"
+    ) 
+    str_symbol_element = BaseElement(symbol_xml)
+    assert str_symbol_element.is_str == True
+
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
+def test_BaseElement_all_pvs(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    result = symbol_element.all_pvs()
+    assert result == [
+        "TEST:MAIN:NEW_VAR_OUT",
+        "TEST:MAIN:NEW_VAR_IN"
+    ]
+
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
+def test_BaseElement_freeze_pv(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+     
+    with pytest.raises(PvNotFrozenError):
+        z = symbol_element.pragma
+    
+    with pytest.raises(PvNotFrozenError):
+        symbol_element.pragma = 2
+
+    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+    assert symbol_element.pv() == 'TEST:MAIN:NEW_VAR_IN'
+    assert symbol_element.read_pragma() == data
+
+    assert symbol_element.pragma == data, "Pragma not prperly read or set"
+    extra = {'title': 'none', 'tag': 'blank'}
+    symbol_element.pragma.append(extra)
+    data.append(extra)
+    assert symbol_element.pragma == data, "Pragma not properly added"
+    del symbol_element.pragma
+    assert symbol_element._pragma == None, "Pragma not deleted properly"
+
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
+def test_BaseElement_add_pragma_line(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    with pytest.raises(PvNotFrozenError):
+        symbol_element.add_pragma_line('a','b')
+    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+    symbol_element.add_pragma_line("a","b")
+    data.append({'title': 'a', 'tag': 'b'})
+    assert symbol_element.pragma == data
+
+
+@pytest.mark.skip(reason="pragma features moved to Configuration object")
+def test_BaseElement_add_pragma_field(generic_tmc_root):
+    root = generic_tmc_root
+    symbol_xml = root.find(
+        "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
+    ) 
+    symbol_element = Symbol(symbol_xml)
+    with pytest.raises(PvNotFrozenError):
+        symbol_element.add_pragma_field('a','b')
+    symbol_element.freeze_pv('TEST:MAIN:NEW_VAR_IN')
+    data = [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+    symbol_element.add_pragma_field("a","b")
+    data.append({'title': 'field', 'tag': {'f_name': 'a', 'f_set': 'b'}})
+    assert symbol_element.pragma == data
+
+
+def test_Configuration_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg._config_lines()
+    assert result == [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':'ZNAM\tSINGLE'},
+        {'title': 'field', 'tag':'ONAM\tMULTI'},
+        {'title': 'field', 'tag':'SCAN\t1 second'},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init', 'tag': 'True'},
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':'ZNAM\tSINGLE'},
+        {'title': 'field', 'tag':'ONAM\tMULTI'},
+        {'title': 'field', 'tag':'SCAN\t1 second'},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+
+
+def test_Configuration_neaten_field(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    cfg_lines = cfg._config_lines()
+    result = cfg._neaten_field(cfg_lines[2]['tag'])
+    
+    assert result == {'f_name':'ZNAM','f_set':'SINGLE'}
+
+
+def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg._formatted_config_lines()
+    assert result == [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init', 'tag': 'True'},
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+        {'title': 'type', 'tag': 'bi'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+ 
+
+def test_Configuration_config_by_name(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg._config_by_name()
+    assert result == [
+        [
+            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+            {'title': 'type', 'tag': 'bo'},
+            {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+            {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+            {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+            {'title': 'str', 'tag': '%d'},
+            {'title': 'io', 'tag': 'o'},
+            {'title': 'init', 'tag': 'True'},
+        ],
+        [
+            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+            {'title': 'type', 'tag': 'bi'},
+            {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+            {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+            {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+            {'title': 'str', 'tag': '%d'},
+            {'title': 'io', 'tag': 'i'},
+        ]
+    ]
+
+
+def test_Configuration_select_config_by_name(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg._select_config_by_name('TEST:MAIN:NEW_VAR_OUT')
+    assert result == [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init', 'tag': 'True'},
+    ]
+
+
+def test_Configuration_config_names(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg.config_names()
+    assert result == [
+        "TEST:MAIN:NEW_VAR_OUT",
+        "TEST:MAIN:NEW_VAR_IN"
+    ]
+
+
+def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    result = cfg.fix_to_config_name('TEST:MAIN:NEW_VAR_OUT')
+    assert cfg.config == [
+        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+        {'title': 'type', 'tag': 'bo'},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'str', 'tag': '%d'},
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'init', 'tag': 'True'},
+    ]
+
+
+def test_Configuration_add_config_line(branch_bool_pragma_string):
+    cfg = Configuration(branch_bool_pragma_string)
+    cfg.add_config_line('pv','THIRD')
+    assert cfg.config == [
+        {'title': 'pv', 'tag': 'FIRST'}, 
+        {'title': 'pv', 'tag': 'SECOND'}, 
+        {'title': 'pv', 'tag': 'THIRD'}, 
+    ]
+
+
+def test_Configuration_add_config_field(branch_bool_pragma_string):
+    cfg = Configuration(branch_bool_pragma_string)
+    cfg.add_config_field('ABC','XYZ',1)
+    assert cfg.config == [
+        {'title': 'pv', 'tag': 'FIRST'}, 
+        {'title': 'field', 'tag': {'f_name': 'ABC', 'f_set': 'XYZ'}}, 
+        {'title': 'pv', 'tag': 'SECOND'}, 
+    ]
+
+
+def test_Configuration_get_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    response = cfg.get_config_lines('io')
+    
+    assert response == [ 
+        {'title': 'io', 'tag': 'o'},
+        {'title': 'io', 'tag': 'i'},
+    ]
+
+
+def test_Configuration_get_config_lines(leaf_bool_pragma_string):
+    cfg = Configuration(leaf_bool_pragma_string)
+    response = cfg.get_config_fields('ZNAM')
+    assert response == [ 
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+    ]
+    
+
+def test_Configuration__eq__(leaf_bool_pragma_string):
+    cfg_A = Configuration(leaf_bool_pragma_string)
+    cfg_B = Configuration(leaf_bool_pragma_string)
+    assert cfg_A == cfg_B
+    cfg_A.add_config_line("a","b")
+    assert cfg_A != cfg_B
+
+
+def test_Configuration_concat(branch_connection_pragma_string,
+            branch_bool_pragma_string): 
+    cfg_A = Configuration(branch_connection_pragma_string)
+    cfg_B = Configuration(branch_bool_pragma_string)
+    cfg_B.fix_to_config_name("FIRST")
+    new_config = Configuration(config=[])
+    new_config.concat(cfg_A)
+    new_config.concat(cfg_B)
+    assert new_config.config == [
+        {'title':'pv', 'tag':'MIDDLE:FIRST'},
+        {'title':'aux', 'tag':'nothing'},
+    ]
+
+
+def test_Configuration_seek():
+    c = Configuration(config=[])
+    c.add_config_line(title="pv",tag="ABC")
+    c.add_config_field(f_name="ONAM",f_set="ABC")
+    assert c.seek(['title'],'pv') == [{'title':'pv','tag':'ABC'}]
+    assert c.seek(['tag','f_name'],'ONAM') == [
+        {'title':'field','tag':{'f_name':'ONAM','f_set':'ABC'}}
+    ]
+    assert c.seek(['bad'],3) == []
