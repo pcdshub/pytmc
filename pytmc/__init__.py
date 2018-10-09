@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .xml_obj import Symbol, DataType, SubItem
-from .xml_collector import TmcFile, PvPackage
+from .xml_collector import TmcFile
 from .tmc_render import (DbRenderAgent, SingleRecordData, TmcExplorer,
             FullRender, SingleProtoData, ProtoRenderAgent)
 

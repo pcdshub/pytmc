@@ -10,7 +10,7 @@ from pytmc.xml_obj import BaseElement
 from pytmc import TmcFile
 from pytmc.xml_collector import ElementCollector
 from pytmc import (DbRenderAgent, SingleRecordData, TmcExplorer, FullRender,
-        SingleProtoData, ProtoRenderAgent, PvPackage)
+        SingleProtoData, ProtoRenderAgent)
 
 from collections import defaultdict
 

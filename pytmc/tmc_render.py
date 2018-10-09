@@ -16,7 +16,6 @@ from . import DataType
 from . import TmcFile
 from .xml_obj import BaseElement
 from . import Symbol, DataType, SubItem
-from . import PvPackage
 import pytmc
 
 
