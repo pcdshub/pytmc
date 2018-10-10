@@ -14,8 +14,10 @@ import re
 class XmlObjError(Exception):
     pass
 
+
 class NotStringError(Exception):
     pass
+
 
 class PvNotFrozenError(XmlObjError):
     pass
@@ -609,8 +611,6 @@ class BaseElement:
 
         return False
 
-    
-
     def _get_subfield(self, field_target, get_all=False):
         """
         Produce element(s) within the class instance's target element. If
@@ -808,71 +808,6 @@ class BaseElement:
             to resume.
         """
         self._cached_name = name
-
-
-
-    # refactored
-#    def read_pragma(self, only_pv=None):
-#        '''
-#        Return the cropped down pragma that is specific to a single PV.
-#
-#        Parameters
-#        ----------
-#        only_pv : str or None
-#            Specify which PV's pragma to print. Defaults to the frozen PV. Must
-#            be provided if no PV has been frozen.
-#
-#        Returns
-#        -------
-#        list:
-#            The PV specific pragma for this element
-#        '''
-#        if not self.freeze_config and only_pv == None:
-#            raise PvNotFrozenError
-#        
-#        if self.freeze_config and only_pv == None:
-#            only_pv = self.freeze_pv_target
-#
-#        
-#        all_results = self.config_by_pv()
-#
-#        for specific_pv_config in all_results:
-#            if {'title': 'pv', 'tag':only_pv} in specific_pv_config:
-#                return specific_pv_config
-    # refactored
-#    def pv(self):
-#        '''
-#        Retrieve the config line specifying pv name for this entity.
-#
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        [result] = self.extract_from_pragma('pv',pv=self.freeze_pv_target)
-#        return result
-#    
-#
-#    @property
-#    def pragma(self):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        return self._pragma
-#
-#    @pragma.setter
-#    def pragma(self, pragma):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        self._pragma = pragma
-#
-#    @pragma.deleter
-#    def pragma(self):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        self._pragma = None
-#    
 
 
 class Symbol(BaseElement):
