@@ -7,5 +7,4 @@ Source code documentation
 
    xml_obj.rst
    xml_collector.rst
-   tmc_render.rst
 
