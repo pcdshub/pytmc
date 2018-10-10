@@ -529,7 +529,6 @@ class BaseElement:
             self.pragma = None
         else:
             self.pragma = Configuration(self.raw_config)
-        
 
     def _get_raw_properties(self):
         """
@@ -1025,7 +1024,6 @@ class SubItem(BaseElement):
         if self not in self.__parent.children:
             self.__parent.children.append(self)
 
-    
     @parent.deleter
     def parent(self):
         if self.__parent != None:

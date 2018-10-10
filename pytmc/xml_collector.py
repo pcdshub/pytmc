@@ -62,7 +62,6 @@ class TmcFile:
     '''
     Object for handling the reading comprehension comprehension of .tmc files.
 
-
     Attributes
     ----------
     all_Symbols : :class:`~pytmc.xml_collector.ElementCollector`
@@ -84,8 +83,6 @@ class TmcFile:
     all_singular_TmcChains : list
         Collection of all singularized TmcChains in the document. Must be
         initialized with :func:`~isolate_chains`.
-
-    
     '''
     def __init__(self, filename):
         self.filename = filename
@@ -334,14 +331,15 @@ class TmcFile:
             rec_list.append(record_str)
 
         return self.file_template.render(records=rec_list)
-        
 
 
 class ChainNotSingularError(Exception):
     pass
 
+
 class MissingConfigError(Exception):
     pass
+
 
 class TmcChain:
     """
