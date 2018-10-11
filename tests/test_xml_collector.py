@@ -661,25 +661,56 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     assert field['tag'] == final_io 
 
 
-@pytest.mark.parametrize("tc_type, io, final_DTYP",[
-        ("BOOL", 'o', '"asynInt32"'),
-        ("BOOL", 'i', '"asynInt32"'),
-        ("INT", 'o', '"asynInt32"'),
-        ("INT", 'i', '"asynInt32"'),
-        ("LREAL", 'o', '"asynFloat64"'),
-        ("LREAL", 'i', '"asynFloat64"'),
-        ("STRING", 'o', '"asynInt8ArrayOut"'),
-        ("STRING", 'i', '"asynInt8ArrayIn"'),
-        ("STRING", 'io', '"asynInt8ArrayOut"'),
+@pytest.mark.parametrize("tc_type, io, is_array, final_DTYP",[
+        # BOOl
+        ("BOOL", 'i', False, '"asynInt32"'),
+        ("BOOL", 'o', False, '"asynInt32"'),
+        ("BOOL", 'io', False, '"asynInt32"'),
+        ("BOOL", 'i', True, '"CHECK"'),
+        ("BOOL", 'o', True, '"CHECK"'),
+        ("BOOL", 'io', True, '"CHECK"'),
+        # INT
+        ("INT", 'i', False, '"asynInt32"'),
+        ("INT", 'o', False, '"asynInt32"'),
+        ("INT", 'io', False, '"asynInt32"'),
+        ("INT", 'i', True, '"asynInt16ArrayIn"'),
+        ("INT", 'o', True, '"asynInt16ArrayOut"'),
+        ("INT", 'io', True, '"asynInt16ArrayOut"'),
+        # DINT
+        ("DINT", 'i', False, '"asynInt32"'),
+        ("DINT", 'o', False, '"asynInt32"'),
+        ("DINT", 'io', False, '"asynInt32"'),
+        ("DINT", 'i', True, '"asynInt32ArrayIn"'),
+        ("DINT", 'o', True, '"asynInt32ArrayOut"'),
+        ("DINT", 'io', True, '"asynInt32ArrayOut"'),
+        # REAL
+        ("REAL", 'i', False, '"asynFloat32"'),
+        ("REAL", 'o', False, '"asynFloat32"'),
+        ("REAL", 'io', False, '"asynFloat32"'),
+        ("REAL", 'i', True, '"asynFloat32ArrayIn"'),
+        ("REAL", 'o', True, '"asynFloat32ArrayOut"'),
+        ("REAL", 'io', True, '"asynFloat32ArrayOut"'),
+        # LREAL
+        ("LREAL", 'i', False, '"asynFloat64"'),
+        ("LREAL", 'o', False, '"asynFloat64"'),
+        ("LREAL", 'io', False, '"asynFloat64"'),
+        ("LREAL", 'i', True, '"asynFloat64ArrayIn"'),
+        ("LREAL", 'o', True, '"asynFloat64ArrayOut"'),
+        ("LREAL", 'io', True, '"asynFloat64ArrayOut"'),
+        # String
+        ("STRING", 'i', False, '"asynInt8ArrayIn"'),
+        ("STRING", 'o', False, '"asynInt8ArrayOut"'),
+        ("STRING", 'io', False, '"asynInt8ArrayOut"'),
 ])
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
-            tc_type, io, final_DTYP):
+            tc_type, io, is_array, final_DTYP):
     # chain must be broken into singular
     record = BaseRecordPackage(example_singular_tmc_chains[0])
     logger.debug((record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_array
     record.generate_naive_config()
     record.cfg.add_config_line('io',io,overwrite=True)
     assert True == record.guess_DTYP()
