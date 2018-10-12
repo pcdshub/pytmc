@@ -666,9 +666,9 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
         ("BOOL", 'i', False, '"asynInt32"'),
         ("BOOL", 'o', False, '"asynInt32"'),
         ("BOOL", 'io', False, '"asynInt32"'),
-        ("BOOL", 'i', True, '"CHECK"'),
-        ("BOOL", 'o', True, '"CHECK"'),
-        ("BOOL", 'io', True, '"CHECK"'),
+        ("BOOL", 'i', False, '"asynInt8ArrayIn"'),
+        ("BOOL", 'o', False, '"asynInt8ArrayOut"'),
+        ("BOOL", 'io', False, '"asynInt8ArrayOut"'),
         # INT
         ("INT", 'i', False, '"asynInt32"'),
         ("INT", 'o', False, '"asynInt32"'),
@@ -828,21 +828,43 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
         assert out['tag']['f_set'] == '"3"' 
 
 
-@pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
-        ("INT", 0, False, False, None),
+@pytest.mark.parametrize("tc_type, io, is_str, is_arr, final_FTVL",[
+        ("INT", 'o', False, False, None),
         pytest.mark.skip(
-            ("INT", 0, False, True, '"FINISH"'),
+            ("INT", 'o', False, True, '"FINISH"'),
             reason="feature pending"),
-        ("LREAL", 0, False, True, '"DOUBLE"'),
-        ("STRING", 0, True, False, '"CHAR"'),
+        ("BOOL", 'i', False, False, None),
+        ("BOOL", 'i', False, True, '"CHAR"'),
+        ("BOOL", 'o', False, True, '"CHAR"'),
+        ("BOOL", 'io', False, True, '"CHAR"'),
+        ("INT", 'i', False, False, None),
+        ("INT", 'i', False, True, '"SHORT"'),
+        ("INT", 'o', False, True, '"SHORT"'),
+        ("INT", 'io', False, True, '"SHORT"'),
+        ("DINT", 'i', False, False, None),
+        ("DINT", 'i', False, True, '"LONG"'),
+        ("DINT", 'o', False, True, '"LONG"'),
+        ("DINT", 'io', False, True, '"LONG"'),
+        ("REAL", 'i', False, False, None),
+        ("REAL", 'i', False, True, '"FLOAT"'),
+        ("REAL", 'o', False, True, '"FLOAT"'),
+        ("REAL", 'io', False, True, '"FLOAT"'),
+        ("LREAL", 'i', False, False, None),
+        ("LREAL", 'i', False, True, '"DOUBLE"'),
+        ("LREAL", 'o', False, True, '"DOUBLE"'),
+        ("LREAL", 'io', False, True, '"DOUBLE"'),
+        ("STRING", 'i', True, False, '"CHAR"'),
+        ("STRING", 'o', True, False, '"CHAR"'),
+        ("STRING", 'io', True, False, '"CHAR"'),
 ])
 def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
-            tc_type, sing_index, is_str, is_arr, final_FTVL):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+            tc_type, io, is_str, is_arr, final_FTVL):
+    record = BaseRecordPackage(example_singular_tmc_chains[0])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
     record.generate_naive_config()
+    record.cfg.add_config_line('io',io,overwrite=True)
     result = record.guess_FTVL()
     print(record.cfg.config)
     if final_FTVL is None:
