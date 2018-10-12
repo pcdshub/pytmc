@@ -842,12 +842,43 @@ class BaseRecordPackage:
         
         [io] =  self.cfg.get_config_lines('io')
         io = io['tag'] 
+        
+        BOOL_set = {"BOOL"}
+        if self.chain.last.tc_type in BOOL_set:
+            base = '"asynInt32'
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayOut"')
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayIn"')
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayOut"')
+                    return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
 
-        asynint32_set = {
-            "BOOL",
-            "INT"
-        }
-        if self.chain.last.tc_type in asynint32_set:
+        INT_set = {"INT"}
+        if self.chain.last.tc_type in INT_set:
+            base = '"asynInt32'
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayOut"')
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayIn"')
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayOut"')
+                    return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
+        
+        DINT_set = {"DINT"}
+        if self.chain.last.tc_type in DINT_set:
             base = '"asynInt32'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
@@ -859,13 +890,29 @@ class BaseRecordPackage:
                 elif 'o' in io:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
-            self.cfg.add_config_field("DTYP", base+'"')
-            return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
         
-        asynfloat64_set = {
-            "LREAL",
-        }
-        if self.chain.last.tc_type in asynfloat64_set:
+        REAL_set = {"REAL"}
+        if self.chain.last.tc_type in REAL_set:
+            base = '"asynFloat32'
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",base+'ArrayIn"')
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
+        
+        LREAL_set = {"LREAL"}
+        if self.chain.last.tc_type in LREAL_set:
             base = '"asynFloat64'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
@@ -877,12 +924,11 @@ class BaseRecordPackage:
                 elif 'o' in io:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
-            self.cfg.add_config_field("DTYP", base+'"')
-            return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
 
-        asynInt8ArrayOut_set = {
-            "STRING",
-        }
+        asynInt8ArrayOut_set = {"STRING"}
         if self.chain.last.tc_type in asynInt8ArrayOut_set:
             [io] =  self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
@@ -900,6 +946,8 @@ class BaseRecordPackage:
     def guess_INP_OUT(self):
         """
         Construct, add, INP or OUT field
+        Fields will have this form:
+        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
         
         Returns
         -------
@@ -913,7 +961,6 @@ class BaseRecordPackage:
         name = '.'.join(name_list)
         assign_symbol = ""
         field_type = ""
-        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
         if 'i' in io and 'o' in io:
             assign_symbol = "?"
             if self.chain.last.is_array or self.chain.last.is_str:
@@ -1047,11 +1094,21 @@ class BaseRecordPackage:
             pass
 
         if self.chain.last.is_array:
-            if self.chain.last.tc_type == "LREAL":
-                self.cfg.add_config_field("FTVL", '"DOUBLE"')
-                return True
-            if self.chain.last.tc_type == "BOOL":
+            tc_type = self.chain.last.tc_type
+            if tc_type == "BOOL":
                 self.cfg.add_config_field("FTVL", '"CHAR"')
+                return True
+            if tc_type == "INT":
+                self.cfg.add_config_field("FTVL", '"SHORT"')
+                return True
+            if tc_type == "DINT":
+                self.cfg.add_config_field("FTVL", '"LONG"')
+                return True
+            if tc_type == "REAL":
+                self.cfg.add_config_field("FTVL", '"FLOAT"')
+                return True
+            if tc_type == "LREAL":
+                self.cfg.add_config_field("FTVL", '"DOUBLE"')
                 return True
 
         if self.chain.last.is_str:

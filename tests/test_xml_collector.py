@@ -237,7 +237,6 @@ def test_TmcFile_isolate_chains(generic_tmc_path):
 
 
 def test_TmcFile_create_packages(example_singular_tmc_chains):
-    
     tmc = TmcFile(None)
     check_list = []
     # build artificial tmcChains and generate fake names
@@ -275,6 +274,7 @@ def test_TmcFile_create_packages(example_singular_tmc_chains):
         assert check.cfg.config == rec.cfg.config
         assert check.chain.chain == rec.chain.chain
 
+
 def test_TmcFile_configure_packages(example_singular_tmc_chains):
     tmc = TmcFile(None)
     check_list = []
@@ -304,7 +304,8 @@ def test_TmcFile_configure_packages(example_singular_tmc_chains):
     for check, rec in zip(check_list, tmc.all_RecordPackages):
         assert check.cfg.config == rec.cfg.config
         assert check.chain.chain == rec.chain.chain
-    
+
+
 def test_TmcFile_fullbuild(string_tmc_path):
     tmc = TmcFile(string_tmc_path)
     tmc.create_chains()
@@ -313,6 +314,7 @@ def test_TmcFile_fullbuild(string_tmc_path):
     tmc.configure_packages()
     z = tmc.render()
     print(z)
+
 
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)
@@ -659,26 +661,58 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     assert field['tag'] == final_io 
 
 
-@pytest.mark.parametrize("tc_type, sing_index, final_DTYP",[
-        ("BOOL", 0, '"asynInt32"'),
-        ("BOOL", 2, '"asynInt32"'),
-        ("INT", 0, '"asynInt32"'),
-        ("INT", 2, '"asynInt32"'),
-        ("LREAL", 0, '"asynFloat64"'),
-        ("LREAL", 2, '"asynFloat64"'),
-        ("STRING", 0, '"asynInt8ArrayOut"'),
-        ("STRING", 2, '"asynInt8ArrayIn"'),
-        ("STRING", 4, '"asynInt8ArrayOut"'),
+@pytest.mark.parametrize("tc_type, io, is_array, final_DTYP",[
+        # BOOl
+        ("BOOL", 'i', False, '"asynInt32"'),
+        ("BOOL", 'o', False, '"asynInt32"'),
+        ("BOOL", 'io', False, '"asynInt32"'),
+        ("BOOL", 'i', True, '"asynInt8ArrayIn"'),
+        ("BOOL", 'o', True, '"asynInt8ArrayOut"'),
+        ("BOOL", 'io', True, '"asynInt8ArrayOut"'),
+        # INT
+        ("INT", 'i', False, '"asynInt32"'),
+        ("INT", 'o', False, '"asynInt32"'),
+        ("INT", 'io', False, '"asynInt32"'),
+        ("INT", 'i', True, '"asynInt16ArrayIn"'),
+        ("INT", 'o', True, '"asynInt16ArrayOut"'),
+        ("INT", 'io', True, '"asynInt16ArrayOut"'),
+        # DINT
+        ("DINT", 'i', False, '"asynInt32"'),
+        ("DINT", 'o', False, '"asynInt32"'),
+        ("DINT", 'io', False, '"asynInt32"'),
+        ("DINT", 'i', True, '"asynInt32ArrayIn"'),
+        ("DINT", 'o', True, '"asynInt32ArrayOut"'),
+        ("DINT", 'io', True, '"asynInt32ArrayOut"'),
+        # REAL
+        ("REAL", 'i', False, '"asynFloat32"'),
+        ("REAL", 'o', False, '"asynFloat32"'),
+        ("REAL", 'io', False, '"asynFloat32"'),
+        ("REAL", 'i', True, '"asynFloat32ArrayIn"'),
+        ("REAL", 'o', True, '"asynFloat32ArrayOut"'),
+        ("REAL", 'io', True, '"asynFloat32ArrayOut"'),
+        # LREAL
+        ("LREAL", 'i', False, '"asynFloat64"'),
+        ("LREAL", 'o', False, '"asynFloat64"'),
+        ("LREAL", 'io', False, '"asynFloat64"'),
+        ("LREAL", 'i', True, '"asynFloat64ArrayIn"'),
+        ("LREAL", 'o', True, '"asynFloat64ArrayOut"'),
+        ("LREAL", 'io', True, '"asynFloat64ArrayOut"'),
+        # String
+        ("STRING", 'i', False, '"asynInt8ArrayIn"'),
+        ("STRING", 'o', False, '"asynInt8ArrayOut"'),
+        ("STRING", 'io', False, '"asynInt8ArrayOut"'),
 ])
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
-            tc_type, sing_index, final_DTYP):
+            tc_type, io, is_array, final_DTYP):
     # chain must be broken into singular
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(example_singular_tmc_chains[0])
     logger.debug((record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_array
     record.generate_naive_config()
+    record.cfg.add_config_line('io',io,overwrite=True)
     assert True == record.guess_DTYP()
     logger.debug((record.cfg.config))
     [field] = record.cfg.get_config_fields('DTYP')
@@ -794,21 +828,43 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
         assert out['tag']['f_set'] == '"3"' 
 
 
-@pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
-        ("INT", 0, False, False, None),
+@pytest.mark.parametrize("tc_type, io, is_str, is_arr, final_FTVL",[
+        ("INT", 'o', False, False, None),
         pytest.mark.skip(
-            ("INT", 0, False, True, '"FINISH"'),
+            ("INT", 'o', False, True, '"FINISH"'),
             reason="feature pending"),
-        ("LREAL", 0, False, True, '"DOUBLE"'),
-        ("STRING", 0, True, False, '"CHAR"'),
+        ("BOOL", 'i', False, False, None),
+        ("BOOL", 'i', False, True, '"CHAR"'),
+        ("BOOL", 'o', False, True, '"CHAR"'),
+        ("BOOL", 'io', False, True, '"CHAR"'),
+        ("INT", 'i', False, False, None),
+        ("INT", 'i', False, True, '"SHORT"'),
+        ("INT", 'o', False, True, '"SHORT"'),
+        ("INT", 'io', False, True, '"SHORT"'),
+        ("DINT", 'i', False, False, None),
+        ("DINT", 'i', False, True, '"LONG"'),
+        ("DINT", 'o', False, True, '"LONG"'),
+        ("DINT", 'io', False, True, '"LONG"'),
+        ("REAL", 'i', False, False, None),
+        ("REAL", 'i', False, True, '"FLOAT"'),
+        ("REAL", 'o', False, True, '"FLOAT"'),
+        ("REAL", 'io', False, True, '"FLOAT"'),
+        ("LREAL", 'i', False, False, None),
+        ("LREAL", 'i', False, True, '"DOUBLE"'),
+        ("LREAL", 'o', False, True, '"DOUBLE"'),
+        ("LREAL", 'io', False, True, '"DOUBLE"'),
+        ("STRING", 'i', True, False, '"CHAR"'),
+        ("STRING", 'o', True, False, '"CHAR"'),
+        ("STRING", 'io', True, False, '"CHAR"'),
 ])
 def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
-            tc_type, sing_index, is_str, is_arr, final_FTVL):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+            tc_type, io, is_str, is_arr, final_FTVL):
+    record = BaseRecordPackage(example_singular_tmc_chains[0])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
     record.generate_naive_config()
+    record.cfg.add_config_line('io',io,overwrite=True)
     result = record.guess_FTVL()
     print(record.cfg.config)
     if final_FTVL is None:
