@@ -1047,11 +1047,21 @@ class BaseRecordPackage:
             pass
 
         if self.chain.last.is_array:
-            if self.chain.last.tc_type == "LREAL":
-                self.cfg.add_config_field("FTVL", '"DOUBLE"')
-                return True
-            if self.chain.last.tc_type == "BOOL":
+            tc_type = self.chain.last.tc_type
+            if tc_type == "BOOL":
                 self.cfg.add_config_field("FTVL", '"CHAR"')
+                return True
+            if tc_type == "INT":
+                self.cfg.add_config_field("FTVL", '"SHORT"')
+                return True
+            if tc_type == "DINT":
+                self.cfg.add_config_field("FTVL", '"LONG"')
+                return True
+            if tc_type == "REAL":
+                self.cfg.add_config_field("FTVL", '"FLOAT"')
+                return True
+            if tc_type == "LREAL":
+                self.cfg.add_config_field("FTVL", '"DOUBLE"')
                 return True
 
         if self.chain.last.is_str:
