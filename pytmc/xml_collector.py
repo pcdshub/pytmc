@@ -819,18 +819,6 @@ class BaseRecordPackage:
             self.cfg.add_config_line("io","io")
             return True
 
-    def guess_DTYP_array_handler(self, io, base):
-        """
-        Append the proper suffix to array-like datatypes
-        """
-        if 'i' in io and 'o' in io:
-            return base+'ArrayOut"'
-        elif 'i' in io:
-            return base+'ArrayIn"'
-        elif 'o' in io:
-            return base+'ArrayOut"'
-            
-
     def guess_DTYP(self):
         """
         Add field specifying DTYP.
@@ -958,6 +946,8 @@ class BaseRecordPackage:
     def guess_INP_OUT(self):
         """
         Construct, add, INP or OUT field
+        Fields will have this form:
+        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
         
         Returns
         -------
@@ -971,7 +961,6 @@ class BaseRecordPackage:
         name = '.'.join(name_list)
         assign_symbol = ""
         field_type = ""
-        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
         if 'i' in io and 'o' in io:
             assign_symbol = "?"
             if self.chain.last.is_array or self.chain.last.is_str:
