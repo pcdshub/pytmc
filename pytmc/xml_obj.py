@@ -835,6 +835,9 @@ class Symbol(BaseElement):
         #]
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
+        
+        # set during isolation phase
+        self.is_enum = False
 
     @property
     def tc_type(self):
@@ -970,7 +973,6 @@ class DataType(BaseElement):
         if None != self._get_subfield('EnumInfo'):
             return True
         return False
-
     
 
 class SubItem(BaseElement):
@@ -1012,6 +1014,8 @@ class SubItem(BaseElement):
         #]
         self.__parent = None
         self.parent = parent
+        # set during isolation phase
+        self.is_enum = False
 
         if self.parent == None:
             logger.warning("SubItem has no parent")

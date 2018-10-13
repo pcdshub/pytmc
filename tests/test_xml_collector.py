@@ -129,6 +129,9 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert 'extra2' in tmc.all_SubItems['iterator']
    
     assert len(tmc.all_SubItems['iterator']) == 6
+    
+    assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
 
 
 def test_TmcFile_explore_all(generic_tmc_path):
@@ -145,6 +148,18 @@ def test_TmcFile_explore_all(generic_tmc_path):
         tmc.all_SubItems['DUT_STRUCT']['struct_var']
     ]
     assert target in complete_chain_list
+
+
+def test_TmcFile_resolve_enums(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    tmc.isolate_Symbols()
+    tmc.isolate_DataTypes()
+    assert not tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert not tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
+    tmc.resolve_enums()
+    assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
+    
 
 
 def test_TmcFile_recursive_explore(generic_tmc_path):

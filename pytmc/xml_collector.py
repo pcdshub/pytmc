@@ -172,6 +172,32 @@ class TmcFile:
         if type(parent) == ET.Element:
             pass
 
+    def resolve_enums(self):
+        """
+        Identify the SubItems and Datatypes that represent enum types.
+        Requires isolate_Datatypes and isolate_Subitems to have been run first.
+        """
+        # resolve str
+        for sym_name in self.all_Symbols:
+            sym = self.all_Symbols[sym_name]
+            sym_type_str = sym.tc_type
+            try:
+                if self.all_DataTypes[sym_type_str].is_enum:
+                    sym.is_enum = True
+            except KeyError:
+                pass
+
+        # resolve subitems
+        for datatype_name in self.all_SubItems:
+            for subitem_name in self.all_SubItems[datatype_name]:
+                subitem = self.all_SubItems[datatype_name][subitem_name]
+                subitem_type_str = subitem.tc_type
+                try:
+                    if self.all_DataTypes[subitem_type_str].is_enum:
+                        subitem.is_enum = True
+                except KeyError:
+                    pass
+        
     def isolate_all(self):
         '''
         Shortcut for running :func:`~isolate_Symbols` and
@@ -179,6 +205,7 @@ class TmcFile:
         '''
         self.isolate_Symbols()
         self.isolate_DataTypes()
+        self.resolve_enums()
 
     def explore_all(self):
         """
