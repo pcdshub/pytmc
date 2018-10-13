@@ -852,7 +852,8 @@ class Symbol(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
-
+        if self.is_enum:
+            return "ENUM"
         if self.is_str:
             return "STRING"
         name_field = self._get_subfield("BaseType")
@@ -1035,6 +1036,10 @@ class SubItem(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
+        if self.is_enum:
+            return "ENUM"
+        if self.is_str:
+            return "STRING"
         name_field = self._get_subfield("Type")
         return name_field.text
 
