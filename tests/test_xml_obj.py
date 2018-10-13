@@ -316,6 +316,24 @@ def test_DataType_tc_extends(generic_tmc_root):
     assert el.tc_extends == 'DUT_STRUCT'
 
 
+def test_DataType_is_enum(string_tmc_root):
+    root = string_tmc_root
+    symbol_xml = root.find(
+        "./DataTypes/DataType/[Name='DUT_ENUMTEST']"
+    ) 
+    print(symbol_xml)
+    nonstr_symbol_element = DataType(symbol_xml)
+    assert nonstr_symbol_element.is_enum == True
+    
+    root = string_tmc_root
+    symbol_xml = root.find(
+        "./DataTypes/DataType/[Name='DUT_STRUCT']"
+    )
+    print(symbol_xml)
+    nonstr_symbol_element = DataType(symbol_xml)
+    assert nonstr_symbol_element.is_enum == False
+
+
 def test_raw_config(generic_tmc_root):
     root = generic_tmc_root
     
@@ -405,7 +423,7 @@ def test_BaseElement_is_string(string_tmc_root):
     ) 
     str_symbol_element = BaseElement(symbol_xml)
     assert str_symbol_element.is_str == True
-
+   
 
 def test_Configuration_config_lines(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)

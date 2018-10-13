@@ -25,6 +25,8 @@ class PvNotFrozenError(XmlObjError):
 
 class Configuration:
     def __init__(self, str=None, config=None):
+        """
+        """
         # str: self._raw_config (READ ONLY, set at instantaiation)
         # list: self.config
         self._raw_config = str
@@ -497,6 +499,8 @@ class BaseElement:
         self.is_str_ = None
         self.iterable_length_ = None
         
+        self.is_enum_ = None
+        
         self.element = element
         #self.registered_pragmas = []
         #self.freeze_config = False
@@ -948,6 +952,27 @@ class DataType(BaseElement):
         return extension_element.text
     
 
+    @property
+    def is_enum(self):
+        """
+        This property is true if this twincat element is an enum. It works for
+        Datatypes, symbols and subItems.
+        
+        Returns
+        -------
+        Bool
+            is true if this twincat element is an enum.
+        """
+        if self.is_enum_ is not None:
+            return self.is_enum_
+        if self.element is None:
+            return False
+        if None != self._get_subfield('EnumInfo'):
+            return True
+        return False
+
+    
+
 class SubItem(BaseElement):
     '''
     Inherits from :class:`~pytmc.xml_obj.baseElement`
@@ -1033,4 +1058,3 @@ class SubItem(BaseElement):
             ))
             self.__parent.children = new_list
             self.__parent = None 
-    
