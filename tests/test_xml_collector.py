@@ -159,7 +159,6 @@ def test_TmcFile_resolve_enums(generic_tmc_path):
     tmc.resolve_enums()
     assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
     assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
-    
 
 
 def test_TmcFile_recursive_explore(generic_tmc_path):
@@ -712,6 +711,13 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
         ("LREAL", 'i', True, '"asynFloat64ArrayIn"'),
         ("LREAL", 'o', True, '"asynFloat64ArrayOut"'),
         ("LREAL", 'io', True, '"asynFloat64ArrayOut"'),
+        # ENUM
+        ("ENUM", 'i', False, '"asynInt32"'),
+        ("ENUM", 'o', False, '"asynInt32"'),
+        ("ENUM", 'io', False, '"asynInt32"'),
+        ("ENUM", 'i', True, '"asynInt32ArrayIn"'),
+        ("ENUM", 'o', True, '"asynInt32ArrayOut"'),
+        ("ENUM", 'io', True, '"asynInt32ArrayOut"'),
         # String
         ("STRING", 'i', False, '"asynInt8ArrayIn"'),
         ("STRING", 'o', False, '"asynInt8ArrayOut"'),
