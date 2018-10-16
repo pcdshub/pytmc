@@ -10,7 +10,10 @@ Pytmc currently supports the following TwinCAT Datatypes.
 
  - BOOL
  - INT
+ - DINT
+ - REAL
  - LREAL
+ - ENUM
  - STRING 
 
 
