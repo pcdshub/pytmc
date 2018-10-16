@@ -620,22 +620,58 @@ def test_BaseRecordPackage_guess_common():
     assert tse['tag']['f_set'] == '-2'
 
 
-@pytest.mark.parametrize("tc_type, sing_index, final_type",[
-        ("BOOL", 0, 'bo'),
-        ("BOOL", 2, 'bi'),
-        ("BOOL", 4, 'bo'),
-        ("INT", 0, 'ao'),
-        ("INT", 2, 'ai'),
-        ("INT", 4, 'ao'),
-        ("LREAL", 0, 'ao'),
-        ("LREAL", 2, 'ai'),
-        ("LREAL", 4, 'ao'),
-        ("STRING", 0, 'waveform'),
-        ("STRING", 2, 'waveform'),
-        ("STRING", 4, 'waveform'),
+@pytest.mark.parametrize("tc_type, io, is_array, final_type",[
+        ("BOOL", "i", False, 'bi'),
+        ("BOOL", "o", False, 'bo'),
+        ("BOOL", "io", False, 'bo'),
+        ("BOOL", "i", True, 'waveform'),
+        ("BOOL", "o", True, 'waveform'),
+        ("BOOL", "io", True, 'waveform'),
+        ("INT", "i", False, 'ai'),
+        ("INT", "o", False, 'ao'),
+        ("INT", "io", False, 'ao'),
+        ("INT", "i", True, 'waveform'),
+        ("INT", "o", True, 'waveform'),
+        ("INT", "io", True, 'waveform'),
+        ("DINT", "i", False, 'ai'),
+        ("DINT", "o", False, 'ao'),
+        ("DINT", "io", False, 'ao'),
+        ("DINT", "i", True, 'waveform'),
+        ("DINT", "o", True, 'waveform'),
+        ("DINT", "io", True, 'waveform'),
+        ("ENUM", "i", False, 'ai'),
+        ("ENUM", "o", False, 'ao'),
+        ("ENUM", "io", False, 'ao'),
+        ("ENUM", "i", True, 'waveform'),
+        ("ENUM", "o", True, 'waveform'),
+        ("ENUM", "io", True, 'waveform'),
+        ("REAL", "i", False, 'ai'),
+        ("REAL", "o", False, 'ao'),
+        ("REAL", "io", False, 'ao'),
+        ("REAL", "i", True, 'waveform'),
+        ("REAL", "o", True, 'waveform'),
+        ("REAL", "io", True, 'waveform'),
+        ("LREAL", "i", False, 'ai'),
+        ("LREAL", "o", False, 'ao'),
+        ("LREAL", "io", False, 'ao'),
+        ("LREAL", "i", True, 'waveform'),
+        ("LREAL", "o", True, 'waveform'),
+        ("LREAL", "io", True, 'waveform'),
+        ("STRING", "i", False, 'waveform'),
+        ("STRING", "o", False, 'waveform'),
+        ("STRING", "io", False, 'waveform'),
+        #("INT", 2, 'ai'),
+        #("INT", 0, 'ao'),
+        #("INT", 4, 'ao'),
+        #("LREAL", 2, 'ai'),
+        #("LREAL", 0, 'ao'),
+        #("LREAL", 4, 'ao'),
+        #("STRING", 2, 'waveform'),
+        #("STRING", 0, 'waveform'),
+        #("STRING", 4, 'waveform'),
 ])
 def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
-            tc_type, sing_index, final_type):
+            tc_type, io, is_array, final_type):
     # chain must be broken into singular
     # for x in example_singular_tmc_chains:
     #     z = BaseRecordPackage(x)
@@ -643,12 +679,15 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     #     z.generate_naive_config()
     #     print(z.cfg.config)
     # assert False
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(example_singular_tmc_chains[0])
     logger.debug(str(record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_array
     record.generate_naive_config()
+    record.cfg.add_config_line('io', io, overwrite=True)
+
     assert True == record.guess_type()
     [field] = record.cfg.get_config_lines('type')
     assert field['tag'] == final_type 
@@ -715,9 +754,9 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
         ("ENUM", 'i', False, '"asynInt32"'),
         ("ENUM", 'o', False, '"asynInt32"'),
         ("ENUM", 'io', False, '"asynInt32"'),
-        ("ENUM", 'i', True, '"asynInt32ArrayIn"'),
-        ("ENUM", 'o', True, '"asynInt32ArrayOut"'),
-        ("ENUM", 'io', True, '"asynInt32ArrayOut"'),
+        ("ENUM", 'i', True, '"asynInt16ArrayIn"'),
+        ("ENUM", 'o', True, '"asynInt16ArrayOut"'),
+        ("ENUM", 'io', True, '"asynInt16ArrayOut"'),
         # String
         ("STRING", 'i', False, '"asynInt8ArrayIn"'),
         ("STRING", 'o', False, '"asynInt8ArrayOut"'),
@@ -867,9 +906,9 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
         ("DINT", 'o', False, True, '"LONG"'),
         ("DINT", 'io', False, True, '"LONG"'),
         ("ENUM", 'i', False, False, None),
-        ("ENUM", 'i', False, True, '"LONG"'),
-        ("ENUM", 'o', False, True, '"LONG"'),
-        ("ENUM", 'io', False, True, '"LONG"'),
+        ("ENUM", 'i', False, True, '"SHORT"'),
+        ("ENUM", 'o', False, True, '"SHORT"'),
+        ("ENUM", 'io', False, True, '"SHORT"'),
         ("REAL", 'i', False, False, None),
         ("REAL", 'i', False, True, '"FLOAT"'),
         ("REAL", 'o', False, True, '"FLOAT"'),

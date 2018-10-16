@@ -798,7 +798,10 @@ class BaseRecordPackage:
         
         ai_ao_set = {
             "INT",
+            "DINT",
+            "REAL",
             "LREAL",
+            "ENUM",
         }
         if self.chain.last.tc_type in ai_ao_set:
             [io] =  self.cfg.get_config_lines('io')
@@ -887,7 +890,7 @@ class BaseRecordPackage:
                 self.cfg.add_config_field("DTYP", base+'"')
                 return True
 
-        INT_set = {"INT"}
+        INT_set = {"INT", "ENUM"}
         if self.chain.last.tc_type in INT_set:
             base = '"asynInt32'
             if self.chain.last.is_array:
@@ -904,7 +907,7 @@ class BaseRecordPackage:
                 self.cfg.add_config_field("DTYP", base+'"')
                 return True
         
-        DINT_set = {"DINT","ENUM"}
+        DINT_set = {"DINT"}
         if self.chain.last.tc_type in DINT_set:
             base = '"asynInt32'
             if self.chain.last.is_array:
@@ -1125,10 +1128,11 @@ class BaseRecordPackage:
             if tc_type == "BOOL":
                 self.cfg.add_config_field("FTVL", '"CHAR"')
                 return True
-            if tc_type == "INT":
+            INT_set = {"INT", "ENUM"}
+            if tc_type in INT_set:
                 self.cfg.add_config_field("FTVL", '"SHORT"')
                 return True
-            DINT_set = {"DINT", "ENUM"}
+            DINT_set = {"DINT"}
             if tc_type in DINT_set:
                 self.cfg.add_config_field("FTVL", '"LONG"')
                 return True
