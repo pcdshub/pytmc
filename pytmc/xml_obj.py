@@ -25,6 +25,8 @@ class PvNotFrozenError(XmlObjError):
 
 class Configuration:
     def __init__(self, str=None, config=None):
+        """
+        """
         # str: self._raw_config (READ ONLY, set at instantaiation)
         # list: self.config
         self._raw_config = str
@@ -497,6 +499,8 @@ class BaseElement:
         self.is_str_ = None
         self.iterable_length_ = None
         
+        self.is_enum_ = None
+        
         self.element = element
         #self.registered_pragmas = []
         #self.freeze_config = False
@@ -831,6 +835,9 @@ class Symbol(BaseElement):
         #]
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
+        
+        # set during isolation phase
+        self.is_enum = False
 
     @property
     def tc_type(self):
@@ -845,7 +852,8 @@ class Symbol(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
-
+        if self.is_enum:
+            return "ENUM"
         if self.is_str:
             return "STRING"
         name_field = self._get_subfield("BaseType")
@@ -948,6 +956,26 @@ class DataType(BaseElement):
         return extension_element.text
     
 
+    @property
+    def is_enum(self):
+        """
+        This property is true if this twincat element is an enum. It works for
+        Datatypes, symbols and subItems.
+        
+        Returns
+        -------
+        Bool
+            is true if this twincat element is an enum.
+        """
+        if self.is_enum_ is not None:
+            return self.is_enum_
+        if self.element is None:
+            return False
+        if None != self._get_subfield('EnumInfo'):
+            return True
+        return False
+    
+
 class SubItem(BaseElement):
     '''
     Inherits from :class:`~pytmc.xml_obj.baseElement`
@@ -987,6 +1015,8 @@ class SubItem(BaseElement):
         #]
         self.__parent = None
         self.parent = parent
+        # set during isolation phase
+        self.is_enum = False
 
         if self.parent == None:
             logger.warning("SubItem has no parent")
@@ -1006,6 +1036,10 @@ class SubItem(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
+        if self.is_enum:
+            return "ENUM"
+        if self.is_str:
+            return "STRING"
         name_field = self._get_subfield("Type")
         return name_field.text
 
@@ -1033,4 +1067,3 @@ class SubItem(BaseElement):
             ))
             self.__parent.children = new_list
             self.__parent = None 
-    

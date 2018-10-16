@@ -129,6 +129,9 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert 'extra2' in tmc.all_SubItems['iterator']
    
     assert len(tmc.all_SubItems['iterator']) == 6
+    
+    assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
 
 
 def test_TmcFile_explore_all(generic_tmc_path):
@@ -145,6 +148,17 @@ def test_TmcFile_explore_all(generic_tmc_path):
         tmc.all_SubItems['DUT_STRUCT']['struct_var']
     ]
     assert target in complete_chain_list
+
+
+def test_TmcFile_resolve_enums(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    tmc.isolate_Symbols()
+    tmc.isolate_DataTypes()
+    assert not tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert not tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
+    tmc.resolve_enums()
+    assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
 
 
 def test_TmcFile_recursive_explore(generic_tmc_path):
@@ -697,6 +711,13 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
         ("LREAL", 'i', True, '"asynFloat64ArrayIn"'),
         ("LREAL", 'o', True, '"asynFloat64ArrayOut"'),
         ("LREAL", 'io', True, '"asynFloat64ArrayOut"'),
+        # ENUM
+        ("ENUM", 'i', False, '"asynInt32"'),
+        ("ENUM", 'o', False, '"asynInt32"'),
+        ("ENUM", 'io', False, '"asynInt32"'),
+        ("ENUM", 'i', True, '"asynInt32ArrayIn"'),
+        ("ENUM", 'o', True, '"asynInt32ArrayOut"'),
+        ("ENUM", 'io', True, '"asynInt32ArrayOut"'),
         # String
         ("STRING", 'i', False, '"asynInt8ArrayIn"'),
         ("STRING", 'o', False, '"asynInt8ArrayOut"'),
@@ -845,6 +866,10 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
         ("DINT", 'i', False, True, '"LONG"'),
         ("DINT", 'o', False, True, '"LONG"'),
         ("DINT", 'io', False, True, '"LONG"'),
+        ("ENUM", 'i', False, False, None),
+        ("ENUM", 'i', False, True, '"LONG"'),
+        ("ENUM", 'o', False, True, '"LONG"'),
+        ("ENUM", 'io', False, True, '"LONG"'),
         ("REAL", 'i', False, False, None),
         ("REAL", 'i', False, True, '"FLOAT"'),
         ("REAL", 'o', False, True, '"FLOAT"'),
