@@ -1128,7 +1128,8 @@ class BaseRecordPackage:
             if tc_type == "INT":
                 self.cfg.add_config_field("FTVL", '"SHORT"')
                 return True
-            if tc_type == "DINT":
+            DINT_set = {"DINT", "ENUM"}
+            if tc_type in DINT_set:
                 self.cfg.add_config_field("FTVL", '"LONG"')
                 return True
             if tc_type == "REAL":
