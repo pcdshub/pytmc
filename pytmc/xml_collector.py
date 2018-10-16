@@ -890,7 +890,7 @@ class BaseRecordPackage:
                 self.cfg.add_config_field("DTYP", base+'"')
                 return True
 
-        INT_set = {"INT"}
+        INT_set = {"INT", "ENUM"}
         if self.chain.last.tc_type in INT_set:
             base = '"asynInt32'
             if self.chain.last.is_array:
@@ -907,7 +907,7 @@ class BaseRecordPackage:
                 self.cfg.add_config_field("DTYP", base+'"')
                 return True
         
-        DINT_set = {"DINT","ENUM"}
+        DINT_set = {"DINT"}
         if self.chain.last.tc_type in DINT_set:
             base = '"asynInt32'
             if self.chain.last.is_array:
