@@ -798,7 +798,10 @@ class BaseRecordPackage:
         
         ai_ao_set = {
             "INT",
+            "DINT",
+            "REAL",
             "LREAL",
+            "ENUM",
         }
         if self.chain.last.tc_type in ai_ao_set:
             [io] =  self.cfg.get_config_lines('io')
