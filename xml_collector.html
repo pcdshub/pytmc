@@ -342,6 +342,13 @@ derived from inherited DataTypes</p>
 <dd><p>Produce .db file as string</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="pytmc.TmcFile.resolve_enums">
+<code class="descname">resolve_enums</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcFile.resolve_enums" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify the SubItems and Datatypes that represent enum types.
+Requires isolate_Datatypes and isolate_Subitems to have been run first.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -640,7 +647,9 @@ meaningless.”</p>
 <dl class="method">
 <dt id="pytmc.xml_collector.BaseRecordPackage.guess_INP_OUT">
 <code class="descname">guess_INP_OUT</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_collector.BaseRecordPackage.guess_INP_OUT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct, add, INP or OUT field</p>
+<dd><p>Construct, add, INP or OUT field
+Fields will have this form:
+“&#64;asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine=”</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

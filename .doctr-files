@@ -6,7 +6,6 @@
 ./_sources/source_code.rst.txt
 ./_sources/source_docs.rst.txt
 ./_sources/terminal_usage.rst.txt
-./_sources/tmc_render.rst.txt
 ./_sources/user_guide.rst.txt
 ./_sources/xml_collector.rst.txt
 ./_sources/xml_obj.rst.txt
@@ -57,7 +56,6 @@
 ./source_code.html
 ./source_docs.html
 ./terminal_usage.html
-./tmc_render.html
 ./user_guide.html
 ./xml_collector.html
 ./xml_obj.html
