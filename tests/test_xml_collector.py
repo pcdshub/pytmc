@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from pytmc import Symbol, DataType, SubItem
 from pytmc.xml_obj import BaseElement, Configuration
 
-from pytmc import TmcFile, PvPackage
+from pytmc import TmcFile
 from pytmc.xml_collector import ElementCollector, TmcChain, BaseRecordPackage
 from pytmc.xml_collector import ChainNotSingularError
 
@@ -129,6 +129,9 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert 'extra2' in tmc.all_SubItems['iterator']
    
     assert len(tmc.all_SubItems['iterator']) == 6
+    
+    assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
 
 
 def test_TmcFile_explore_all(generic_tmc_path):
@@ -145,6 +148,17 @@ def test_TmcFile_explore_all(generic_tmc_path):
         tmc.all_SubItems['DUT_STRUCT']['struct_var']
     ]
     assert target in complete_chain_list
+
+
+def test_TmcFile_resolve_enums(generic_tmc_path):
+    tmc = TmcFile(generic_tmc_path)
+    tmc.isolate_Symbols()
+    tmc.isolate_DataTypes()
+    assert not tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert not tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
+    tmc.resolve_enums()
+    assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
+    assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
 
 
 def test_TmcFile_recursive_explore(generic_tmc_path):
@@ -237,7 +251,6 @@ def test_TmcFile_isolate_chains(generic_tmc_path):
 
 
 def test_TmcFile_create_packages(example_singular_tmc_chains):
-    
     tmc = TmcFile(None)
     check_list = []
     # build artificial tmcChains and generate fake names
@@ -275,6 +288,7 @@ def test_TmcFile_create_packages(example_singular_tmc_chains):
         assert check.cfg.config == rec.cfg.config
         assert check.chain.chain == rec.chain.chain
 
+
 def test_TmcFile_configure_packages(example_singular_tmc_chains):
     tmc = TmcFile(None)
     check_list = []
@@ -304,7 +318,8 @@ def test_TmcFile_configure_packages(example_singular_tmc_chains):
     for check, rec in zip(check_list, tmc.all_RecordPackages):
         assert check.cfg.config == rec.cfg.config
         assert check.chain.chain == rec.chain.chain
-    
+
+
 def test_TmcFile_fullbuild(string_tmc_path):
     tmc = TmcFile(string_tmc_path)
     tmc.create_chains()
@@ -313,6 +328,7 @@ def test_TmcFile_fullbuild(string_tmc_path):
     tmc.configure_packages()
     z = tmc.render()
     print(z)
+
 
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)
@@ -604,22 +620,58 @@ def test_BaseRecordPackage_guess_common():
     assert tse['tag']['f_set'] == '-2'
 
 
-@pytest.mark.parametrize("tc_type, sing_index, final_type",[
-        ("BOOL", 0, 'bo'),
-        ("BOOL", 2, 'bi'),
-        ("BOOL", 4, 'bo'),
-        ("INT", 0, 'ao'),
-        ("INT", 2, 'ai'),
-        ("INT", 4, 'ao'),
-        ("LREAL", 0, 'ao'),
-        ("LREAL", 2, 'ai'),
-        ("LREAL", 4, 'ao'),
-        ("STRING", 0, 'waveform'),
-        ("STRING", 2, 'waveform'),
-        ("STRING", 4, 'waveform'),
+@pytest.mark.parametrize("tc_type, io, is_array, final_type",[
+        ("BOOL", "i", False, 'bi'),
+        ("BOOL", "o", False, 'bo'),
+        ("BOOL", "io", False, 'bo'),
+        ("BOOL", "i", True, 'waveform'),
+        ("BOOL", "o", True, 'waveform'),
+        ("BOOL", "io", True, 'waveform'),
+        ("INT", "i", False, 'ai'),
+        ("INT", "o", False, 'ao'),
+        ("INT", "io", False, 'ao'),
+        ("INT", "i", True, 'waveform'),
+        ("INT", "o", True, 'waveform'),
+        ("INT", "io", True, 'waveform'),
+        ("DINT", "i", False, 'ai'),
+        ("DINT", "o", False, 'ao'),
+        ("DINT", "io", False, 'ao'),
+        ("DINT", "i", True, 'waveform'),
+        ("DINT", "o", True, 'waveform'),
+        ("DINT", "io", True, 'waveform'),
+        ("ENUM", "i", False, 'ai'),
+        ("ENUM", "o", False, 'ao'),
+        ("ENUM", "io", False, 'ao'),
+        ("ENUM", "i", True, 'waveform'),
+        ("ENUM", "o", True, 'waveform'),
+        ("ENUM", "io", True, 'waveform'),
+        ("REAL", "i", False, 'ai'),
+        ("REAL", "o", False, 'ao'),
+        ("REAL", "io", False, 'ao'),
+        ("REAL", "i", True, 'waveform'),
+        ("REAL", "o", True, 'waveform'),
+        ("REAL", "io", True, 'waveform'),
+        ("LREAL", "i", False, 'ai'),
+        ("LREAL", "o", False, 'ao'),
+        ("LREAL", "io", False, 'ao'),
+        ("LREAL", "i", True, 'waveform'),
+        ("LREAL", "o", True, 'waveform'),
+        ("LREAL", "io", True, 'waveform'),
+        ("STRING", "i", False, 'waveform'),
+        ("STRING", "o", False, 'waveform'),
+        ("STRING", "io", False, 'waveform'),
+        #("INT", 2, 'ai'),
+        #("INT", 0, 'ao'),
+        #("INT", 4, 'ao'),
+        #("LREAL", 2, 'ai'),
+        #("LREAL", 0, 'ao'),
+        #("LREAL", 4, 'ao'),
+        #("STRING", 2, 'waveform'),
+        #("STRING", 0, 'waveform'),
+        #("STRING", 4, 'waveform'),
 ])
 def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
-            tc_type, sing_index, final_type):
+            tc_type, io, is_array, final_type):
     # chain must be broken into singular
     # for x in example_singular_tmc_chains:
     #     z = BaseRecordPackage(x)
@@ -627,12 +679,15 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     #     z.generate_naive_config()
     #     print(z.cfg.config)
     # assert False
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(example_singular_tmc_chains[0])
     logger.debug(str(record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_array
     record.generate_naive_config()
+    record.cfg.add_config_line('io', io, overwrite=True)
+
     assert True == record.guess_type()
     [field] = record.cfg.get_config_lines('type')
     assert field['tag'] == final_type 
@@ -659,26 +714,65 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     assert field['tag'] == final_io 
 
 
-@pytest.mark.parametrize("tc_type, sing_index, final_DTYP",[
-        ("BOOL", 0, '"asynInt32"'),
-        ("BOOL", 2, '"asynInt32"'),
-        ("INT", 0, '"asynInt32"'),
-        ("INT", 2, '"asynInt32"'),
-        ("LREAL", 0, '"asynFloat64"'),
-        ("LREAL", 2, '"asynFloat64"'),
-        ("STRING", 0, '"asynInt8ArrayOut"'),
-        ("STRING", 2, '"asynInt8ArrayIn"'),
-        ("STRING", 4, '"asynInt8ArrayOut"'),
+@pytest.mark.parametrize("tc_type, io, is_array, final_DTYP",[
+        # BOOl
+        ("BOOL", 'i', False, '"asynInt32"'),
+        ("BOOL", 'o', False, '"asynInt32"'),
+        ("BOOL", 'io', False, '"asynInt32"'),
+        ("BOOL", 'i', True, '"asynInt8ArrayIn"'),
+        ("BOOL", 'o', True, '"asynInt8ArrayOut"'),
+        ("BOOL", 'io', True, '"asynInt8ArrayOut"'),
+        # INT
+        ("INT", 'i', False, '"asynInt32"'),
+        ("INT", 'o', False, '"asynInt32"'),
+        ("INT", 'io', False, '"asynInt32"'),
+        ("INT", 'i', True, '"asynInt16ArrayIn"'),
+        ("INT", 'o', True, '"asynInt16ArrayOut"'),
+        ("INT", 'io', True, '"asynInt16ArrayOut"'),
+        # DINT
+        ("DINT", 'i', False, '"asynInt32"'),
+        ("DINT", 'o', False, '"asynInt32"'),
+        ("DINT", 'io', False, '"asynInt32"'),
+        ("DINT", 'i', True, '"asynInt32ArrayIn"'),
+        ("DINT", 'o', True, '"asynInt32ArrayOut"'),
+        ("DINT", 'io', True, '"asynInt32ArrayOut"'),
+        # REAL
+        ("REAL", 'i', False, '"asynFloat32"'),
+        ("REAL", 'o', False, '"asynFloat32"'),
+        ("REAL", 'io', False, '"asynFloat32"'),
+        ("REAL", 'i', True, '"asynFloat32ArrayIn"'),
+        ("REAL", 'o', True, '"asynFloat32ArrayOut"'),
+        ("REAL", 'io', True, '"asynFloat32ArrayOut"'),
+        # LREAL
+        ("LREAL", 'i', False, '"asynFloat64"'),
+        ("LREAL", 'o', False, '"asynFloat64"'),
+        ("LREAL", 'io', False, '"asynFloat64"'),
+        ("LREAL", 'i', True, '"asynFloat64ArrayIn"'),
+        ("LREAL", 'o', True, '"asynFloat64ArrayOut"'),
+        ("LREAL", 'io', True, '"asynFloat64ArrayOut"'),
+        # ENUM
+        ("ENUM", 'i', False, '"asynInt32"'),
+        ("ENUM", 'o', False, '"asynInt32"'),
+        ("ENUM", 'io', False, '"asynInt32"'),
+        ("ENUM", 'i', True, '"asynInt16ArrayIn"'),
+        ("ENUM", 'o', True, '"asynInt16ArrayOut"'),
+        ("ENUM", 'io', True, '"asynInt16ArrayOut"'),
+        # String
+        ("STRING", 'i', False, '"asynInt8ArrayIn"'),
+        ("STRING", 'o', False, '"asynInt8ArrayOut"'),
+        ("STRING", 'io', False, '"asynInt8ArrayOut"'),
 ])
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
-            tc_type, sing_index, final_DTYP):
+            tc_type, io, is_array, final_DTYP):
     # chain must be broken into singular
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(example_singular_tmc_chains[0])
     logger.debug((record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
+    record.chain.last.is_array = is_array
     record.generate_naive_config()
+    record.cfg.add_config_line('io',io,overwrite=True)
     assert True == record.guess_DTYP()
     logger.debug((record.cfg.config))
     [field] = record.cfg.get_config_fields('DTYP')
@@ -794,21 +888,47 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
         assert out['tag']['f_set'] == '"3"' 
 
 
-@pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_FTVL",[
-        ("INT", 0, False, False, None),
+@pytest.mark.parametrize("tc_type, io, is_str, is_arr, final_FTVL",[
+        ("INT", 'o', False, False, None),
         pytest.mark.skip(
-            ("INT", 0, False, True, '"FINISH"'),
+            ("INT", 'o', False, True, '"FINISH"'),
             reason="feature pending"),
-        ("LREAL", 0, False, True, '"DOUBLE"'),
-        ("STRING", 0, True, False, '"CHAR"'),
+        ("BOOL", 'i', False, False, None),
+        ("BOOL", 'i', False, True, '"CHAR"'),
+        ("BOOL", 'o', False, True, '"CHAR"'),
+        ("BOOL", 'io', False, True, '"CHAR"'),
+        ("INT", 'i', False, False, None),
+        ("INT", 'i', False, True, '"SHORT"'),
+        ("INT", 'o', False, True, '"SHORT"'),
+        ("INT", 'io', False, True, '"SHORT"'),
+        ("DINT", 'i', False, False, None),
+        ("DINT", 'i', False, True, '"LONG"'),
+        ("DINT", 'o', False, True, '"LONG"'),
+        ("DINT", 'io', False, True, '"LONG"'),
+        ("ENUM", 'i', False, False, None),
+        ("ENUM", 'i', False, True, '"SHORT"'),
+        ("ENUM", 'o', False, True, '"SHORT"'),
+        ("ENUM", 'io', False, True, '"SHORT"'),
+        ("REAL", 'i', False, False, None),
+        ("REAL", 'i', False, True, '"FLOAT"'),
+        ("REAL", 'o', False, True, '"FLOAT"'),
+        ("REAL", 'io', False, True, '"FLOAT"'),
+        ("LREAL", 'i', False, False, None),
+        ("LREAL", 'i', False, True, '"DOUBLE"'),
+        ("LREAL", 'o', False, True, '"DOUBLE"'),
+        ("LREAL", 'io', False, True, '"DOUBLE"'),
+        ("STRING", 'i', True, False, '"CHAR"'),
+        ("STRING", 'o', True, False, '"CHAR"'),
+        ("STRING", 'io', True, False, '"CHAR"'),
 ])
 def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
-            tc_type, sing_index, is_str, is_arr, final_FTVL):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+            tc_type, io, is_str, is_arr, final_FTVL):
+    record = BaseRecordPackage(example_singular_tmc_chains[0])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
     record.generate_naive_config()
+    record.cfg.add_config_line('io',io,overwrite=True)
     result = record.guess_FTVL()
     print(record.cfg.config)
     if final_FTVL is None:
@@ -871,240 +991,4 @@ def test_BaseRecordPackage_guess_all(example_singular_tmc_chains, tc_type,
         print(ln)
     [out] = record.cfg.get_config_fields(spot_check)
     assert out['tag']['f_set'] == result
-
-# PvPackage tests
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_instantiation(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    #print(tmc.all_Symbols)
-    #print(tmc.all_DataTypes)
-    #print(tmc.all_SubItems)
-    element_path = [
-        tmc.all_Symbols['MAIN.test_iterator'],
-        tmc.all_SubItems['iterator']['value']
-    ]
-    
-    # ensure that you can instantiate w/o errors
-    try:
-        pv_pack = PvPackage(
-            target_path = element_path,
-            pragma = element_path[-1].config_by_pv[0],
-            proto_name = '',
-            proto_file_name = '',
-        )
-    except:
-        pytest.fail()
-
-    # ensure that the pragmas properly crossed over
-    #print(tmc.all_SubItems['iterator']['value'].config_by_pv)
-    assert pv_pack.pv_complete == "TEST:MAIN:ITERATOR:VALUE"
-    assert {'title':'pv', 'tag':'VALUE'} in pv_pack.pragma
-    
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_from_element_path(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-
-    pv_packs = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-    )
-
-    assert len(pv_packs) == 2
-
-    assert pv_packs[0].guessing_applied == False
-    assert pv_packs[1].guessing_applied == False
-
-    assert pv_packs[0].pv_partial == "TEST:MAIN:NEW_VAR_OUT"
-    assert pv_packs[1].pv_partial == "TEST:MAIN:NEW_VAR_IN"
-
-    assert pv_packs[0].pv_complete == "TEST:MAIN:NEW_VAR_OUT"
-    assert pv_packs[1].pv_complete == "TEST:MAIN:NEW_VAR_IN"
-
-    assert pv_packs[0].proto_name == "SetNEW_VAR"
-    assert pv_packs[1].proto_name == "GetNEW_VAR"
-
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_make_config(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-    pv_out, pv_in = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-    )
-    new = pv_out.make_config(title="test_line", setting="test", field=False)
-    assert {'title': 'test_line', 'tag': 'test'} == new 
-
-    new = pv_out.make_config(title="FLD", setting="test 9", field=True)
-    assert {
-        'title': 'field',
-        'tag': {'f_name': "FLD", 'f_set': 'test 9'}
-    } == new 
-
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_missing_pragma_lines(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-    pv_out, pv_in = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-    )
-    ''' 
-    for x in pv_out.pragma:
-        print(x)
-    '''
-    missing = pv_out.missing_pragma_lines()
-    
-    assert odict([('field',['title']),('DTYP',['tag','f_name'])]) in missing
-    assert odict([('field',['title']),('INP',['tag','f_name'])]) in missing
-    
-    pv_out.pragma.append(
-        {'title': 'field', 'tag': {'f_name': 'DTYP', 'f_set': ''}}
-    )
-    pv_out.pragma.append(
-        {'title': 'field', 'tag': {'f_name': 'INP', 'f_set': ''}}
-    )
-    
-    assert [] == pv_out.missing_pragma_lines()
-
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_is_config_complete(generic_tmc_path):
-    '''Test a single version for pragma completeness. This only tests for the
-    existance of these fields, it does NOT test if they are valid.
-    '''
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-    pv_out, pv_in = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-    )
-    '''
-    for x in pv_out.pragma:
-        print(x)
-    '''
-
-    assert False == pv_out.is_config_complete
-    
-    pv_out.pragma.append(
-        {'title': 'field', 'tag': {'f_name': 'DTYP', 'f_set': ''}}
-    )
-    pv_out.pragma.append(
-        {'title': 'field', 'tag': {'f_name': 'INP', 'f_set': ''}}
-    )
-    
-    assert True == pv_out.is_config_complete
-
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_term_exists(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-    pv_out, _ = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-    )
-
-    # confirm that the 'pv' field exists, rule 0
-    assert pv_out.term_exists(pv_out.req_fields[0]) == True
-    # confirm that the 'INP field does not exist, rule 6
-    assert pv_out.term_exists(pv_out.req_fields[6]) == False
-
-
-# PvPackage field guessing tests
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPacakge_guess(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-    pv_out, _ = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-    )
-
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_guess():
-    ''
-    assert pv_packs[0].fields == {
-        "ZNAM":"SINGLE",
-        "ONAM":"MULTI",
-        "SCAN":"1 second"
-    }
-    assert pv_packs[1].fields == {
-        "ZNAM":"SINGLE",
-        "ONAM":"MULTI",
-        "SCAN":"1 second"
-    }
-
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_create_record(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-
-    pv_packs = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-        use_proto = True,
-    )
-
-    print(element_path)
-    record0 = pv_packs[0].create_record()
-    assert record0.pv == "TEST:MAIN:NEW_VAR_OUT"
-    assert record0.rec_type == "bo"
-    assert record0.fields == {
-        "ZNAM":"SINGLE",
-        "ONAM":"MULTI",
-        "SCAN":"1 second"
-    }
-    assert record0.comment
-
-
-@pytest.mark.skip(reason="PvPackage pending deprecation")
-def test_PvPackage_create_proto(generic_tmc_path):
-    tmc = TmcFile(generic_tmc_path)
-    element_path = [
-        tmc.all_Symbols['MAIN.NEW_VAR'],
-    ]
-
-    pv_packs = PvPackage.from_element_path(
-        target_path = element_path,
-        base_proto_name = 'NEW_VAR',
-        proto_file_name = '',
-        use_proto = True,
-    )
-
-    proto0 = pv_packs[0].create_proto()
-    '''
-    assert proto0.name
-    assert proto0.out_field
-    assert proto0.in_field
-    assert proto0.init
-    '''
 

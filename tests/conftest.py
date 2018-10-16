@@ -3,7 +3,7 @@ import logging
 import xml.etree.ElementTree as ET
 import os
 
-from pytmc import SingleRecordData, TmcFile, TmcExplorer
+from pytmc import TmcFile
 from pytmc.xml_collector import BaseElement, Configuration, TmcChain
 logger = logging.getLogger(__name__)
 

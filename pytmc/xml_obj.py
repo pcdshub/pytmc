@@ -14,8 +14,10 @@ import re
 class XmlObjError(Exception):
     pass
 
+
 class NotStringError(Exception):
     pass
+
 
 class PvNotFrozenError(XmlObjError):
     pass
@@ -23,6 +25,8 @@ class PvNotFrozenError(XmlObjError):
 
 class Configuration:
     def __init__(self, str=None, config=None):
+        """
+        """
         # str: self._raw_config (READ ONLY, set at instantaiation)
         # list: self.config
         self._raw_config = str
@@ -495,6 +499,8 @@ class BaseElement:
         self.is_str_ = None
         self.iterable_length_ = None
         
+        self.is_enum_ = None
+        
         self.element = element
         #self.registered_pragmas = []
         #self.freeze_config = False
@@ -527,7 +533,6 @@ class BaseElement:
             self.pragma = None
         else:
             self.pragma = Configuration(self.raw_config)
-        
 
     def _get_raw_properties(self):
         """
@@ -608,69 +613,6 @@ class BaseElement:
             return True
 
         return False
-
-    # refactored   
-#    @property
-#    def _config_lines(self):
-#        '''
-#        Read in a rudimentary python representation of the config statement.
-#        Use :func:`~config` to access a more cleanly formatted version of this
-#        information.
-#
-#        Returns
-#        -------
-#        list
-#            this list contains dictionaries for each line of the config 
-#            statement
-#
-#        '''
-#        finder = re.compile(
-#            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
-#        )
-#        result = [ m.groupdict() for m in finder.finditer(self.raw_config)]
-#        for line in result:
-#            line['tag'] = line['tag'].strip()
-#        return result
-    
-    # refactored   
-#    def neaten_field(self, string):
-#        '''
-#        Method for formatting the 'field' line
-#        
-#        Parameters
-#        ----------
-#        string : str
-#            This is the string to be broken into field name and field setting
-#
-#        Returns
-#        -------
-#            dict
-#                Keys are f_name for the field name and f_set for the
-#                corresponding setting.
-#        '''
-#        finder = re.compile(
-#            r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)"
-#        )
-#        return finder.search(string).groupdict()
-
-    # refactored   
-#    @property
-#    def _config(self):
-#        """
-#        Cleanly formatted python representation of the config statement. Fields
-#        are broken into their own dictionaries.
-#
-#        Returns
-#        -------
-#             list
-#                this list contains dictionaries for each line of the config
-#                statement
-#        """
-#        cfg_lines = self._config_lines
-#        for line in cfg_lines:
-#            if line['title'] == 'field':
-#                line['tag'] = self.neaten_field(line['tag'])
-#        return cfg_lines
 
     def _get_subfield(self, field_target, get_all=False):
         """
@@ -871,152 +813,6 @@ class BaseElement:
         self._cached_name = name
 
 
-    # refactored
-#    def extract_from_pragma(self, title, pv=None):
-#        '''
-#        Extract a given setting(s) from the pragma.
-#
-#        Attributes
-#        ----------
-#        title : str
-#            Specify the name of the field to seek from
-#
-#        pv : str, optional
-#            Specify which PV to pull the config line from. If not specified 
-#        Returns
-#        -------
-#        list 
-#            list of all pragma information from the specified location.
-#        '''
-#
-#        if pv == None:
-#            # scan for the title across config lines from all PVs
-#            config_set = self._config
-#        else:
-#            # only lines specific to this PV are available for examination
-#            config_set = self.read_pragma(only_pv = pv)
-#
-#        results = []
-#        for line in config_set:
-#            if line['title'] == title:
-#                results.append(line['tag'])
-#
-#        return results
-
-    # refactored
-#    def read_pragma(self, only_pv=None):
-#        '''
-#        Return the cropped down pragma that is specific to a single PV.
-#
-#        Parameters
-#        ----------
-#        only_pv : str or None
-#            Specify which PV's pragma to print. Defaults to the frozen PV. Must
-#            be provided if no PV has been frozen.
-#
-#        Returns
-#        -------
-#        list:
-#            The PV specific pragma for this element
-#        '''
-#        if not self.freeze_config and only_pv == None:
-#            raise PvNotFrozenError
-#        
-#        if self.freeze_config and only_pv == None:
-#            only_pv = self.freeze_pv_target
-#
-#        
-#        all_results = self.config_by_pv()
-#
-#        for specific_pv_config in all_results:
-#            if {'title': 'pv', 'tag':only_pv} in specific_pv_config:
-#                return specific_pv_config
-    # refactored
-#    def pv(self):
-#        '''
-#        Retrieve the config line specifying pv name for this entity.
-#
-#        Returns
-#        -------
-#        str, list of str, or None
-#            See :func:`~extract_pragmas` for details.
-#        '''
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        [result] = self.extract_from_pragma('pv',pv=self.freeze_pv_target)
-#        return result
-#
-#    # refactored 
-#    def all_pvs(self):
-#        return self.extract_from_pragma('pv')
-#    
-#    # refactored
-#    def config_by_pv(self):
-#        '''
-#        Parse the pytmc pragma into groups, one for each PV to be made from the
-#        variable. 
-#
-#        Returns
-#        -------
-#        list 
-#            This list contains a list for each unique PV. These lists contain
-#            dictionaries, one for each row of the pragma.
-#        '''
-#        data = self._config
-#        separate_lists = []
-#        for line in data:
-#            if line['title'] == 'pv':
-#                separate_lists.append([])
-#                index = len(separate_lists) - 1
-#            separate_lists[index].append(line)
-#        return separate_lists
-#
-#    
-#    def freeze_pv(self,pv):
-#        '''
-#        Internally set the element to behave as if only a single PV is tied
-#        to this element when config_by_pv is used.
-#
-#        Parameters
-#        ----------
-#        pf : str
-#            String of the target PV
-#        '''
-#        self.freeze_config = True
-#        self.freeze_pv_target = pv
-#
-#        self._pragma = self.read_pragma()
-#
-#    @property
-#    def pragma(self):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        return self._pragma
-#
-#    @pragma.setter
-#    def pragma(self, pragma):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        self._pragma = pragma
-#
-#    @pragma.deleter
-#    def pragma(self):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        self._pragma = None
-#
-#    def add_pragma_line(self, title, tag):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        self._pragma.append({'title': title, 'tag': tag})
-#    
-#    def add_pragma_field(self, f_name, f_set):
-#        if not self.freeze_config:
-#            raise PvNotFrozenError
-#        
-#        self.add_pragma_line('field',{'f_name': f_name, 'f_set': f_set}) 
-
-
 class Symbol(BaseElement):
     '''
     Inherits from :class:`~pytmc.xml_obj.BaseElement`
@@ -1039,6 +835,9 @@ class Symbol(BaseElement):
         #]
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
+        
+        # set during isolation phase
+        self.is_enum = False
 
     @property
     def tc_type(self):
@@ -1053,7 +852,8 @@ class Symbol(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
-
+        if self.is_enum:
+            return "ENUM"
         if self.is_str:
             return "STRING"
         name_field = self._get_subfield("BaseType")
@@ -1156,6 +956,26 @@ class DataType(BaseElement):
         return extension_element.text
     
 
+    @property
+    def is_enum(self):
+        """
+        This property is true if this twincat element is an enum. It works for
+        Datatypes, symbols and subItems.
+        
+        Returns
+        -------
+        Bool
+            is true if this twincat element is an enum.
+        """
+        if self.is_enum_ is not None:
+            return self.is_enum_
+        if self.element is None:
+            return False
+        if None != self._get_subfield('EnumInfo'):
+            return True
+        return False
+    
+
 class SubItem(BaseElement):
     '''
     Inherits from :class:`~pytmc.xml_obj.baseElement`
@@ -1195,6 +1015,8 @@ class SubItem(BaseElement):
         #]
         self.__parent = None
         self.parent = parent
+        # set during isolation phase
+        self.is_enum = False
 
         if self.parent == None:
             logger.warning("SubItem has no parent")
@@ -1214,6 +1036,10 @@ class SubItem(BaseElement):
             'iterator' if it is an instance of a user defined struct/fb named
             'iterator'
         '''
+        if self.is_enum:
+            return "ENUM"
+        if self.is_str:
+            return "STRING"
         name_field = self._get_subfield("Type")
         return name_field.text
 
@@ -1232,7 +1058,6 @@ class SubItem(BaseElement):
         if self not in self.__parent.children:
             self.__parent.children.append(self)
 
-    
     @parent.deleter
     def parent(self):
         if self.__parent != None:
@@ -1242,4 +1067,3 @@ class SubItem(BaseElement):
             ))
             self.__parent.children = new_list
             self.__parent = None 
-    

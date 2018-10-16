@@ -62,7 +62,6 @@ class TmcFile:
     '''
     Object for handling the reading comprehension comprehension of .tmc files.
 
-
     Attributes
     ----------
     all_Symbols : :class:`~pytmc.xml_collector.ElementCollector`
@@ -84,8 +83,6 @@ class TmcFile:
     all_singular_TmcChains : list
         Collection of all singularized TmcChains in the document. Must be
         initialized with :func:`~isolate_chains`.
-
-    
     '''
     def __init__(self, filename):
         self.filename = filename
@@ -175,6 +172,32 @@ class TmcFile:
         if type(parent) == ET.Element:
             pass
 
+    def resolve_enums(self):
+        """
+        Identify the SubItems and Datatypes that represent enum types.
+        Requires isolate_Datatypes and isolate_Subitems to have been run first.
+        """
+        # resolve str
+        for sym_name in self.all_Symbols:
+            sym = self.all_Symbols[sym_name]
+            sym_type_str = sym.tc_type
+            try:
+                if self.all_DataTypes[sym_type_str].is_enum:
+                    sym.is_enum = True
+            except KeyError:
+                pass
+
+        # resolve subitems
+        for datatype_name in self.all_SubItems:
+            for subitem_name in self.all_SubItems[datatype_name]:
+                subitem = self.all_SubItems[datatype_name][subitem_name]
+                subitem_type_str = subitem.tc_type
+                try:
+                    if self.all_DataTypes[subitem_type_str].is_enum:
+                        subitem.is_enum = True
+                except KeyError:
+                    pass
+        
     def isolate_all(self):
         '''
         Shortcut for running :func:`~isolate_Symbols` and
@@ -182,6 +205,7 @@ class TmcFile:
         '''
         self.isolate_Symbols()
         self.isolate_DataTypes()
+        self.resolve_enums()
 
     def explore_all(self):
         """
@@ -334,14 +358,15 @@ class TmcFile:
             rec_list.append(record_str)
 
         return self.file_template.render(records=rec_list)
-        
 
 
 class ChainNotSingularError(Exception):
     pass
 
+
 class MissingConfigError(Exception):
     pass
+
 
 class TmcChain:
     """
@@ -773,7 +798,10 @@ class BaseRecordPackage:
         
         ai_ao_set = {
             "INT",
+            "DINT",
+            "REAL",
             "LREAL",
+            "ENUM",
         }
         if self.chain.last.tc_type in ai_ao_set:
             [io] =  self.cfg.get_config_lines('io')
@@ -844,12 +872,43 @@ class BaseRecordPackage:
         
         [io] =  self.cfg.get_config_lines('io')
         io = io['tag'] 
+        
+        BOOL_set = {"BOOL"}
+        if self.chain.last.tc_type in BOOL_set:
+            base = '"asynInt32'
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayOut"')
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayIn"')
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayOut"')
+                    return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
 
-        asynint32_set = {
-            "BOOL",
-            "INT"
-        }
-        if self.chain.last.tc_type in asynint32_set:
+        INT_set = {"INT", "ENUM"}
+        if self.chain.last.tc_type in INT_set:
+            base = '"asynInt32'
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayOut"')
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayIn"')
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayOut"')
+                    return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
+        
+        DINT_set = {"DINT"}
+        if self.chain.last.tc_type in DINT_set:
             base = '"asynInt32'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
@@ -861,13 +920,29 @@ class BaseRecordPackage:
                 elif 'o' in io:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
-            self.cfg.add_config_field("DTYP", base+'"')
-            return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
         
-        asynfloat64_set = {
-            "LREAL",
-        }
-        if self.chain.last.tc_type in asynfloat64_set:
+        REAL_set = {"REAL"}
+        if self.chain.last.tc_type in REAL_set:
+            base = '"asynFloat32'
+            if self.chain.last.is_array:
+                if 'i' in io and 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    return True
+                elif 'i' in io:
+                    self.cfg.add_config_field("DTYP",base+'ArrayIn"')
+                    return True
+                elif 'o' in io:
+                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
+        
+        LREAL_set = {"LREAL"}
+        if self.chain.last.tc_type in LREAL_set:
             base = '"asynFloat64'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
@@ -879,12 +954,11 @@ class BaseRecordPackage:
                 elif 'o' in io:
                     self.cfg.add_config_field("DTYP",base+'ArrayOut"')
                     return True
-            self.cfg.add_config_field("DTYP", base+'"')
-            return True
+            else:
+                self.cfg.add_config_field("DTYP", base+'"')
+                return True
 
-        asynInt8ArrayOut_set = {
-            "STRING",
-        }
+        asynInt8ArrayOut_set = {"STRING"}
         if self.chain.last.tc_type in asynInt8ArrayOut_set:
             [io] =  self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
@@ -902,6 +976,8 @@ class BaseRecordPackage:
     def guess_INP_OUT(self):
         """
         Construct, add, INP or OUT field
+        Fields will have this form:
+        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
         
         Returns
         -------
@@ -915,7 +991,6 @@ class BaseRecordPackage:
         name = '.'.join(name_list)
         assign_symbol = ""
         field_type = ""
-        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
         if 'i' in io and 'o' in io:
             assign_symbol = "?"
             if self.chain.last.is_array or self.chain.last.is_str:
@@ -1049,11 +1124,23 @@ class BaseRecordPackage:
             pass
 
         if self.chain.last.is_array:
-            if self.chain.last.tc_type == "LREAL":
-                self.cfg.add_config_field("FTVL", '"DOUBLE"')
-                return True
-            if self.chain.last.tc_type == "BOOL":
+            tc_type = self.chain.last.tc_type
+            if tc_type == "BOOL":
                 self.cfg.add_config_field("FTVL", '"CHAR"')
+                return True
+            INT_set = {"INT", "ENUM"}
+            if tc_type in INT_set:
+                self.cfg.add_config_field("FTVL", '"SHORT"')
+                return True
+            DINT_set = {"DINT"}
+            if tc_type in DINT_set:
+                self.cfg.add_config_field("FTVL", '"LONG"')
+                return True
+            if tc_type == "REAL":
+                self.cfg.add_config_field("FTVL", '"FLOAT"')
+                return True
+            if tc_type == "LREAL":
+                self.cfg.add_config_field("FTVL", '"DOUBLE"')
                 return True
 
         if self.chain.last.is_str:
@@ -1103,390 +1190,4 @@ class BaseRecordPackage:
         raise NotImplementedError
 
 
-
-class PvPackage:
-    '''
-    PvPackage stores the information for each PV to be created. These instances
-    can store the complete set of configuration lines. The initial set is taken
-    from the pragma and those unfilled are guessed into place when the object
-    is created.
-
-    Deprecate the following? 
-    Most of the work occurs during instantiation so the instances of this
-    object are intended for single setup.
-
-    Parameters
-    ----------
-    target_path : list
-        This is a list of Symbols, DataTypes, and/or subitems leading to the
-        targeted TwinCAT variable
-
-    pragma : list
-        The list of configuration lines specific to a single PV, taken from the
-        config_by_pv method. 
-
-    proto_name : str, optional
-        The name for this proto method.
-
-    proto_file_name : str, optional
-        The local file name for the proto file. Full path is not necessary
-
-    Attributes
-    ----------
-    target_path : list
-        Identical to target_path parameter
-
-    pragma : list
-        this list of dictionaries is a deep-copied version of the pragmas
-        attached to the TwinCAT variable. This variable is meant for
-        guessing in the automated fields.
-
-    pv_partial : str
-        This str designates the pv term specific to this variable.
-
-    pv_complete : str
-        The full PV for this variable concatenating all encapsulating PVs and
-        the target PV. 
-
-    proto_name : str, Non
-        Identical to proto_name parameter.
-
-    proto_file_name : str, None
-        Identical to proto_file_name parameter.
-
-    guessing_applied : bool
-        Have the guessing procedures been run yet?
-    '''
-    versions = ['legacy']
-    
-    def __init__(self, target_path, pragma=None, proto_name=None,
-            proto_file_name=None, use_proto=True,version='legacy'):
-        self.define_versions()
-        self.target_path = target_path
-        # Create separate pragma copy to hold both original and guessed lines
-        if pragma != None:
-            self.pragma = deepcopy(pragma)
-        else:
-            self.pragma = target_path[-1].config_by_pv()[0]
-        # Acquire the Pv attached to this pragma (may only be the tail)
-        for row in self.pragma:
-            if row['title'] == 'pv':
-                pv = row['tag']
-        # Set partial to the component of the PV specified in this element
-        self.pv_partial = pv
-        # Construct the full PV by iterating through all PVs in the path
-        self.prefix = ""
-        for entry in target_path[:-1]: 
-            self.prefix += (entry.pv + ":")
-        self.pv_complete = self.prefix + self.pv_partial
-        # Save the name of the proto method and file
-        self.proto_name = proto_name
-
-        self.proto_file_name = proto_file_name
-        # Indicate that guessing procedures have not been applied
-        self.guessing_applied = False
-        self.version = version
-        self.set_version()
-
-    def define_versions(self):
-        '''Define all auto-complete rule sets for ALL versions.
-        '''
-        # list out required pragma fields for this version
-        self._all_req_fields = {
-            'legacy':[
-                odict([('pv',['title'])]),
-                odict([('type',['title'])]),
-                odict([('str',['title'])]),
-                odict([('io',['title'])]),
-                odict([('field',['title']),('DTYP',['tag','f_name'])]),
-                odict([('field',['title']),('SCAN',['tag','f_name'])]),
-                odict([('field',['title']),('INP',['tag','f_name'])]),
-            ]
-        }
-
-        '''
-        # list out variables that must be =/= None for this version 
-        self._all_req_vars = {
-            'legacy':[
-                self.proto_name,
-                self.
-            ]
-        }
-
-        '''
-        # list the approved guessig methods for this version
-        # number referes to which requirement in _all_req_fields (by index)
-        self._all_guess_methods = {
-            'legacy': {
-                 1: [ # type
-                    self.set_version
-                 ],
-                 2: [ # str
-                 ],
-                 3: [ # io
-                 ],
-                 4: [ # DTYP field
-                 ],
-                 5: [ # SCAN field
-                 ],
-                 6: [ # INP field
-                 ],
-            }
-        }
-
-        # list if this version uses the proto file 
-        self._all_use_proto = {
-            'legacy': True
-        }
-
-    def set_version(self):
-        '''Set variables indicating the rules for the version this pack uses
-        '''
-        self.req_fields = self._all_req_fields[self.version]
-        # self.req_vars = ._all_req_vars[self.version] 
-        self.guess_methods = self._all_guess_methods[self.version]
-        self.use_proto = self._all_use_proto[self.version]
-
-    def term_exists(self, req_line):
-        '''Return True if the req_line (required rule) exists in pragma
-        '''
-        for row in self.pragma:
-            # determine wether this line satisfies the rule 
-            valid = True
-            for req_term in req_line:
-                # req_term indicates the individual tags that mush exist
-                req_location = req_line[req_term]
-                try:
-                    # recursively step into encapsulated dictionaries
-                    target = row
-                    for page in req_location:
-                        target = target[page]
-                    # If the term found at the end of dictionary rabbit-hole
-                    # matches, accept it and check the next term of the rule.
-                    # Allow valid to remain true
-                    valid = valid and (target == req_term)
-                    if not valid:
-                        break
-                except KeyError:
-                    valid = False
-                    break
-            
-            if valid == True:
-                return True
-
-        return False
-    
-    def missing_pragma_lines(self):
-        '''Identify missing pragma lines in an array.
-        '''
-        rejection_list = []
-        for req_line in self.req_fields:
-            # each req_line is an individual requirement for a term to exist
-            if not self.term_exists(req_line):
-                rejection_list.append(req_line)
-            
-        return rejection_list 
-            
-    @property
-    def is_config_complete(self):
-        '''Return True if all necessary config information is pressent
-        '''
-        if len(self.missing_pragma_lines()) == 0:
-            return True
-
-        return False
-
-    @classmethod
-    def assemble_package_chains(cls, target_path, progress_chain=None):
-        '''
-        When provided with a target path (list of element objects), assemble
-        unique lists for each PV to be created. Because multiple PVs can be
-        specified from a single element (arrays or IO pairs) the PV hierarchy
-        can follow a tree like structure.
-
-        Parameters
-        ----------
-        target_path : list of elements
-            Specify the sequence of encapsulated elements in order of
-            least deeply encapsulated to most deeply encapsulated.
-
-        progress_chain : list or None
-            This is the list of individual lists to be returned when the
-            recursion is complete. Only used for recursive application of this
-            method. 
-
-        Returns
-        -------
-        list
-            List contains lists of elements with frozen PVs such that each list
-            can be be used for constructing a single PV package or be 
-        '''
-        if progress_chain == None:
-            progress_chain = []
-        target = target_path[0]
-        progress_chain_inital_len = len(progress_chain)
-        
-        new_elements = []
-        # Examine the configs in the first entry of the target_path provided
-        for config_set in target.config_by_pv():
-            # construct the 'virtual tree' of copied 1:1 element-pragmas  
-            pv_line = BaseElement.parse_pragma('pv',config_set)
-            element_copy = copy(target)
-            element_copy.freeze_pv(pv_line)
-            # add array parsing here (for discrete arrays) 
-            new_elements.append(element_copy)
-
-        # Iterate through the previously processed chains
-        for chain_idx in range(len(progress_chain)):
-            for new_elem_idx in range(len(new_elements)):
-                if new_elem_idx == 0:
-                    # append the new element to an existing chain
-                    progress_chain[chain_idx].append(new_elements[new_elem_idx])
-                if new_elem_idx > 0:
-                    # create new chain and append the new element
-                    progress_chain.append(progress_chain[chain_idx].copy())
-                    progress_chain[-1].append(new_elements[new_elem_idx])
-        # If this is the first-tier call and the progress chain is empty,
-        if len(progress_chain) == 0: 
-            for new_elem_idx in range(len(new_elements)):
-                progress_chain.append([new_elements[new_elem_idx]])
-
-        # Limit recursion depth
-        if len(target_path) == 1:
-            return progress_chain
-
-        return cls.assemble_package_chains(
-            target_path = target_path[1:],
-            progress_chain = progress_chain
-        )
-
-    @classmethod
-    def from_element_path(cls, target_path, base_proto_name=None, 
-            proto_file_name=None,use_proto=None,return_rejects=False):
-        '''
-        Produce a list of PvPackage instances, one for each unique PV being
-        created from a specific TwinCAT variable. 
-        
-        Parameters
-        ----------
-        target_path : list
-            Identical to target_path in __init__.
-    
-        base_proto_name : str, None
-            Stub for the name of the proto. Get/Set will be appended to the
-            front depending on io.
-
-        proto_file_name : str, None
-            Name of the file to store the protos.
-
-        use_proto : bool, None
-            Explicity state whether or not to use protos. Typically this should
-            be left undefined (equal to None) so from_element_path will guess 
-            it automatically
-        '''
-        logger.debug("target_path: "+str(target_path))
-        logger.debug("t: "+str(target_path[-1].is_array))
-        pvpacks_output_list = []
-        reject_path_list = []
-        # Presume that no proto file is being used if all are left blank 
-        if use_proto == None:
-            if base_proto_name != None or proto_file_name != None:
-                use_proto = True
-            else:
-                use_proto = False
-
-        direct_paths = cls.assemble_package_chains(target_path)
-        
-        for path in direct_paths:
-            # If the last element in the path isn't default type, don't create
-            # a package and pass the path back for further processing
-            logging.debug(str(path[-1])+ ' tc_type: ' + path[-1].tc_type)
-            target_pv = path[-1].freeze_pv_target
-            if '[' in target_pv or ']' in target_pv:
-                reject_path_list.append(path)
-            # otherwise create a pvpackage
-            else:
-                # prepare the proto if it is necessary
-                if use_proto:
-                    io_line = BaseElement.parse_pragma(
-                        'io',
-                        path[-1].config_by_pv()[0]
-                    )
-                    try:
-                        if "o" in io_line:
-                            proto_name = "Set" + base_proto_name
-                        elif "i" in io_line:
-                            proto_name = "Get" + base_proto_name
-                    # If no 'io' value is set, do the following 
-                    except TypeError:
-                        proto_name = base_proto_name
-                else:
-                    proto_file_name = None
-                    proto_name = None
-    
-                new_pvpack = cls(
-                    target_path = path,
-                    proto_name = proto_name,
-                    proto_file_name = proto_file_name,
-                    use_proto = use_proto
-                )
-                pvpacks_output_list.append(new_pvpack)
-        
-        if return_rejects:
-            return pvpacks_output_list, reject_path_list
-        return pvpacks_output_list
-
-    def make_config(self, title, setting, field=False):
-        """Create pragma formatted dict. 
-
-        Parameters
-        ----------
-        title : str
-            Configuration lines and fields have both a title designating what
-            the line sets. This string sets the configuraiton type or the field
-            type.
-
-        setting : str
-            Configuration lines and fields must then apply some setting. This
-             argument defines what setting is applied.
-
-        field : bool, optional, defaults to False
-            If true, this method will add a field line with title and setting
-            specified by the previous parameters,
-        """
-        if field:    
-            new_entry = {
-                'title': 'field', 
-                'tag': {'f_name': title, 'f_set': setting}
-            }
-        
-        else:
-            new_entry = {'title': title, 'tag': setting}
-
-        return new_entry
-    
-    def create_record(self):
-        raise NotImplementedError
-
-    def create_proto(self):
-        raise NotImplementedError
-
-    def __eq__(self, other):
-        """
-        Compare the dictionaries of the two objects against one another but
-        don't compare the entries in the 'skip field - this causes infinite
-        recursion issues 
-        """
-        skip = [
-            '_all_req_fields',
-            '_all_req_vars',
-            '_all_guess_methods',
-            'req_fields',
-            'req_vars',
-            'guess_methods',
-        ] 
-        s_dict = {i:self.__dict__[i] for i in self.__dict__ if i not in skip}
-        o_dict = {i:other.__dict__[i] for i in other.__dict__ if i not in skip}
-
-        return s_dict == o_dict
 
