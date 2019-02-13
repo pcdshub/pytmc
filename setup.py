@@ -10,7 +10,6 @@ setup(
     license='BSD',
     packages    = find_packages(),
     description = 'Generate Epics DB records from TwinCAT .tmc files',
-    #scripts = ['bin/xmltranslate','bin/makerecord'],
     entry_points = {
         'console_scripts': [
             'pytmc = pytmc.bin.makerecord:main',
