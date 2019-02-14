@@ -12,7 +12,7 @@ matrix:
   include:
     -python: "3.6"
 #     env: BUILD_DOCS=1
-#    -python: "3.7"
+    -python: "3.7"
 #     dist: xenial
 #     sudo: true
 #  allow_failures:
