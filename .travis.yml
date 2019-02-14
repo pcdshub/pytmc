@@ -50,7 +50,7 @@ script:
   - make html
   - cd ../
   - |
-    if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $BUILD_DOCS]]; then
+    if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $BUILD_DOCS ]]; then
       #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
       doctr deploy . --built-docs docs/_build/html
     fi
