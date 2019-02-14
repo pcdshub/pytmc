@@ -11,12 +11,12 @@ env:
 matrix:
   include:
     -python: "3.6"
-#     env: BUILD_DOCS=1
+     env: BUILD_DOCS=1
+    -python: "3.7"
+     dist: xenial
+     sudo: true
+#  allow_failures:
 #    -python: 3.7
-#     dist: xenial
-#     sudo: true
-  allow_failures:
-    -python: 3.7
 
 sudo: false
 
