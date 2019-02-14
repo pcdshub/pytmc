@@ -7,9 +7,9 @@ from .. import TmcFile
 
 def main():
     description = """\
-    Commandline utility for generating epics records files from TwinCAT3 .tmc
-    files. This program is designed to work in conjunction with ESSS'
-    m-epics-twincat-ads driver."""
+    "pytmc" is a command line utility for generating epics records files from
+    TwinCAT3 .tmc files. This program is designed to work in conjunction with
+    ESSS' m-epics-twincat-ads driver."""
     
     parser = argparse.ArgumentParser(
         description = description,
