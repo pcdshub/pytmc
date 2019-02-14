@@ -1,4 +1,5 @@
 language: python 
+sudo: false
 
 env:
   global:
@@ -17,7 +18,6 @@ matrix:
      dist: xenial
      sudo: true
 
-sudo: false
 
 git:
   depth: 5
