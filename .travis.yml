@@ -12,8 +12,6 @@ matrix:
       env: BUILD_DOCUMENTATION=1
     - python: 3.7
       dist: xenial
-  allow_failures:
-    - python: 3.7
 
 install:
   - sudo apt-get update
