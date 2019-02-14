@@ -11,6 +11,7 @@ matrix:
     - python: 3.6
       env: BUILD_DOCUMENTATION=1
     - python: 3.7
+      dist: xenial
   allow_failures:
     - python: 3.7
 
