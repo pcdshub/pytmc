@@ -1,10 +1,4 @@
 language: python 
-python: 
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "3.7"
-  - "3.8-dev"
 
 env:
   global:
@@ -12,10 +6,15 @@ env:
     - secure: "eW+HXTrfHs6UN5WqJUg23J6gNIxntYUY6eeEDpS5ShCLaPBjrVOzDBhBKXGHLYCSP+iorvDZA1jQhH4eiyeZgQE4wfsJHf9o6T2klN8sKD9rwgfaWd1/ramnLDPGh+Ccz12WlzoOIAEKlQJ1PhmpXPcH8sT+dC8bUl04Qf2Feg+LxHCtuXgrwoYlqjebaMWBvDbk/ngGCY1wMSYqkv1Nzn/J2K+syZFLpY7k61HiCKUQZlIm8KPz924ICZ5oKYMPAF7POC6BORXhgH9qKbxZ0Q86+D+LX7HGhFU/MFb3kbLmUmZtE6Q3Wc9BHvKiIyHXhBLBDVGHH4JXdWzMNulYapS9iuctjfmhuHySVXAv9E22FXlnKBJicCjlBKzcl2Re2Yn6F5oN34y0K6uQb2ip/Cfe0K4jO2R2lD74eHktLuCTVfXejnRZHkGY2C3TjpEOTKmN7Qfwuze1iJcGLLTO4SZFurdpyOwNipyK83KbNNecmNAgenwH9J2sv6ZQ+pDO5DobtxI9jPIX0X1XDbtSbwIb0Cg718qVA50KfC6XLLNcQW+61b4POFiGlSUfA+PJMqvX9OGkm3rj7zsG7IrfkGVAT6IJxU5wiMhwsal5IvAAG2t0Un9EDGdSzIr0s3P9fh5fl1afU9IL7FnVmKGOIwtdWILtDxGd6kbV7jEGn50="
 
 matrix:
+    -python: 3.6
+     env: BUILD_DOCS=1
+    -python: 3.7
+     dist: xenial
+     sudo: true
   allow_failures:
-    -python: "3.4"
-    -python: "3.7"
-    -python: "3.8-dev"
+    -python: 3.7
+     dist: xenial
+     sudo: true
 
 sudo: false
 
@@ -50,7 +49,7 @@ script:
   - make html
   - cd ../
   - |
-    if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO ]]; then
+    if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $BUILD_DOCS]]; then
       #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
       doctr deploy . --built-docs docs/_build/html
     fi
