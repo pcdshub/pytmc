@@ -95,6 +95,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Terminal Usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#using-pytmc">Using pytmc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#command-line-arguments">Command line arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-xmltranslate">Using xmltranslate</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pragma_usage.html">Annotating a TwinCAT3 project</a></li>
@@ -170,28 +171,39 @@
 <h1>Terminal Usage<a class="headerlink" href="#terminal-usage" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="using-pytmc">
 <h2>Using pytmc<a class="headerlink" href="#using-pytmc" title="Permalink to this headline">¶</a></h2>
-<p>Once pytmc has been installed in a virtual environment the <code class="docutils literal"><span class="pre">makerecord</span></code>
+<p>Once pytmc has been installed in a virtual environment the <code class="docutils literal"><span class="pre">pytmc</span></code>
 command can be called from the command line to generate the .db file. The
 command uses two positional arguments. The first is the input specifying the
 location of the .tmc file to be processed. In most TwinCAT projects the .tmc
-file will be located in  <code class="docutils literal"><span class="pre">[solution</span> <span class="pre">folder]/[project</span> <span class="pre">folder]/[plc</span> <span class="pre">project]</span>
-<span class="pre">named</span> <span class="pre">[plc</span> <span class="pre">project].tmc</span></code>.</p>
+file will be located here:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>[TwinCAT solution folder]/[project folder]/[plc project]/[plc project].tmc
+</pre></div>
+</div>
 </div>
 <div class="section" id="command-line-arguments">
 <h2>Command line arguments<a class="headerlink" href="#command-line-arguments" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-none"><div class="highlight"><pre><span></span>NAME
-   pytmc
-DESCRIPTION
-   usage: pytmc TMC_FILE [-o DB_FILE] [-h]
-OPTIONS
-   positional arguments:
-     INPUT       Path to interpreted .tmc file
-     OUTPUT      Path to output .db file
+<div class="highlight-none"><div class="highlight"><pre><span></span>usage: pytmc [-h] INPUT OUTPUT
 
-   optional arguments:
-     -h, --help  show this help message and exit
+    &quot;pytmc&quot; is a command line utility for generating epics records files from
+    TwinCAT3 .tmc files. This program is designed to work in conjunction with
+    ESSS&#39; m-epics-twincat-ads driver.
+
+positional arguments:
+  INPUT       Path to interpreted .tmc file
+  OUTPUT      Path to output .db file
+
+optional arguments:
+  -h, --help  show this help message and exit
 </pre></div>
 </div>
+</div>
+<div class="section" id="using-xmltranslate">
+<h2>Using xmltranslate<a class="headerlink" href="#using-xmltranslate" title="Permalink to this headline">¶</a></h2>
+<p>Pytmc comes packaged with a small script, <code class="docutils literal"><span class="pre">xmltranslate</span></code>. Xmltranslate is for
+reading in xml and xml-like files and outputting a more human-readable
+translation of the xml. It is intended for debugging and development with
+python. For normal XML reading, web browsers often offer much more intuitive
+interfaces.</p>
 </div>
 </div>
 
