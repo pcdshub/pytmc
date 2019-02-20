@@ -430,11 +430,17 @@ def test_TmcChain_recursive_permute():
     ]
 
 
-def test_TmcChain_build_singular_chains(generic_tmc_path, 
+@pytest.mark.parametrize("use_base_pragma, answer_set",[
+        (False, 0),
+        (True, 1),
+])
+def test_TmcChain_build_singular_chains(use_base_pragma, generic_tmc_path,
+            answer_set,
             leaf_bool_pragma_string, branch_bool_pragma_string,
             branch_connection_pragma_string):
     stem = BaseElement(element=None)
-    stem.pragma = Configuration(branch_connection_pragma_string) 
+    if use_base_pragma:
+        stem.pragma = Configuration(branch_connection_pragma_string) 
     leaf_a = BaseElement(element=None)
     leaf_a.pragma = Configuration(branch_bool_pragma_string)
     leaf_b = BaseElement(element=None)
@@ -446,7 +452,6 @@ def test_TmcChain_build_singular_chains(generic_tmc_path,
     logger.debug(str(chain.forkmap()))
 
     response_set = chain.build_singular_chains()
-    assert len(response_set) == 4
     for x in response_set:
         logger.debug(str(x.forkmap()))
         assert x.is_singular()
@@ -457,27 +462,32 @@ def test_TmcChain_build_singular_chains(generic_tmc_path,
                 continue
             if x == y:
                 assert False
-
-    assert response_set[0].forkmap() == [
-        ['MIDDLE'],
-        ['FIRST'],
-        ['TEST:MAIN:NEW_VAR_OUT'],
-    ]
-    assert response_set[1].forkmap() == [
-        ['MIDDLE'],
-        ['SECOND'],
-        ['TEST:MAIN:NEW_VAR_OUT'],
-    ]
-    assert response_set[2].forkmap() == [
-        ['MIDDLE'],
-        ['FIRST'],
-        ['TEST:MAIN:NEW_VAR_IN'],
-    ]
-    assert response_set[3].forkmap() == [
-        ['MIDDLE'],
-        ['SECOND'],
-        ['TEST:MAIN:NEW_VAR_IN'],
-    ]
+    
+    if answer_set is 0:
+        assert response_set == []
+    
+    if answer_set is 1:
+        assert len(response_set) == 4
+        assert response_set[0].forkmap() == [
+            ['MIDDLE'],
+            ['FIRST'],
+            ['TEST:MAIN:NEW_VAR_OUT'],
+        ]
+        assert response_set[1].forkmap() == [
+            ['MIDDLE'],
+            ['SECOND'],
+            ['TEST:MAIN:NEW_VAR_OUT'],
+        ]
+        assert response_set[2].forkmap() == [
+            ['MIDDLE'],
+            ['FIRST'],
+            ['TEST:MAIN:NEW_VAR_IN'],
+        ]
+        assert response_set[3].forkmap() == [
+            ['MIDDLE'],
+            ['SECOND'],
+            ['TEST:MAIN:NEW_VAR_IN'],
+        ]
 
 
 @pytest.fixture(scope='function')

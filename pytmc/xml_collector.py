@@ -489,12 +489,18 @@ class TmcChain:
         name_sequences = self._recursive_permute(self.forkmap())
         logging.debug(str(name_sequences))
         results = []
+        append = True
         for seq in name_sequences:
             new_TmcChain = deepcopy(self)
             for config, select_name in zip(new_TmcChain.chain, seq):
-                config.pragma.fix_to_config_name(select_name[0])
-            results.append(new_TmcChain)
-
+                if config.pragma is not None:
+                    config.pragma.fix_to_config_name(select_name[0])
+                else:
+                    append = False
+            if append:
+                results.append(new_TmcChain)
+            else:
+                append = True
         return results
 
     def naive_config(self, cc_symbol = ":"):
