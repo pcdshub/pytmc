@@ -1,6 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
+import pytmc
 import argparse
 from .. import TmcFile
 
