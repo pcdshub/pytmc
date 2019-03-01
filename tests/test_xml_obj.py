@@ -425,8 +425,10 @@ def test_BaseElement_is_string(string_tmc_root):
     assert str_symbol_element.is_str == True
    
 
-def test_Configuration_config_lines(leaf_bool_pragma_string):
-    cfg = Configuration(leaf_bool_pragma_string)
+def test_Configuration_config_lines(leaf_bool_pragma_string_w_semicolon):
+    print(type(leaf_bool_pragma_string_w_semicolon))
+    print(leaf_bool_pragma_string_w_semicolon)
+    cfg = Configuration(leaf_bool_pragma_string_w_semicolon)
     result = cfg._config_lines()
     assert result == [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
@@ -444,6 +446,8 @@ def test_Configuration_config_lines(leaf_bool_pragma_string):
         {'title': 'field', 'tag':'SCAN\t1 second'},
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'i'},
+        {'title': 'ensure', 'tag': 'that'},
+        {'title': 'semicolons', 'tag': 'work'},
     ]
 
 
