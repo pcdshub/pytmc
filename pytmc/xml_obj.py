@@ -64,12 +64,6 @@ class Configuration:
         """
         if raw_config is None:
             raw_config = self._raw_config
-        
-        """
-        finder = re.compile(
-            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
-        )
-        """
 
         # Select special delimiter sequences and prepare them for re injection
         line_term_seqs = [r";",r";;"]
