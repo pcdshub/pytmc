@@ -24,12 +24,12 @@ class PvNotFrozenError(XmlObjError):
 
 
 class Configuration:
-    def __init__(self, str=None, config=None):
+    def __init__(self, in_str=None, config=None):
         """
         """
         # str: self._raw_config (READ ONLY, set at instantaiation)
         # list: self.config
-        self._raw_config = str
+        self._raw_config = in_str
         if config is None:
             self.config = self._formatted_config_lines()
         else:

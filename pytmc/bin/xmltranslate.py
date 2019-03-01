@@ -64,6 +64,9 @@ def recursive(branch, level=1, indent_size=4, indent=0):
         recursive(limb,level-1,indent_size,indent+1)
 
 if __name__ == "__main__":
+    main()
+
+def main():
     tree = ET.parse(args.input_file)
     root = tree.getroot()
     recursive(root, args.depth, args.indent_size)

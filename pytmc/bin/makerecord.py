@@ -1,6 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
+import pytmc
 import argparse
 from .. import TmcFile
 
@@ -23,8 +24,19 @@ def main():
     parser.add_argument(
         'record_file', metavar="OUTPUT", type=str, help='Path to output .db file'
     )
+
+    parser.add_argument(
+        '--log',
+        '-l',
+        metavar="LOG_LEVEL",
+        default=30, #WARN level messages
+        type=int,
+        help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
+    )
     
     args = parser.parse_args()
+    pytmc_logger = logging.getLogger('pytmc')
+    pytmc_logger.setLevel(args.log)
     tmc_file = open(args.tmc_file,'r')
     tmc_obj = pytmc.TmcFile(tmc_file)
     tmc_obj.create_chains()
