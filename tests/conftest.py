@@ -68,7 +68,7 @@ def generic_explorer():
 
 @pytest.fixture(scope='function')
 def leaf_bool_pragma_string():
-    str = """
+    sample_str = """
                      pv: TEST:MAIN:NEW_VAR_OUT
                      type: bo 
                      field: ZNAM	SINGLE
@@ -85,7 +85,15 @@ def leaf_bool_pragma_string():
                      str: %d
                      io: i
     """
-    return str
+    return sample_str
+
+@pytest.fixture(scope='function')
+def leaf_bool_pragma_string_w_semicolon():
+    sample_str = """
+                     ensure: that ; semicolons: work;
+    """
+    return leaf_bool_pragma_string() + sample_str
+
 
 @pytest.fixture(scope='function')
 def light_leaf_bool_pragma_string():

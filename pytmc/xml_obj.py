@@ -65,12 +65,37 @@ class Configuration:
         if raw_config is None:
             raw_config = self._raw_config
 
-        finder = re.compile(
-            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)(?:[\r\n]?)"
+        # Select special delimiter sequences and prepare them for re injection
+        line_term_seqs = [r";",r";;"]
+        flex_term_regex = "|".join(line_term_seqs)
+
+
+        # Break configuration str into list of lines paired w/ their delimiters 
+        line_finder = re.compile(
+            r"(?P<line>.+?)(?P<delim>"+flex_term_regex+"|[\n\r])"
         )
-        result = [ m.groupdict() for m in finder.finditer(raw_config)]
+        conf_lines = [m.groupdict() for m in line_finder.finditer(raw_config)]
+        
+        # create list of lines information only. Strip out delimiters
+        result_no_delims = [r["line"] for r in conf_lines]
+
+        # erase any empty lines
+        result_no_delims = [
+            x for x in result_no_delims if x.strip() != ''
+        ]
+
+        # Break lines into list of dictionaries w/ title/tag structure
+        line_parser = re.compile(
+            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)"
+        )
+        result = [
+            line_parser.search(m).groupdict() for m in result_no_delims
+        ]
+
+        # Strip out extra whitespace in the tag
         for line in result:
             line['tag'] = line['tag'].strip()
+        
         return result
         
     def _neaten_field(self, string):
