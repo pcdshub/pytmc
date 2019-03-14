@@ -86,7 +86,7 @@ class Configuration:
 
         # Break lines into list of dictionaries w/ title/tag structure
         line_parser = re.compile(
-            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)"
+            r"(?P<title>[\S]+):(?:[^\S]?)(?P<tag>.*)"
         )
         result = [
             line_parser.search(m).groupdict() for m in result_no_delims
