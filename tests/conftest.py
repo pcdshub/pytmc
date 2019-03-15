@@ -73,12 +73,12 @@ def leaf_bool_pragma_string():
                      type: bo 
                      field: ZNAM	SINGLE
                      field: ONAM	MULTI
-                     field: SCAN	1 second
+                     field:   SCAN	1 second
                      str: %d
                      io: o
                      init: True
                      pv: TEST:MAIN:NEW_VAR_IN
-                     type: bi
+                     type:bi
                      field: ZNAM	SINGLE
                      field: ONAM	MULTI
                      field: SCAN	1 second
