@@ -73,12 +73,12 @@ def leaf_bool_pragma_string():
                      type: bo 
                      field: ZNAM	SINGLE
                      field: ONAM	MULTI
-                     field: SCAN	1 second
+                     field:   SCAN	1 second
                      str: %d
                      io: o
                      init: True
                      pv: TEST:MAIN:NEW_VAR_IN
-                     type: bi
+                     type:bi
                      field: ZNAM	SINGLE
                      field: ONAM	MULTI
                      field: SCAN	1 second
@@ -94,6 +94,10 @@ def leaf_bool_pragma_string_w_semicolon():
     """
     return leaf_bool_pragma_string() + sample_str
 
+@pytest.fixture(scope='function')
+def leaf_bool_pragma_string_single_line():
+    sample_str = """pv:pv_name"""
+    return sample_str
 
 @pytest.fixture(scope='function')
 def light_leaf_bool_pragma_string():
@@ -110,19 +114,35 @@ def light_leaf_bool_pragma_string():
 
 @pytest.fixture(scope='function')
 def branch_bool_pragma_string():
-    str = """
+    string = """
             pv: FIRST
             pv: SECOND
     """
-    return str
+    return string
+
+@pytest.fixture(scope='function')
+def branch_bool_pragma_string_empty(branch_bool_pragma_string):
+    string = branch_bool_pragma_string + """
+            pv: 
+            pv:"""
+    
+    return string
 
 @pytest.fixture(scope='function')
 def branch_connection_pragma_string():
-    str = """
+    string = """
             pv: MIDDLE
             aux: nothing
     """
-    return str
+    return string
+
+@pytest.fixture(scope='function')
+def empty_pv_pragma_string():
+    string = """
+            pv:
+    """
+    return string
+    
 
 @pytest.fixture(scope='function')
 def branch_skip_pragma_string():

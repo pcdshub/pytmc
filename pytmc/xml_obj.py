@@ -66,13 +66,13 @@ class Configuration:
             raw_config = self._raw_config
 
         # Select special delimiter sequences and prepare them for re injection
-        line_term_seqs = [r";",r";;"]
+        line_term_seqs = [r";",r";;",r"[\n\r]",r"$"]
         flex_term_regex = "|".join(line_term_seqs)
 
 
         # Break configuration str into list of lines paired w/ their delimiters 
         line_finder = re.compile(
-            r"(?P<line>.+?)(?P<delim>"+flex_term_regex+"|[\n\r])"
+            r"(?P<line>.+?)(?P<delim>"+flex_term_regex+")"
         )
         conf_lines = [m.groupdict() for m in line_finder.finditer(raw_config)]
         
@@ -86,7 +86,7 @@ class Configuration:
 
         # Break lines into list of dictionaries w/ title/tag structure
         line_parser = re.compile(
-            r"(?P<title>[\S]+):(?:[^\S]+)(?P<tag>.*)"
+            r"(?P<title>[\S]+):(?:[^\S]*)(?P<tag>.*)"
         )
         result = [
             line_parser.search(m).groupdict() for m in result_no_delims
@@ -446,7 +446,10 @@ class Configuration:
         if not self.config_names():
             title_base = ""
         if len(self.config_names()) == 1:
-            title_base = self.config_names()[0]+cc_symbol
+            title_base = self.config_names()[0]
+            if title_base[-1] is not cc_symbol:
+                if title_base.strip() is not "":
+                    title_base = title_base + cc_symbol
         
         for line in other.config:
             # handle config titles

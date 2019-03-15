@@ -424,31 +424,43 @@ def test_BaseElement_is_string(string_tmc_root):
     str_symbol_element = BaseElement(symbol_xml)
     assert str_symbol_element.is_str == True
    
+@pytest.mark.parametrize("model_set",[
+    (0),
+    (1),
+])
+def test_Configuration_config_lines(leaf_bool_pragma_string_w_semicolon,
+        leaf_bool_pragma_string_single_line, model_set):
+    if model_set is 0:
+        string = leaf_bool_pragma_string_w_semicolon
+        test =  [
+            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
+            {'title': 'type', 'tag': 'bo'},
+            {'title': 'field', 'tag':'ZNAM\tSINGLE'},
+            {'title': 'field', 'tag':'ONAM\tMULTI'},
+            {'title': 'field', 'tag':'SCAN\t1 second'},
+            {'title': 'str', 'tag': '%d'},
+            {'title': 'io', 'tag': 'o'},
+            {'title': 'init', 'tag': 'True'},
+            {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
+            {'title': 'type', 'tag': 'bi'},
+            {'title': 'field', 'tag':'ZNAM\tSINGLE'},
+            {'title': 'field', 'tag':'ONAM\tMULTI'},
+            {'title': 'field', 'tag':'SCAN\t1 second'},
+            {'title': 'str', 'tag': '%d'},
+            {'title': 'io', 'tag': 'i'},
+            {'title': 'ensure', 'tag': 'that'},
+            {'title': 'semicolons', 'tag': 'work'},
+        ]
+    if model_set is 1:
+        string = leaf_bool_pragma_string_single_line
+        test = [{'title': "pv", 'tag':'pv_name'}]
 
-def test_Configuration_config_lines(leaf_bool_pragma_string_w_semicolon):
-    print(type(leaf_bool_pragma_string_w_semicolon))
-    print(leaf_bool_pragma_string_w_semicolon)
-    cfg = Configuration(leaf_bool_pragma_string_w_semicolon)
+
+    print(type(string))
+    print(string)
+    cfg = Configuration(string)
     result = cfg._config_lines()
-    assert result == [
-        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'}, 
-        {'title': 'type', 'tag': 'bo'},
-        {'title': 'field', 'tag':'ZNAM\tSINGLE'},
-        {'title': 'field', 'tag':'ONAM\tMULTI'},
-        {'title': 'field', 'tag':'SCAN\t1 second'},
-        {'title': 'str', 'tag': '%d'},
-        {'title': 'io', 'tag': 'o'},
-        {'title': 'init', 'tag': 'True'},
-        {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'}, 
-        {'title': 'type', 'tag': 'bi'},
-        {'title': 'field', 'tag':'ZNAM\tSINGLE'},
-        {'title': 'field', 'tag':'ONAM\tMULTI'},
-        {'title': 'field', 'tag':'SCAN\t1 second'},
-        {'title': 'str', 'tag': '%d'},
-        {'title': 'io', 'tag': 'i'},
-        {'title': 'ensure', 'tag': 'that'},
-        {'title': 'semicolons', 'tag': 'work'},
-    ]
+    assert result == test
 
 
 def test_Configuration_neaten_field(leaf_bool_pragma_string):
@@ -594,17 +606,21 @@ def test_Configuration__eq__(leaf_bool_pragma_string):
 
 
 def test_Configuration_concat(branch_connection_pragma_string,
-            branch_bool_pragma_string): 
+            branch_bool_pragma_string_empty, empty_pv_pragma_string): 
     cfg_A = Configuration(branch_connection_pragma_string)
-    cfg_B = Configuration(branch_bool_pragma_string)
+    cfg_AA = Configuration(empty_pv_pragma_string)
+    cfg_B = Configuration(branch_bool_pragma_string_empty)
     cfg_B.fix_to_config_name("FIRST")
     new_config = Configuration(config=[])
     new_config.concat(cfg_A)
+    new_config.concat(cfg_AA)
     new_config.concat(cfg_B)
+    print(new_config.config)
     assert new_config.config == [
         {'title':'pv', 'tag':'MIDDLE:FIRST'},
         {'title':'aux', 'tag':'nothing'},
     ]
+    #assert False
 
 
 def test_Configuration_seek():
