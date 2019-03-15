@@ -446,7 +446,10 @@ class Configuration:
         if not self.config_names():
             title_base = ""
         if len(self.config_names()) == 1:
-            title_base = self.config_names()[0]+cc_symbol
+            title_base = self.config_names()[0]
+            if title_base[-1] is not cc_symbol:
+                if title_base.strip() is not "":
+                    title_base = title_base + cc_symbol
         
         for line in other.config:
             # handle config titles

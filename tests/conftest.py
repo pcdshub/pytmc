@@ -114,19 +114,35 @@ def light_leaf_bool_pragma_string():
 
 @pytest.fixture(scope='function')
 def branch_bool_pragma_string():
-    str = """
+    string = """
             pv: FIRST
             pv: SECOND
     """
-    return str
+    return string
+
+@pytest.fixture(scope='function')
+def branch_bool_pragma_string_empty(branch_bool_pragma_string):
+    string = branch_bool_pragma_string + """
+            pv: 
+            pv:"""
+    
+    return string
 
 @pytest.fixture(scope='function')
 def branch_connection_pragma_string():
-    str = """
+    string = """
             pv: MIDDLE
             aux: nothing
     """
-    return str
+    return string
+
+@pytest.fixture(scope='function')
+def empty_pv_pragma_string():
+    string = """
+            pv:
+    """
+    return string
+    
 
 @pytest.fixture(scope='function')
 def branch_skip_pragma_string():
