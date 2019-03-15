@@ -94,6 +94,10 @@ def leaf_bool_pragma_string_w_semicolon():
     """
     return leaf_bool_pragma_string() + sample_str
 
+@pytest.fixture(scope='function')
+def leaf_bool_pragma_string_single_line():
+    sample_str = """pv:pv_name"""
+    return sample_str
 
 @pytest.fixture(scope='function')
 def light_leaf_bool_pragma_string():
