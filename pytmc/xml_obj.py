@@ -66,13 +66,13 @@ class Configuration:
             raw_config = self._raw_config
 
         # Select special delimiter sequences and prepare them for re injection
-        line_term_seqs = [r";",r";;"]
+        line_term_seqs = [r";",r";;",r"[\n\r]",r"$"]
         flex_term_regex = "|".join(line_term_seqs)
 
 
         # Break configuration str into list of lines paired w/ their delimiters 
         line_finder = re.compile(
-            r"(?P<line>.+?)(?P<delim>"+flex_term_regex+"|[\n\r])"
+            r"(?P<line>.+?)(?P<delim>"+flex_term_regex+")"
         )
         conf_lines = [m.groupdict() for m in line_finder.finditer(raw_config)]
         
