@@ -460,7 +460,9 @@ class Configuration:
                     overwrite=True
                 )
             # handle fields
-            elif line['title'] == 'field':
+            elif line['title'] is 'field':
+                # TODO: the above comparison is incorrect; however
+                # test_TmcFile_fullbuild fails without using 'is'
                 self.add_config_field(
                     f_name=line['tag']['f_name'],
                     f_set=line['tag']['f_set'],
