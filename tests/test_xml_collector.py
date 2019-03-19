@@ -401,7 +401,7 @@ def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
         [stem, leaf_a, leaf_b]
     )
     logger.debug(str(chain.forkmap()))
-    assert chain.is_singular() == False
+    assert chain.is_singular() is False
 
     for element in chain.chain:
         element.pragma.fix_to_config_name(element.pragma.config_names()[0])
@@ -409,7 +409,7 @@ def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
     # for element in chain.chain:
         # print(element.pragma.config)
 
-    assert chain.is_singular() == True
+    assert chain.is_singular() is True
 
 
 def test_TmcChain_recursive_permute():
@@ -619,7 +619,7 @@ def test_BaseRecordPackage_ID_type():
 
 def test_BaseRecordPackage_guess_common():
     brp = BaseRecordPackage()
-    assert True == brp.guess_common()
+    assert brp.guess_common() is True
     print(brp.cfg.config)
     [pini] = brp.cfg.get_config_fields('PINI')
     assert pini['tag']['f_set'] == '"1"'
@@ -695,7 +695,7 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     record.generate_naive_config()
     record.cfg.add_config_line('io', io, overwrite=True)
 
-    assert True == record.guess_type()
+    assert record.guess_type() is True
     [field] = record.cfg.get_config_lines('type')
     assert field['tag'] == final_type
 
@@ -715,7 +715,7 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
-    assert True == record.guess_io()
+    assert record.guess_io() is True
     print(record.cfg.config)
     [field] = record.cfg.get_config_lines('io')
     assert field['tag'] == final_io
@@ -780,7 +780,7 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     record.chain.last.is_array = is_array
     record.generate_naive_config()
     record.cfg.add_config_line('io', io, overwrite=True)
-    assert True == record.guess_DTYP()
+    assert record.guess_DTYP() is True
     logger.debug((record.cfg.config))
     [field] = record.cfg.get_config_fields('DTYP')
     assert field['tag']['f_set'] == final_DTYP
@@ -813,7 +813,7 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
         element.name = chr(97+idx)
     record.generate_naive_config()
     record.guess_io()
-    assert True == record.guess_INP_OUT()
+    assert record.guess_INP_OUT() is True
     print(record.cfg.config)
 
     [field] = record.cfg.get_config_fields(field_type)
@@ -848,7 +848,7 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
     record.guess_io()
-    assert True == record.guess_SCAN()
+    assert record.guess_SCAN() is True
     logger.debug(str(record.cfg.config))
     [field] = record.cfg.get_config_fields('SCAN')
     assert field['tag']['f_set'] == final_SCAN
@@ -888,11 +888,11 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
     print(record.cfg.config)
     record.guess_type()
     if final_PREC is None:
-        assert False == record.guess_PREC()
+        assert record.guess_PREC() is False
         with pytest.raises(ValueError):
             [out] = record.cfg.get_config_fields("PREC")
     else:
-        assert True == record.guess_PREC()
+        assert record.guess_PREC() is True
         [out] = record.cfg.get_config_fields("PREC")
         assert out['tag']['f_set'] == '"3"'
 
@@ -941,11 +941,11 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
     result = record.guess_FTVL()
     print(record.cfg.config)
     if final_FTVL is None:
-        assert False == result
+        assert result is False
         with pytest.raises(ValueError):
             [out] = record.cfg.get_config_fields("FTVL")
     else:
-        assert True == result
+        assert result is True
         [out] = record.cfg.get_config_fields("FTVL")
         assert out['tag']['f_set'] == final_FTVL
 
@@ -967,11 +967,11 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
     result = record.guess_NELM()
     print(record.cfg.config)
     if final_NELM is None:
-        assert False == result
+        assert result is False
         with pytest.raises(ValueError):
             [out] = record.cfg.get_config_fields("NELM")
     else:
-        assert True == result
+        assert result is True
         [out] = record.cfg.get_config_fields("NELM")
         assert out['tag']['f_set'] == final_NELM
 
