@@ -899,9 +899,9 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
 
 @pytest.mark.parametrize("tc_type, io, is_str, is_arr, final_FTVL", [
     ("INT", 'o', False, False, None),
-    pytest.mark.skip(
-        ("INT", 'o', False, True, '"FINISH"'),
-        reason="feature pending"),
+    pytest.param(
+        "INT", 'o', False, True, '"FINISH"',
+        marks=pytest.mark.skip(reason="feature pending")),
     ("BOOL", 'i', False, False, None),
     ("BOOL", 'i', False, True, '"CHAR"'),
     ("BOOL", 'o', False, True, '"CHAR"'),

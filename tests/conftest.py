@@ -98,11 +98,11 @@ def leaf_bool_pragma_string():
 
 
 @pytest.fixture(scope='function')
-def leaf_bool_pragma_string_w_semicolon():
+def leaf_bool_pragma_string_w_semicolon(leaf_bool_pragma_string):
     sample_str = """
                      ensure: that ; semicolons: work;
     """
-    return leaf_bool_pragma_string() + sample_str
+    return leaf_bool_pragma_string + sample_str
 
 
 @pytest.fixture(scope='function')
