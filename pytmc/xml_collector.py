@@ -6,15 +6,21 @@ interpretations. Db Files can be produced from the interpretation
 """
 import typing
 import logging
-logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
+
 from collections import defaultdict, OrderedDict as odict
-from . import Symbol, DataType, SubItem
 from copy import deepcopy, copy
-from .xml_obj import BaseElement, Configuration
-from .beckhoff import beckhoff_types
 from functools import reduce
+
 from jinja2 import Environment, PackageLoader
+
+from . import Symbol, DataType, SubItem
+from .beckhoff import beckhoff_types
+from .xml_obj import BaseElement, Configuration
+
+
+logger = logging.getLogger(__name__)
+
 
 class ElementCollector(dict):
     '''
@@ -27,6 +33,7 @@ class ElementCollector(dict):
 
     Subclassed from python's standard dictionary.
     '''
+
     def add(self, value):
         '''
         Include new item in the dictionary.
@@ -37,7 +44,7 @@ class ElementCollector(dict):
             The instance to add to the ElementCollector
         '''
         name = value.name
-        dict.__setitem__(self,name,value)
+        dict.__setitem__(self, name, value)
 
     @property
     def registered(self):
@@ -55,7 +62,7 @@ class ElementCollector(dict):
             self,
 
         ))
-        return {name:self[name] for name in names}
+        return {name: self[name] for name in names}
 
 
 class TmcFile:
@@ -84,6 +91,7 @@ class TmcFile:
         Collection of all singularized TmcChains in the document. Must be
         initialized with :func:`~isolate_chains`.
     '''
+
     def __init__(self, filename):
         self.filename = filename
         if self.filename is not None:
@@ -105,9 +113,9 @@ class TmcFile:
 
         # Load jinja templates
         self.jinja_env = Environment(
-            loader = PackageLoader("pytmc","templates"),
-            trim_blocks = True,
-            lstrip_blocks = True,
+            loader=PackageLoader("pytmc", "templates"),
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
 
         self.file_template = self.jinja_env.get_template(
@@ -127,7 +135,7 @@ class TmcFile:
             sym = Symbol(xml_symbol)
             self.all_Symbols.add(sym)
 
-    def isolate_DataTypes(self,process_subitems=True):
+    def isolate_DataTypes(self, process_subitems=True):
         '''
         Populate :attr:`~all_DataTypes` with a :class:`~pytmc.DataType`
         representing each DataType in the .tmc file.
@@ -147,7 +155,7 @@ class TmcFile:
             if process_subitems:
                 self.isolate_SubItems(data.name)
 
-    def isolate_SubItems(self,parent=None):
+    def isolate_SubItems(self, parent=None):
         '''
         Populate :attr:`~all_SubItems` with a :class:`~pytmc.SubItem`
         representing each subitem in the .tmc file.
@@ -167,7 +175,6 @@ class TmcFile:
                     parent=parent_obj
                 )
                 self.all_SubItems[parent].add(s_item)
-
 
         if type(parent) == ET.Element:
             pass
@@ -343,7 +350,7 @@ class TmcFile:
                 removal_list.append(idx)
 
         logger.debug("Invalid RecordPackages: " + str(len(removal_list)))
-        #must remove highest index first so not to disturb index/entry mapping
+        # must remove highest index first so not to disturb index/entry mapping
         removal_list.reverse()
         for idx in removal_list:
             self.all_RecordPackages.pop(idx)
@@ -372,6 +379,7 @@ class TmcChain:
     """
     Pointer to the tmc instances and track order. Leaf node is last.
     """
+
     def __init__(self, chain):
         self.chain = chain
 
@@ -466,13 +474,13 @@ class TmcChain:
                 extras.append(deepcopy(chain))
         so_far.extend(extras)
 
-        for term, term_index in zip(master_list[0],range(len(master_list[0]))):
+        for term, term_index in zip(master_list[0], range(len(master_list[0]))):
             for i in range(replicate_count):
                 index = term_index * replicate_count + i
                 so_far[index].append([term])
 
         if len(master_list) > 1:
-            return self._recursive_permute(master_list[1:],so_far)
+            return self._recursive_permute(master_list[1:], so_far)
         else:
             return so_far
 
@@ -503,7 +511,7 @@ class TmcChain:
                 append = True
         return results
 
-    def naive_config(self, cc_symbol = ":"):
+    def naive_config(self, cc_symbol=":"):
         """
         On chains of singular configs, stack up configurations from lowest to
         highest to generate a guess-free configuration.
@@ -520,7 +528,7 @@ class TmcChain:
         new_config = Configuration(config=[])
         cfg_title = ""
         for entry in self.chain:
-            new_config.concat(entry.pragma, cc_symbol = cc_symbol)
+            new_config.concat(entry.pragma, cc_symbol=cc_symbol)
 
         return new_config
 
@@ -565,6 +573,7 @@ class BaseRecordPackage:
     variable. Overwrite/inherit features as necessary.
 
     """
+
     def __init__(self, chain=None, origin=None):
         """
         All subclasses should use super on their init method.
@@ -572,7 +581,7 @@ class BaseRecordPackage:
         # Just fills in a default
         self.cfg = Configuration(config=[])
 
-        self.chain = chain # TmcChain instance - so I could add methods there
+        self.chain = chain  # TmcChain instance - so I could add methods there
 
         # TmcChain instance-do I need this? unclear
         self.origin_chain = origin
@@ -599,9 +608,9 @@ class BaseRecordPackage:
 
         # Load jinja templates
         self.jinja_env = Environment(
-            loader = PackageLoader("pytmc","templates"),
-            trim_blocks = True,
-            lstrip_blocks = True,
+            loader=PackageLoader("pytmc", "templates"),
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
         self.record_template = self.jinja_env.get_template(
             "asyn_standard_record.jinja2"
@@ -699,13 +708,13 @@ class BaseRecordPackage:
             if row['title'] == 'type':
                 cfg_dict['type'] = row['tag']
             if row['title'] == 'field':
-                cfg_dict.setdefault('field',{})
+                cfg_dict.setdefault('field', {})
                 tag = row['tag']
                 cfg_dict['field'][tag['f_name']] = tag['f_set']
             if row['title'] == 'info':
                 cfg_dict['info'] = True
 
-        cfg_dict.setdefault('info',False)
+        cfg_dict.setdefault('info', False)
         return cfg_dict
 
     def render_record(self):
@@ -776,30 +785,30 @@ class BaseRecordPackage:
 
         # must be tested first, arrays will have the tc_type of the iterable:
         if self.chain.last.is_array:
-            [io] =  self.cfg.get_config_lines('io')
+            [io] = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "waveform")
                 return True
             elif 'i' in io['tag']:
-                self.cfg.add_config_line("type","waveform")
+                self.cfg.add_config_line("type", "waveform")
                 return True
             elif 'o' in io['tag']:
-                self.cfg.add_config_line("type","waveform")
+                self.cfg.add_config_line("type", "waveform")
                 return True
 
         bi_bo_set = {
             "BOOL"
         }
         if self.chain.last.tc_type in bi_bo_set:
-            [io] =  self.cfg.get_config_lines('io')
+            [io] = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "bo")
                 return True
             elif 'i' in io['tag']:
-                self.cfg.add_config_line("type","bi")
+                self.cfg.add_config_line("type", "bi")
                 return True
             elif 'o' in io['tag']:
-                self.cfg.add_config_line("type","bo")
+                self.cfg.add_config_line("type", "bo")
                 return True
 
         ai_ao_set = {
@@ -810,30 +819,30 @@ class BaseRecordPackage:
             "ENUM",
         }
         if self.chain.last.tc_type in ai_ao_set:
-            [io] =  self.cfg.get_config_lines('io')
+            [io] = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "ao")
                 return True
             elif 'i' in io['tag']:
-                self.cfg.add_config_line("type","ai")
+                self.cfg.add_config_line("type", "ai")
                 return True
             elif 'o' in io['tag']:
-                self.cfg.add_config_line("type","ao")
+                self.cfg.add_config_line("type", "ao")
                 return True
 
         waveform_set = {
             "STRING",
         }
         if self.chain.last.tc_type in waveform_set:
-            [io] =  self.cfg.get_config_lines('io')
+            [io] = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "waveform")
                 return True
             elif 'i' in io['tag']:
-                self.cfg.add_config_line("type","waveform")
+                self.cfg.add_config_line("type", "waveform")
                 return True
             elif 'o' in io['tag']:
-                self.cfg.add_config_line("type","waveform")
+                self.cfg.add_config_line("type", "waveform")
                 return True
 
         return False
@@ -849,10 +858,10 @@ class BaseRecordPackage:
 
         """
         try:
-            [io] =  self.cfg.get_config_lines('io')
+            [io] = self.cfg.get_config_lines('io')
             return False
         except ValueError:
-            self.cfg.add_config_line("io","io")
+            self.cfg.add_config_line("io", "io")
             return True
 
     def guess_DTYP(self):
@@ -871,12 +880,12 @@ class BaseRecordPackage:
             Return a boolean that is True iff a change has been made.
         """
         try:
-            [dtyp] =  self.cfg.get_config_fields('DTYP')
+            [dtyp] = self.cfg.get_config_fields('DTYP')
             return False
         except ValueError:
             pass
 
-        [io] =  self.cfg.get_config_lines('io')
+        [io] = self.cfg.get_config_lines('io')
         io = io['tag']
 
         BOOL_set = {"BOOL"}
@@ -884,13 +893,13 @@ class BaseRecordPackage:
             base = '"asynInt32'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayOut"')
+                    self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayIn"')
+                    self.cfg.add_config_field("DTYP", '"asynInt8ArrayIn"')
                     return True
                 elif 'o' in io:
-                    self.cfg.add_config_field("DTYP",'"asynInt8ArrayOut"')
+                    self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
                     return True
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
@@ -901,13 +910,13 @@ class BaseRecordPackage:
             base = '"asynInt32'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayOut"')
+                    self.cfg.add_config_field("DTYP", '"asynInt16ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayIn"')
+                    self.cfg.add_config_field("DTYP", '"asynInt16ArrayIn"')
                     return True
                 elif 'o' in io:
-                    self.cfg.add_config_field("DTYP",'"asynInt16ArrayOut"')
+                    self.cfg.add_config_field("DTYP", '"asynInt16ArrayOut"')
                     return True
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
@@ -918,13 +927,13 @@ class BaseRecordPackage:
             base = '"asynInt32'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayIn"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayIn"')
                     return True
                 elif 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
@@ -935,13 +944,13 @@ class BaseRecordPackage:
             base = '"asynFloat32'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayIn"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayIn"')
                     return True
                 elif 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
@@ -952,13 +961,13 @@ class BaseRecordPackage:
             base = '"asynFloat64'
             if self.chain.last.is_array:
                 if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
                 elif 'i' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayIn"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayIn"')
                     return True
                 elif 'o' in io:
-                    self.cfg.add_config_field("DTYP",base+'ArrayOut"')
+                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
@@ -966,7 +975,7 @@ class BaseRecordPackage:
 
         asynInt8ArrayOut_set = {"STRING"}
         if self.chain.last.tc_type in asynInt8ArrayOut_set:
-            [io] =  self.cfg.get_config_lines('io')
+            [io] = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
                 return True
@@ -991,7 +1000,7 @@ class BaseRecordPackage:
             Return a boolean that is true iff a change has been made.
         """
 
-        [io] =  self.cfg.get_config_lines('io')
+        [io] = self.cfg.get_config_lines('io')
         io = io['tag']
         name_list = self.chain.name_list
         name = '.'.join(name_list)
@@ -1016,13 +1025,13 @@ class BaseRecordPackage:
         str_template = '"@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"'
 
         final_str = str_template.format(
-            port = self.ads_port,
-            name = name,
-            symbol = assign_symbol,
+            port=self.ads_port,
+            name=name,
+            symbol=assign_symbol,
         )
 
         try:
-            [res] =  self.cfg.get_config_fields(field_type)
+            [res] = self.cfg.get_config_fields(field_type)
             return False
         except ValueError:
             pass
@@ -1041,14 +1050,14 @@ class BaseRecordPackage:
         """
 
         try:
-            [res] =  self.cfg.get_config_fields("SCAN")
+            [res] = self.cfg.get_config_fields("SCAN")
             return False
         except ValueError:
             pass
-        [io] =  self.cfg.get_config_lines('io')
+        [io] = self.cfg.get_config_lines('io')
         if 'i' in io['tag'] and 'o' in io['tag']:
             self.cfg.add_config_field("SCAN", '"Passive"')
-            self.cfg.add_config_line("info",True)
+            self.cfg.add_config_line("info", True)
             return True
 
         elif 'i' in io['tag']:
@@ -1063,10 +1072,9 @@ class BaseRecordPackage:
             self.cfg.add_config_field("SCAN", '"Passive"')
             return True
 
-
         return False
 
-    ### guess lines below this comment are not always used (context specific)
+    # guess lines below this comment are not always used (context specific)
 
     def guess_OZ_NAM(self):
         """
@@ -1078,15 +1086,15 @@ class BaseRecordPackage:
             Return a boolean that is true iff a change has been made.
         """
         result = False
-        o =  self.cfg.get_config_fields("ONAM")
-        z =  self.cfg.get_config_fields("ZNAM")
+        o = self.cfg.get_config_fields("ONAM")
+        z = self.cfg.get_config_fields("ZNAM")
         one_zero_set = {"BOOL"}
         if self.chain.last.tc_type in one_zero_set:
             if len(o) < 1:
                 self.cfg.add_config_field("ONAM", "One")
                 result = result or True
             if len(z) < 1:
-                self.cfg.add_config_field("ZNAM","Zero")
+                self.cfg.add_config_field("ZNAM", "Zero")
                 result = result or True
 
         return result
@@ -1101,7 +1109,7 @@ class BaseRecordPackage:
             Return a boolean that is true iff a change has been made.
         """
         try:
-            [out] =  self.cfg.get_config_fields("PREC")
+            [out] = self.cfg.get_config_fields("PREC")
             return False
         except ValueError:
             pass
@@ -1112,7 +1120,7 @@ class BaseRecordPackage:
             #raise MissingConfigError
             return False
 
-        float_set ={'ai','ao'}
+        float_set = {'ai', 'ao'}
         if epics_type['tag'] in float_set:
             self.cfg.add_config_field("PREC", '"3"')
             return True
@@ -1124,7 +1132,7 @@ class BaseRecordPackage:
         Add datatype specification field for waveforms
         """
         try:
-            [ftvl] =  self.cfg.get_config_fields("FTVL")
+            [ftvl] = self.cfg.get_config_fields("FTVL")
             return False
         except ValueError:
             pass
@@ -1160,7 +1168,7 @@ class BaseRecordPackage:
         Add data length secification for waveforms
         """
         try:
-            [nelm] =  self.cfg.get_config_fields("NELM")
+            [nelm] = self.cfg.get_config_fields("NELM")
             return False
         except ValueError:
             pass

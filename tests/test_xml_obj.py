@@ -27,7 +27,7 @@ def test_BaseElement_type_rejection(generic_tmc_root):
 
 
 def test_BaseElement_get_raw_properties(generic_tmc_root):
-    #Read properties of MAIN variable w/ pragma
+    # Read properties of MAIN variable w/ pragma
     root = generic_tmc_root
     sym = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.NEW_VAR']"
@@ -42,7 +42,7 @@ def test_BaseElement_get_raw_properties(generic_tmc_root):
 
     assert prop_out == prop_actual, "Reported Properties lists don't match"
 
-    #Read properties of MAIN variable w/o pragma
+    # Read properties of MAIN variable w/o pragma
     root = generic_tmc_root
     sym = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/[Name='MAIN.count']"
@@ -58,7 +58,7 @@ def test_BaseElement_get_raw_properties(generic_tmc_root):
 
     assert prop_out == [], "Reported Properties lists don't match"
 
-    #Read properties of DataType w/ pragma
+    # Read properties of DataType w/ pragma
     root = generic_tmc_root
     sym = root.find(
         "./DataTypes/DataType/[Name='iterator']"
@@ -72,7 +72,7 @@ def test_BaseElement_get_raw_properties(generic_tmc_root):
 
     assert prop_out == prop_actual, "Reported Properties lists don't match"
 
-    #Read properties of DataType variable w/ pragma
+    # Read properties of DataType variable w/ pragma
     root = generic_tmc_root
     sym = root.find(
         "./DataTypes/DataType/SubItem/[Name='lim']"
@@ -93,9 +93,9 @@ def test_BaseElement_properties(generic_tmc_root):
     s = BaseElement(sym)
     prop_out = s.properties
     assert prop_out == {
-                'PouType':'FunctionBlock',
-                'iterator attr':'42',
-                'pytmc':'name: ITERATORNAME'}, "Incorrect properties found"
+        'PouType': 'FunctionBlock',
+        'iterator attr': '42',
+        'pytmc': 'name: ITERATORNAME'}, "Incorrect properties found"
 
 
 def test_BaseElement_pragma(generic_tmc_root):
@@ -109,12 +109,12 @@ def test_BaseElement_pragma(generic_tmc_root):
     data = [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
         {'title': 'type', 'tag': 'bo'},
-        {'title': 'field', 'tag':{'f_name':'ZNAM','f_set':'SINGLE'}},
-        {'title': 'field', 'tag':{'f_name':'ONAM','f_set':'MULTI'}},
-        {'title': 'field', 'tag':{'f_name':'SCAN','f_set':'1 second'}},
+        {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag': {'f_name': 'SCAN', 'f_set': '1 second'}},
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'o'},
-        {'title': 'init','tag':'True'},
+        {'title': 'init', 'tag': 'True'},
     ]
 
     assert base_element.pragma.config == data
@@ -216,7 +216,7 @@ def test_SubItem_tc_type(generic_tmc_root):
 def test_eq(generic_tmc_root):
     root = generic_tmc_root
 
-    par_element= root.find(
+    par_element = root.find(
         "./DataTypes/DataType/[Name='iterator']"
     )
     par = DataType(par_element)
@@ -241,7 +241,7 @@ def test_eq(generic_tmc_root):
 def test_parent_relation(generic_tmc_root):
     root = generic_tmc_root
 
-    par_element= root.find(
+    par_element = root.find(
         "./DataTypes/DataType/[Name='iterator']"
     )
     par = DataType(par_element)
@@ -258,11 +258,9 @@ def test_parent_relation(generic_tmc_root):
     )
     c2 = SubItem(c2_element)
 
-
     c0.parent = par
     c1.parent = par
     c2.parent = par
-
 
     assert c0 in par.children
     assert c1 in par.children
@@ -293,7 +291,7 @@ def test_parent_relation(generic_tmc_root):
 def test_BaseElement_name(generic_tmc_root):
     root = generic_tmc_root
 
-    element= root.find(
+    element = root.find(
         "./DataTypes/DataType/[Name='iterator']"
     )
     el = DataType(element)
@@ -303,13 +301,13 @@ def test_BaseElement_name(generic_tmc_root):
 def test_DataType_tc_extends(generic_tmc_root):
     root = generic_tmc_root
 
-    element= root.find(
+    element = root.find(
         "./DataTypes/DataType/[Name='DUT_STRUCT']"
     )
     el = DataType(element)
     assert el.tc_extends == None
 
-    element= root.find(
+    element = root.find(
         "./DataTypes/DataType/[Name='DUT_EXTENSION_STRUCT']"
     )
     el = DataType(element)
@@ -337,7 +335,7 @@ def test_DataType_is_enum(string_tmc_root):
 def test_raw_config(generic_tmc_root):
     root = generic_tmc_root
 
-    element= root.find(
+    element = root.find(
         "./DataTypes/DataType/[Name='iterator']"
     )
     el = DataType(element)
@@ -359,28 +357,26 @@ def test_has_config(generic_tmc_root):
     assert symbol_element.has_config == False
 
 
-
-
 def test_BaseElement_is_array(generic_tmc_root):
     root = generic_tmc_root
 
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/"
-        +"[Name='MAIN.dtype_samples_int_array']"
+        + "[Name='MAIN.dtype_samples_int_array']"
     )
     symbol_element = Symbol(symbol_xml)
     assert symbol_element.is_array
 
     datatype_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/"
-        +"[Name='MAIN.dtype_samples_int_array']"
+        + "[Name='MAIN.dtype_samples_int_array']"
     )
     symbol_element = Symbol(symbol_xml)
     assert symbol_element.is_array
 
     item_xml = root.find(
         "./DataTypes/DataType/[Name='DUT_CONTAINER']/SubItem/"
-        +"[Name='dtype_samples_iter_array']"
+        + "[Name='dtype_samples_iter_array']"
     )
     subitem_element = SubItem(item_xml)
     assert subitem_element.is_array
@@ -395,14 +391,14 @@ def test_BaseElement_iterable_length(string_tmc_root):
     assert non_iter_symbol_element.iterable_length is None
     array_symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/"
-        +"[Name='MAIN.dtype_samples_int_array']"
+        + "[Name='MAIN.dtype_samples_int_array']"
     )
     array_symbol_element = BaseElement(array_symbol_xml)
     assert array_symbol_element.iterable_length == 5
 
     str_symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/"
-        +"[Name='MAIN.StringTest']"
+        + "[Name='MAIN.StringTest']"
     )
     str_symbol_element = BaseElement(str_symbol_xml)
     assert str_symbol_element.iterable_length == 55
@@ -412,40 +408,41 @@ def test_BaseElement_is_string(string_tmc_root):
     root = string_tmc_root
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/"
-        +"[Name='MAIN.dtype_samples_int_array']"
+        + "[Name='MAIN.dtype_samples_int_array']"
     )
     nonstr_symbol_element = BaseElement(symbol_xml)
     assert nonstr_symbol_element.is_str == False
 
     symbol_xml = root.find(
         "./Modules/Module/DataAreas/DataArea/Symbol/"
-        +"[Name='MAIN.StringTest']"
+        + "[Name='MAIN.StringTest']"
     )
     str_symbol_element = BaseElement(symbol_xml)
     assert str_symbol_element.is_str == True
 
-@pytest.mark.parametrize("model_set",[
+
+@pytest.mark.parametrize("model_set", [
     (0),
     (1),
 ])
 def test_Configuration_config_lines(leaf_bool_pragma_string_w_semicolon,
-        leaf_bool_pragma_string_single_line, model_set):
+                                    leaf_bool_pragma_string_single_line, model_set):
     if model_set is 0:
         string = leaf_bool_pragma_string_w_semicolon
-        test =  [
+        test = [
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
             {'title': 'type', 'tag': 'bo'},
-            {'title': 'field', 'tag':'ZNAM\tSINGLE'},
-            {'title': 'field', 'tag':'ONAM\tMULTI'},
-            {'title': 'field', 'tag':'SCAN\t1 second'},
+            {'title': 'field', 'tag': 'ZNAM\tSINGLE'},
+            {'title': 'field', 'tag': 'ONAM\tMULTI'},
+            {'title': 'field', 'tag': 'SCAN\t1 second'},
             {'title': 'str', 'tag': '%d'},
             {'title': 'io', 'tag': 'o'},
             {'title': 'init', 'tag': 'True'},
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'},
             {'title': 'type', 'tag': 'bi'},
-            {'title': 'field', 'tag':'ZNAM\tSINGLE'},
-            {'title': 'field', 'tag':'ONAM\tMULTI'},
-            {'title': 'field', 'tag':'SCAN\t1 second'},
+            {'title': 'field', 'tag': 'ZNAM\tSINGLE'},
+            {'title': 'field', 'tag': 'ONAM\tMULTI'},
+            {'title': 'field', 'tag': 'SCAN\t1 second'},
             {'title': 'str', 'tag': '%d'},
             {'title': 'io', 'tag': 'i'},
             {'title': 'ensure', 'tag': 'that'},
@@ -453,8 +450,7 @@ def test_Configuration_config_lines(leaf_bool_pragma_string_w_semicolon,
         ]
     if model_set is 1:
         string = leaf_bool_pragma_string_single_line
-        test = [{'title': "pv", 'tag':'pv_name'}]
-
+        test = [{'title': "pv", 'tag': 'pv_name'}]
 
     print(type(string))
     print(string)
@@ -468,7 +464,7 @@ def test_Configuration_neaten_field(leaf_bool_pragma_string):
     cfg_lines = cfg._config_lines()
     result = cfg._neaten_field(cfg_lines[2]['tag'])
 
-    assert result == {'f_name':'ZNAM','f_set':'SINGLE'}
+    assert result == {'f_name': 'ZNAM', 'f_set': 'SINGLE'}
 
 
 def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
@@ -477,17 +473,17 @@ def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
     assert result == [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
         {'title': 'type', 'tag': 'bo'},
-        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
-        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
-        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag': {'f_name': 'SCAN', 'f_set': '1 second'}},
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'o'},
         {'title': 'init', 'tag': 'True'},
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'},
         {'title': 'type', 'tag': 'bi'},
-        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
-        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
-        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag': {'f_name': 'SCAN', 'f_set': '1 second'}},
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'i'},
     ]
@@ -500,9 +496,9 @@ def test_Configuration_config_by_name(leaf_bool_pragma_string):
         [
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
             {'title': 'type', 'tag': 'bo'},
-            {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
-            {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
-            {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+            {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+            {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}},
+            {'title': 'field', 'tag': {'f_name': 'SCAN', 'f_set': '1 second'}},
             {'title': 'str', 'tag': '%d'},
             {'title': 'io', 'tag': 'o'},
             {'title': 'init', 'tag': 'True'},
@@ -510,9 +506,9 @@ def test_Configuration_config_by_name(leaf_bool_pragma_string):
         [
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_IN'},
             {'title': 'type', 'tag': 'bi'},
-            {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
-            {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
-            {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+            {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+            {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}},
+            {'title': 'field', 'tag': {'f_name': 'SCAN', 'f_set': '1 second'}},
             {'title': 'str', 'tag': '%d'},
             {'title': 'io', 'tag': 'i'},
         ]
@@ -525,9 +521,9 @@ def test_Configuration_select_config_by_name(leaf_bool_pragma_string):
     assert result == [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
         {'title': 'type', 'tag': 'bo'},
-        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
-        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
-        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag': {'f_name': 'SCAN', 'f_set': '1 second'}},
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'o'},
         {'title': 'init', 'tag': 'True'},
@@ -549,9 +545,9 @@ def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
     assert cfg.config == [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
         {'title': 'type', 'tag': 'bo'},
-        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
-        {'title': 'field', 'tag':{'f_name':'ONAM', 'f_set': 'MULTI'}},
-        {'title': 'field', 'tag':{'f_name':'SCAN', 'f_set': '1 second'}},
+        {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}},
+        {'title': 'field', 'tag': {'f_name': 'SCAN', 'f_set': '1 second'}},
         {'title': 'str', 'tag': '%d'},
         {'title': 'io', 'tag': 'o'},
         {'title': 'init', 'tag': 'True'},
@@ -560,7 +556,7 @@ def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
 
 def test_Configuration_add_config_line(branch_bool_pragma_string):
     cfg = Configuration(branch_bool_pragma_string)
-    cfg.add_config_line('pv','THIRD')
+    cfg.add_config_line('pv', 'THIRD')
     assert cfg.config == [
         {'title': 'pv', 'tag': 'FIRST'},
         {'title': 'pv', 'tag': 'SECOND'},
@@ -570,7 +566,7 @@ def test_Configuration_add_config_line(branch_bool_pragma_string):
 
 def test_Configuration_add_config_field(branch_bool_pragma_string):
     cfg = Configuration(branch_bool_pragma_string)
-    cfg.add_config_field('ABC','XYZ',1)
+    cfg.add_config_field('ABC', 'XYZ', 1)
     assert cfg.config == [
         {'title': 'pv', 'tag': 'FIRST'},
         {'title': 'field', 'tag': {'f_name': 'ABC', 'f_set': 'XYZ'}},
@@ -592,8 +588,8 @@ def test_Configuration_get_config_lines(leaf_bool_pragma_string):
     cfg = Configuration(leaf_bool_pragma_string)
     response = cfg.get_config_fields('ZNAM')
     assert response == [
-        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
-        {'title': 'field', 'tag':{'f_name':'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
+        {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
     ]
 
 
@@ -601,12 +597,12 @@ def test_Configuration__eq__(leaf_bool_pragma_string):
     cfg_A = Configuration(leaf_bool_pragma_string)
     cfg_B = Configuration(leaf_bool_pragma_string)
     assert cfg_A == cfg_B
-    cfg_A.add_config_line("a","b")
+    cfg_A.add_config_line("a", "b")
     assert cfg_A != cfg_B
 
 
 def test_Configuration_concat(branch_connection_pragma_string,
-            branch_bool_pragma_string_empty, empty_pv_pragma_string):
+                              branch_bool_pragma_string_empty, empty_pv_pragma_string):
     cfg_A = Configuration(branch_connection_pragma_string)
     cfg_AA = Configuration(empty_pv_pragma_string)
     cfg_B = Configuration(branch_bool_pragma_string_empty)
@@ -617,18 +613,18 @@ def test_Configuration_concat(branch_connection_pragma_string,
     new_config.concat(cfg_B)
     print(new_config.config)
     assert new_config.config == [
-        {'title':'pv', 'tag':'MIDDLE:FIRST'},
-        {'title':'aux', 'tag':'nothing'},
+        {'title': 'pv', 'tag': 'MIDDLE:FIRST'},
+        {'title': 'aux', 'tag': 'nothing'},
     ]
     #assert False
 
 
 def test_Configuration_seek():
     c = Configuration(config=[])
-    c.add_config_line(title="pv",tag="ABC")
-    c.add_config_field(f_name="ONAM",f_set="ABC")
-    assert c.seek(['title'],'pv') == [{'title':'pv','tag':'ABC'}]
-    assert c.seek(['tag','f_name'],'ONAM') == [
-        {'title':'field','tag':{'f_name':'ONAM','f_set':'ABC'}}
+    c.add_config_line(title="pv", tag="ABC")
+    c.add_config_field(f_name="ONAM", f_set="ABC")
+    assert c.seek(['title'], 'pv') == [{'title': 'pv', 'tag': 'ABC'}]
+    assert c.seek(['tag', 'f_name'], 'ONAM') == [
+        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'ABC'}}
     ]
-    assert c.seek(['bad'],3) == []
+    assert c.seek(['bad'], 3) == []

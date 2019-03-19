@@ -7,9 +7,11 @@ from pytmc import TmcFile
 from pytmc.xml_collector import BaseElement, Configuration, TmcChain
 logger = logging.getLogger(__name__)
 
+
 def load_generic_tmc():
-    f = open("generic.tmc","r")
+    f = open("generic.tmc", "r")
     return f
+
 
 @pytest.fixture(scope='function')
 def generic_tmc_root():
@@ -19,11 +21,13 @@ def generic_tmc_root():
     root = tree.getroot()
     return root
 
+
 @pytest.fixture(scope='function')
 def string_tmc_path():
     directory = os.path.dirname(os.path.realpath(__file__))
     test_path = os.path.join(directory, "generic_w_pragmas180921.tmc")
     return test_path
+
 
 @pytest.fixture(scope='function')
 def string_tmc_root():
@@ -33,25 +37,28 @@ def string_tmc_root():
     root = tree.getroot()
     return root
 
+
 @pytest.fixture(scope='function')
 def generic_tmc_path():
     directory = os.path.dirname(os.path.realpath(__file__))
     test_path = os.path.join(directory, "generic_w_pragmas180426.tmc")
     return test_path
 
+
 @pytest.fixture(scope='function')
 def safe_record_factory():
     rec = SingleRecordData(
-        pv = "GDET:FEE1:241:ENRC",
-        rec_type = "ai",
-        fields = dict([
-            ("DTYP","asynInt32"),
-            ("INP",None),
-            ("ZNAM","Z"),
+        pv="GDET:FEE1:241:ENRC",
+        rec_type="ai",
+        fields=dict([
+            ("DTYP", "asynInt32"),
+            ("INP", None),
+            ("ZNAM", "Z"),
         ]),
-        comment = "sample comment",
+        comment="sample comment",
     )
     return rec
+
 
 @pytest.fixture(scope='function')
 def generic_file():
@@ -59,12 +66,14 @@ def generic_file():
     test_path = os.path.join(directory, "generic.tmc")
     return TmcFile(test_path)
 
+
 @pytest.fixture(scope='function')
 def generic_explorer():
     directory = os.path.dirname(os.path.realpath(__file__))
     test_path = os.path.join(directory, "generic.tmc")
     tmc = TmcFile(test_path)
     return TmcExplorer(tmc)
+
 
 @pytest.fixture(scope='function')
 def leaf_bool_pragma_string():
@@ -87,6 +96,7 @@ def leaf_bool_pragma_string():
     """
     return sample_str
 
+
 @pytest.fixture(scope='function')
 def leaf_bool_pragma_string_w_semicolon():
     sample_str = """
@@ -94,10 +104,12 @@ def leaf_bool_pragma_string_w_semicolon():
     """
     return leaf_bool_pragma_string() + sample_str
 
+
 @pytest.fixture(scope='function')
 def leaf_bool_pragma_string_single_line():
     sample_str = """pv:pv_name"""
     return sample_str
+
 
 @pytest.fixture(scope='function')
 def light_leaf_bool_pragma_string():
@@ -112,6 +124,7 @@ def light_leaf_bool_pragma_string():
     """
     return str
 
+
 @pytest.fixture(scope='function')
 def branch_bool_pragma_string():
     string = """
@@ -119,6 +132,7 @@ def branch_bool_pragma_string():
             pv: SECOND
     """
     return string
+
 
 @pytest.fixture(scope='function')
 def branch_bool_pragma_string_empty(branch_bool_pragma_string):
@@ -128,6 +142,7 @@ def branch_bool_pragma_string_empty(branch_bool_pragma_string):
 
     return string
 
+
 @pytest.fixture(scope='function')
 def branch_connection_pragma_string():
     string = """
@@ -135,6 +150,7 @@ def branch_connection_pragma_string():
             aux: nothing
     """
     return string
+
 
 @pytest.fixture(scope='function')
 def empty_pv_pragma_string():
@@ -151,10 +167,11 @@ def branch_skip_pragma_string():
     """
     return str
 
+
 @pytest.fixture(scope='function')
 def example_singular_tmc_chains(light_leaf_bool_pragma_string,
-            branch_bool_pragma_string,
-            branch_connection_pragma_string):
+                                branch_bool_pragma_string,
+                                branch_connection_pragma_string):
     stem = BaseElement(element=None)
     stem.pragma = Configuration(branch_connection_pragma_string)
     leaf_a = BaseElement(element=None)

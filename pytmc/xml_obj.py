@@ -4,11 +4,15 @@ xml_obj.py
 This file contains the objects for representing the essential TwinCAT
 variables and data structures found in the xml (tmc) formatted file.
 """
+
 import logging
-logger = logging.getLogger(__name__)
-import xml.etree.ElementTree as ET
-from collections import defaultdict
 import re
+import xml.etree.ElementTree as ET
+
+from collections import defaultdict
+
+
+logger = logging.getLogger(__name__)
 
 
 class XmlObjError(Exception):
@@ -66,9 +70,8 @@ class Configuration:
             raw_config = self._raw_config
 
         # Select special delimiter sequences and prepare them for re injection
-        line_term_seqs = [r";",r";;",r"[\n\r]",r"$"]
+        line_term_seqs = [r";", r";;", r"[\n\r]", r"$"]
         flex_term_regex = "|".join(line_term_seqs)
-
 
         # Break configuration str into list of lines paired w/ their delimiters
         line_finder = re.compile(
@@ -258,7 +261,7 @@ class Configuration:
         self.config = self._select_config_by_name(config_name)
 
     def add_config_line(self, title, tag, line_no=None, config=None,
-                overwrite=False):
+                        overwrite=False):
         """
         add basic line to config
 
@@ -303,7 +306,7 @@ class Configuration:
             config.insert(line_no, new_line)
 
     def add_config_field(self, f_name, f_set, line_no=None, config=None,
-                overwrite=False):
+                         overwrite=False):
         """
         add field to config
 
@@ -342,7 +345,6 @@ class Configuration:
                         config=config,
                         overwrite=True
                     )
-
 
         self.add_config_line(
             title='field',
@@ -404,7 +406,7 @@ class Configuration:
         """
 
         results_list = []
-        fields_list = self.get_config_lines('field',config)
+        fields_list = self.get_config_lines('field', config)
 
         for line in fields_list:
             if line['tag']['f_name'] == f_name:
@@ -412,7 +414,7 @@ class Configuration:
 
         return results_list
 
-    def __eq__(self,other):
+    def __eq__(self, other):
         """
         two Configurations are equal if their _raw_config and config are the
         same
@@ -421,12 +423,12 @@ class Configuration:
             return False
 
         if (other._raw_config == self._raw_config
-                    and other.config == self.config):
+                and other.config == self.config):
             return True
 
         return False
 
-    def concat(self, other, cc_symbol = ":"):
+    def concat(self, other, cc_symbol=":"):
         """
         Using configs from an object and its encapsulated data, string the two
         together concatenating the PV and using the outside (self) config to
@@ -469,8 +471,8 @@ class Configuration:
             # hanlde all normal lines
             else:
                 self.add_config_line(
-                    title = line['title'],
-                    tag = line['tag'],
+                    title=line['title'],
+                    tag=line['tag'],
                     overwrite=True
                 )
 
@@ -519,6 +521,7 @@ class BaseElement:
     base : str
         The prefix that will mark pragmas intended for pytmc's consumption.
     '''
+
     def __init__(self, element, base=None, suffixes=None):
         if type(element) != ET.Element and element is not None:
             raise TypeError("ElementTree.Element required")
@@ -539,13 +542,13 @@ class BaseElement:
         else:
             self.com_base = base
 
-        #if suffixes is None:
+        # if suffixes is None:
         #    self.suffixes = {
         #        'Pv': '_pv',
         #        'DataType': '_dt_name',
         #        'Field': '_field'
         #    }
-        #else:
+        # else:
         #    self.suffixes = suffixes
 
         #self._pragma = None
@@ -855,12 +858,13 @@ class Symbol(BaseElement):
     base : str
         The prefix that will mark pragmas intended for pytmc's consumption.
     '''
-    def __init__(self, element, base=None,suffixes=None):
+
+    def __init__(self, element, base=None, suffixes=None):
         super().__init__(element, base, suffixes)
-        #self.registered_pragmas = [
+        # self.registered_pragmas = [
         #    self.com_base + self.suffixes['Field'],
         #    self.com_base + self.suffixes['Pv'],
-        #]
+        # ]
         if element.tag != 'Symbol':
             logger.warning("Symbol instance not matched to xml Symbol")
 
@@ -916,9 +920,9 @@ class DataType(BaseElement):
 
     def __init__(self, element, base=None, suffixes=None):
         super().__init__(element, base, suffixes)
-        #self.registered_pragmas = [
+        # self.registered_pragmas = [
         #    self.com_base + self.suffixes['DataType'],
-        #]
+        # ]
 
         self.children = []
 
@@ -983,7 +987,6 @@ class DataType(BaseElement):
             return None
         return extension_element.text
 
-
     @property
     def is_enum(self):
         """
@@ -1035,12 +1038,13 @@ class SubItem(BaseElement):
     parent : :class:`~pytmc.xml_obj.baseElement`
         The DataStructure in which this SubItem appears
     '''
-    def __init__(self, element, base=None, suffixes=None, parent = None):
+
+    def __init__(self, element, base=None, suffixes=None, parent=None):
         super().__init__(element, base, suffixes)
-        #self.registered_pragmas = [
+        # self.registered_pragmas = [
         #    self.com_base + self.suffixes['Field'],
         #    self.com_base + self.suffixes['Pv'],
-        #]
+        # ]
         self.__parent = None
         self.parent = parent
         # set during isolation phase
@@ -1076,7 +1080,7 @@ class SubItem(BaseElement):
         return self.__parent
 
     @parent.setter
-    def parent(self,other):
+    def parent(self, other):
         del self.parent
 
         self.__parent = other
@@ -1090,7 +1094,7 @@ class SubItem(BaseElement):
     def parent(self):
         if self.__parent != None:
             new_list = list(filter(
-                lambda g : g != self,
+                lambda g: g != self,
                 self.__parent.children
             ))
             self.__parent.children = new_list
