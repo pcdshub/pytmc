@@ -660,7 +660,7 @@ class BaseRecordPackage:
             String name of type
         """
         # Instantly remove list formatting if this is len(1) list, leaves dict
-        [type_search] = self.cfg.seek(['title'], 'type')
+        type_search, = self.cfg.seek(['title'], 'type')
         if type_search['tag'] == 'motor':
             return 'motor'
         else:
@@ -752,8 +752,8 @@ class BaseRecordPackage:
         Add fields that are common to all records (PINI, TSE)
         """
         try:
-            [pini] = self.cfg.get_config_fields('PINI')
-            [tse] = self.cfg.get_config_fields('TSE')
+            pini, = self.cfg.get_config_fields('PINI')
+            tse, = self.cfg.get_config_fields('TSE')
             return False
         except ValueError:
             self.cfg.add_config_field("PINI", '"1"')
@@ -770,19 +770,19 @@ class BaseRecordPackage:
             Return a boolean that is true iff a change has been made.
         """
         try:
-            [ty] = self.cfg.get_config_lines('type')
+            ty, = self.cfg.get_config_lines('type')
             return False
         except ValueError:
             pass
 
         try:
-            [io] = self.cfg.get_config_lines('io')
+            io, = self.cfg.get_config_lines('io')
         except ValueError:
             return False
 
         # must be tested first, arrays will have the tc_type of the iterable:
         if self.chain.last.is_array:
-            [io] = self.cfg.get_config_lines('io')
+            io, = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "waveform")
                 return True
@@ -797,7 +797,7 @@ class BaseRecordPackage:
             "BOOL"
         }
         if self.chain.last.tc_type in bi_bo_set:
-            [io] = self.cfg.get_config_lines('io')
+            io, = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "bo")
                 return True
@@ -816,7 +816,7 @@ class BaseRecordPackage:
             "ENUM",
         }
         if self.chain.last.tc_type in ai_ao_set:
-            [io] = self.cfg.get_config_lines('io')
+            io, = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "ao")
                 return True
@@ -831,7 +831,7 @@ class BaseRecordPackage:
             "STRING",
         }
         if self.chain.last.tc_type in waveform_set:
-            [io] = self.cfg.get_config_lines('io')
+            io, = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_line("type", "waveform")
                 return True
@@ -855,7 +855,7 @@ class BaseRecordPackage:
 
         """
         try:
-            [io] = self.cfg.get_config_lines('io')
+            io, = self.cfg.get_config_lines('io')
             return False
         except ValueError:
             self.cfg.add_config_line("io", "io")
@@ -877,12 +877,12 @@ class BaseRecordPackage:
             Return a boolean that is True iff a change has been made.
         """
         try:
-            [dtyp] = self.cfg.get_config_fields('DTYP')
+            dtyp, = self.cfg.get_config_fields('DTYP')
             return False
         except ValueError:
             pass
 
-        [io] = self.cfg.get_config_lines('io')
+        io, = self.cfg.get_config_lines('io')
         io = io['tag']
 
         BOOL_set = {"BOOL"}
@@ -972,7 +972,7 @@ class BaseRecordPackage:
 
         asynInt8ArrayOut_set = {"STRING"}
         if self.chain.last.tc_type in asynInt8ArrayOut_set:
-            [io] = self.cfg.get_config_lines('io')
+            io, = self.cfg.get_config_lines('io')
             if 'i' in io['tag'] and 'o' in io['tag']:
                 self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
                 return True
@@ -997,7 +997,7 @@ class BaseRecordPackage:
             Return a boolean that is true iff a change has been made.
         """
 
-        [io] = self.cfg.get_config_lines('io')
+        io, = self.cfg.get_config_lines('io')
         io = io['tag']
         name_list = self.chain.name_list
         name = '.'.join(name_list)
@@ -1028,7 +1028,7 @@ class BaseRecordPackage:
         )
 
         try:
-            [res] = self.cfg.get_config_fields(field_type)
+            res, = self.cfg.get_config_fields(field_type)
             return False
         except ValueError:
             pass
@@ -1047,11 +1047,11 @@ class BaseRecordPackage:
         """
 
         try:
-            [res] = self.cfg.get_config_fields("SCAN")
+            res, = self.cfg.get_config_fields("SCAN")
             return False
         except ValueError:
             pass
-        [io] = self.cfg.get_config_lines('io')
+        io, = self.cfg.get_config_lines('io')
         if 'i' in io['tag'] and 'o' in io['tag']:
             self.cfg.add_config_field("SCAN", '"Passive"')
             self.cfg.add_config_line("info", True)
@@ -1106,15 +1106,15 @@ class BaseRecordPackage:
             Return a boolean that is true iff a change has been made.
         """
         try:
-            [out] = self.cfg.get_config_fields("PREC")
+            prec, = self.cfg.get_config_fields("PREC")
             return False
         except ValueError:
             pass
 
         try:
-            [epics_type] = self.cfg.get_config_lines("type")
+            epics_type, = self.cfg.get_config_lines("type")
         except ValueError:
-            #raise MissingConfigError
+            # raise MissingConfigError
             return False
 
         float_set = {'ai', 'ao'}
@@ -1129,7 +1129,7 @@ class BaseRecordPackage:
         Add datatype specification field for waveforms
         """
         try:
-            [ftvl] = self.cfg.get_config_fields("FTVL")
+            ftvl, = self.cfg.get_config_fields("FTVL")
             return False
         except ValueError:
             pass
@@ -1165,7 +1165,7 @@ class BaseRecordPackage:
         Add data length secification for waveforms
         """
         try:
-            [nelm] = self.cfg.get_config_fields("NELM")
+            nelm, = self.cfg.get_config_fields("NELM")
             return False
         except ValueError:
             pass
@@ -1180,7 +1180,7 @@ class BaseRecordPackage:
     def guess_all(self):
         """
         Cycle through guessing methods until none can be applied.
-        guessing methods is a list of functions.
+        guess_methods_list is a list of functions.
         """
         complete = False
         count = 0
@@ -1189,7 +1189,7 @@ class BaseRecordPackage:
             assert count < 20
             complete = True
             for method in self.guess_methods_list:
-                if method() == True:
+                if method() is True:
                     complete = False
 
     def render_to_string(self):
