@@ -9,8 +9,6 @@ import logging
 import re
 import xml.etree.ElementTree as ET
 
-from collections import defaultdict
-
 
 logger = logging.getLogger(__name__)
 
@@ -450,7 +448,7 @@ class Configuration:
         if len(self.config_names()) == 1:
             title_base = self.config_names()[0]
             if title_base[-1] is not cc_symbol:
-                if title_base.strip() is not "":
+                if title_base.strip() != "":
                     title_base = title_base + cc_symbol
 
         for line in other.config:
@@ -462,7 +460,7 @@ class Configuration:
                     overwrite=True
                 )
             # handle fields
-            elif line['title'] is 'field':
+            elif line['title'] == 'field':
                 self.add_config_field(
                     f_name=line['tag']['f_name'],
                     f_set=line['tag']['f_set'],
@@ -533,9 +531,9 @@ class BaseElement:
         self.is_enum_ = None
 
         self.element = element
-        #self.registered_pragmas = []
-        #self.freeze_config = False
-        #self.freeze_pv_target = None
+        # self.registered_pragmas = []
+        # self.freeze_config = False
+        # self.freeze_pv_target = None
 
         if base is None:
             self.com_base = 'pytmc'
@@ -551,7 +549,7 @@ class BaseElement:
         # else:
         #    self.suffixes = suffixes
 
-        #self._pragma = None
+        # self._pragma = None
         self._cached_name = None
 
         # This is to allow testing without actual tmc elements
@@ -691,7 +689,7 @@ class BaseElement:
             return self.is_array_
         if self.element is None:
             return False
-        if None != self._get_subfield('ArrayInfo'):
+        if self._get_subfield('ArrayInfo') is not None:
             return True
         return False
 
@@ -797,10 +795,7 @@ class BaseElement:
                 and type(other) != DataType
                 and type(other) != SubItem):
             return False
-        if self.element == other.element:
-            return True
-        else:
-            return False
+        return self.element == other.element
 
     def __repr__(self):
         if self.element is None:
@@ -940,18 +935,9 @@ class DataType(BaseElement):
         str
             Name of data type
         '''
-        has_EnumInfo = False
-        has_SubItem = False
-        has_Properties = False
-
-        if None != self._get_subfield("EnumInfo"):
-            has_EnumInfo = True
-
-        if None != self._get_subfield("SubItem"):
-            has_SubItem = True
-
-        if None != self._get_subfield("Properties"):
-            has_Properties = True
+        has_EnumInfo = self._get_subfield("EnumInfo") is not None
+        has_SubItem = self._get_subfield("SubItem") is not None
+        has_Properties = self._get_subfield("Properties") is not None
 
         result = None
 
@@ -983,7 +969,7 @@ class DataType(BaseElement):
 
         '''
         extension_element = self._get_subfield("ExtendsType")
-        if extension_element == None:
+        if extension_element is None:
             return None
         return extension_element.text
 
@@ -1002,7 +988,7 @@ class DataType(BaseElement):
             return self.is_enum_
         if self.element is None:
             return False
-        if None != self._get_subfield('EnumInfo'):
+        if self._get_subfield('EnumInfo') is not None:
             return True
         return False
 
@@ -1050,7 +1036,7 @@ class SubItem(BaseElement):
         # set during isolation phase
         self.is_enum = False
 
-        if self.parent == None:
+        if self.parent is None:
             logger.warning("SubItem has no parent")
 
         if element.tag != 'SubItem':
@@ -1084,7 +1070,7 @@ class SubItem(BaseElement):
         del self.parent
 
         self.__parent = other
-        if other == None:
+        if other is None:
             return
         # add self to parent's list of children
         if self not in self.__parent.children:
@@ -1092,7 +1078,7 @@ class SubItem(BaseElement):
 
     @parent.deleter
     def parent(self):
-        if self.__parent != None:
+        if self.__parent is not None:
             new_list = list(filter(
                 lambda g: g != self,
                 self.__parent.children
