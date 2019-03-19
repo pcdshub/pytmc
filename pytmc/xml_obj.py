@@ -337,7 +337,7 @@ class Configuration:
         """
         if overwrite:
             for field in self.get_config_fields(f_name):
-                if line['tag']['f_set'] == f_set:
+                if field['tag']['f_set'] == f_set:
                     self.add_config_line(
                         title='field',
                         tag={'f_set': f_set, 'f_name': f_name},
