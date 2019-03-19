@@ -783,12 +783,8 @@ class BaseElement:
         Two objects are equal if they point to the same xml element. e.g. their
         element fields point to the same place in the same file.
         '''
-        if (type(other) != BaseElement
-                and type(other) != Symbol
-                and type(other) != DataType
-                and type(other) != SubItem):
-            return False
-        return self.element == other.element
+        return (isinstance(other, (BaseElement, Symbol, DataType, SubItem))
+                and self.element == other.element)
 
     def __repr__(self):
         if self.element is None:
