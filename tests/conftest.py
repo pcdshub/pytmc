@@ -4,7 +4,10 @@ import xml.etree.ElementTree as ET
 import os
 
 from pytmc import TmcFile
-from pytmc.xml_collector import BaseElement, Configuration, TmcChain
+from pytmc.xml_collector import TmcChain
+from pytmc.xml_obj import BaseElement, Configuration
+
+
 logger = logging.getLogger(__name__)
 
 
