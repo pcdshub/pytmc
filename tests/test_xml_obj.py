@@ -22,7 +22,7 @@ def test_BaseElement_type_rejection(generic_tmc_root):
     except:
         pytest.fail("No error should have been raised")
 
-    with pytest.raises(TypeError, message="TypeError expected"):
+    with pytest.raises(TypeError):
         s = BaseElement("string")
 
 
