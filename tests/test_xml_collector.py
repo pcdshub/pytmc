@@ -1,10 +1,9 @@
-import pytest
 import logging
 import textwrap
-from copy import deepcopy
-import xml.etree.ElementTree as ET
 
-from pytmc import Symbol, DataType, SubItem
+import pytest
+
+from pytmc import Symbol, DataType
 from pytmc.xml_obj import BaseElement, Configuration
 
 from pytmc import TmcFile
@@ -21,7 +20,7 @@ logger = logging.getLogger(__name__)
 def test_ElementCollector_instantiation(generic_tmc_root):
     try:
         col = ElementCollector()
-    except Error as e:
+    except Exception:
         pytest.fail(
             "Instantiation of XmlObjCollector should not generate errors"
         )
@@ -62,7 +61,7 @@ def test_ElementCollector_registered(generic_tmc_root):
 def test_TmcFile_instantiation(generic_tmc_path, generic_tmc_root):
     try:
         tmc = TmcFile(generic_tmc_path)
-    except Error as e:
+    except Exception:
         pytest.fail("Instantiation of TmcFile should not generate errors")
 
 
