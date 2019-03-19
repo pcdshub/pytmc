@@ -4,7 +4,7 @@ xml_collector.py
 This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation
 """
-import typing 
+import typing
 import logging
 logger = logging.getLogger(__name__)
 import xml.etree.ElementTree as ET
@@ -23,15 +23,15 @@ class ElementCollector(dict):
     :class:`~pytmc.SubItem`. Each entry's key is the name of the TwinCAT
     variable.  :func:`~pytmc.xml_collector.ElementCollector.add` automates this
     setup and should be used to add entries instead of normal dictionary
-    insertion techniques. 
-    
+    insertion techniques.
+
     Subclassed from python's standard dictionary.
     '''
     def add(self, value):
         '''
         Include new item in the dictionary.
 
-        Parameters 
+        Parameters
         ----------
         value : :class:`~pytmc.Symbol`, :class:`~pytmc.DataType`,or :class:`~pytmc.SubItem`.
             The instance to add to the ElementCollector
@@ -67,19 +67,19 @@ class TmcFile:
     all_Symbols : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all Symbols in the document. Must be initialized with
         :func:`~isolate_Symbols`.
-    
+
     all_DataTypes : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all DataTypes in the document. Must be initialized with
         :func:`~isolate_DataTypes`.
-        
+
     all_SubItems : :class:`~pytmc.xml_collector.ElementCollector`
         Collection of all SubItems in the document. Must be initialized with
         :func:`~isolate_SubItems`.
-    
+
     all_TmcChains : list
         Collection of all TmcChains in the document. Must be initialized with
         :func:`~create_chains`. These chains are NOT SINGULAR.
-    
+
     all_singular_TmcChains : list
         Collection of all singularized TmcChains in the document. Must be
         initialized with :func:`~isolate_chains`.
@@ -95,28 +95,28 @@ class TmcFile:
 
         self.all_Symbols = ElementCollector()
         self.all_DataTypes = ElementCollector()
-        self.all_SubItems = defaultdict(ElementCollector) 
+        self.all_SubItems = defaultdict(ElementCollector)
         if self.filename is not None:
             self.isolate_all()
-        
+
         self.all_TmcChains = []
         self.all_singular_TmcChains = []
         self.all_RecordPackages = []
-        
+
         # Load jinja templates
         self.jinja_env = Environment(
             loader = PackageLoader("pytmc","templates"),
             trim_blocks = True,
             lstrip_blocks = True,
         )
-        
+
         self.file_template = self.jinja_env.get_template(
             "asyn_standard_file.jinja2"
         )
 
     def isolate_Symbols(self):
         '''
-        Populate :attr:`~all_Symbols` with a :class:`~pytmc.Symbol` 
+        Populate :attr:`~all_Symbols` with a :class:`~pytmc.Symbol`
         representing each symbol in the .tmc file.
         '''
         data_area = self.root.find(
@@ -129,7 +129,7 @@ class TmcFile:
 
     def isolate_DataTypes(self,process_subitems=True):
         '''
-        Populate :attr:`~all_DataTypes` with a :class:`~pytmc.DataType` 
+        Populate :attr:`~all_DataTypes` with a :class:`~pytmc.DataType`
         representing each DataType in the .tmc file.
 
         Parameters
@@ -149,9 +149,9 @@ class TmcFile:
 
     def isolate_SubItems(self,parent=None):
         '''
-        Populate :attr:`~all_SubItems` with a :class:`~pytmc.SubItem` 
+        Populate :attr:`~all_SubItems` with a :class:`~pytmc.SubItem`
         representing each subitem in the .tmc file.
-        
+
         Parameters
         ----------
         parent : :str
@@ -197,7 +197,7 @@ class TmcFile:
                         subitem.is_enum = True
                 except KeyError:
                     pass
-        
+
     def isolate_all(self):
         '''
         Shortcut for running :func:`~isolate_Symbols` and
@@ -213,12 +213,12 @@ class TmcFile:
 
         Returns
         -------
-        list 
+        list
             For every instantiated variable in the TmcFile, return a list
             documenting the path to that variable. This path starts at the
             global level instantiation and tracks through successive levels of
             encapsulation to find the final value itself. For each value, this
-            list contains a single row. 
+            list contains a single row.
         """
         results = []
         for sym in self.all_Symbols:
@@ -228,9 +228,9 @@ class TmcFile:
     def recursive_explore(self, root_path):
         """
         Given a starting Symbol or SubItem, recursively explore the contents of
-        the target and return a list for the path to each final leaf-item. 
+        the target and return a list for the path to each final leaf-item.
 
-        Parameters 
+        Parameters
         ----------
         root_path : list
             This is a list leading to the initial item to explore from. The
@@ -247,18 +247,18 @@ class TmcFile:
         root = root_path[-1]
         response = []
         target_SubItems = []
-        
+
         # If this is a user defined datatype
         DataType_str = root.tc_type
         if DataType_str in self.all_DataTypes:
-            
+
             # Accumulate list of SubItems in this Subitem/Symbol
             target_DataType = self.all_DataTypes[DataType_str]
             target_SubItems.extend(
                 self.recursive_list_SubItems(target_DataType)
             )
 
-            # For each subitem in this object/datatype explore further 
+            # For each subitem in this object/datatype explore further
             for subitem in target_SubItems:
                 new_paths = self.recursive_explore(root_path + [subitem])
                 response.extend(new_paths)
@@ -268,7 +268,7 @@ class TmcFile:
         # If not a use defined datatype
         else:
             return [root_path]
-        
+
     def recursive_list_SubItems(self, root_DataType):
         """
         For a given DataType, provide all of its SubItems including those
@@ -278,7 +278,7 @@ class TmcFile:
         ----------
         root_DataType : :class:`~DataType`
             instance of the target datatype
-        
+
         Returns
         -------
         list
@@ -308,7 +308,7 @@ class TmcFile:
         full_list = self.explore_all()
         for row in full_list:
             self.all_TmcChains.append(TmcChain(row))
-    
+
     def isolate_chains(self):
         """
         Populate the self.all_Singular_TmcChains with singularized versions of
@@ -372,7 +372,7 @@ class TmcChain:
     """
     Pointer to the tmc instances and track order. Leaf node is last.
     """
-    def __init__(self, chain):    
+    def __init__(self, chain):
         self.chain = chain
 
     def forkmap(self):
@@ -395,7 +395,7 @@ class TmcChain:
             else:
                 full_list.append(entry.pragma.config_names())
         return full_list
-    
+
     def is_singular(self):
         """
         Determine whether this TmcChain has only a single configuration for
@@ -403,7 +403,7 @@ class TmcChain:
 
         Returns
         -------
-        bool 
+        bool
             True if all elements in this chain are singular
         """
         no_violations = True
@@ -411,10 +411,10 @@ class TmcChain:
             if len(element) != 1:
                 no_violations = False
                 break
-        
+
         return no_violations
 
-    def __eq__(self, other):    
+    def __eq__(self, other):
         """
         Two chains are equal if all their elements share the same xml element
         targets (elements are ==) and their configurations are the same.
@@ -449,7 +449,7 @@ class TmcChain:
         so_far : list or None
             Only used for internal recursive work. This lists the the 'so_far'
             assembled chains. This list grows with each iteration, either in
-            length or in the length of the contained lists 
+            length or in the length of the contained lists
         Returns
         -------
         list
@@ -459,7 +459,7 @@ class TmcChain:
             so_far = [[]]
 
         replicate_count = len(so_far)
-        
+
         extras = []
         for i in range(len(master_list[0])-1):
             for chain in so_far:
@@ -475,16 +475,16 @@ class TmcChain:
             return self._recursive_permute(master_list[1:],so_far)
         else:
             return so_far
-            
+
     def build_singular_chains(self):
         """
-        Generate list of all acceptable configurations. 
+        Generate list of all acceptable configurations.
 
         Returns
         -------
         list
             List of TmcChains. Each chain is bound to one of the possible paths
-            given the configurations available at each step. 
+            given the configurations available at each step.
         """
         name_sequences = self._recursive_permute(self.forkmap())
         logging.debug(str(name_sequences))
@@ -521,14 +521,14 @@ class TmcChain:
         cfg_title = ""
         for entry in self.chain:
             new_config.concat(entry.pragma, cc_symbol = cc_symbol)
-        
+
         return new_config
-   
-    @property 
+
+    @property
     def last(self):
         """
         Return the last element in the chain.
-        
+
         Returns
         -------
         BaseElement, Symbol, or SubItem
@@ -546,7 +546,7 @@ class TmcChain:
         Returns
         -------
         list
-            
+
         """
         result = []
         for entry in self.chain:
@@ -562,7 +562,7 @@ class BaseRecordPackage:
     BaseRecordPackage includes some basic funcionality that should be shared
     across most versions. This includes things like common methods so things
     like validation can be configured at the __init__ with an instance
-    variable. Overwrite/inherit features as necessary. 
+    variable. Overwrite/inherit features as necessary.
 
     """
     def __init__(self, chain=None, origin=None):
@@ -573,13 +573,13 @@ class BaseRecordPackage:
         self.cfg = Configuration(config=[])
 
         self.chain = chain # TmcChain instance - so I could add methods there
-        
-        # TmcChain instance-do I need this? unclear
-        self.origin_chain = origin 
-        # ^could be relevant for init fields
-        # Will continue without this for now 
 
-        # List of methods defined in the class 
+        # TmcChain instance-do I need this? unclear
+        self.origin_chain = origin
+        # ^could be relevant for init fields
+        # Will continue without this for now
+
+        # List of methods defined in the class
         self.guess_methods_list = [
             self.guess_common,
             self.guess_type,
@@ -592,7 +592,7 @@ class BaseRecordPackage:
             self.guess_FTVL,
             self.guess_NELM,
         ]
-        
+
         # use form list of dicts,1st list has 1 entry per requirement
         # dict has form {'path':[],'target':n} where n is any variable
         self.validation_list = None
@@ -611,15 +611,15 @@ class BaseRecordPackage:
         )
 
         self.ads_port = 851
-        
+
     def apply_config_validation(self):
         """
         Apply the guessing module. Assert that the proper fields exist.
-        
+
         Returns
         -------
         List
-            a list of the missing requirements 
+            a list of the missing requirements
         """
         violations = []
         for req in self.validation_list:
@@ -646,12 +646,12 @@ class BaseRecordPackage:
         Distinguish special record types from one another such as a motor
         record. Select from the available types of "standard" and "motor
         record." Should always return a value. No guessing should be required
-        to use this method 
-        
+        to use this method
+
         Returns
         -------
         string
-            String name of type 
+            String name of type
         """
         # Instantly remove list formatting if this is len(1) list, leaves dict
         [type_search] = self.cfg.seek(['title'], 'type')
@@ -663,7 +663,7 @@ class BaseRecordPackage:
     def generate_record_entry(self):
         """
         apply all jinja functionality to create the template
-        return dict w/ filename as key for each entry in the iterable 
+        return dict w/ filename as key for each entry in the iterable
         """
         raise NotImplementedError
 
@@ -676,21 +676,21 @@ class BaseRecordPackage:
         dict
             return a dict. Keys are the fields of the jinja template. Contains
             special 'field' key where the value is a dictionary with f_name and
-            f_set as the key/value pairs respectively. 
+            f_set as the key/value pairs respectively.
         """
         raise NotImplementedError
 
     def cfg_as_dict(self):
         """
         Produce a jinja-template-compatible dictionary describing this
-        RecordPackage. 
-        
+        RecordPackage.
+
         Returns
         -------
         dict
             return a dict. Keys are the fields of the jinja template. Contains
             special 'field' key where the value is a dictionary with f_name and
-            f_set as the key/value pairs respectively. 
+            f_set as the key/value pairs respectively.
         """
         cfg_dict = {}
         for row in self.cfg.config:
@@ -704,7 +704,7 @@ class BaseRecordPackage:
                 cfg_dict['field'][tag['f_name']] = tag['f_set']
             if row['title'] == 'info':
                 cfg_dict['info'] = True
-        
+
         cfg_dict.setdefault('info',False)
         return cfg_dict
 
@@ -723,7 +723,7 @@ class BaseRecordPackage:
         except KeyError:
             print(self.cfg.config)
             print(self.chain)
-            
+
         return self.record_template.render(**simple_dict)
 
     @staticmethod
@@ -731,16 +731,16 @@ class BaseRecordPackage:
         """
         Parameters
         ----------
-        records : list 
+        records : list
             list of all incoming Record objects
-        
+
         Returns
         -------
-        str 
+        str
             The Jinja-made output of the full resulting file.
         """
         raise NotImplementedError
-        
+
     def guess_common(self):
         """
         Add fields that are common to all records (PINI, TSE)
@@ -768,12 +768,12 @@ class BaseRecordPackage:
             return False
         except ValueError:
             pass
-            
-        try:    
+
+        try:
             [io] = self.cfg.get_config_lines('io')
         except ValueError:
             return False
-    
+
         # must be tested first, arrays will have the tc_type of the iterable:
         if self.chain.last.is_array:
             [io] =  self.cfg.get_config_lines('io')
@@ -801,7 +801,7 @@ class BaseRecordPackage:
             elif 'o' in io['tag']:
                 self.cfg.add_config_line("type","bo")
                 return True
-        
+
         ai_ao_set = {
             "INT",
             "DINT",
@@ -841,12 +841,12 @@ class BaseRecordPackage:
     def guess_io(self):
         """
         Add information indicating io direction if it is not provided.
-        
+
         Returns
         -------
         bool
             Return a boolean that is true iff a change has been made.
-    
+
         """
         try:
             [io] =  self.cfg.get_config_lines('io')
@@ -858,16 +858,16 @@ class BaseRecordPackage:
     def guess_DTYP(self):
         """
         Add field specifying DTYP.
-        
+
         The following is taken from the EPICS wiki: "This field specifies the
         device type for the record. Each record type has its own set of device
         support routines which are specified in devSup.ASCII. If a record type
         does not have any associated device support, DTYP and DSET are
         meaningless."
-    
+
         Returns
         -------
-        bool 
+        bool
             Return a boolean that is True iff a change has been made.
         """
         try:
@@ -875,10 +875,10 @@ class BaseRecordPackage:
             return False
         except ValueError:
             pass
-        
+
         [io] =  self.cfg.get_config_lines('io')
-        io = io['tag'] 
-        
+        io = io['tag']
+
         BOOL_set = {"BOOL"}
         if self.chain.last.tc_type in BOOL_set:
             base = '"asynInt32'
@@ -912,7 +912,7 @@ class BaseRecordPackage:
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
                 return True
-        
+
         DINT_set = {"DINT"}
         if self.chain.last.tc_type in DINT_set:
             base = '"asynInt32'
@@ -929,7 +929,7 @@ class BaseRecordPackage:
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
                 return True
-        
+
         REAL_set = {"REAL"}
         if self.chain.last.tc_type in REAL_set:
             base = '"asynFloat32'
@@ -946,7 +946,7 @@ class BaseRecordPackage:
             else:
                 self.cfg.add_config_field("DTYP", base+'"')
                 return True
-        
+
         LREAL_set = {"LREAL"}
         if self.chain.last.tc_type in LREAL_set:
             base = '"asynFloat64'
@@ -977,14 +977,14 @@ class BaseRecordPackage:
                 self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
                 return True
 
-        return False 
+        return False
 
     def guess_INP_OUT(self):
         """
         Construct, add, INP or OUT field
         Fields will have this form:
         "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
-        
+
         Returns
         -------
         bool
@@ -1001,7 +1001,7 @@ class BaseRecordPackage:
             assign_symbol = "?"
             if self.chain.last.is_array or self.chain.last.is_str:
                 field_type = 'INP'
-            else:    
+            else:
                 field_type = 'OUT'
         elif 'i' in io:
             assign_symbol = "?"
@@ -1010,7 +1010,7 @@ class BaseRecordPackage:
             assign_symbol = "="
             if self.chain.last.is_array or self.chain.last.is_str:
                 field_type = 'INP'
-            else:    
+            else:
                 field_type = 'OUT'
 
         str_template = '"@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"'
@@ -1020,7 +1020,7 @@ class BaseRecordPackage:
             name = name,
             symbol = assign_symbol,
         )
-        
+
         try:
             [res] =  self.cfg.get_config_fields(field_type)
             return False
@@ -1033,7 +1033,7 @@ class BaseRecordPackage:
     def guess_SCAN(self):
         """
         add field for SCAN field
-        
+
         Returns
         -------
         bool
@@ -1050,13 +1050,13 @@ class BaseRecordPackage:
             self.cfg.add_config_field("SCAN", '"Passive"')
             self.cfg.add_config_line("info",True)
             return True
-            
+
         elif 'i' in io['tag']:
             fast_i_set = {'BOOL'}
             if self.chain.last.tc_type in fast_i_set:
                 self.cfg.add_config_field("SCAN", '"I/O Intr"')
                 return True
-            else: 
+            else:
                 self.cfg.add_config_field("SCAN", '".5 second"')
                 return True
         elif 'o' in io['tag']:
@@ -1065,19 +1065,19 @@ class BaseRecordPackage:
 
 
         return False
-    
+
     ### guess lines below this comment are not always used (context specific)
 
     def guess_OZ_NAM(self):
         """
         Add ONAM and ZNAM fields for booleans
-        
+
         Returns
         -------
         bool
             Return a boolean that is true iff a change has been made.
         """
-        result = False 
+        result = False
         o =  self.cfg.get_config_fields("ONAM")
         z =  self.cfg.get_config_fields("ZNAM")
         one_zero_set = {"BOOL"}
@@ -1088,13 +1088,13 @@ class BaseRecordPackage:
             if len(z) < 1:
                 self.cfg.add_config_field("ZNAM","Zero")
                 result = result or True
-    
+
         return result
 
     def guess_PREC(self):
         """
         Add precision field for the ai/ao type
-        
+
         Returns
         -------
         bool
@@ -1105,7 +1105,7 @@ class BaseRecordPackage:
             return False
         except ValueError:
             pass
-        
+
         try:
             [epics_type] = self.cfg.get_config_lines("type")
         except ValueError:
@@ -1164,9 +1164,9 @@ class BaseRecordPackage:
             return False
         except ValueError:
             pass
-        
+
         if self.chain.last.is_array or self.chain.last.is_str:
-            length = self.chain.last.iterable_length 
+            length = self.chain.last.iterable_length
             self.cfg.add_config_field("NELM", length)
             return True
 
@@ -1175,12 +1175,12 @@ class BaseRecordPackage:
     def guess_all(self):
         """
         Cycle through guessing methods until none can be applied.
-        guessing methods is a list of functions. 
+        guessing methods is a list of functions.
         """
         complete = False
         count = 0
         while not complete:
-            count += 1 
+            count += 1
             assert count < 20
             complete = True
             for method in self.guess_methods_list:
@@ -1190,10 +1190,7 @@ class BaseRecordPackage:
     def render_to_string(self):
         """
         Create the individual record to be inserted in the DB file. To be
-        returned as a string. 
+        returned as a string.
         redundant?
         """
         raise NotImplementedError
-
-
-

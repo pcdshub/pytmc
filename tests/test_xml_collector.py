@@ -99,14 +99,14 @@ def test_TmcFile_isolate_SubItems(generic_tmc_path):
     assert 'lim' in tmc.all_SubItems['iterator']
     assert 'extra1' in tmc.all_SubItems['iterator']
     assert 'extra2' in tmc.all_SubItems['iterator']
-   
+
     assert len(tmc.all_SubItems['iterator']) == 6
 
 
 def test_TmcFile_isolate_all(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
     tmc.isolate_all()
-    
+
     assert "MAIN.ulimit" in tmc.all_Symbols
     assert "MAIN.count" in tmc.all_Symbols
     assert "MAIN.NEW_VAR" in tmc.all_Symbols
@@ -127,9 +127,9 @@ def test_TmcFile_isolate_all(generic_tmc_path):
     assert 'lim' in tmc.all_SubItems['iterator']
     assert 'extra1' in tmc.all_SubItems['iterator']
     assert 'extra2' in tmc.all_SubItems['iterator']
-   
+
     assert len(tmc.all_SubItems['iterator']) == 6
-    
+
     assert tmc.all_Symbols['MAIN.dtype_samples_enum'].is_enum
     assert tmc.all_SubItems['DUT_CONTAINER']['dtype_enum'].is_enum
 
@@ -211,7 +211,7 @@ def test_TmcFile_create_chains(generic_tmc_path):
             break
     assert accept
 
-    
+
     target = [
         tmc.all_Symbols['MAIN.test_iterator'],
         tmc.all_SubItems['iterator']['extra1'],
@@ -227,12 +227,12 @@ def test_TmcFile_create_chains(generic_tmc_path):
 
 def test_TmcFile_isolate_chains(generic_tmc_path):
     tmc = TmcFile(generic_tmc_path)
-    
+
     tmc.create_chains()
     tmc.isolate_chains()
     print(len(tmc.all_TmcChains))
     print(len(tmc.all_singular_TmcChains))
-    
+
     target = [
         tmc.all_Symbols['MAIN.test_iterator'],
         tmc.all_SubItems['iterator']['extra1'],
@@ -258,18 +258,18 @@ def test_TmcFile_create_packages(example_singular_tmc_chains):
         cn = example_singular_tmc_chains[idx]
         for element, ix in zip(cn.chain,range(len(cn.chain))):
             element.name = chr(97+ix)
-        
-        cn.last.tc_type = tc_type 
-        
+
+        cn.last.tc_type = tc_type
+
         tmc.all_TmcChains.append(cn)
-        
+
         # create the check_set
         rec = BaseRecordPackage(cn)
         #rec.naive_config()
         #rec.guess_all()
         logger.debug(str(rec.chain.last.pragma.config))
         check_list.append(rec)
-    
+
     tmc.create_chains()
     logger.debug("all_TmcChains: ")
     for x in tmc.all_TmcChains:
@@ -282,7 +282,7 @@ def test_TmcFile_create_packages(example_singular_tmc_chains):
     logger.debug("all_RecordPackages: ")
     for x in tmc.all_RecordPackages:
         logger.debug(x.chain.name_list)
-    
+
     assert len(tmc.all_RecordPackages) == 4
     for check, rec in zip(check_list, tmc.all_RecordPackages):
         assert check.cfg.config == rec.cfg.config
@@ -297,23 +297,23 @@ def test_TmcFile_configure_packages(example_singular_tmc_chains):
         cn = example_singular_tmc_chains[idx]
         for element, ix in zip(cn.chain,range(len(cn.chain))):
             element.name = chr(97+ix)
-        
-        cn.last.tc_type = tc_type 
-        
+
+        cn.last.tc_type = tc_type
+
         tmc.all_TmcChains.append(cn)
-        
+
         # create the check_set
         rec = BaseRecordPackage(cn)
         rec.generate_naive_config()
         rec.guess_all()
         logger.debug(str(rec.chain.last.pragma.config))
         check_list.append(rec)
-    
+
     tmc.create_chains()
     tmc.isolate_chains()
     tmc.create_packages()
     tmc.configure_packages()
-    
+
     assert len(tmc.all_RecordPackages) == 4
     for check, rec in zip(check_list, tmc.all_RecordPackages):
         assert check.cfg.config == rec.cfg.config
@@ -347,7 +347,7 @@ def test_TmcFile_render(generic_tmc_path):
 
     tmc.all_RecordPackages.append(brp1)
     tmc.all_RecordPackages.append(brp2)
-    
+
     target_response="""\
     record(ao,"example_pv"){
       field(PINI, "VX")
@@ -360,7 +360,7 @@ def test_TmcFile_render(generic_tmc_path):
       field(NELM, 2)
       field(ABC, "test k")
     }
-    
+
     """
     target_response = textwrap.dedent(target_response)
     assert target_response == tmc.render()
@@ -371,7 +371,7 @@ def test_TmcFile_render(generic_tmc_path):
 def test_TmcChain_forkmap(generic_tmc_path, leaf_bool_pragma_string,
             branch_bool_pragma_string, branch_connection_pragma_string):
     stem = BaseElement(element=None)
-    stem.pragma = Configuration(branch_connection_pragma_string) 
+    stem.pragma = Configuration(branch_connection_pragma_string)
     leaf_a = BaseElement(element=None)
     leaf_a.pragma = Configuration(branch_bool_pragma_string)
     leaf_b = BaseElement(element=None)
@@ -393,7 +393,7 @@ def test_TmcChain_forkmap(generic_tmc_path, leaf_bool_pragma_string,
 def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
             branch_bool_pragma_string, branch_connection_pragma_string):
     stem = BaseElement(element=None)
-    stem.pragma = Configuration(branch_connection_pragma_string) 
+    stem.pragma = Configuration(branch_connection_pragma_string)
     leaf_a = BaseElement(element=None)
     leaf_a.pragma = Configuration(branch_bool_pragma_string)
     leaf_b = BaseElement(element=None)
@@ -407,7 +407,7 @@ def test_TmcChain_is_singular(generic_tmc_path, leaf_bool_pragma_string,
 
     for element in chain.chain:
         element.pragma.fix_to_config_name(element.pragma.config_names()[0])
-    
+
     # for element in chain.chain:
         # print(element.pragma.config)
 
@@ -440,7 +440,7 @@ def test_TmcChain_build_singular_chains(use_base_pragma, generic_tmc_path,
             branch_connection_pragma_string):
     stem = BaseElement(element=None)
     if use_base_pragma:
-        stem.pragma = Configuration(branch_connection_pragma_string) 
+        stem.pragma = Configuration(branch_connection_pragma_string)
     leaf_a = BaseElement(element=None)
     leaf_a.pragma = Configuration(branch_bool_pragma_string)
     leaf_b = BaseElement(element=None)
@@ -455,17 +455,17 @@ def test_TmcChain_build_singular_chains(use_base_pragma, generic_tmc_path,
     for x in response_set:
         logger.debug(str(x.forkmap()))
         assert x.is_singular()
-    
+
     for x in response_set:
         for y in response_set:
             if x is y:
                 continue
             if x == y:
                 assert False
-    
+
     if answer_set is 0:
         assert response_set == []
-    
+
     if answer_set is 1:
         assert len(response_set) == 4
         assert response_set[0].forkmap() == [
@@ -491,11 +491,11 @@ def test_TmcChain_build_singular_chains(use_base_pragma, generic_tmc_path,
 
 
 @pytest.fixture(scope='function')
-def sample_TmcChain(generic_tmc_path, 
+def sample_TmcChain(generic_tmc_path,
             leaf_bool_pragma_string, branch_bool_pragma_string,
             branch_connection_pragma_string):
     stem = BaseElement(element=None)
-    stem.pragma = Configuration(branch_connection_pragma_string) 
+    stem.pragma = Configuration(branch_connection_pragma_string)
     leaf_a = BaseElement(element=None)
     leaf_a.pragma = Configuration(branch_bool_pragma_string)
     leaf_b = BaseElement(element=None)
@@ -504,7 +504,7 @@ def sample_TmcChain(generic_tmc_path,
     chain = TmcChain(
         [stem, leaf_a, leaf_b]
     )
-    
+
     return chain
 
 
@@ -557,7 +557,7 @@ def test_BaseRecordPackage_apply_config_valid(sample_TmcChain):
     brp.generate_naive_config()
     for x in brp.cfg.config:
         print(x)
-    
+
     brp.validation_list = [
         {'path':[],'target':3},
     ]
@@ -612,7 +612,7 @@ def test_BaseRecordPackage_ID_type():
     brp.cfg.add_config_line('type','ao')
     brp.cfg.add_config_field("PINI","1")
     assert brp.ID_type() == 'standard'
-    
+
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv','example_pv')
     brp.cfg.add_config_line('type','motor')
@@ -700,7 +700,7 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
 
     assert True == record.guess_type()
     [field] = record.cfg.get_config_lines('type')
-    assert field['tag'] == final_type 
+    assert field['tag'] == final_type
 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_io",[
@@ -721,7 +721,7 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     assert True == record.guess_io()
     print(record.cfg.config)
     [field] = record.cfg.get_config_lines('io')
-    assert field['tag'] == final_io 
+    assert field['tag'] == final_io
 
 
 @pytest.mark.parametrize("tc_type, io, is_array, final_DTYP",[
@@ -786,7 +786,7 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     assert True == record.guess_DTYP()
     logger.debug((record.cfg.config))
     [field] = record.cfg.get_config_fields('DTYP')
-    assert field['tag']['f_set'] == final_DTYP 
+    assert field['tag']['f_set'] == final_DTYP
 
 
 @pytest.mark.parametrize("tc_type, sing_index, field_type, final_INP_OUT",[
@@ -818,13 +818,13 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     record.guess_io()
     assert True == record.guess_INP_OUT()
     print(record.cfg.config)
-    
+
     [field] = record.cfg.get_config_fields(field_type)
     if field_type == "OUT":
         assert record.cfg.get_config_fields('INP') == []
     if field_type == "INP":
         assert record.cfg.get_config_fields('OUT') == []
-    
+
     assert field['tag']['f_set'] == final_INP_OUT
 
 
@@ -854,7 +854,7 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
     assert True == record.guess_SCAN()
     logger.debug(str(record.cfg.config))
     [field] = record.cfg.get_config_fields('SCAN')
-    assert field['tag']['f_set'] == final_SCAN 
+    assert field['tag']['f_set'] == final_SCAN
 
 @pytest.mark.parametrize("tc_type, sing_index, final_ZNAM, final_ONAM, ret",[
         ("BOOL", 0, 'Zero', "One", True),
@@ -873,7 +873,7 @@ def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
     else:
         assert len(o) == 0
     if final_ZNAM is not None:
-        assert z[0]['tag']['f_set'] == final_ZNAM 
+        assert z[0]['tag']['f_set'] == final_ZNAM
     else :
         assert len(z) == 0
 
@@ -895,7 +895,7 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
     else:
         assert True == record.guess_PREC()
         [out] = record.cfg.get_config_fields("PREC")
-        assert out['tag']['f_set'] == '"3"' 
+        assert out['tag']['f_set'] == '"3"'
 
 
 @pytest.mark.parametrize("tc_type, io, is_str, is_arr, final_FTVL",[
@@ -975,7 +975,7 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
         assert True == result
         [out] = record.cfg.get_config_fields("NELM")
         assert out['tag']['f_set'] == final_NELM
-        
+
 
 @pytest.mark.parametrize(
     "tc_type, sing_index, is_str, is_arr, final_NELM, spot_check, result",[
@@ -986,7 +986,7 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
         ("LREAL", 0, False, True, 9, "FTVL",'"DOUBLE"'),
         ("STRING", 0, True, False, 12,"FTVL",'"CHAR"'),
 ])
-def test_BaseRecordPackage_guess_all(example_singular_tmc_chains, tc_type, 
+def test_BaseRecordPackage_guess_all(example_singular_tmc_chains, tc_type,
             sing_index, is_str, is_arr, final_NELM, spot_check, result):
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
     record.chain.last.tc_type = tc_type
