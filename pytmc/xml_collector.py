@@ -4,19 +4,16 @@ xml_collector.py
 This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation
 """
-import typing
 import logging
 import xml.etree.ElementTree as ET
 
-from collections import defaultdict, OrderedDict as odict
-from copy import deepcopy, copy
-from functools import reduce
+from collections import defaultdict
+from copy import deepcopy
 
 from jinja2 import Environment, PackageLoader
 
 from . import Symbol, DataType, SubItem
-from .beckhoff import beckhoff_types
-from .xml_obj import BaseElement, Configuration
+from .xml_obj import Configuration
 
 
 logger = logging.getLogger(__name__)
