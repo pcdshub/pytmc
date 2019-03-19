@@ -420,11 +420,8 @@ class Configuration:
         if other.__class__ != Configuration:
             return False
 
-        if (other._raw_config == self._raw_config
-                and other.config == self.config):
-            return True
-
-        return False
+        return (other._raw_config == self._raw_config and
+                other.config == self.config)
 
     def concat(self, other, cc_symbol=":"):
         """
@@ -640,10 +637,7 @@ class BaseElement:
         bool
             True if there is a config pragma attached to this xml element
         '''
-        if self.raw_config is not None:
-            return True
-
-        return False
+        return self.raw_config is not None
 
     def _get_subfield(self, field_target, get_all=False):
         """
@@ -691,9 +685,7 @@ class BaseElement:
             return self.is_array_
         if self.element is None:
             return False
-        if self._get_subfield('ArrayInfo') is not None:
-            return True
-        return False
+        return self._get_subfield('ArrayInfo') is not None
 
     @is_array.setter
     def is_array(self, new_data):
@@ -723,10 +715,9 @@ class BaseElement:
 
         finder = re.compile(r"(?P<type>STRING)\((?P<count>[0-9]+)\)")
         result = finder.search(base_type_str)
-        if result is None:
-            return False, None
-        if result['type'] == "STRING":
+        if result is not None and result['type'] == "STRING":
             return True, int(result['count'])
+        return False, None
 
     @_string_info.setter
     def _string_info(self, new_data):
@@ -990,9 +981,7 @@ class DataType(BaseElement):
             return self.is_enum_
         if self.element is None:
             return False
-        if self._get_subfield('EnumInfo') is not None:
-            return True
-        return False
+        return self._get_subfield('EnumInfo') is not None
 
 
 class SubItem(BaseElement):
