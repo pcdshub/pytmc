@@ -16,5 +16,8 @@ setup(
             'xmltranslate = pytmc.bin.xmltranslate:main',
         ]
     },
-    include_package_data = True,
+    package_data={
+      'pytmc': ['templates/*'],
+    },
+    include_package_data=True,
 )
