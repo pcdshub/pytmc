@@ -14,7 +14,19 @@ logger = logging.getLogger(__name__)
 description = __doc__
 
 
-def make_db_file(tmc_file_obj):
+def make_db_text(tmc_file_obj):
+    '''
+    Create an EPICS database from a TmcFileA
+
+    Parameters
+    ----------
+    tmc_file_obj : TmcFile
+
+    Returns
+    -------
+    dbtext : str
+        The rendered database text
+    '''
     tmc_file_obj.create_chains()
     tmc_file_obj.isolate_chains()
     tmc_file_obj.create_packages()
@@ -54,7 +66,7 @@ def main():
     with open(args.tmc_file, 'r') as tmc_file:
         tmc_file_obj = pytmc.TmcFile(tmc_file)
 
-    db_string = make_db_file(tmc_file_obj)
+    db_string = make_db_text(tmc_file_obj)
 
     with open(args.record_file, 'wt') as record_file:
         record_file.write(db_string)
