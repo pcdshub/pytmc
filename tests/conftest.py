@@ -1,5 +1,6 @@
 import pytest
 import logging
+import pathlib
 import xml.etree.ElementTree as ET
 import os
 
@@ -9,43 +10,42 @@ from pytmc.xml_obj import BaseElement, Configuration
 
 
 logger = logging.getLogger(__name__)
+TEST_PATH = pathlib.Path(__file__).parent
+TMC_FILES = list(TEST_PATH.glob('*.tmc'))
+DBD_FILE = TEST_PATH / 'ads.dbd'
 
 
-def load_generic_tmc():
-    f = open("generic.tmc", "r")
-    return f
+@pytest.fixture(params=TMC_FILES, ids=[f.name for f in TMC_FILES])
+def tmc_filename(request):
+    return TEST_PATH / request.param
+
+
+@pytest.fixture(scope='function')
+def tmc_root(tmc_filename):
+    tree = ET.parse(tmc_filename)
+    return tree.getroot()
 
 
 @pytest.fixture(scope='function')
 def generic_tmc_root():
-    directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic_w_pragmas180426.tmc")
-    tree = ET.parse(test_path)
-    root = tree.getroot()
-    return root
+    tree = ET.parse(TEST_PATH / "generic_w_pragmas180426.tmc")
+    return tree.getroot()
 
 
 @pytest.fixture(scope='function')
 def string_tmc_path():
-    directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic_w_pragmas180921.tmc")
-    return test_path
+    return TEST_PATH /"generic_w_pragmas180921.tmc"
 
 
 @pytest.fixture(scope='function')
 def string_tmc_root():
-    directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic_w_pragmas180921.tmc")
-    tree = ET.parse(test_path)
-    root = tree.getroot()
-    return root
+    tree = ET.parse(TEST_PATH / "generic_w_pragmas180921.tmc")
+    return tree.getroot()
 
 
 @pytest.fixture(scope='function')
 def generic_tmc_path():
-    directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic_w_pragmas180426.tmc")
-    return test_path
+    return TEST_PATH / "generic_w_pragmas180426.tmc"
 
 
 @pytest.fixture(scope='function')
