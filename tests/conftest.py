@@ -1,3 +1,4 @@
+import contextlib
 import pytest
 import logging
 import pathlib
@@ -13,6 +14,18 @@ logger = logging.getLogger(__name__)
 TEST_PATH = pathlib.Path(__file__).parent
 TMC_FILES = list(TEST_PATH.glob('*.tmc'))
 DBD_FILE = TEST_PATH / 'ads.dbd'
+
+
+@contextlib.contextmanager
+def caplog_at_level(caplog, logger_name, level):
+    'Context manager - capture logs at a specific level'
+    logger = logging.getLogger(logger_name)
+    # This handler setup is necessary for caplog to work, though the docs don't
+    # say anything about this:
+    logger.addHandler(caplog.handler)
+    with caplog.at_level(level, logger_name):
+        yield
+    logger.removeHandler(caplog.handler)
 
 
 @pytest.fixture(params=TMC_FILES, ids=[f.name for f in TMC_FILES])
