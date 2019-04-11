@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 
 import pytest
@@ -14,7 +15,7 @@ dbdlint_logger = logging.getLogger('dbdlint')
 
 
 def test_db_linting(caplog, tmp_path, tmc_filename, monkeypatch):
-    db_fn = tmp_path / 'test.db'
+    db_fn = tmp_path / '{}.db'.format(tmc_filename)
     tmc_file = pytmc.TmcFile(tmc_filename)
     db_text = pytmc.bin.makerecord.make_db_text(tmc_file)
     with open(db_fn, 'wt') as f:
@@ -36,7 +37,16 @@ def test_db_linting(caplog, tmp_path, tmc_filename, monkeypatch):
         dbdlint.main(args)
 
     print('Warnings/errors from the linter:')
-    for line in sorted(set(caplog.text.splitlines())):
+
+    lines = [
+        '{dbfile} line {dbline} {tag}: {msg}'
+        ''.format(dbfile=os.path.split(record.dbfile)[-1],
+                  dbline=record.dbline, tag=record.tag,
+                  msg=record.message)
+        for record in caplog.records
+    ]
+
+    for line in sorted(set(lines)):
         print('[DBDLINT]', line)
 
     # Clear the log so pytest doesn't show the full list:
