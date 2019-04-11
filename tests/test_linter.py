@@ -44,6 +44,7 @@ def test_db_linting(caplog, tmp_path, tmc_filename, monkeypatch):
                   dbline=record.dbline, tag=record.tag,
                   msg=record.message)
         for record in caplog.records
+        if hasattr(record, 'dbfile')
     ]
 
     for line in sorted(set(lines)):
