@@ -938,8 +938,8 @@ class BaseRecordPackage:
 
         REAL_set = {"REAL"}
         if self.chain.last.tc_type in REAL_set:
-            base = '"asynFloat32'
             if self.chain.last.is_array:
+                base = '"asynFloat32'
                 if 'i' in io and 'o' in io:
                     self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
@@ -950,7 +950,7 @@ class BaseRecordPackage:
                     self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
             else:
-                self.cfg.add_config_field("DTYP", base+'"')
+                self.cfg.add_config_field("DTYP", '"asynFloat64"')
                 return True
 
         LREAL_set = {"LREAL"}
