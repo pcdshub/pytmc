@@ -720,7 +720,12 @@ class BaseRecordPackage:
 
     @property
     def valid(self):
-        'Is this a fully specified and valid record?'
+        """
+        Returns
+        -------
+        bool
+            Returns true if this record is fully specified and valid.
+        """
         simple_dict = self.cfg_as_dict()
         has_required_keys = all(simple_dict.get(key)
                                 for key in self._required_keys)
