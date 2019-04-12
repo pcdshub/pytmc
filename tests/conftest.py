@@ -12,8 +12,11 @@ from pytmc.xml_obj import BaseElement, Configuration
 
 logger = logging.getLogger(__name__)
 TEST_PATH = pathlib.Path(__file__).parent
-TMC_FILES = list(TEST_PATH.glob('*.tmc'))
 DBD_FILE = TEST_PATH / 'ads.dbd'
+
+TMC_ROOT = TEST_PATH / 'tmc_files'
+TMC_FILES = list(TMC_ROOT.glob('*.tmc'))
+INVALID_TMC_FILES = list((TMC_ROOT / 'invalid').glob('*.tmc'))
 
 
 @contextlib.contextmanager
@@ -28,9 +31,10 @@ def caplog_at_level(caplog, logger_name, level):
     logger.removeHandler(caplog.handler)
 
 
-@pytest.fixture(params=TMC_FILES, ids=[f.name for f in TMC_FILES])
+@pytest.fixture(params=TMC_FILES,
+                ids=[f.name for f in TMC_FILES])
 def tmc_filename(request):
-    return TEST_PATH / request.param
+    return request.param
 
 
 @pytest.fixture(scope='function')
@@ -40,25 +44,25 @@ def tmc_root(tmc_filename):
 
 
 @pytest.fixture(scope='function')
-def generic_tmc_root():
-    tree = ET.parse(TEST_PATH / "generic_w_pragmas180426.tmc")
+def generic_tmc_path():
+    return TMC_ROOT / "invalid" / "generic_w_pragmas180426.tmc"
+
+
+@pytest.fixture(scope='function')
+def generic_tmc_root(generic_tmc_path):
+    tree = ET.parse(generic_tmc_path)
     return tree.getroot()
 
 
 @pytest.fixture(scope='function')
 def string_tmc_path():
-    return TEST_PATH /"generic_w_pragmas180921.tmc"
+    return TMC_ROOT / "invalid" / "generic_w_pragmas180921.tmc"
 
 
 @pytest.fixture(scope='function')
-def string_tmc_root():
-    tree = ET.parse(TEST_PATH / "generic_w_pragmas180921.tmc")
+def string_tmc_root(string_tmc_path):
+    tree = ET.parse(string_tmc_path)
     return tree.getroot()
-
-
-@pytest.fixture(scope='function')
-def generic_tmc_path():
-    return TEST_PATH / "generic_w_pragmas180426.tmc"
 
 
 @pytest.fixture(scope='function')
@@ -78,17 +82,12 @@ def safe_record_factory():
 
 @pytest.fixture(scope='function')
 def generic_file():
-    directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic.tmc")
-    return TmcFile(test_path)
+    return TmcFile(TMC_ROOT / "generic.tmc")
 
 
 @pytest.fixture(scope='function')
-def generic_explorer():
-    directory = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(directory, "generic.tmc")
-    tmc = TmcFile(test_path)
-    return TmcExplorer(tmc)
+def generic_explorer(generic_file):
+    return TmcExplorer(generic_file)
 
 
 @pytest.fixture(scope='function')

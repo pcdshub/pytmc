@@ -13,10 +13,20 @@ dbdlint = pytest.importorskip('pyPDB.dbdlint')
 
 dbdlint_logger = logging.getLogger('dbdlint')
 
+ALL_TMC_FILES = conftest.TMC_FILES + conftest.INVALID_TMC_FILES
 
-def test_db_linting(caplog, tmp_path, tmc_filename, monkeypatch):
-    db_fn = tmp_path / '{}.db'.format(tmc_filename)
-    tmc_file = pytmc.TmcFile(tmc_filename)
+
+@pytest.mark.parametrize(
+    'filename',
+    [pytest.param(f, marks=pytest.mark.xfail)
+     if f in conftest.INVALID_TMC_FILES else f
+     for f in ALL_TMC_FILES
+     ],
+    ids=[f.name for f in ALL_TMC_FILES]
+)
+def test_db_linting(caplog, tmp_path, filename, monkeypatch):
+    db_fn = tmp_path / '{}.db'.format(filename)
+    tmc_file = pytmc.TmcFile(filename)
     db_text = pytmc.bin.makerecord.make_db_text(tmc_file)
     with open(db_fn, 'wt') as f:
         print(db_text, file=f)
