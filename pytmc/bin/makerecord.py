@@ -16,7 +16,7 @@ description = __doc__
 
 def make_db_text(tmc_file_obj):
     '''
-    Create an EPICS database from a TmcFileA
+    Create an EPICS database from a TmcFile
 
     Parameters
     ----------
