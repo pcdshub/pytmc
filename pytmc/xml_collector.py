@@ -359,7 +359,8 @@ class TmcFile:
         rec_list = []
         for pack in self.all_RecordPackages:
             record_str = pack.render_record()
-            rec_list.append(record_str)
+            if record_str:
+                rec_list.append(record_str)
 
         return self.file_template.render(records=rec_list)
 
@@ -571,6 +572,9 @@ class BaseRecordPackage:
 
     """
 
+    _required_keys = {'pv', 'type', 'field'}
+    _required_fields = {'DTYP', }
+
     def __init__(self, chain=None, origin=None):
         """
         All subclasses should use super on their init method.
@@ -714,6 +718,23 @@ class BaseRecordPackage:
         cfg_dict.setdefault('info', False)
         return cfg_dict
 
+    @property
+    def valid(self):
+        """
+        Returns
+        -------
+        bool
+            Returns true if this record is fully specified and valid.
+        """
+        simple_dict = self.cfg_as_dict()
+        has_required_keys = all(simple_dict.get(key)
+                                for key in self._required_keys)
+
+        fields = simple_dict.get('field', {})
+        has_required_fields = all(fields.get(key)
+                                  for key in self._required_fields)
+        return has_required_keys and has_required_fields
+
     def render_record(self):
         """
         Returns
@@ -722,13 +743,9 @@ class BaseRecordPackage:
             Jinja rendered entry for this BaseRecordPackage
         """
         simple_dict = self.cfg_as_dict()
-        try:
-            if simple_dict['pv'] == "":
-                print(self.cfg.config)
-                print(self.chain)
-        except KeyError:
-            print(self.cfg.config)
-            print(self.chain)
+        if not self.valid:
+            logger.error('Unable to render record: %s', simple_dict)
+            return
 
         return self.record_template.render(**simple_dict)
 
@@ -938,8 +955,8 @@ class BaseRecordPackage:
 
         REAL_set = {"REAL"}
         if self.chain.last.tc_type in REAL_set:
-            base = '"asynFloat32'
             if self.chain.last.is_array:
+                base = '"asynFloat32'
                 if 'i' in io and 'o' in io:
                     self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
@@ -950,7 +967,7 @@ class BaseRecordPackage:
                     self.cfg.add_config_field("DTYP", base+'ArrayOut"')
                     return True
             else:
-                self.cfg.add_config_field("DTYP", base+'"')
+                self.cfg.add_config_field("DTYP", '"asynFloat64"')
                 return True
 
         LREAL_set = {"LREAL"}

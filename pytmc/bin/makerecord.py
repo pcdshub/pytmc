@@ -14,6 +14,27 @@ logger = logging.getLogger(__name__)
 description = __doc__
 
 
+def make_db_text(tmc_file_obj):
+    '''
+    Create an EPICS database from a TmcFile
+
+    Parameters
+    ----------
+    tmc_file_obj : TmcFile
+
+    Returns
+    -------
+    dbtext : str
+        The rendered database text
+    '''
+    tmc_file_obj.create_chains()
+    tmc_file_obj.isolate_chains()
+    tmc_file_obj.create_packages()
+    tmc_file_obj.configure_packages()
+    return tmc_file_obj.render()
+
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=description,
@@ -42,17 +63,13 @@ def main():
     args = parser.parse_args()
     pytmc_logger = logging.getLogger('pytmc')
     pytmc_logger.setLevel(args.log)
-    tmc_file = open(args.tmc_file, 'r')
-    tmc_obj = pytmc.TmcFile(tmc_file)
-    tmc_obj.create_chains()
-    tmc_obj.isolate_chains()
-    tmc_obj.create_packages()
-    tmc_obj.configure_packages()
-    db_string = tmc_obj.render()
-    record_file = open(args.record_file, 'w')
-    record_file.write(db_string)
-    tmc_file.close()
-    record_file.close()
+    with open(args.tmc_file, 'r') as tmc_file:
+        tmc_file_obj = pytmc.TmcFile(tmc_file)
+
+    db_string = make_db_text(tmc_file_obj)
+
+    with open(args.record_file, 'wt') as record_file:
+        record_file.write(db_string)
 
 
 if __name__ == '__main__':

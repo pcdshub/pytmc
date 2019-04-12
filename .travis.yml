@@ -16,7 +16,7 @@ matrix:
 install:
   - sudo apt-get update
   # Install, configure conda
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes --set changeps1 no
@@ -27,8 +27,7 @@ install:
   # Manage conda environment
   - conda create -n pytmc-env pip python=$TRAVIS_PYTHON_VERSION
   - source activate pytmc-env
-  - pip install -U pip
-  - pip install -r requirements.txt
+  - pip install -U pip -r requirements.txt -r dev-requirements.txt
   - pip install -e .
   - pip install coverage codecov
 

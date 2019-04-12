@@ -333,12 +333,14 @@ def test_TmcFile_render(generic_tmc_path):
     brp1 = BaseRecordPackage()
     brp1.cfg.add_config_line('pv', 'example_pv')
     brp1.cfg.add_config_line('type', 'ao')
+    brp1.cfg.add_config_field("DTYP", '"MyDTYP"')
     brp1.cfg.add_config_field("PINI", '"VX"')
     brp1.cfg.add_config_field("NELM", 3)
     brp1.cfg.add_config_field('ABC', '"test 0"')
     brp2 = BaseRecordPackage()
     brp2.cfg.add_config_line('pv', 'example_pv2')
     brp2.cfg.add_config_line('type', 'bi')
+    brp2.cfg.add_config_field("DTYP", '"MyDTYP"')
     brp2.cfg.add_config_field("PINI", '"1"')
     brp2.cfg.add_config_field("NELM", 2)
     brp2.cfg.add_config_field('ABC', '"test k"')
@@ -348,12 +350,14 @@ def test_TmcFile_render(generic_tmc_path):
 
     target_response = """\
     record(ao,"example_pv"){
+      field(DTYP, "MyDTYP")
       field(PINI, "VX")
       field(NELM, 3)
       field(ABC, "test 0")
     }
 
     record(bi,"example_pv2"){
+      field(DTYP, "MyDTYP")
       field(PINI, "1")
       field(NELM, 2)
       field(ABC, "test k")
@@ -588,11 +592,13 @@ def test_BaseRecordPackage_render_record():
     brp = BaseRecordPackage()
     brp.cfg.add_config_line('pv', 'example_pv')
     brp.cfg.add_config_line('type', 'ao')
+    brp.cfg.add_config_field('DTYP', '"MyDTYP"')
     brp.cfg.add_config_field("PINI", '"1"')
     brp.cfg.add_config_field("NELM", 3)
     brp.cfg.add_config_field('ABC', '"test 0"')
     target_response = """\
     record(ao,"example_pv"){
+      field(DTYP, "MyDTYP")
       field(PINI, "1")
       field(NELM, 3)
       field(ABC, "test 0")
@@ -744,9 +750,9 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     ("DINT", 'o', True, '"asynInt32ArrayOut"'),
     ("DINT", 'io', True, '"asynInt32ArrayOut"'),
     # REAL
-    ("REAL", 'i', False, '"asynFloat32"'),
-    ("REAL", 'o', False, '"asynFloat32"'),
-    ("REAL", 'io', False, '"asynFloat32"'),
+    ("REAL", 'i', False, '"asynFloat64"'),
+    ("REAL", 'o', False, '"asynFloat64"'),
+    ("REAL", 'io', False, '"asynFloat64"'),
     ("REAL", 'i', True, '"asynFloat32ArrayIn"'),
     ("REAL", 'o', True, '"asynFloat32ArrayOut"'),
     ("REAL", 'io', True, '"asynFloat32ArrayOut"'),
