@@ -5,7 +5,7 @@ import sys
 import pytest
 
 import pytmc
-import pytmc.bin.makerecord
+import pytmc.bin.pytmc
 
 from . import conftest
 
@@ -27,7 +27,7 @@ ALL_TMC_FILES = conftest.TMC_FILES + conftest.INVALID_TMC_FILES
 def test_db_linting(caplog, tmp_path, filename, monkeypatch):
     db_fn = tmp_path / '{}.db'.format(filename)
     tmc_file = pytmc.TmcFile(filename)
-    db_text = pytmc.bin.makerecord.make_db_text(tmc_file)
+    db_text = pytmc.bin.pytmc.make_db_text(tmc_file)
     with open(db_fn, 'wt') as f:
         print(db_text, file=f)
 
