@@ -20,15 +20,17 @@ install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes --set changeps1 no
-  - conda install conda-build anaconda-client pip
-  - conda update -q conda
+  - conda install conda-build anaconda-client
+  - conda update -q conda conda-build
+  - conda config --add channels pcds-tag
   # Useful for debugging
   - conda info -a
+  - conda build  -q conda-recipe --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
+  - conda config --add channels "file://`pwd`/bld-dir"
   # Manage conda environment
-  - conda create -n pytmc-env pip python=$TRAVIS_PYTHON_VERSION
+  - conda create -n pytmc-env python=$TRAVIS_PYTHON_VERSION pytmc pip
   - source activate pytmc-env
-  - pip install -U pip -r requirements.txt -r dev-requirements.txt
-  - pip install -e .
+  - pip install -U pip -r dev-requirements.txt
 
 script:
   - coverage run run_tests.py
