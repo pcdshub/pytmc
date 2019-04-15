@@ -4,17 +4,17 @@ TwinCAT3 .tmc files. This program is designed to work in conjunction with
 ESSS' m-epics-twincat-ads driver.
 """
 
-import logging
 import argparse
+import logging
+import sys
 
 import pytmc
-
 
 logger = logging.getLogger(__name__)
 description = __doc__
 
 
-def make_db_text(tmc_file_obj):
+def make_db_text(tmc_file_obj, *, dbd_file=None, allow_errors=False):
     '''
     Create an EPICS database from a TmcFile
 
@@ -31,6 +31,20 @@ def make_db_text(tmc_file_obj):
     tmc_file_obj.isolate_chains()
     tmc_file_obj.create_packages()
     tmc_file_obj.configure_packages()
+    if dbd_file is not None:
+        results = tmc_file_obj.validate_with_dbd(dbd_file)
+        for warning in results.warnings:
+            logger.warning('[%s line %s] %s', warning['file'], warning['line'],
+                           warning['message'])
+        for error in results.errors:
+            logger.error('[%s line %s] %s', error['file'], error['line'],
+                         error['message'])
+        if not results.success and not allow_errors:
+            logger.error('Linter errors - failed to create database. '
+                         'To disable this behavior, use the flag '
+                         '--allow-errors')
+            sys.exit(1)
+
     return tmc_file_obj.render()
 
 
@@ -52,6 +66,23 @@ def main():
     )
 
     parser.add_argument(
+        '--dbd',
+        '-d',
+        default=None,
+        type=str,
+        help=('Specify an expanded .dbd file for validating fields '
+              '(requires pyPDB)')
+    )
+
+    parser.add_argument(
+        '--allow-errors',
+        '-i',
+        action='store_true',
+        default=False,
+        help='Generate the .db file even if linter issues are found'
+    )
+
+    parser.add_argument(
         '--log',
         '-l',
         metavar="LOG_LEVEL",
@@ -66,7 +97,9 @@ def main():
     with open(args.tmc_file, 'r') as tmc_file:
         tmc_file_obj = pytmc.TmcFile(tmc_file)
 
-    db_string = make_db_text(tmc_file_obj)
+    db_string = make_db_text(
+        tmc_file_obj, dbd_file=args.dbd, allow_errors=args.allow_errors,
+    )
 
     with open(args.record_file, 'wt') as record_file:
         record_file.write(db_string)

@@ -3,6 +3,7 @@ import logging
 from ._version import get_versions  # noqa
 from .xml_obj import Symbol, DataType, SubItem  # noqa
 from .xml_collector import TmcFile  # noqa
+from . import epics  # noqa
 
 
 logger = logging.getLogger(__name__)
@@ -15,5 +16,6 @@ __all__ = [
     'SubItem',
     'Symbol',
     'TmcFile',
+    'epics',
     'logger',
 ]

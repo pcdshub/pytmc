@@ -352,6 +352,28 @@ class Configuration:
             overwrite=False
         )
 
+    def remove_config_field(self, f_name):
+        """
+        Remove field from config
+
+        Parameters
+        ----------
+        f_name : str
+            The new field type
+
+        Returns
+        -------
+        lines : list
+            The removed entries
+        """
+        removed = [
+            line for line in self.config
+            if line['title'] == 'field' and line['tag']['f_name'] == f_name
+        ]
+        for line in removed:
+            self.config.remove(line)
+        return removed
+
     def get_config_lines(self, title, config=None):
         """
         return list of lines of this title type

@@ -14,7 +14,7 @@ from copy import deepcopy
 
 from jinja2 import Environment, PackageLoader
 
-from . import Symbol, DataType, SubItem
+from . import Symbol, DataType, SubItem, epics
 from .xml_obj import Configuration
 
 
@@ -367,6 +367,33 @@ class TmcFile:
             except ChainNotSingularError:
                 logger.debug("Invalid RecordPackage: %s", pack)
                 self.all_RecordPackages.remove(pack)
+
+    def validate_with_dbd(self, dbd_file, **linter_options):
+        '''
+        Validate all to-be-generated record fields
+
+        Parameters
+        ----------
+        dbd_file : str or DbdFile
+            The dbd file with which to validate
+        **linter_options : dict
+            Options to pass to the linter
+
+        Returns
+        -------
+        pytmc.epics.LinterResults
+            Results from the linting process
+
+        Raises
+        ------
+        DBSyntaxError
+            If db/dbd processing fails
+
+        See also
+        --------
+        pytmc.epics.lint_db
+        '''
+        return epics.lint_db(dbd=dbd_file, db=self.render(), **linter_options)
 
     def render(self):
         """
