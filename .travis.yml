@@ -29,13 +29,11 @@ install:
   - source activate pytmc-env
   - pip install -U pip -r requirements.txt -r dev-requirements.txt
   - pip install -e .
-  - pip install coverage codecov
 
 script:
   - coverage run run_tests.py
   - coverage report -m 
   - set -e
-  - pip install doctr
   - cd docs
   - make html
   - cd ../
