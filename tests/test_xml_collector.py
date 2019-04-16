@@ -368,6 +368,11 @@ def test_TmcFile_render(generic_tmc_path):
     assert target_response == tmc.render()
 
 
+def test_TmcFile_ads_port(tmc_filename):
+    tmc = TmcFile(tmc_filename)
+    assert tmc.ads_port == 851
+
+
 # TmcChain tests
 
 def test_TmcChain_forkmap(generic_tmc_path, leaf_bool_pragma_string,
