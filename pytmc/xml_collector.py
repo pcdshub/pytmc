@@ -120,6 +120,19 @@ class TmcFile:
             "asyn_standard_file.jinja2"
         )
 
+    @property
+    def ads_port(self):
+        """Return the ADS Port defined in the TMC file under ApplicationName"""
+        if not self.root:
+            return None
+        # Grab the ApplicationName from XML Tree
+        element = self.root.find("./Modules/Module/Properties/"
+                                 "Property/[Name='ApplicationName']")
+        element_value = element.find('./Value').text
+        # Parse the value for the port number and convert
+        port = int(re.search('(\d+)', element_value).group())
+        return port
+
     def isolate_Symbols(self):
         '''
         Populate :attr:`~all_Symbols` with a :class:`~pytmc.Symbol`
