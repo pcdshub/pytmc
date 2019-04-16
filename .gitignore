@@ -1,7 +1,8 @@
 # Custom
 *.swp
 *.swo
-
+tests/tmc_files/*.db
+tests/tmc_files/invalid/*.db
 
 
 .DS_store
