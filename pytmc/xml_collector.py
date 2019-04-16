@@ -338,19 +338,13 @@ class TmcFile:
         """
         Apply guessing methods to self.all_RecordPackages.
         """
-        removal_list = []
-        for idx, pack in enumerate(self.all_RecordPackages):
+        for pack in list(self.all_RecordPackages):
             try:
                 pack.generate_naive_config()
                 pack.guess_all()
             except ChainNotSingularError:
-                removal_list.append(idx)
-
-        logger.debug("Invalid RecordPackages: " + str(len(removal_list)))
-        # must remove highest index first so not to disturb index/entry mapping
-        removal_list.reverse()
-        for idx in removal_list:
-            self.all_RecordPackages.pop(idx)
+                logger.debug("Invalid RecordPackage: %s", pack)
+                self.all_RecordPackages.remove(pack)
 
     def render(self):
         """
