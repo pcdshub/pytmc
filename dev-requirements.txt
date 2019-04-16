@@ -1,3 +1,11 @@
 git+https://github.com/epicsdeb/pypdb.git
 # a pyPDB requirement that is not getting installed:
 ply >=3.4
+coverage
+codecov
+doctr
+pytest
+sphinx
+sphinx-rtd-theme
+sphinxcontrib-websupport
+sphinx_autodoc_typehints

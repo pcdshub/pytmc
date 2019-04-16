@@ -1,0 +1,29 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: pytmc
+  version : {{ data.get('version') }}
+
+source:
+  path: ..
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - python {{PY_VER}}*,>=3
+    - setuptools
+
+  run:
+    - python {{PY_VER}}*,>=3
+    - jinja2
+
+test:
+  imports:
+    - pytmc
+
+about:
+  home: https://github.com/slaclab/pytmc
+  license: SLAC Open License
+  summary: Generate Epics DB records from TwinCAT .tmc files

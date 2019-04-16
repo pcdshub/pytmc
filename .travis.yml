@@ -20,30 +20,39 @@ install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes --set changeps1 no
-  - conda install conda-build anaconda-client pip
-  - conda update -q conda
+  - conda install conda-build anaconda-client
+  - conda update -q conda conda-build
+  - conda config --add channels pcds-tag
   # Useful for debugging
   - conda info -a
+  - conda build  -q conda-recipe --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
+  - conda config --add channels "file://`pwd`/bld-dir"
   # Manage conda environment
-  - conda create -n pytmc-env pip python=$TRAVIS_PYTHON_VERSION
+  - conda create -n pytmc-env python=$TRAVIS_PYTHON_VERSION pytmc pip
   - source activate pytmc-env
-  - pip install -U pip -r requirements.txt -r dev-requirements.txt
-  - pip install -e .
-  - pip install coverage codecov
+  - pip install -U pip -r dev-requirements.txt
 
 script:
   - coverage run run_tests.py
   - coverage report -m 
   - set -e
-  - pip install doctr
   - cd docs
   - make html
   - cd ../
   - |
     if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $BUILD_DOCS ]]; then
-      #doctr deploy . --built-docs docs/_build/html --command "touch .nojekyll; git add .nojekyll"
       doctr deploy . --built-docs docs/_build/html
     fi
 
 after_success:
   - codecov
+  - |
+    if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $TRAVIS_BRANCH == $TRAVIS_TAG  && $TRAVIS_TAG != '' ]]; then
+      export ANACONDA_API_TOKEN=$CONDA_UPLOAD_TOKEN_TAG
+      anaconda upload bld-dir/linux-64/*.tar.bz2
+    fi
+  - |
+    if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $TRAVIS_BRANCH == 'master' ]]; then
+      export ANACONDA_API_TOKEN=$CONDA_UPLOAD_TOKEN_DEV
+      anaconda upload bld-dir/linux-64/*.tar.bz2
+    fi
