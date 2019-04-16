@@ -623,12 +623,17 @@ def test_BaseRecordPackage_ID_type():
     assert brp.ID_type() == 'motor'
 
 
-def test_BaseRecordPackage_guess_common():
+def test_BaseRecordPackage_guess_PINI():
     brp = BaseRecordPackage()
-    assert brp.guess_common() is True
+    assert brp.guess_PINI() is True
     print(brp.cfg.config)
     [pini] = brp.cfg.get_config_fields('PINI')
     assert pini['tag']['f_set'] == '"1"'
+
+
+def test_BaseRecordPackage_guess_TSE():
+    brp = BaseRecordPackage()
+    assert brp.guess_TSE() is True
     [tse] = brp.cfg.get_config_fields('TSE')
     assert tse['tag']['f_set'] == '-2'
 
@@ -868,7 +873,8 @@ def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
                                         tc_type, sing_index, final_ZNAM, final_ONAM, ret):
     record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
     record.chain.last.tc_type = tc_type
-    assert ret == record.guess_OZ_NAM()
+    assert ret == record.guess_ONAM()
+    assert ret == record.guess_ZNAM()
     o = record.cfg.get_config_fields('ONAM')
     z = record.cfg.get_config_fields('ZNAM')
     logger.debug(str(record.cfg.config))
