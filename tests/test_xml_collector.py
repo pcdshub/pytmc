@@ -262,7 +262,7 @@ def test_TmcFile_create_packages(example_singular_tmc_chains):
         tmc.all_TmcChains.append(cn)
 
         # create the check_set
-        rec = BaseRecordPackage(cn)
+        rec = BaseRecordPackage(851, cn)
         # rec.naive_config()
         # rec.guess_all()
         logger.debug(str(rec.chain.last.pragma.config))
@@ -301,7 +301,7 @@ def test_TmcFile_configure_packages(example_singular_tmc_chains):
         tmc.all_TmcChains.append(cn)
 
         # create the check_set
-        rec = BaseRecordPackage(cn)
+        rec = BaseRecordPackage(None, cn)
         rec.generate_naive_config()
         rec.guess_all()
         logger.debug(str(rec.chain.last.pragma.config))
@@ -330,14 +330,14 @@ def test_TmcFile_fullbuild(string_tmc_path):
 
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)
-    brp1 = BaseRecordPackage()
+    brp1 = BaseRecordPackage(851)
     brp1.cfg.add_config_line('pv', 'example_pv')
     brp1.cfg.add_config_line('type', 'ao')
     brp1.cfg.add_config_field("DTYP", '"MyDTYP"')
     brp1.cfg.add_config_field("PINI", '"VX"')
     brp1.cfg.add_config_field("NELM", 3)
     brp1.cfg.add_config_field('ABC', '"test 0"')
-    brp2 = BaseRecordPackage()
+    brp2 = BaseRecordPackage(851)
     brp2.cfg.add_config_line('pv', 'example_pv2')
     brp2.cfg.add_config_line('type', 'bi')
     brp2.cfg.add_config_field("DTYP", '"MyDTYP"')
@@ -548,7 +548,7 @@ def test_TmcChain_name_list():
 
 def test_BaseRecordPackage_generate_naive_config(sample_TmcChain):
     test_chain = sample_TmcChain.build_singular_chains()[0]
-    brp = BaseRecordPackage(test_chain)
+    brp = BaseRecordPackage(851, test_chain)
     brp.generate_naive_config()
     assert brp.cfg.config[0:3] == [
         {'title': 'pv', 'tag': 'MIDDLE:FIRST:TEST:MAIN:NEW_VAR_OUT'},
@@ -559,7 +559,7 @@ def test_BaseRecordPackage_generate_naive_config(sample_TmcChain):
 
 def test_BaseRecordPackage_apply_config_valid(sample_TmcChain):
     test_chain = sample_TmcChain.build_singular_chains()[0]
-    brp = BaseRecordPackage(test_chain)
+    brp = BaseRecordPackage(851, test_chain)
     brp.generate_naive_config()
     for x in brp.cfg.config:
         print(x)
@@ -579,7 +579,7 @@ def test_BaseRecordPackage_apply_config_valid(sample_TmcChain):
 
 
 def test_BaseRecordPackage_cfg_as_dict():
-    brp = BaseRecordPackage()
+    brp = BaseRecordPackage(851)
     brp.cfg.add_config_line('pv', 'example_pv')
     brp.cfg.add_config_line('type', 'ao')
     brp.cfg.add_config_field('ABC', 'test 0')
@@ -594,7 +594,7 @@ def test_BaseRecordPackage_cfg_as_dict():
 
 
 def test_BaseRecordPackage_render_record():
-    brp = BaseRecordPackage()
+    brp = BaseRecordPackage(851)
     brp.cfg.add_config_line('pv', 'example_pv')
     brp.cfg.add_config_line('type', 'ao')
     brp.cfg.add_config_field('DTYP', '"MyDTYP"')
@@ -615,13 +615,13 @@ def test_BaseRecordPackage_render_record():
 
 @pytest.mark.skip(reason="Feature pending")
 def test_BaseRecordPackage_ID_type():
-    brp = BaseRecordPackage()
+    brp = BaseRecordPackage(851)
     brp.cfg.add_config_line('pv', 'example_pv')
     brp.cfg.add_config_line('type', 'ao')
     brp.cfg.add_config_field("PINI", "1")
     assert brp.ID_type() == 'standard'
 
-    brp = BaseRecordPackage()
+    brp = BaseRecordPackage(851)
     brp.cfg.add_config_line('pv', 'example_pv')
     brp.cfg.add_config_line('type', 'motor')
     brp.cfg.add_config_field("PINI", "1")
@@ -629,7 +629,7 @@ def test_BaseRecordPackage_ID_type():
 
 
 def test_BaseRecordPackage_guess_PINI():
-    brp = BaseRecordPackage()
+    brp = BaseRecordPackage(851)
     assert brp.guess_PINI() is True
     print(brp.cfg.config)
     [pini] = brp.cfg.get_config_fields('PINI')
@@ -702,7 +702,7 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     #     z.generate_naive_config()
     #     print(z.cfg.config)
     # assert False
-    record = BaseRecordPackage(example_singular_tmc_chains[0])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[0])
     logger.debug(str(record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
@@ -725,7 +725,7 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
 def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
                                     tc_type, sing_index, final_io):
     # chain must be broken into singular
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     logger.debug(str(record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
@@ -788,7 +788,7 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
                                       tc_type, io, is_array, final_DTYP):
     # chain must be broken into singular
-    record = BaseRecordPackage(example_singular_tmc_chains[0])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[0])
     logger.debug((record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
@@ -819,7 +819,7 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
 def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
                                          tc_type, sing_index, field_type, final_INP_OUT):
     # chain must be broken into singular
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
     record.chain.last.tc_type = tc_type
@@ -857,7 +857,7 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
 ])
 def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
                                       tc_type, sing_index, final_SCAN):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     logger.debug((record.chain.last.pragma.config))
     # tc_type is assignable because it isn't implemented in BaseElement
     # this field must be added because it is typically derived from the .tmc
@@ -876,7 +876,7 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
 ])
 def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
                                         tc_type, sing_index, final_ZNAM, final_ONAM, ret):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     record.chain.last.tc_type = tc_type
     assert ret == record.guess_ONAM()
     assert ret == record.guess_ZNAM()
@@ -899,7 +899,7 @@ def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
 ])
 def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
                                       tc_type, sing_index, final_PREC, ret):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     record.chain.last.tc_type = tc_type
     record.generate_naive_config()
     print(record.cfg.config)
@@ -949,7 +949,7 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
 ])
 def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
                                       tc_type, io, is_str, is_arr, final_FTVL):
-    record = BaseRecordPackage(example_singular_tmc_chains[0])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[0])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
@@ -975,7 +975,7 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
 ])
 def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
                                       tc_type, sing_index, is_str, is_arr, final_NELM):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
@@ -1004,7 +1004,7 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
     ])
 def test_BaseRecordPackage_guess_all(example_singular_tmc_chains, tc_type,
                                      sing_index, is_str, is_arr, final_NELM, spot_check, result):
-    record = BaseRecordPackage(example_singular_tmc_chains[sing_index])
+    record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
