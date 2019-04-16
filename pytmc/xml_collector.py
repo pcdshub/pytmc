@@ -122,7 +122,14 @@ class TmcFile:
 
     @property
     def ads_port(self):
-        """Return the ADS Port defined in the TMC file under ApplicationName"""
+        """
+        Return the ADS Port defined in the TMC file under ApplicationName
+
+        Returns
+        -------
+        int:
+            The ADS Port defined in the TMC file under ApplicationName
+        """
         if not self.root:
             return None
         # Grab the ApplicationName from XML Tree
