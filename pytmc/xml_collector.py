@@ -344,7 +344,7 @@ class TmcFile:
         packages. requires self.all_singular_TmcChains to be populated.
         """
         for singular_chain in self.all_singular_TmcChains:
-            brp = BaseRecordPackage(chain=singular_chain)
+            brp = BaseRecordPackage(self.ads_port, chain=singular_chain)
             #brp = BaseRecordPackage(chain=singular_chain, origin=chain)
             self.all_RecordPackages.append(brp)
 
@@ -583,7 +583,7 @@ class BaseRecordPackage:
     _required_keys = {'pv', 'type', 'field'}
     _required_fields = {'DTYP', }
 
-    def __init__(self, chain=None, origin=None):
+    def __init__(self, ads_port, chain=None, origin=None):
         """
         All subclasses should use super on their init method.
         """
@@ -630,7 +630,7 @@ class BaseRecordPackage:
             "asyn_standard_file.jinja2"
         )
 
-        self.ads_port = 851
+        self.ads_port = ads_port
 
     def apply_config_validation(self):
         """
