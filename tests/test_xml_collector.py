@@ -637,7 +637,7 @@ def test_BaseRecordPackage_guess_PINI():
 
 
 def test_BaseRecordPackage_guess_TSE():
-    brp = BaseRecordPackage()
+    brp = BaseRecordPackage(851)
     assert brp.guess_TSE() is True
     [tse] = brp.cfg.get_config_fields('TSE')
     assert tse['tag']['f_set'] == '-2'
