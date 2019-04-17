@@ -4,6 +4,7 @@ xml_collector.py
 This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation
 """
+import re
 import logging
 import functools
 import xml.etree.ElementTree as ET
