@@ -9,7 +9,7 @@ import logging
 import functools
 import xml.etree.ElementTree as ET
 
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from copy import deepcopy
 
 from jinja2 import Environment, PackageLoader
@@ -579,6 +579,57 @@ class TmcChain:
         return "TmcChain: " + str(self.name_list)
 
 
+RecordSpec = namedtuple('RecordSpec',
+                        ['input_record_type', 'output_record_type',
+                         'data_type'])
+
+data_types = {
+    'scalar': {
+        'BOOL': RecordSpec('bi', 'bo', 'asynInt32'),
+        'BYTE': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'SINT': RecordSpec('longin', 'longout', 'asynInt32'),
+        'USINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+
+        # TODO: WORD should be ('longin', 'longout', 'asynUInt32Digital'),
+        'WORD': RecordSpec('ai', 'ao', 'asynInt32'),
+        # TODO: INT should be ('longin', 'longout', 'asynInt32'),
+        'INT': RecordSpec('ai', 'ao', 'asynInt32'),
+        # TODO: UINT should be ('longin', 'longout', 'asynUInt32Digital'),
+        'UINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+
+        # TODO: DWORD should be ('longin', 'longout', 'asynUInt32Digital'),
+        'DWORD': RecordSpec('ai', 'ao', 'asynInt32'),
+        # TODO: DINT should be ('longin', 'longout', 'asynInt32'),
+        'DINT': RecordSpec('ai', 'ao', 'asynInt32'),
+        'ENUM': RecordSpec('ai', 'ao', 'asynInt32'),
+
+        'REAL': RecordSpec('ai', 'ao', 'asynFloat64'),
+        'LREAL': RecordSpec('ai', 'ao', 'asynFloat64'),
+    },
+    'array': {
+        # Assumes ArrayIn/ArrayOut will be appended
+        'BOOL': RecordSpec('waveform', 'waveform', 'asynInt8'),
+        'BYTE': RecordSpec('waveform', 'waveform', 'asynInt8'),
+        'SINT': RecordSpec('waveform', 'waveform', 'asynInt8'),
+        'USINT': RecordSpec('waveform', 'waveform', 'asynInt8'),
+
+        'WORD': RecordSpec('waveform', 'waveform', 'asynInt16'),
+        'INT': RecordSpec('waveform', 'waveform', 'asynInt16'),
+        'UINT': RecordSpec('waveform', 'waveform', 'asynInt16'),
+
+        'DWORD': RecordSpec('waveform', 'waveform', 'asynInt32'),
+        'DINT': RecordSpec('waveform', 'waveform', 'asynInt32'),
+        'UDINT': RecordSpec('waveform', 'waveform', 'asynInt32'),
+        'ENUM': RecordSpec('waveform', 'waveform', 'asynInt16'),  # -> Int32?
+
+        'REAL': RecordSpec('waveform', 'waveform', 'asynFloat32'),
+        'LREAL': RecordSpec('waveform', 'waveform', 'asynFloat64'),
+
+        'STRING': RecordSpec('waveform', 'waveform', 'asynInt8'),
+    },
+}
+
+
 class BaseRecordPackage:
     """
     BaseRecordPackage includes some basic funcionality that should be shared
@@ -820,6 +871,31 @@ class BaseRecordPackage:
         self.cfg.add_config_field("TSE", "-2")
         return True
 
+    @property
+    def io_direction(self):
+        """
+        Determine the direction based on the `io` config lines
+
+        Returns
+        -------
+        direction : str
+            {'input', 'output'}
+
+        Raises
+        ------
+        ValueError
+            If unable to determine IO direction
+        """
+        io, = self.cfg.get_config_lines('io')
+        io = io['tag']
+
+        if 'i' in io and 'o' in io:
+            return 'output'
+        elif 'i' in io:
+            return 'input'
+        elif 'o' in io:
+            return 'output'
+
     def guess_type(self):
         """
         Add information indicating record type (e.g. ai, bo, waveform, etc.)
@@ -836,73 +912,27 @@ class BaseRecordPackage:
             pass
 
         try:
-            io, = self.cfg.get_config_lines('io')
+            direction = self.io_direction
         except ValueError:
             return False
 
-        # must be tested first, arrays will have the tc_type of the iterable:
-        if self.chain.last.is_array:
-            io, = self.cfg.get_config_lines('io')
-            if 'i' in io['tag'] and 'o' in io['tag']:
-                self.cfg.add_config_line("type", "waveform")
-                return True
-            elif 'i' in io['tag']:
-                self.cfg.add_config_line("type", "waveform")
-                return True
-            elif 'o' in io['tag']:
-                self.cfg.add_config_line("type", "waveform")
-                return True
+        last = self.chain.last
 
-        bi_bo_set = {
-            "BOOL"
-        }
-        if self.chain.last.tc_type in bi_bo_set:
-            io, = self.cfg.get_config_lines('io')
-            if 'i' in io['tag'] and 'o' in io['tag']:
-                self.cfg.add_config_line("type", "bo")
-                return True
-            elif 'i' in io['tag']:
-                self.cfg.add_config_line("type", "bi")
-                return True
-            elif 'o' in io['tag']:
-                self.cfg.add_config_line("type", "bo")
-                return True
+        scalar_key = ('array'
+                      if last.is_array or last.tc_type in {'STRING'}
+                      else 'scalar')
 
-        ai_ao_set = {
-            "INT",
-            "DINT",
-            "REAL",
-            "LREAL",
-            "ENUM",
-        }
-        if self.chain.last.tc_type in ai_ao_set:
-            io, = self.cfg.get_config_lines('io')
-            if 'i' in io['tag'] and 'o' in io['tag']:
-                self.cfg.add_config_line("type", "ao")
-                return True
-            elif 'i' in io['tag']:
-                self.cfg.add_config_line("type", "ai")
-                return True
-            elif 'o' in io['tag']:
-                self.cfg.add_config_line("type", "ao")
-                return True
+        try:
+            spec = data_types[scalar_key][last.tc_type]
+        except KeyError:
+            return False
 
-        waveform_set = {
-            "STRING",
-        }
-        if self.chain.last.tc_type in waveform_set:
-            io, = self.cfg.get_config_lines('io')
-            if 'i' in io['tag'] and 'o' in io['tag']:
-                self.cfg.add_config_line("type", "waveform")
-                return True
-            elif 'i' in io['tag']:
-                self.cfg.add_config_line("type", "waveform")
-                return True
-            elif 'o' in io['tag']:
-                self.cfg.add_config_line("type", "waveform")
-                return True
+        rtyp = (spec.input_record_type
+                if direction == 'input'
+                else spec.output_record_type)
 
-        return False
+        self.cfg.add_config_line("type", rtyp)
+        return True
 
     def guess_io(self):
         """
@@ -937,108 +967,29 @@ class BaseRecordPackage:
         bool
             Return a boolean that is True iff a change has been made.
         """
-        io, = self.cfg.get_config_lines('io')
-        io = io['tag']
+        try:
+            direction = self.io_direction
+        except ValueError:
+            return False
 
-        BOOL_set = {"BOOL"}
-        if self.chain.last.tc_type in BOOL_set:
-            base = '"asynInt32'
-            if self.chain.last.is_array:
-                if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
-                    return True
-                elif 'i' in io:
-                    self.cfg.add_config_field("DTYP", '"asynInt8ArrayIn"')
-                    return True
-                elif 'o' in io:
-                    self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
-                    return True
-            else:
-                self.cfg.add_config_field("DTYP", base+'"')
-                return True
+        last = self.chain.last
+        scalar_key = ('array'
+                      if last.is_array or last.tc_type in {'STRING'}
+                      else 'scalar')
 
-        INT_set = {"INT", "ENUM"}
-        if self.chain.last.tc_type in INT_set:
-            base = '"asynInt32'
-            if self.chain.last.is_array:
-                if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP", '"asynInt16ArrayOut"')
-                    return True
-                elif 'i' in io:
-                    self.cfg.add_config_field("DTYP", '"asynInt16ArrayIn"')
-                    return True
-                elif 'o' in io:
-                    self.cfg.add_config_field("DTYP", '"asynInt16ArrayOut"')
-                    return True
-            else:
-                self.cfg.add_config_field("DTYP", base+'"')
-                return True
+        try:
+            spec = data_types[scalar_key][last.tc_type]
+        except KeyError:
+            return False
 
-        DINT_set = {"DINT"}
-        if self.chain.last.tc_type in DINT_set:
-            base = '"asynInt32'
-            if self.chain.last.is_array:
-                if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
-                    return True
-                elif 'i' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayIn"')
-                    return True
-                elif 'o' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
-                    return True
-            else:
-                self.cfg.add_config_field("DTYP", base+'"')
-                return True
+        direction_suffix = ''
+        if scalar_key == 'array':
+            direction_suffix = ('ArrayIn'
+                                if direction == 'input'
+                                else 'ArrayOut')
 
-        REAL_set = {"REAL"}
-        if self.chain.last.tc_type in REAL_set:
-            if self.chain.last.is_array:
-                base = '"asynFloat32'
-                if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
-                    return True
-                elif 'i' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayIn"')
-                    return True
-                elif 'o' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
-                    return True
-            else:
-                self.cfg.add_config_field("DTYP", '"asynFloat64"')
-                return True
-
-        LREAL_set = {"LREAL"}
-        if self.chain.last.tc_type in LREAL_set:
-            base = '"asynFloat64'
-            if self.chain.last.is_array:
-                if 'i' in io and 'o' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
-                    return True
-                elif 'i' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayIn"')
-                    return True
-                elif 'o' in io:
-                    self.cfg.add_config_field("DTYP", base+'ArrayOut"')
-                    return True
-            else:
-                self.cfg.add_config_field("DTYP", base+'"')
-                return True
-
-        asynInt8ArrayOut_set = {"STRING"}
-        if self.chain.last.tc_type in asynInt8ArrayOut_set:
-            io, = self.cfg.get_config_lines('io')
-            if 'i' in io['tag'] and 'o' in io['tag']:
-                self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
-                return True
-            elif 'i' in io['tag']:
-                self.cfg.add_config_field("DTYP", '"asynInt8ArrayIn"')
-                return True
-            elif 'o' in io['tag']:
-                self.cfg.add_config_field("DTYP", '"asynInt8ArrayOut"')
-                return True
-
-        return False
+        self.cfg.add_config_field("DTYP", '"{}"'.format(spec.data_type + direction_suffix))
+        return True
 
     def guess_INP_OUT(self):
         """
