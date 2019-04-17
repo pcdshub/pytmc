@@ -4,6 +4,7 @@ xml_collector.py
 This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation
 """
+import re
 import logging
 import functools
 import xml.etree.ElementTree as ET
@@ -119,6 +120,26 @@ class TmcFile:
         self.file_template = self.jinja_env.get_template(
             "asyn_standard_file.jinja2"
         )
+
+    @property
+    def ads_port(self):
+        """
+        Return the ADS Port defined in the TMC file under ApplicationName
+
+        Returns
+        -------
+        int:
+            The ADS Port defined in the TMC file under ApplicationName
+        """
+        if not self.root:
+            return None
+        # Grab the ApplicationName from XML Tree
+        element = self.root.find("./Modules/Module/Properties/"
+                                 "Property/[Name='ApplicationName']")
+        element_value = element.find('./Value').text
+        # Parse the value for the port number and convert
+        port = int(re.search('(\d+)', element_value).group())
+        return port
 
     def isolate_Symbols(self):
         '''
@@ -331,7 +352,7 @@ class TmcFile:
         packages. requires self.all_singular_TmcChains to be populated.
         """
         for singular_chain in self.all_singular_TmcChains:
-            brp = BaseRecordPackage(chain=singular_chain)
+            brp = BaseRecordPackage(self.ads_port, chain=singular_chain)
             #brp = BaseRecordPackage(chain=singular_chain, origin=chain)
             self.all_RecordPackages.append(brp)
 
@@ -570,7 +591,7 @@ class BaseRecordPackage:
     _required_keys = {'pv', 'type', 'field'}
     _required_fields = {'DTYP', }
 
-    def __init__(self, chain=None, origin=None):
+    def __init__(self, ads_port, chain=None, origin=None):
         """
         All subclasses should use super on their init method.
         """
@@ -617,7 +638,7 @@ class BaseRecordPackage:
             "asyn_standard_file.jinja2"
         )
 
-        self.ads_port = 851
+        self.ads_port = ads_port
 
     def apply_config_validation(self):
         """
