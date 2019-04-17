@@ -5,6 +5,7 @@ This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation
 """
 import logging
+import functools
 import xml.etree.ElementTree as ET
 
 from collections import defaultdict
@@ -585,13 +586,15 @@ class BaseRecordPackage:
 
         # List of methods defined in the class
         self.guess_methods_list = [
-            self.guess_common,
+            self.guess_PINI,
+            self.guess_TSE,
             self.guess_type,
             self.guess_io,
             self.guess_DTYP,
             self.guess_INP_OUT,
             self.guess_SCAN,
-            self.guess_OZ_NAM,
+            self.guess_ONAM,
+            self.guess_ZNAM,
             self.guess_PREC,
             self.guess_FTVL,
             self.guess_NELM,
@@ -758,18 +761,43 @@ class BaseRecordPackage:
         """
         raise NotImplementedError
 
-    def guess_common(self):
+    def _skip_if_field_set(field):
+        '''
+        decorator: skip a `guess` function if `field` is already set
+
+        Parameters
+        ----------
+        field : str
+            The field name
+        '''
+        def wrapper(func):
+            @functools.wraps(func)
+            def wrapped(self, *args, **kwargs):
+                try:
+                    field_value, = self.cfg.get_config_fields(field)
+                    return False
+                except ValueError:
+                    pass
+                return func(self, *args, **kwargs)
+            return wrapped
+        return wrapper
+
+    @_skip_if_field_set('PINI')
+    def guess_PINI(self):
         """
-        Add fields that are common to all records (PINI, TSE)
+        Add process-on-init (PINI) field
         """
-        try:
-            pini, = self.cfg.get_config_fields('PINI')
-            tse, = self.cfg.get_config_fields('TSE')
-            return False
-        except ValueError:
-            self.cfg.add_config_field("PINI", '"1"')
-            self.cfg.add_config_field("TSE", "-2")
-            return True
+        self.cfg.add_config_field("PINI", '"1"')
+        return True
+
+    @_skip_if_field_set('TSE')
+    def guess_TSE(self):
+        """
+        Add timestamp event (TSE) field
+        """
+        # TSE=-2: the device support provides the time stamp from the hardware
+        self.cfg.add_config_field("TSE", "-2")
+        return True
 
     def guess_type(self):
         """
@@ -872,6 +900,7 @@ class BaseRecordPackage:
             self.cfg.add_config_line("io", "io")
             return True
 
+    @_skip_if_field_set('DTYP')
     def guess_DTYP(self):
         """
         Add field specifying DTYP.
@@ -887,12 +916,6 @@ class BaseRecordPackage:
         bool
             Return a boolean that is True iff a change has been made.
         """
-        try:
-            dtyp, = self.cfg.get_config_fields('DTYP')
-            return False
-        except ValueError:
-            pass
-
         io, = self.cfg.get_config_lines('io')
         io = io['tag']
 
@@ -1047,6 +1070,7 @@ class BaseRecordPackage:
         self.cfg.add_config_field(field_type, final_str)
         return True
 
+    @_skip_if_field_set('SCAN')
     def guess_SCAN(self):
         """
         add field for SCAN field
@@ -1057,11 +1081,6 @@ class BaseRecordPackage:
             Return a boolean that is true iff a change has been made.
         """
 
-        try:
-            res, = self.cfg.get_config_fields("SCAN")
-            return False
-        except ValueError:
-            pass
         io, = self.cfg.get_config_lines('io')
         if 'i' in io['tag'] and 'o' in io['tag']:
             self.cfg.add_config_field("SCAN", '"Passive"')
@@ -1084,29 +1103,38 @@ class BaseRecordPackage:
 
     # guess lines below this comment are not always used (context specific)
 
-    def guess_OZ_NAM(self):
+    @_skip_if_field_set('ONAM')
+    def guess_ONAM(self):
         """
-        Add ONAM and ZNAM fields for booleans
+        Add ONAM fields for booleans
 
         Returns
         -------
         bool
             Return a boolean that is true iff a change has been made.
         """
-        result = False
-        o = self.cfg.get_config_fields("ONAM")
-        z = self.cfg.get_config_fields("ZNAM")
-        one_zero_set = {"BOOL"}
-        if self.chain.last.tc_type in one_zero_set:
-            if len(o) < 1:
-                self.cfg.add_config_field("ONAM", "One")
-                result = result or True
-            if len(z) < 1:
-                self.cfg.add_config_field("ZNAM", "Zero")
-                result = result or True
+        if self.chain.last.tc_type in {'BOOL'}:
+            self.cfg.add_config_field("ONAM", "One")
+            return True
+        return False
 
-        return result
+    @_skip_if_field_set('ZNAM')
+    def guess_ZNAM(self):
+        """
+        Add ZNAM fields for booleans
 
+        Returns
+        -------
+        bool
+            Return a boolean that is true iff a change has been made.
+        """
+        if self.chain.last.tc_type in {'BOOL'}:
+            self.cfg.add_config_field("ZNAM", "Zero")
+            return True
+
+        return False
+
+    @_skip_if_field_set('PREC')
     def guess_PREC(self):
         """
         Add precision field for the ai/ao type
@@ -1116,12 +1144,6 @@ class BaseRecordPackage:
         bool
             Return a boolean that is true iff a change has been made.
         """
-        try:
-            prec, = self.cfg.get_config_fields("PREC")
-            return False
-        except ValueError:
-            pass
-
         try:
             epics_type, = self.cfg.get_config_lines("type")
         except ValueError:
@@ -1135,16 +1157,11 @@ class BaseRecordPackage:
 
         return False
 
+    @_skip_if_field_set('FTVL')
     def guess_FTVL(self):
         """
         Add datatype specification field for waveforms
         """
-        try:
-            ftvl, = self.cfg.get_config_fields("FTVL")
-            return False
-        except ValueError:
-            pass
-
         if self.chain.last.is_array:
             tc_type = self.chain.last.tc_type
             if tc_type == "BOOL":
@@ -1171,16 +1188,11 @@ class BaseRecordPackage:
 
         return False
 
+    @_skip_if_field_set('NELM')
     def guess_NELM(self):
         """
         Add data length secification for waveforms
         """
-        try:
-            nelm, = self.cfg.get_config_fields("NELM")
-            return False
-        except ValueError:
-            pass
-
         if self.chain.last.is_array or self.chain.last.is_str:
             length = self.chain.last.iterable_length
             self.cfg.add_config_field("NELM", length)
