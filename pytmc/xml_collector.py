@@ -638,18 +638,13 @@ data_types = {
         'SINT': RecordSpec('longin', 'longout', 'asynInt32'),
         'USINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
 
-        # TODO: WORD should be ('longin', 'longout', 'asynUInt32Digital'),
-        'WORD': RecordSpec('ai', 'ao', 'asynInt32'),
-        # TODO: INT should be ('longin', 'longout', 'asynInt32'),
-        'INT': RecordSpec('ai', 'ao', 'asynInt32'),
-        # TODO: UINT should be ('longin', 'longout', 'asynUInt32Digital'),
+        'WORD': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'INT': RecordSpec('longin', 'longout', 'asynInt32'),
         'UINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
 
-        # TODO: DWORD should be ('longin', 'longout', 'asynUInt32Digital'),
-        'DWORD': RecordSpec('ai', 'ao', 'asynInt32'),
-        # TODO: DINT should be ('longin', 'longout', 'asynInt32'),
-        'DINT': RecordSpec('ai', 'ao', 'asynInt32'),
-        'ENUM': RecordSpec('ai', 'ao', 'asynInt32'),
+        'DWORD': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'DINT': RecordSpec('longin', 'longout', 'asynInt32'),
+        'ENUM': RecordSpec('longin', 'longout', 'asynInt32'),
 
         'REAL': RecordSpec('ai', 'ao', 'asynFloat64'),
         'LREAL': RecordSpec('ai', 'ao', 'asynFloat64'),
