@@ -368,7 +368,8 @@ class TmcFile:
                 logger.debug("Invalid RecordPackage: %s", pack)
                 self.all_RecordPackages.remove(pack)
 
-    def validate_with_dbd(self, dbd_file, **linter_options):
+    def validate_with_dbd(self, dbd_file, remove_invalid_fields=True,
+                          **linter_options):
         '''
         Validate all to-be-generated record fields
 
@@ -376,6 +377,8 @@ class TmcFile:
         ----------
         dbd_file : str or DbdFile
             The dbd file with which to validate
+        remove_invalid_fields : bool, optional
+            Remove fields marked by the linter as invalid
         **linter_options : dict
             Options to pass to the linter
 
@@ -393,7 +396,26 @@ class TmcFile:
         --------
         pytmc.epics.lint_db
         '''
-        return epics.lint_db(dbd=dbd_file, db=self.render(), **linter_options)
+        results = epics.lint_db(dbd=dbd_file, db=self.render(),
+                                **linter_options)
+        if remove_invalid_fields:
+            all_invalid_fields = [
+                error['format_args']
+                for error in results.errors
+                if error['name'] == 'bad-field'
+                and len(error['format_args']) == 2
+            ]
+            print(all_invalid_fields)
+            invalid_fields_by_record = defaultdict(set)
+            for record_type, field_name in all_invalid_fields:
+                invalid_fields_by_record[record_type].add(field_name)
+
+            for pack in self.all_RecordPackages:
+                for field in invalid_fields_by_record.get(pack.record_type,
+                                                          []):
+                    pack.cfg.remove_config_field(field)
+
+        return results
 
     def render(self):
         """
@@ -785,6 +807,32 @@ class BaseRecordPackage:
             f_set as the key/value pairs respectively.
         """
         raise NotImplementedError
+
+    @property
+    def record_type(self):
+        """
+        Returns
+        -------
+        pvname : str or None
+            The record type associated with the BaseRecordPackage
+        """
+        try:
+            return self.cfg.get_config_lines('type')[0]['tag']
+        except (TypeError, KeyError):
+            pass
+
+    @property
+    def pvname(self):
+        """
+        Returns
+        -------
+        pvname : str or None
+            The PV name associated with the BaseRecordPackage
+        """
+        try:
+            return self.cfg.get_config_lines('pv')[0]['tag']
+        except (TypeError, KeyError):
+            pass
 
     def cfg_as_dict(self):
         """
