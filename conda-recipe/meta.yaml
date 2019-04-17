@@ -18,6 +18,7 @@ requirements:
   run:
     - python {{PY_VER}}*,>=3
     - jinja2
+    - pypdb
 
 test:
   imports:
