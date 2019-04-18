@@ -633,7 +633,7 @@ RecordSpec = namedtuple('RecordSpec',
 
 data_types = {
     'scalar': {
-        'BOOL': RecordSpec('bi', 'bo', 'asynInt32'),
+        'BOOL': RecordSpec('bi', 'bo', 'asynUInt32Digital'),
         'BYTE': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
         'SINT': RecordSpec('longin', 'longout', 'asynInt32'),
         'USINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
