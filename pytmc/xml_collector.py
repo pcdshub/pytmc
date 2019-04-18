@@ -1120,7 +1120,6 @@ class BaseRecordPackage:
         except (ValueError, KeyError):
             return False
 
-        print('dtyp is', dtyp)
         if dtyp == 'asynUInt32Digital':
             num_bits = tc_type_num_bits[self.chain.last.tc_type]
             mask = hex(2 ** num_bits - 1)

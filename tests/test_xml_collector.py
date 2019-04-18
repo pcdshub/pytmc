@@ -802,22 +802,46 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     assert field['tag']['f_set'] == final_DTYP
 
 
-@pytest.mark.parametrize("tc_type, sing_index, field_type, final_INP_OUT", [
-    ("BOOL", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("BOOL", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("BOOL", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("INT", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("INT", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("INT", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("LREAL", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("LREAL", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("LREAL", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("STRING", 0, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("STRING", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("STRING", 6, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+@pytest.mark.parametrize("tc_type, dtyp, sing_index, field_type, final_INP_OUT", [
+    ("BOOL", "asynUInt32Digital", 0, "OUT", '"@asynMask($(PORT),0,0x1,1)ADSPORT=851/a.b.c="'),
+    ("BOOL", "asynUInt32Digital", 2, "INP", '"@asynMask($(PORT),0,0x1,1)ADSPORT=851/a.b.c?"'),
+    ("BOOL", "asynUInt32Digital", 6, "OUT", '"@asynMask($(PORT),0,0x1,1)ADSPORT=851/a.b.c?"'),
+    ("BYTE", "asynUInt32Digital", 0, "OUT", '"@asynMask($(PORT),0,0xff,1)ADSPORT=851/a.b.c="'),
+    ("BYTE", "asynUInt32Digital", 2, "INP", '"@asynMask($(PORT),0,0xff,1)ADSPORT=851/a.b.c?"'),
+    ("BYTE", "asynUInt32Digital", 6, "OUT", '"@asynMask($(PORT),0,0xff,1)ADSPORT=851/a.b.c?"'),
+    ("SINT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("SINT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("SINT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("USINT", "asynUInt32Digital", 0, "OUT", '"@asynMask($(PORT),0,0xff,1)ADSPORT=851/a.b.c="'),
+    ("USINT", "asynUInt32Digital", 2, "INP", '"@asynMask($(PORT),0,0xff,1)ADSPORT=851/a.b.c?"'),
+    ("USINT", "asynUInt32Digital", 6, "OUT", '"@asynMask($(PORT),0,0xff,1)ADSPORT=851/a.b.c?"'),
+    ("WORD", "asynUInt32Digital", 0, "OUT", '"@asynMask($(PORT),0,0xffff,1)ADSPORT=851/a.b.c="'),
+    ("WORD", "asynUInt32Digital", 2, "INP", '"@asynMask($(PORT),0,0xffff,1)ADSPORT=851/a.b.c?"'),
+    ("WORD", "asynUInt32Digital", 6, "OUT", '"@asynMask($(PORT),0,0xffff,1)ADSPORT=851/a.b.c?"'),
+    ("INT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("INT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("INT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("UINT", "asynUInt32Digital", 0, "OUT", '"@asynMask($(PORT),0,0xffff,1)ADSPORT=851/a.b.c="'),
+    ("UINT", "asynUInt32Digital", 2, "INP", '"@asynMask($(PORT),0,0xffff,1)ADSPORT=851/a.b.c?"'),
+    ("UINT", "asynUInt32Digital", 6, "OUT", '"@asynMask($(PORT),0,0xffff,1)ADSPORT=851/a.b.c?"'),
+    ("DWORD", "asynUInt32Digital", 0, "OUT", '"@asynMask($(PORT),0,0xffffffff,1)ADSPORT=851/a.b.c="'),
+    ("DWORD", "asynUInt32Digital", 2, "INP", '"@asynMask($(PORT),0,0xffffffff,1)ADSPORT=851/a.b.c?"'),
+    ("DWORD", "asynUInt32Digital", 6, "OUT", '"@asynMask($(PORT),0,0xffffffff,1)ADSPORT=851/a.b.c?"'),
+    ("DINT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("DINT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("DINT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("UDINT", "asynUInt32Digital", 0, "OUT", '"@asynMask($(PORT),0,0xffffffff,1)ADSPORT=851/a.b.c="'),
+    ("UDINT", "asynUInt32Digital", 2, "INP", '"@asynMask($(PORT),0,0xffffffff,1)ADSPORT=851/a.b.c?"'),
+    ("UDINT", "asynUInt32Digital", 6, "OUT", '"@asynMask($(PORT),0,0xffffffff,1)ADSPORT=851/a.b.c?"'),
+    ("LREAL", "asynFloat64", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("LREAL", "asynFloat64", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("LREAL", "asynFloat64", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("STRING", "asynInt8ArrayIn", 0, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("STRING", "asynInt8ArrayIn", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("STRING", "asynInt8ArrayIn", 6, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
 ])
 def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
-                                         tc_type, sing_index, field_type, final_INP_OUT):
+                                         tc_type, dtyp, sing_index, field_type, final_INP_OUT):
     # chain must be broken into singular
     record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     # tc_type is assignable because it isn't implemented in BaseElement
@@ -825,10 +849,12 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     record.chain.last.tc_type = tc_type
     if tc_type == "STRING":
         record.chain.last.is_str = True
+
     for element, idx in zip(record.chain.chain, range(3)):
         element.name = chr(97+idx)
     record.generate_naive_config()
     record.guess_io()
+    record.cfg.add_config_field('DTYP', dtyp)
     assert record.guess_INP_OUT() is True
     print(record.cfg.config)
 
