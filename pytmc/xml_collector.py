@@ -673,6 +673,24 @@ data_types = {
 }
 
 
+tc_type_num_bits = {
+    'BOOL': 1,
+    'BYTE': 8,
+    'SINT': 8,
+    'USINT': 8,
+    'WORD': 16,
+    'INT': 16,
+    'UINT': 16,
+    'DWORD': 32,
+    'DINT': 32,
+    'UDINT': 32,
+    'LWORD': 64,
+    'LINT': 64,
+    'ULINT': 64,
+    'REAL': 32,
+    'LREAL': 64,
+}
+
 class BaseRecordPackage:
     """
     BaseRecordPackage includes some basic funcionality that should be shared
@@ -1060,6 +1078,8 @@ class BaseRecordPackage:
         self.cfg.add_config_field("DTYP", '"{}"'.format(spec.data_type + direction_suffix))
         return True
 
+    @_skip_if_field_set('INP')
+    @_skip_if_field_set('OUT')
     def guess_INP_OUT(self):
         """
         Construct, add, INP or OUT field
@@ -1094,21 +1114,23 @@ class BaseRecordPackage:
             else:
                 field_type = 'OUT'
 
-        str_template = '"@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"'
-
-        final_str = str_template.format(
-            port=self.ads_port,
-            name=name,
-            symbol=assign_symbol,
-        )
-
         try:
-            res, = self.cfg.get_config_fields(field_type)
+            dtyp, = self.cfg.get_config_fields('DTYP')
+            dtyp = dtyp['tag']['f_set']
+        except (ValueError, KeyError):
             return False
-        except ValueError:
-            pass
 
-        self.cfg.add_config_field(field_type, final_str)
+        print('dtyp is', dtyp)
+        if dtyp == 'asynUInt32Digital':
+            num_bits = tc_type_num_bits[self.chain.last.tc_type]
+            mask = hex(2 ** num_bits - 1)
+            final = (f'"@asynMask($(PORT),0,{mask},1)ADSPORT={self.ads_port}/'
+                     f'{name}{assign_symbol}"')
+        else:
+            final = (f'"@asyn($(PORT),0,1)ADSPORT={self.ads_port}/'
+                     f'{name}{assign_symbol}"')
+
+        self.cfg.add_config_field(field_type, final)
         return True
 
     @_skip_if_field_set('SCAN')
