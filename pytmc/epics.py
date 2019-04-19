@@ -1,6 +1,7 @@
 import os
 import pyPDB.dbd.yacc as _yacc
-import pyPDB.dbdlint as _dbdlint from pyPDB.dbdlint import DBSyntaxError
+import pyPDB.dbdlint as _dbdlint
+from pyPDB.dbdlint import DBSyntaxError
 
 
 
