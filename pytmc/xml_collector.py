@@ -405,7 +405,6 @@ class TmcFile:
                 if error['name'] == 'bad-field'
                 and len(error['format_args']) == 2
             ]
-            print(all_invalid_fields)
             invalid_fields_by_record = defaultdict(set)
             for record_type, field_name in all_invalid_fields:
                 invalid_fields_by_record[record_type].add(field_name)
