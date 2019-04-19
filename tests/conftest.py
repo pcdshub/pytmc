@@ -5,6 +5,7 @@ import pathlib
 import xml.etree.ElementTree as ET
 import os
 
+import pytmc
 from pytmc import TmcFile
 from pytmc.xml_collector import TmcChain
 from pytmc.xml_obj import BaseElement, Configuration
@@ -19,16 +20,9 @@ TMC_FILES = list(TMC_ROOT.glob('*.tmc'))
 INVALID_TMC_FILES = list((TMC_ROOT / 'invalid').glob('*.tmc'))
 
 
-@contextlib.contextmanager
-def caplog_at_level(caplog, logger_name, level):
-    'Context manager - capture logs at a specific level'
-    logger = logging.getLogger(logger_name)
-    # This handler setup is necessary for caplog to work, though the docs don't
-    # say anything about this:
-    logger.addHandler(caplog.handler)
-    with caplog.at_level(level, logger_name):
-        yield
-    logger.removeHandler(caplog.handler)
+@pytest.fixture(scope='module')
+def dbd_file():
+    return pytmc.epics.DbdFile(DBD_FILE)
 
 
 @pytest.fixture(params=TMC_FILES,

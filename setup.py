@@ -39,7 +39,7 @@ setup(
     long_description=readme,
     entry_points = {
         'console_scripts': [
-            'pytmc = pytmc.bin.makerecord:main',
+            'pytmc = pytmc.bin.pytmc:main',
             'xmltranslate = pytmc.bin.xmltranslate:main',
         ]
     },
