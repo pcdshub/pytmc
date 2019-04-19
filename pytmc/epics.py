@@ -1,7 +1,6 @@
 import os
 import pyPDB.dbd.yacc as _yacc
-import pyPDB.dbdlint as _dbdlint
-from pyPDB.dbdlint import DBSyntaxError
+import pyPDB.dbdlint as _dbdlint from pyPDB.dbdlint import DBSyntaxError
 
 
 
@@ -59,20 +58,23 @@ class LinterResults(_dbdlint.Results):
 
 
 class DbdFile:
+    '''
+    An expanded EPICS dbd file
+
+    Parameters
+    ----------
+    fn : str or file
+        dbd filename
+
+    Attributes
+    ----------
+    filename : str
+        The dbd filename
+    parsed : list
+        pyPDB parsed dbd nodes
+    '''
+
     def __init__(self, fn):
-        '''
-        Load an expanded EPICS dbd file
-
-        Parameters
-        ----------
-        fn : str or file
-            dbd filename
-
-        Returns
-        -------
-        dbd : list
-            A list of pyPDB dbd nodes
-        '''
         if hasattr(fn, 'read'):
             self.filename = getattr(fn, 'name', None)
             contents = fn.read()
