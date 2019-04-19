@@ -3,7 +3,7 @@ import textwrap
 
 import pytest
 
-from pytmc import Symbol, DataType
+from pytmc import Symbol, DataType, epics
 from pytmc.xml_obj import BaseElement, Configuration
 
 from pytmc import TmcFile
@@ -11,6 +11,8 @@ from pytmc.xml_collector import ElementCollector, TmcChain, BaseRecordPackage
 from pytmc.xml_collector import ChainNotSingularError
 
 from collections import defaultdict, OrderedDict as odict
+
+from . import conftest
 
 logger = logging.getLogger(__name__)
 
@@ -739,9 +741,9 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
 
 @pytest.mark.parametrize("tc_type, io, is_array, final_DTYP", [
     # BOOl
-    ("BOOL", 'i', False, '"asynInt32"'),
-    ("BOOL", 'o', False, '"asynInt32"'),
-    ("BOOL", 'io', False, '"asynInt32"'),
+    ("BOOL", 'i', False, '"asynUInt32Digital"'),
+    ("BOOL", 'o', False, '"asynUInt32Digital"'),
+    ("BOOL", 'io', False, '"asynUInt32Digital"'),
     ("BOOL", 'i', True, '"asynInt8ArrayIn"'),
     ("BOOL", 'o', True, '"asynInt8ArrayOut"'),
     ("BOOL", 'io', True, '"asynInt8ArrayOut"'),
@@ -840,7 +842,7 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     ("STRING", "asynInt8ArrayIn", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
     ("STRING", "asynInt8ArrayIn", 6, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
 ])
-def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
+def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains, dbd_file,
                                          tc_type, dtyp, sing_index, field_type, final_INP_OUT):
     # chain must be broken into singular
     record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
@@ -853,6 +855,7 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     for element, idx in zip(record.chain.chain, range(3)):
         element.name = chr(97+idx)
     record.generate_naive_config()
+    has_type = record.guess_type()
     record.guess_io()
     record.cfg.add_config_field('DTYP', dtyp)
     assert record.guess_INP_OUT() is True
@@ -865,6 +868,10 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
         assert record.cfg.get_config_fields('OUT') == []
 
     assert field['tag']['f_set'] == final_INP_OUT
+
+    if has_type:
+        # Not sure why, but sing_index 6 will not guess a type
+        conftest.lint_record(dbd_file, record)
 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_SCAN", [
@@ -974,13 +981,16 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
     ("STRING", 'io', True, False, '"CHAR"'),
 ])
 def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
-                                      tc_type, io, is_str, is_arr, final_FTVL):
+                                      tc_type, io, is_str, is_arr, final_FTVL,
+                                      dbd_file):
     record = BaseRecordPackage(851, example_singular_tmc_chains[0])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
     record.generate_naive_config()
     record.cfg.add_config_line('io', io, overwrite=True)
+    result = record.guess_type()
+    result = record.guess_DTYP()
     result = record.guess_FTVL()
     print(record.cfg.config)
     if final_FTVL is None:
@@ -991,6 +1001,8 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
         assert result is True
         [out] = record.cfg.get_config_fields("FTVL")
         assert out['tag']['f_set'] == final_FTVL
+
+    conftest.lint_record(dbd_file, record)
 
 
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM", [
