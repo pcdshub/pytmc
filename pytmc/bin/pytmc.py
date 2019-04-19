@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 description = __doc__
 
 
-def make_db_text(tmc_file_obj, *, dbd_file=None, allow_errors=False):
+def make_db_text(tmc_file_obj, *, dbd_file=None, allow_errors=False,
+                 show_error_context=True):
     '''
     Create an EPICS database from a TmcFile
 
@@ -31,14 +32,32 @@ def make_db_text(tmc_file_obj, *, dbd_file=None, allow_errors=False):
     tmc_file_obj.isolate_chains()
     tmc_file_obj.create_packages()
     tmc_file_obj.configure_packages()
+
+    def _show_context_from_line(rendered, from_line):
+        lines = list(enumerate(rendered.splitlines()[:from_line + 1], 1))
+        context = []
+        for line_num, line in reversed(lines):
+            context.append((line_num, line))
+            if line.lstrip().startswith('record'):
+                break
+
+        context.reverse()
+        for line_num, line in context:
+            logger.error('   [db:%d] %s', line_num, line)
+        return context
+
     if dbd_file is not None:
         results = tmc_file_obj.validate_with_dbd(dbd_file)
         for warning in results.warnings:
             logger.warning('[%s line %s] %s', warning['file'], warning['line'],
                            warning['message'])
+        if show_error_context:
+            rendered = tmc_file_obj.render()
         for error in results.errors:
             logger.error('[%s line %s] %s', error['file'], error['line'],
                          error['message'])
+            if show_error_context:
+                _show_context_from_line(rendered, error['line'])
         if not results.success and not allow_errors:
             logger.error('Linter errors - failed to create database. '
                          'To disable this behavior, use the flag '
@@ -83,6 +102,13 @@ def main():
     )
 
     parser.add_argument(
+        '--no-error-context',
+        action='store_true',
+        default=False,
+        help='Do not show db file context around errors'
+    )
+
+    parser.add_argument(
         '--log',
         '-l',
         metavar="LOG_LEVEL",
@@ -99,6 +125,7 @@ def main():
 
     db_string = make_db_text(
         tmc_file_obj, dbd_file=args.dbd, allow_errors=args.allow_errors,
+        show_error_context=not args.no_error_context,
     )
 
     with open(args.record_file, 'wt') as record_file:
