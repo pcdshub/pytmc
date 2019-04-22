@@ -1120,7 +1120,7 @@ class BaseRecordPackage:
         except (ValueError, KeyError):
             return False
 
-        if dtyp == 'asynUInt32Digital':
+        if dtyp.strip('"') == 'asynUInt32Digital':
             num_bits = tc_type_num_bits[self.chain.last.tc_type]
             mask = hex(2 ** num_bits - 1)
             final = (f'"@asynMask($(PORT),0,{mask},1)ADSPORT={self.ads_port}/'
