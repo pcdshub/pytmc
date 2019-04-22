@@ -830,7 +830,7 @@ class BaseRecordPackage:
         """
         try:
             return self.cfg.get_config_lines('type')[0]['tag']
-        except (TypeError, KeyError):
+        except (TypeError, KeyError, IndexError):
             pass
 
     @property
@@ -843,7 +843,7 @@ class BaseRecordPackage:
         """
         try:
             return self.cfg.get_config_lines('pv')[0]['tag']
-        except (TypeError, KeyError):
+        except (TypeError, KeyError, IndexError):
             pass
 
     def cfg_as_dict(self):
