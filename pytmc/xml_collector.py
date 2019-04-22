@@ -644,6 +644,7 @@ data_types = {
 
         'DWORD': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
         'DINT': RecordSpec('longin', 'longout', 'asynInt32'),
+        'UDINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
         'ENUM': RecordSpec('mbbi', 'mbbo', 'asynInt32'),
 
         'REAL': RecordSpec('ai', 'ao', 'asynFloat64'),
