@@ -674,24 +674,6 @@ data_types = {
 }
 
 
-tc_type_num_bits = {
-    'BOOL': 1,
-    'BYTE': 8,
-    'SINT': 8,
-    'USINT': 8,
-    'WORD': 16,
-    'INT': 16,
-    'UINT': 16,
-    'DWORD': 32,
-    'DINT': 32,
-    'UDINT': 32,
-    'LWORD': 64,
-    'LINT': 64,
-    'ULINT': 64,
-    'REAL': 32,
-    'LREAL': 64,
-}
-
 class BaseRecordPackage:
     """
     BaseRecordPackage includes some basic funcionality that should be shared
