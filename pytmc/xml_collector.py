@@ -633,18 +633,18 @@ RecordSpec = namedtuple('RecordSpec',
 
 data_types = {
     'scalar': {
-        'BOOL': RecordSpec('bi', 'bo', 'asynUInt32Digital'),
-        'BYTE': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'BOOL': RecordSpec('bi', 'bo', 'asynInt32'),
+        'BYTE': RecordSpec('longin', 'longout', 'asynInt32'),
         'SINT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'USINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'USINT': RecordSpec('longin', 'longout', 'asynInt32'),
 
-        'WORD': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'WORD': RecordSpec('longin', 'longout', 'asynInt32'),
         'INT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'UINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'UINT': RecordSpec('longin', 'longout', 'asynInt32'),
 
-        'DWORD': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'DWORD': RecordSpec('longin', 'longout', 'asynInt32'),
         'DINT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'UDINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'UDINT': RecordSpec('longin', 'longout', 'asynInt32'),
         'ENUM': RecordSpec('mbbi', 'mbbo', 'asynInt32'),
 
         'REAL': RecordSpec('ai', 'ao', 'asynFloat64'),
@@ -1121,16 +1121,10 @@ class BaseRecordPackage:
         except (ValueError, KeyError):
             return False
 
-        if dtyp.strip('"') == 'asynUInt32Digital':
-            num_bits = tc_type_num_bits[self.chain.last.tc_type]
-            mask = hex(2 ** num_bits - 1)
-            final = (f'"@asynMask($(PORT),0,{mask},1)ADSPORT={self.ads_port}/'
-                     f'{name}{assign_symbol}"')
-        else:
-            final = (f'"@asyn($(PORT),0,1)ADSPORT={self.ads_port}/'
-                     f'{name}{assign_symbol}"')
-
-        self.cfg.add_config_field(field_type, final)
+        self.cfg.add_config_field(
+            field_type,
+            f'@asyn($(PORT),0,1)ADSPORT={self.ads_port}/{name}{assign_symbol}'
+        )
         return True
 
     @_skip_if_field_set('SCAN')
