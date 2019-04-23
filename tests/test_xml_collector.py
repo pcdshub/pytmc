@@ -989,8 +989,8 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
     record.chain.last.is_str = is_str
     record.generate_naive_config()
     record.cfg.add_config_line('io', io, overwrite=True)
-    result = record.guess_type()
-    result = record.guess_DTYP()
+    assert record.guess_type()
+    assert record.guess_DTYP()
     result = record.guess_FTVL()
     print(record.cfg.config)
     if final_FTVL is None:
