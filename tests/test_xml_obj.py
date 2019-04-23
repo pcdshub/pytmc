@@ -569,7 +569,7 @@ def test_Configuration_add_config_field(branch_bool_pragma_string):
     cfg.add_config_field('ABC', 'XYZ', 1)
     assert cfg.config == [
         {'title': 'pv', 'tag': 'FIRST'},
-        {'title': 'field', 'tag': {'f_name': 'ABC', 'f_set': 'XYZ'}},
+        {'title': 'field', 'tag': {'f_name': 'ABC', 'f_set': '"XYZ"'}},
         {'title': 'pv', 'tag': 'SECOND'},
     ]
 
@@ -625,6 +625,6 @@ def test_Configuration_seek():
     c.add_config_field(f_name="ONAM", f_set="ABC")
     assert c.seek(['title'], 'pv') == [{'title': 'pv', 'tag': 'ABC'}]
     assert c.seek(['tag', 'f_name'], 'ONAM') == [
-        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': 'ABC'}}
+        {'title': 'field', 'tag': {'f_name': 'ONAM', 'f_set': '"ABC"'}}
     ]
     assert c.seek(['bad'], 3) == []
