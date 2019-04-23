@@ -337,14 +337,14 @@ def test_TmcFile_render(generic_tmc_path):
     brp1.cfg.add_config_line('type', 'ao')
     brp1.cfg.add_config_field("DTYP", '"MyDTYP"')
     brp1.cfg.add_config_field("PINI", '"VX"')
-    brp1.cfg.add_config_field("NELM", 3)
+    brp1.cfg.add_config_field("NELM", '"3"')
     brp1.cfg.add_config_field('ABC', '"test 0"')
     brp2 = BaseRecordPackage(851)
     brp2.cfg.add_config_line('pv', 'example_pv2')
     brp2.cfg.add_config_line('type', 'bi')
     brp2.cfg.add_config_field("DTYP", '"MyDTYP"')
     brp2.cfg.add_config_field("PINI", '"1"')
-    brp2.cfg.add_config_field("NELM", 2)
+    brp2.cfg.add_config_field("NELM", '"2"')
     brp2.cfg.add_config_field('ABC', '"test k"')
 
     tmc.all_RecordPackages.append(brp1)
@@ -354,14 +354,14 @@ def test_TmcFile_render(generic_tmc_path):
     record(ao,"example_pv"){
       field(DTYP, "MyDTYP")
       field(PINI, "VX")
-      field(NELM, 3)
+      field(NELM, "3")
       field(ABC, "test 0")
     }
 
     record(bi,"example_pv2"){
       field(DTYP, "MyDTYP")
       field(PINI, "1")
-      field(NELM, 2)
+      field(NELM, "2")
       field(ABC, "test k")
     }
 
@@ -590,7 +590,7 @@ def test_BaseRecordPackage_cfg_as_dict():
         'type': 'ao',
         'info': False,
         'field': {
-            'ABC': 'test 0'
+            'ABC': '"test 0"'
         }
     }
 
@@ -607,7 +607,7 @@ def test_BaseRecordPackage_render_record():
     record(ao,"example_pv"){
       field(DTYP, "MyDTYP")
       field(PINI, "1")
-      field(NELM, 3)
+      field(NELM, "3")
       field(ABC, "test 0")
     }\
     """
@@ -642,7 +642,7 @@ def test_BaseRecordPackage_guess_TSE():
     brp = BaseRecordPackage(851)
     assert brp.guess_TSE() is True
     [tse] = brp.cfg.get_config_fields('TSE')
-    assert tse['tag']['f_set'] == '-2'
+    assert tse['tag']['f_set'] == '"-2"'
 
 
 @pytest.mark.parametrize("tc_type, io, is_array, final_type", [
@@ -904,7 +904,7 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_ZNAM, final_ONAM, ret", [
-    ("BOOL", 0, 'Zero', "One", True),
+    ("BOOL", 0, '"Zero"', '"One"', True),
     ("STRING", 0, None, None, False),
 ])
 def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
@@ -1007,9 +1007,9 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
 
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM", [
     ("INT", 0, False, False, None),
-    ("INT", 0, False, True, 3),
-    ("LREAL", 0, False, True, 9),
-    ("STRING", 0, True, False, 12),
+    ("INT", 0, False, True, '"3"'),
+    ("LREAL", 0, False, True, '"9"'),
+    ("STRING", 0, True, False, '"12"'),
 ])
 def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
                                       tc_type, sing_index, is_str, is_arr, final_NELM):
@@ -1036,7 +1036,7 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
         ("INT", 6, False, False, None, "DTYP", '"asynInt32"'),
         ("INT", 2, False, False, None, "SCAN", '".5 second"'),
         ("LREAL", 2, False, False, None, "PREC", '"3"'),
-        ("INT", 0, False, True, 3, "NELM", 3),
+        ("INT", 0, False, True, 3, "NELM", '"3"'),
         ("LREAL", 0, False, True, 9, "FTVL", '"DOUBLE"'),
         ("STRING", 0, True, False, 12, "FTVL", '"CHAR"'),
     ])
