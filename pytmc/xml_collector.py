@@ -422,7 +422,7 @@ class TmcFile:
         """
         rec_list = []
         for pack in self.all_RecordPackages:
-            record_str = pack.render_record()
+            record_str = pack.render_to_string()
             if record_str:
                 rec_list.append(record_str)
 
@@ -674,15 +674,12 @@ data_types = {
 }
 
 
-class BaseRecordPackage:
+class RecordPackage:
     """
-    BaseRecordPackage includes some basic funcionality that should be shared
-    across most versions. This includes things like common methods so things
-    like validation can be configured at the __init__ with an instance
-    variable. Overwrite/inherit features as necessary.
+    Base class to be inherited by all other RecordPackages
 
+    Subclasses must implement the ``render_record`` function to return
     """
-
     _required_keys = {'pv', 'type', 'field'}
     _required_fields = {'DTYP', }
 
@@ -700,6 +697,107 @@ class BaseRecordPackage:
         # ^could be relevant for init fields
         # Will continue without this for now
 
+        self.ads_port = ads_port
+
+    @property
+    def record_type(self):
+        """
+        Returns
+        -------
+        pvname : str or None
+            The record type associated with the RecordPackage
+        """
+        try:
+            return self.cfg.get_config_lines('type')[0]['tag']
+        except (TypeError, KeyError, IndexError):
+            pass
+
+    @property
+    def pvname(self):
+        """
+        Returns
+        -------
+        pvname : str or None
+            The PV name associated with the RecordPackage
+        """
+        try:
+            return self.cfg.get_config_lines('pv')[0]['tag']
+        except (TypeError, KeyError, IndexError):
+            pass
+
+    def cfg_as_dict(self):
+        """
+        Produce a jinja-template-compatible dictionary describing this
+        RecordPackage.
+
+        Returns
+        -------
+        dict
+            return a dict. Keys are the fields of the jinja template. Contains
+            special 'field' key where the value is a dictionary with f_name and
+            f_set as the key/value pairs respectively.
+        """
+        cfg_dict = {}
+        for row in self.cfg.config:
+            if row['title'] == 'pv':
+                cfg_dict['pv'] = row['tag']
+            if row['title'] == 'type':
+                cfg_dict['type'] = row['tag']
+            if row['title'] == 'field':
+                cfg_dict.setdefault('field', {})
+                tag = row['tag']
+                cfg_dict['field'][tag['f_name']] = tag['f_set']
+            if row['title'] == 'info':
+                cfg_dict['info'] = True
+
+        cfg_dict.setdefault('info', False)
+        return cfg_dict
+
+    @property
+    def valid(self):
+        """
+        Returns
+        -------
+        bool
+            Returns true if this record is fully specified and valid.
+        """
+        simple_dict = self.cfg_as_dict()
+        has_required_keys = all(simple_dict.get(key)
+                                for key in self._required_keys)
+
+        fields = simple_dict.get('field', {})
+        has_required_fields = all(fields.get(key)
+                                  for key in self._required_fields)
+        return has_required_keys and has_required_fields
+
+    def render_record(self):
+        """
+        Returns
+        -------
+        string
+            Jinja rendered entry for the RecordPackage
+        """
+        raise NotImplementedError("Must be implemented by RecordPackage "
+                                  "subclass")
+
+    def render_to_string(self):
+        """Calls :meth:`.render_record` if ``RecordPackage`` is valid"""
+        if not self.valid:
+            logger.error('Unable to render record: %s', simple_dict)
+            return
+        return self.render_record()
+
+
+class BaseRecordPackage(RecordPackage):
+    """
+    BaseRecordPackage includes some basic funcionality that should be shared
+    across most versions. This includes things like common methods so things
+    like validation can be configured at the __init__ with an instance
+    variable. Overwrite/inherit features as necessary.
+
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # List of methods defined in the class
         self.guess_methods_list = [
             self.guess_PINI,
@@ -732,8 +830,6 @@ class BaseRecordPackage:
         self.file_template = self.jinja_env.get_template(
             "asyn_standard_file.jinja2"
         )
-
-        self.ads_port = ads_port
 
     def apply_config_validation(self):
         """
@@ -803,77 +899,6 @@ class BaseRecordPackage:
         """
         raise NotImplementedError
 
-    @property
-    def record_type(self):
-        """
-        Returns
-        -------
-        pvname : str or None
-            The record type associated with the BaseRecordPackage
-        """
-        try:
-            return self.cfg.get_config_lines('type')[0]['tag']
-        except (TypeError, KeyError, IndexError):
-            pass
-
-    @property
-    def pvname(self):
-        """
-        Returns
-        -------
-        pvname : str or None
-            The PV name associated with the BaseRecordPackage
-        """
-        try:
-            return self.cfg.get_config_lines('pv')[0]['tag']
-        except (TypeError, KeyError, IndexError):
-            pass
-
-    def cfg_as_dict(self):
-        """
-        Produce a jinja-template-compatible dictionary describing this
-        RecordPackage.
-
-        Returns
-        -------
-        dict
-            return a dict. Keys are the fields of the jinja template. Contains
-            special 'field' key where the value is a dictionary with f_name and
-            f_set as the key/value pairs respectively.
-        """
-        cfg_dict = {}
-        for row in self.cfg.config:
-            if row['title'] == 'pv':
-                cfg_dict['pv'] = row['tag']
-            if row['title'] == 'type':
-                cfg_dict['type'] = row['tag']
-            if row['title'] == 'field':
-                cfg_dict.setdefault('field', {})
-                tag = row['tag']
-                cfg_dict['field'][tag['f_name']] = tag['f_set']
-            if row['title'] == 'info':
-                cfg_dict['info'] = True
-
-        cfg_dict.setdefault('info', False)
-        return cfg_dict
-
-    @property
-    def valid(self):
-        """
-        Returns
-        -------
-        bool
-            Returns true if this record is fully specified and valid.
-        """
-        simple_dict = self.cfg_as_dict()
-        has_required_keys = all(simple_dict.get(key)
-                                for key in self._required_keys)
-
-        fields = simple_dict.get('field', {})
-        has_required_fields = all(fields.get(key)
-                                  for key in self._required_fields)
-        return has_required_keys and has_required_fields
-
     def render_record(self):
         """
         Returns
@@ -881,11 +906,6 @@ class BaseRecordPackage:
         string
             Jinja rendered entry for this BaseRecordPackage
         """
-        simple_dict = self.cfg_as_dict()
-        if not self.valid:
-            logger.error('Unable to render record: %s', simple_dict)
-            return
-
         return self.record_template.render(**simple_dict)
 
     @staticmethod
@@ -1254,10 +1274,6 @@ class BaseRecordPackage:
                 if method() is True:
                     complete = False
 
-    def render_to_string(self):
-        """
-        Create the individual record to be inserted in the DB file. To be
-        returned as a string.
-        redundant?
-        """
-        raise NotImplementedError
+    def render_record(self):
+        simple_dict = self.cfg_as_dict()
+        return self.record_template.render(**simple_dict)
