@@ -362,10 +362,9 @@ class TmcFile:
         """
         for pack in list(self.all_RecordPackages):
             try:
-                pack.generate_naive_config()
-                pack.guess_all()
-            except ChainNotSingularError:
-                logger.debug("Invalid RecordPackage: %s", pack)
+                pack.configure()
+            except Exception:
+                logger.debug("Error configuring %r", pack)
                 self.all_RecordPackages.remove(pack)
 
     def validate_with_dbd(self, dbd_file, remove_invalid_fields=True,
@@ -725,6 +724,17 @@ class RecordPackage:
         except (TypeError, KeyError, IndexError):
             pass
 
+    def configure(self):
+        """
+        Configure the record before it is rendered
+
+        This can optionally be implemented by subclass if additional
+        configuration is needed for a ``RecordPackage``. Exceptions raised by
+        this method will be caught and the ``RecordPackage`` will not be
+        rendered
+        """
+        pass
+
     def cfg_as_dict(self):
         """
         Produce a jinja-template-compatible dictionary describing this
@@ -859,6 +869,11 @@ class BaseRecordPackage(RecordPackage):
         None
         """
         self.cfg = self.chain.naive_config()
+
+    def configure(self):
+        """Configure the ``BaseRecordPackage`` for rendering"""
+        self.generate_naive_config()
+        self.guess_all()
 
     def ID_type(self):
         """
