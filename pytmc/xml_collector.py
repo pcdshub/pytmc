@@ -993,13 +993,10 @@ class BaseRecordPackage(RecordPackage):
         """
         io, = self.cfg.get_config_lines('io')
         io = io['tag']
-
-        if 'i' in io and 'o' in io:
+        if 'o' in io:
             return 'output'
-        elif 'i' in io:
+        else:
             return 'input'
-        elif 'o' in io:
-            return 'output'
 
     def guess_type(self):
         """
