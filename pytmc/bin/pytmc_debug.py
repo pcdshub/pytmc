@@ -124,8 +124,13 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.chain_info.addItem(str(chain))
 
     def _update_records(self):
-        for record, db_text in self.records.items():
-            names = ' / '.join(_grep_record_names(db_text)) or 'Unknown'
+        self.record_list.clear()
+
+        items = [
+            (' / '.join(_grep_record_names(db_text)) or 'Unknown', record)
+            for record, db_text in self.records.items()
+        ]
+        for names, record in sorted(items, key=lambda item: item[0]):
             item = QtWidgets.QListWidgetItem(names)
             item.setData(Qt.UserRole, record)
             self.record_list.addItem(item)
