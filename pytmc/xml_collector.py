@@ -875,44 +875,6 @@ class BaseRecordPackage(RecordPackage):
         self.generate_naive_config()
         self.guess_all()
 
-    def ID_type(self):
-        """
-        Distinguish special record types from one another such as a motor
-        record. Select from the available types of "standard" and "motor
-        record." Should always return a value. No guessing should be required
-        to use this method
-
-        Returns
-        -------
-        string
-            String name of type
-        """
-        # Instantly remove list formatting if this is len(1) list, leaves dict
-        type_search, = self.cfg.seek(['title'], 'type')
-        if type_search['tag'] == 'motor':
-            return 'motor'
-        else:
-            return 'standard'
-
-    def generate_record_entry(self):
-        """
-        apply all jinja functionality to create the template
-        return dict w/ filename as key for each entry in the iterable
-        """
-        raise NotImplementedError
-
-    def motor_record_as_dict(self):
-        """
-        Produce a jinja-template-compatible dict describing this RecordPackage
-
-        Returns
-        -------
-        dict
-            return a dict. Keys are the fields of the jinja template. Contains
-            special 'field' key where the value is a dictionary with f_name and
-            f_set as the key/value pairs respectively.
-        """
-        raise NotImplementedError
 
     def render_record(self):
         """
@@ -922,21 +884,6 @@ class BaseRecordPackage(RecordPackage):
             Jinja rendered entry for this BaseRecordPackage
         """
         return self.record_template.render(**simple_dict)
-
-    @staticmethod
-    def generate_files(records):
-        """
-        Parameters
-        ----------
-        records : list
-            list of all incoming Record objects
-
-        Returns
-        -------
-        str
-            The Jinja-made output of the full resulting file.
-        """
-        raise NotImplementedError
 
     def _skip_if_field_set(field):
         '''
