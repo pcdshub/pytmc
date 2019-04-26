@@ -14,19 +14,20 @@ logger = logging.getLogger(__name__)
 description = __doc__
 
 
-def make_db_text(tmc_file_obj, *, dbd_file=None, allow_errors=False,
-                 show_error_context=True):
+class LinterError(Exception):
+    ...
+
+
+def process(tmc_file_obj, *, dbd_file=None, allow_errors=False,
+            show_error_context=True):
     '''
-    Create an EPICS database from a TmcFile
+    Process a TmcFile, readying it for database generation
 
     Parameters
     ----------
     tmc_file_obj : TmcFile
 
-    Returns
-    -------
-    dbtext : str
-        The rendered database text
+
     '''
     tmc_file_obj.create_chains()
     tmc_file_obj.isolate_chains()
@@ -62,10 +63,9 @@ def make_db_text(tmc_file_obj, *, dbd_file=None, allow_errors=False,
             logger.error('Linter errors - failed to create database. '
                          'To disable this behavior, use the flag '
                          '--allow-errors')
-            sys.exit(1)
+            raise LinterError('Failed to create database')
 
-    return tmc_file_obj.render()
-
+    return tmc_file_obj
 
 
 def main():
@@ -123,11 +123,15 @@ def main():
     with open(args.tmc_file, 'r') as tmc_file:
         tmc_file_obj = pytmc.TmcFile(tmc_file)
 
-    db_string = make_db_text(
-        tmc_file_obj, dbd_file=args.dbd, allow_errors=args.allow_errors,
-        show_error_context=not args.no_error_context,
-    )
+    try:
+        process(
+            tmc_file_obj, dbd_file=args.dbd, allow_errors=args.allow_errors,
+            show_error_context=not args.no_error_context,
+        )
+    except LinterError:
+        sys.exit(1)
 
+    db_string = tmc_file_obj.render()
     with open(args.record_file, 'wt') as record_file:
         record_file.write(db_string)
 
