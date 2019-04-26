@@ -333,6 +333,11 @@ class Configuration:
         None
 
         """
+        f_set = str(f_set)
+
+        if not f_set.startswith('"') or not f_set.endswith('"'):
+            f_set = f'"{f_set}"'
+
         if overwrite:
             for field in self.get_config_fields(f_name):
                 if field['tag']['f_set'] == f_set:

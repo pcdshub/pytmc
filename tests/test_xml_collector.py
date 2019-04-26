@@ -3,7 +3,7 @@ import textwrap
 
 import pytest
 
-from pytmc import Symbol, DataType
+from pytmc import Symbol, DataType, epics
 from pytmc.xml_obj import BaseElement, Configuration
 
 from pytmc import TmcFile
@@ -11,6 +11,8 @@ from pytmc.xml_collector import ElementCollector, TmcChain, BaseRecordPackage
 from pytmc.xml_collector import ChainNotSingularError
 
 from collections import defaultdict, OrderedDict as odict
+
+from . import conftest
 
 logger = logging.getLogger(__name__)
 
@@ -335,14 +337,14 @@ def test_TmcFile_render(generic_tmc_path):
     brp1.cfg.add_config_line('type', 'ao')
     brp1.cfg.add_config_field("DTYP", '"MyDTYP"')
     brp1.cfg.add_config_field("PINI", '"VX"')
-    brp1.cfg.add_config_field("NELM", 3)
+    brp1.cfg.add_config_field("NELM", '"3"')
     brp1.cfg.add_config_field('ABC', '"test 0"')
     brp2 = BaseRecordPackage(851)
     brp2.cfg.add_config_line('pv', 'example_pv2')
     brp2.cfg.add_config_line('type', 'bi')
     brp2.cfg.add_config_field("DTYP", '"MyDTYP"')
     brp2.cfg.add_config_field("PINI", '"1"')
-    brp2.cfg.add_config_field("NELM", 2)
+    brp2.cfg.add_config_field("NELM", '"2"')
     brp2.cfg.add_config_field('ABC', '"test k"')
 
     tmc.all_RecordPackages.append(brp1)
@@ -352,14 +354,14 @@ def test_TmcFile_render(generic_tmc_path):
     record(ao,"example_pv"){
       field(DTYP, "MyDTYP")
       field(PINI, "VX")
-      field(NELM, 3)
+      field(NELM, "3")
       field(ABC, "test 0")
     }
 
     record(bi,"example_pv2"){
       field(DTYP, "MyDTYP")
       field(PINI, "1")
-      field(NELM, 2)
+      field(NELM, "2")
       field(ABC, "test k")
     }
 
@@ -588,7 +590,7 @@ def test_BaseRecordPackage_cfg_as_dict():
         'type': 'ao',
         'info': False,
         'field': {
-            'ABC': 'test 0'
+            'ABC': '"test 0"'
         }
     }
 
@@ -605,7 +607,7 @@ def test_BaseRecordPackage_render_record():
     record(ao,"example_pv"){
       field(DTYP, "MyDTYP")
       field(PINI, "1")
-      field(NELM, 3)
+      field(NELM, "3")
       field(ABC, "test 0")
     }\
     """
@@ -640,7 +642,7 @@ def test_BaseRecordPackage_guess_TSE():
     brp = BaseRecordPackage(851)
     assert brp.guess_TSE() is True
     [tse] = brp.cfg.get_config_fields('TSE')
-    assert tse['tag']['f_set'] == '-2'
+    assert tse['tag']['f_set'] == '"-2"'
 
 
 @pytest.mark.parametrize("tc_type, io, is_array, final_type", [
@@ -650,21 +652,21 @@ def test_BaseRecordPackage_guess_TSE():
     ("BOOL", "i", True, 'waveform'),
     ("BOOL", "o", True, 'waveform'),
     ("BOOL", "io", True, 'waveform'),
-    ("INT", "i", False, 'ai'),
-    ("INT", "o", False, 'ao'),
-    ("INT", "io", False, 'ao'),
+    ("INT", "i", False, 'longin'),
+    ("INT", "o", False, 'longout'),
+    ("INT", "io", False, 'longout'),
     ("INT", "i", True, 'waveform'),
     ("INT", "o", True, 'waveform'),
     ("INT", "io", True, 'waveform'),
-    ("DINT", "i", False, 'ai'),
-    ("DINT", "o", False, 'ao'),
-    ("DINT", "io", False, 'ao'),
+    ("DINT", "i", False, 'longin'),
+    ("DINT", "o", False, 'longout'),
+    ("DINT", "io", False, 'longout'),
     ("DINT", "i", True, 'waveform'),
     ("DINT", "o", True, 'waveform'),
     ("DINT", "io", True, 'waveform'),
-    ("ENUM", "i", False, 'ai'),
-    ("ENUM", "o", False, 'ao'),
-    ("ENUM", "io", False, 'ao'),
+    ("ENUM", "i", False, 'mbbi'),
+    ("ENUM", "o", False, 'mbbo'),
+    ("ENUM", "io", False, 'mbbo'),
     ("ENUM", "i", True, 'waveform'),
     ("ENUM", "o", True, 'waveform'),
     ("ENUM", "io", True, 'waveform'),
@@ -802,22 +804,46 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     assert field['tag']['f_set'] == final_DTYP
 
 
-@pytest.mark.parametrize("tc_type, sing_index, field_type, final_INP_OUT", [
-    ("BOOL", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("BOOL", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("BOOL", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("INT", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("INT", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("INT", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("LREAL", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("LREAL", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("LREAL", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("STRING", 0, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
-    ("STRING", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
-    ("STRING", 6, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+@pytest.mark.parametrize("tc_type, dtyp, sing_index, field_type, final_INP_OUT", [
+    ("BOOL", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+    ("BOOL", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("BOOL", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("BYTE", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+    ("BYTE", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("BYTE", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("SINT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("SINT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("SINT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("USINT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+    ("USINT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("USINT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("WORD", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+    ("WORD", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("WORD", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("INT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("INT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("INT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("UINT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+    ("UINT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("UINT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("DWORD", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+    ("DWORD", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("DWORD", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("DINT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("DINT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("DINT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("UDINT", "asynInt32", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
+    ("UDINT", "asynInt32", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("UDINT", "asynInt32", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"'),
+    ("LREAL", "asynFloat64", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("LREAL", "asynFloat64", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("LREAL", "asynFloat64", 6, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("STRING", "asynInt8ArrayIn", 0, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="',),
+    ("STRING", "asynInt8ArrayIn", 2, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
+    ("STRING", "asynInt8ArrayIn", 6, "INP", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c?"',),
 ])
-def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
-                                         tc_type, sing_index, field_type, final_INP_OUT):
+def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains, dbd_file,
+                                         tc_type, dtyp, sing_index, field_type, final_INP_OUT):
     # chain must be broken into singular
     record = BaseRecordPackage(851, example_singular_tmc_chains[sing_index])
     # tc_type is assignable because it isn't implemented in BaseElement
@@ -825,10 +851,13 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
     record.chain.last.tc_type = tc_type
     if tc_type == "STRING":
         record.chain.last.is_str = True
+
     for element, idx in zip(record.chain.chain, range(3)):
         element.name = chr(97+idx)
     record.generate_naive_config()
+    has_type = record.guess_type()
     record.guess_io()
+    record.cfg.add_config_field('DTYP', dtyp)
     assert record.guess_INP_OUT() is True
     print(record.cfg.config)
 
@@ -839,6 +868,10 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains,
         assert record.cfg.get_config_fields('OUT') == []
 
     assert field['tag']['f_set'] == final_INP_OUT
+
+    if has_type:
+        # Not sure why, but sing_index 6 will not guess a type
+        conftest.lint_record(dbd_file, record)
 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_SCAN", [
@@ -871,7 +904,7 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_ZNAM, final_ONAM, ret", [
-    ("BOOL", 0, 'Zero', "One", True),
+    ("BOOL", 0, '"Zero"', '"One"', True),
     ("STRING", 0, None, None, False),
 ])
 def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
@@ -948,13 +981,16 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
     ("STRING", 'io', True, False, '"CHAR"'),
 ])
 def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
-                                      tc_type, io, is_str, is_arr, final_FTVL):
+                                      tc_type, io, is_str, is_arr, final_FTVL,
+                                      dbd_file):
     record = BaseRecordPackage(851, example_singular_tmc_chains[0])
     record.chain.last.tc_type = tc_type
     record.chain.last.is_array = is_arr
     record.chain.last.is_str = is_str
     record.generate_naive_config()
     record.cfg.add_config_line('io', io, overwrite=True)
+    assert record.guess_type()
+    assert record.guess_DTYP()
     result = record.guess_FTVL()
     print(record.cfg.config)
     if final_FTVL is None:
@@ -966,12 +1002,14 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
         [out] = record.cfg.get_config_fields("FTVL")
         assert out['tag']['f_set'] == final_FTVL
 
+    conftest.lint_record(dbd_file, record)
+
 
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM", [
     ("INT", 0, False, False, None),
-    ("INT", 0, False, True, 3),
-    ("LREAL", 0, False, True, 9),
-    ("STRING", 0, True, False, 12),
+    ("INT", 0, False, True, '"3"'),
+    ("LREAL", 0, False, True, '"9"'),
+    ("STRING", 0, True, False, '"12"'),
 ])
 def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
                                       tc_type, sing_index, is_str, is_arr, final_NELM):
@@ -998,7 +1036,7 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
         ("INT", 6, False, False, None, "DTYP", '"asynInt32"'),
         ("INT", 2, False, False, None, "SCAN", '".5 second"'),
         ("LREAL", 2, False, False, None, "PREC", '"3"'),
-        ("INT", 0, False, True, 3, "NELM", 3),
+        ("INT", 0, False, True, 3, "NELM", '"3"'),
         ("LREAL", 0, False, True, 9, "FTVL", '"DOUBLE"'),
         ("STRING", 0, True, False, 12, "FTVL", '"CHAR"'),
     ])

@@ -634,22 +634,18 @@ RecordSpec = namedtuple('RecordSpec',
 data_types = {
     'scalar': {
         'BOOL': RecordSpec('bi', 'bo', 'asynInt32'),
-        'BYTE': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'BYTE': RecordSpec('longin', 'longout', 'asynInt32'),
         'SINT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'USINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'USINT': RecordSpec('longin', 'longout', 'asynInt32'),
 
-        # TODO: WORD should be ('longin', 'longout', 'asynUInt32Digital'),
-        'WORD': RecordSpec('ai', 'ao', 'asynInt32'),
-        # TODO: INT should be ('longin', 'longout', 'asynInt32'),
-        'INT': RecordSpec('ai', 'ao', 'asynInt32'),
-        # TODO: UINT should be ('longin', 'longout', 'asynUInt32Digital'),
-        'UINT': RecordSpec('longin', 'longout', 'asynUInt32Digital'),
+        'WORD': RecordSpec('longin', 'longout', 'asynInt32'),
+        'INT': RecordSpec('longin', 'longout', 'asynInt32'),
+        'UINT': RecordSpec('longin', 'longout', 'asynInt32'),
 
-        # TODO: DWORD should be ('longin', 'longout', 'asynUInt32Digital'),
-        'DWORD': RecordSpec('ai', 'ao', 'asynInt32'),
-        # TODO: DINT should be ('longin', 'longout', 'asynInt32'),
-        'DINT': RecordSpec('ai', 'ao', 'asynInt32'),
-        'ENUM': RecordSpec('ai', 'ao', 'asynInt32'),
+        'DWORD': RecordSpec('longin', 'longout', 'asynInt32'),
+        'DINT': RecordSpec('longin', 'longout', 'asynInt32'),
+        'UDINT': RecordSpec('longin', 'longout', 'asynInt32'),
+        'ENUM': RecordSpec('mbbi', 'mbbo', 'asynInt32'),
 
         'REAL': RecordSpec('ai', 'ao', 'asynFloat64'),
         'LREAL': RecordSpec('ai', 'ao', 'asynFloat64'),
@@ -817,7 +813,7 @@ class BaseRecordPackage:
         """
         try:
             return self.cfg.get_config_lines('type')[0]['tag']
-        except (TypeError, KeyError):
+        except (TypeError, KeyError, IndexError):
             pass
 
     @property
@@ -830,7 +826,7 @@ class BaseRecordPackage:
         """
         try:
             return self.cfg.get_config_lines('pv')[0]['tag']
-        except (TypeError, KeyError):
+        except (TypeError, KeyError, IndexError):
             pass
 
     def cfg_as_dict(self):
@@ -1065,6 +1061,8 @@ class BaseRecordPackage:
         self.cfg.add_config_field("DTYP", '"{}"'.format(spec.data_type + direction_suffix))
         return True
 
+    @_skip_if_field_set('INP')
+    @_skip_if_field_set('OUT')
     def guess_INP_OUT(self):
         """
         Construct, add, INP or OUT field
@@ -1099,21 +1097,16 @@ class BaseRecordPackage:
             else:
                 field_type = 'OUT'
 
-        str_template = '"@asyn($(PORT),0,1)ADSPORT={port}/{name}{symbol}"'
-
-        final_str = str_template.format(
-            port=self.ads_port,
-            name=name,
-            symbol=assign_symbol,
-        )
-
         try:
-            res, = self.cfg.get_config_fields(field_type)
+            dtyp, = self.cfg.get_config_fields('DTYP')
+            dtyp = dtyp['tag']['f_set']
+        except (ValueError, KeyError):
             return False
-        except ValueError:
-            pass
 
-        self.cfg.add_config_field(field_type, final_str)
+        self.cfg.add_config_field(
+            field_type,
+            f'@asyn($(PORT),0,1)ADSPORT={self.ads_port}/{name}{assign_symbol}'
+        )
         return True
 
     @_skip_if_field_set('SCAN')

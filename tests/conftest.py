@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 import os
 
 import pytmc
-from pytmc import TmcFile
+from pytmc import TmcFile, epics
 from pytmc.xml_collector import TmcChain
 from pytmc.xml_obj import BaseElement, Configuration
 
@@ -192,3 +192,9 @@ def example_singular_tmc_chains(light_leaf_bool_pragma_string,
         [stem, leaf_a, leaf_b]
     )
     return chain.build_singular_chains()
+
+
+def lint_record(dbd_file, record):
+    assert record.valid
+    linted = epics.lint_db(dbd=dbd_file, db=record.render_record())
+    assert not len(linted.errors)
