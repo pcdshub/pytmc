@@ -15,6 +15,7 @@ from .pytmc import process, LinterError
 
 
 description = __doc__
+logger = logging.getLogger(__name__)
 
 
 def _grep_record_names(text):
@@ -37,6 +38,39 @@ def _grep_record_names(text):
             ]
 
 
+def _annotate_record_text(linter_results, record_text):
+    if not record_text:
+        return record_text
+    if not linter_results or not (linter_results.warnings or
+                                  linter_results.errors):
+        return record_text
+
+    lines = [([], line)
+             for line in record_text.splitlines()]
+
+    for item in linter_results.warnings + linter_results.errors:
+        try:
+            lint_md, line = lines[item['line'] - 1]
+        except IndexError:
+            continue
+
+        if item in linter_results.warnings:
+            lint_md.append('X Warning: {}'.format(item['message']))
+        else:
+            lint_md.append('X Error: {}'.format(item['message']))
+
+    display_lines = []
+    for lint_md, line in lines:
+        if not lint_md:
+            display_lines.append(f'. {line}')
+        else:
+            display_lines.append(f'X {line}')
+            for lint_line in lint_md:
+                display_lines.append(lint_line)
+
+    return '\n'.join(display_lines)
+
+
 class TmcSummary(QtWidgets.QMainWindow):
     '''
     pytmc debug interface
@@ -49,16 +83,30 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     item_selected = Signal(object)
 
-    def __init__(self, tmc):
+    def __init__(self, tmc, dbd):
         super().__init__()
         self.tmc = tmc
-        self.records = {record: record.render_record()
-                        for record in tmc.all_RecordPackages
-                        }
-        self.chains = {
-            ' '.join(record.chain.name_list): record
-            for record in tmc.all_RecordPackages
-        }
+        self.chains = {}
+        self.records = {}
+
+        for record in tmc.all_RecordPackages:
+            record.cfg.add_config_field('ABC', 'test')
+            record_text = record.render_record()
+            chain_label = ' '.join(record.chain.name_list)
+            self.chains[chain_label] = record
+            try:
+                linter_results = (pytmc.epics.lint_db(dbd, record_text)
+                                  if dbd and record_text else None)
+                record_text = _annotate_record_text(linter_results,
+                                                    record_text)
+            except Exception as ex:
+                record_text = (
+                    f'!! Linter failure: {ex.__class__.__name__} {ex}'
+                    f'\n\n{record_text}'
+                )
+                logger.exception('Linter failure')
+
+            self.records[record] = record_text
 
         self.setWindowTitle(f'pytmc-debug summary - {tmc.filename}')
 
@@ -180,7 +228,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.item_list.addItem(item)
 
 
-def show_qt_interface(tmc):
+def show_qt_interface(tmc, dbd):
     '''
     Show the results of tmc processing in a Qt gui
 
@@ -188,9 +236,11 @@ def show_qt_interface(tmc):
     ----------
     tmc : TmcFile
         The tmc file to show
+    dbd : DbdFile, optional
+        The dbd file to lint against
     '''
     app = QtWidgets.QApplication([])
-    interface = TmcSummary(tmc)
+    interface = TmcSummary(tmc, dbd)
     interface.show()
     sys.exit(app.exec_())
 
@@ -219,13 +269,13 @@ def main():
 
     tmc = pytmc.TmcFile(args.tmc_file)
 
-    try:
-        process(tmc, dbd_file=args.dbd, allow_errors=True,
-                show_error_context=True)
-    except LinterError:
-        ...
+    if args.dbd is None:
+        dbd = None
+    else:
+        dbd = pytmc.epics.DbdFile(args.dbd)
 
-    show_qt_interface(tmc)
+    process(tmc)
+    show_qt_interface(tmc, dbd)
 
 
 if __name__ == '__main__':
