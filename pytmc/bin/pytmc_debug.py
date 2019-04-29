@@ -266,6 +266,20 @@ def main():
               '(requires pyPDB)')
     )
 
+    parser.add_argument(
+        '--log',
+        '-l',
+        metavar="LOG_LEVEL",
+        default=30,  # WARN level messages
+        type=int,
+        help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
+    )
+
+    args = parser.parse_args()
+
+    logging.basicConfig()
+    pytmc_logger = logging.getLogger('pytmc')
+    pytmc_logger.setLevel(args.log)
     args = parser.parse_args()
 
     tmc = pytmc.TmcFile(args.tmc_file)
