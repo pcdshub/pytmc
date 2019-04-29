@@ -92,10 +92,10 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.records = {}
 
         for record in tmc.all_RecordPackages:
-            record_text = record.render_record()
             chain_label = ' '.join(record.chain.name_list)
             self.chains[chain_label] = record
             try:
+                record_text = record.render_record()
                 linter_results = (pytmc.epics.lint_db(dbd, record_text)
                                   if dbd and record_text else None)
                 record_text = _annotate_record_text(linter_results,
