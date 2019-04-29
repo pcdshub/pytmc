@@ -58,23 +58,28 @@ class TmcSummary(QtWidgets.QMainWindow):
 
         self.setWindowTitle(f'pytmc-debug summary - {tmc.filename}')
 
-        self.main_frame = QtWidgets.QFrame()
-        self.layout = QtWidgets.QGridLayout()
-        self.main_frame.setLayout(self.layout)
-        self.setCentralWidget(self.main_frame)
+        self.info_frame = QtWidgets.QFrame()
+        self.info_layout = QtWidgets.QVBoxLayout()
+        self.info_frame.setLayout(self.info_layout)
 
+        # Left part of the window
         self.record_list = QtWidgets.QListWidget()
-        self.layout.addWidget(self.record_list, 0, 0, 3, 1)
 
+        # Right part of the window
         self.record_text = QtWidgets.QTextEdit()
         self.record_text.setFontFamily('Courier New')
-        self.layout.addWidget(self.record_text, 0, 1)
-
         self.chain_info = QtWidgets.QListWidget()
-        self.layout.addWidget(self.chain_info, 1, 1)
-
         self.config_info = QtWidgets.QTableWidget()
-        self.layout.addWidget(self.config_info, 2, 1)
+
+        self.info_layout.addWidget(self.record_text)
+        self.info_layout.addWidget(self.chain_info)
+        self.info_layout.addWidget(self.config_info)
+
+        self.splitter = QtWidgets.QSplitter()
+        self.splitter.setOrientation(Qt.Horizontal)
+        self.splitter.addWidget(self.record_list)
+        self.splitter.addWidget(self.info_frame)
+        self.setCentralWidget(self.splitter)
 
         self.record_list.currentItemChanged.connect(
             self._item_selected)
