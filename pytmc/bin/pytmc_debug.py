@@ -47,7 +47,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         The tmc file to inspect
     '''
 
-    record_selected = Signal(object)
+    item_selected = Signal(object)
 
     def __init__(self, tmc):
         super().__init__()
@@ -55,45 +55,70 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.records = {record: record.render_record()
                         for record in tmc.all_RecordPackages
                         }
+        self.chains = {
+            ' '.join(record.chain.name_list): record
+            for record in tmc.all_RecordPackages
+        }
 
         self.setWindowTitle(f'pytmc-debug summary - {tmc.filename}')
 
-        self.info_frame = QtWidgets.QFrame()
-        self.info_layout = QtWidgets.QVBoxLayout()
-        self.info_frame.setLayout(self.info_layout)
+        self._mode = 'chains'
 
         # Left part of the window
-        self.record_list = QtWidgets.QListWidget()
+        self.left_frame = QtWidgets.QFrame()
+        self.left_layout = QtWidgets.QVBoxLayout()
+        self.left_frame.setLayout(self.left_layout)
+
+        self.item_view_type = QtWidgets.QComboBox()
+        self.item_view_type.addItem('Chains')
+        self.item_view_type.addItem('Records')
+        self.item_view_type.currentTextChanged.connect(self._update_view_type)
+        self.item_list = QtWidgets.QListWidget()
+
+        self.left_layout.addWidget(self.item_view_type)
+        self.left_layout.addWidget(self.item_list)
 
         # Right part of the window
+        self.right_frame = QtWidgets.QFrame()
+        self.right_layout = QtWidgets.QVBoxLayout()
+        self.right_frame.setLayout(self.right_layout)
+
         self.record_text = QtWidgets.QTextEdit()
         self.record_text.setFontFamily('Courier New')
         self.chain_info = QtWidgets.QListWidget()
         self.config_info = QtWidgets.QTableWidget()
 
-        self.info_layout.addWidget(self.record_text)
-        self.info_layout.addWidget(self.chain_info)
-        self.info_layout.addWidget(self.config_info)
+        self.right_layout.addWidget(self.record_text)
+        self.right_layout.addWidget(self.chain_info)
+        self.right_layout.addWidget(self.config_info)
 
         self.splitter = QtWidgets.QSplitter()
         self.splitter.setOrientation(Qt.Horizontal)
-        self.splitter.addWidget(self.record_list)
-        self.splitter.addWidget(self.info_frame)
+        self.splitter.addWidget(self.left_frame)
+        self.splitter.addWidget(self.right_frame)
         self.setCentralWidget(self.splitter)
 
-        self.record_list.currentItemChanged.connect(
+        self.item_list.currentItemChanged.connect(
             self._item_selected)
 
-        self.record_selected.connect(self._update_config_info)
-        self.record_selected.connect(self._update_chain_info)
-        self.record_selected.connect(self._update_record_text)
+        self.item_selected.connect(self._update_config_info)
+        self.item_selected.connect(self._update_chain_info)
+        self.item_selected.connect(self._update_record_text)
 
-        self._update_records()
+        self._update_item_list()
 
     def _item_selected(self, current, previous):
-        'Slot - new record in list selected'
+        'Slot - new list item selected'
+        if current is None:
+            return
+
         record = current.data(Qt.UserRole)
-        self.record_selected.emit(record)
+        if isinstance(record, pytmc.xml_collector.BaseRecordPackage):
+            self.item_selected.emit(record)
+        elif isinstance(record, str):  # {chain: record}
+            chain = record
+            record = self.chains[chain]
+            self.item_selected.emit(record)
 
     def _update_config_info(self, record):
         'Slot - update config information when a new record is selected'
@@ -132,17 +157,27 @@ class TmcSummary(QtWidgets.QMainWindow):
         for chain in record.chain.chain:
             self.chain_info.addItem(str(chain))
 
-    def _update_records(self):
-        self.record_list.clear()
+    def _update_view_type(self, name):
+        self._mode = name.lower()
+        self._update_item_list()
 
-        items = [
-            (' / '.join(_grep_record_names(db_text)) or 'Unknown', record)
-            for record, db_text in self.records.items()
-        ]
-        for names, record in sorted(items, key=lambda item: item[0]):
-            item = QtWidgets.QListWidgetItem(names)
+    def _update_item_list(self):
+        self.item_list.clear()
+        if self._mode == 'chains':
+            items = self.chains.items()
+        elif self._mode == 'records':
+            items = [
+                (' / '.join(_grep_record_names(db_text)) or 'Unknown', record)
+                for record, db_text in self.records.items()
+            ]
+        else:
+            return
+
+        for name, record in sorted(items,
+                                   key=lambda item: item[0]):
+            item = QtWidgets.QListWidgetItem(name)
             item.setData(Qt.UserRole, record)
-            self.record_list.addItem(item)
+            self.item_list.addItem(item)
 
 
 def show_qt_interface(tmc):
