@@ -24,8 +24,8 @@ ALL_TMC_FILES = conftest.TMC_FILES + conftest.INVALID_TMC_FILES
 def test_db_linting(dbd_file, tmp_path, filename):
     db_fn = tmp_path / '{}.db'.format(filename)
     tmc_file = pytmc.TmcFile(filename)
-    db_text = pytmc.bin.pytmc.make_db_text(tmc_file, dbd_file=dbd_file,
-                                           allow_errors=True)
+    pytmc.bin.pytmc.process(tmc_file, dbd_file=dbd_file, allow_errors=True)
+    db_text = tmc_file.render()
     with open(db_fn, 'wt') as f:
         print(db_text, file=f)
 
