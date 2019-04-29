@@ -11,7 +11,7 @@ from qtpy import QtWidgets
 from qtpy.QtCore import Qt, Signal
 
 import pytmc
-from .pytmc import process, LinterError
+from .pytmc import process
 
 
 description = __doc__
@@ -24,7 +24,9 @@ def _grep_record_names(text):
 
     records = [line.rstrip('{')
                for line in text.splitlines()
-               if line.startswith('record')
+               if line.startswith('record')   # regular line
+               or line.startswith('. record')  # linted line
+               or line.startswith('X record')  # linted error line
                ]
 
     def split_rtyp(line):
@@ -90,7 +92,6 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.records = {}
 
         for record in tmc.all_RecordPackages:
-            record.cfg.add_config_field('ABC', 'test')
             record_text = record.render_record()
             chain_label = ' '.join(record.chain.name_list)
             self.chains[chain_label] = record
