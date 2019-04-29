@@ -95,22 +95,26 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.config_info.clear()
         self.config_info.setRowCount(len(record.cfg.config))
 
-        columns = set()
+        def add_dict_to_table(row, d):
+            for key, value in d.items():
+                key = str(key)
+                if key not in columns:
+                    columns[key] = max(columns.values()) + 1 if columns else 0
+                self.config_info.setItem(
+                    row, columns[key], QtWidgets.QTableWidgetItem(str(value))
+                )
+                if isinstance(value, dict):
+                    add_dict_to_table(row, value)
+
+        columns = {}
         for row, line in enumerate(record.cfg.config):
-            for line_idx, (key, value) in enumerate(line.items()):
-                key_col = line_idx * 2
-                value_col = key_col + 1
-                columns.add(value_col)
-                self.config_info.setItem(
-                    row, key_col, QtWidgets.QTableWidgetItem(str(key))
-                )
-                self.config_info.setItem(
-                    row, value_col, QtWidgets.QTableWidgetItem(str(value))
-                )
+            add_dict_to_table(row, line)
+
+        self.config_info.setHorizontalHeaderLabels(list(columns))
 
         self.config_info.setColumnCount(
-            max(columns) + 1
-            if columns else 1
+            max(columns.values()) + 1
+            if columns else 0
         )
 
     def _update_record_text(self, record):
