@@ -154,14 +154,6 @@ def show_qt_interface(tmc):
     tmc : TmcFile
         The tmc file to show
     '''
-
-    for pkg in tmc.all_RecordPackages:
-        chain = pkg.chain
-        print(pkg.render_record())
-        print(chain, pkg.origin_chain)
-        print(pkg.cfg)
-        break
-
     app = QtWidgets.QApplication([])
     interface = TmcSummary(tmc)
     interface.show()
