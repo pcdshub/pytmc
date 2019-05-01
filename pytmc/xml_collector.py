@@ -423,8 +423,7 @@ class TmcFile:
                     for field in invalid_fields_by_record.get(
                                                     record.record_type,
                                                     []):
-                        record.fields.pop(field)
-
+                        pack.cfg.remove_config_field(field)
         return results
 
     def render(self):
