@@ -724,6 +724,11 @@ class RecordPackage:
         except (TypeError, KeyError, IndexError):
             pass
 
+    @property
+    def tcname(self):
+        """Complete variable name in Twincat Project"""
+        return '.'.join(self.chain.name_list)
+
     def configure(self):
         """
         Configure the record before it is rendered
