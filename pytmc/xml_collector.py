@@ -1045,8 +1045,20 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     """RecordPackage for broadcasting string values"""
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
-    dtyp = '"asynInt8"'
+    dtyp = '"asynInt8'
     field_defaults = {'FTVL' : '"CHAR"', 'NELM': '"81"'}
+
+    def generate_input_record(self):
+        record = super().generate_input_record()
+        record.fields['DTYP'] += 'ArrayIn"'
+        return record
+
+    def generate_output_record(self):
+        record = super().generate_output_record()
+        record.fields['DTYP'] += 'ArrayOut"'
+        # Waveform records only have INP fields!
+        record.fields['INP'] = record.fields.pop('OUT')
+        return record
 
 
 def BaseRecordPackage(port, chain=None, **kwargs):
