@@ -409,9 +409,11 @@ class TmcFile:
                 invalid_fields_by_record[record_type].add(field_name)
 
             for pack in self.all_RecordPackages:
-                for field in invalid_fields_by_record.get(pack.record_type,
-                                                          []):
-                    pack.cfg.remove_config_field(field)
+                for record in getattr(pack, 'records', []):
+                    for field in invalid_fields_by_record.get(
+                                                    record.record_type,
+                                                    []):
+                        record.fields.pop(field)
 
         return results
 
@@ -421,7 +423,7 @@ class TmcFile:
         """
         rec_list = []
         for pack in self.all_RecordPackages:
-            record_str = pack.render_to_string()
+            record_str = pack.render_records()
             if record_str:
                 rec_list.append(record_str)
 
@@ -677,7 +679,10 @@ class RecordPackage:
     """
     Base class to be inherited by all other RecordPackages
 
-    Subclasses must implement the ``render_record`` function to return
+    The subclass must implement the :attr:`.records` property which returns the
+    :class:`.EPICSRecord` objects which will be rendered from the package.
+    Optionally, ``RecordPackage`` can have a ``configure`` method which does
+    the necessary setup before the record can be configured.
     """
     _required_keys = {'pv', 'type', 'field'}
     _required_fields = {'DTYP', }
@@ -697,19 +702,6 @@ class RecordPackage:
         # Will continue without this for now
 
         self.ads_port = ads_port
-
-    @property
-    def record_type(self):
-        """
-        Returns
-        -------
-        pvname : str or None
-            The record type associated with the RecordPackage
-        """
-        try:
-            return self.cfg.get_config_lines('type')[0]['tag']
-        except (TypeError, KeyError, IndexError):
-            pass
 
     @property
     def pvname(self):
@@ -785,22 +777,23 @@ class RecordPackage:
                                   for key in self._required_fields)
         return has_required_keys and has_required_fields
 
-    def render_record(self):
+    @property
+    def records(self):
+        """Generated :class:`.EPICSRecord` objects"""
+        return NotImplemented
+
+    def render_records(self):
         """
         Returns
         -------
         string
             Jinja rendered entry for the RecordPackage
         """
-        raise NotImplementedError("Must be implemented by RecordPackage "
-                                  "subclass")
-
-    def render_to_string(self):
-        """Calls :meth:`.render_record` if ``RecordPackage`` is valid"""
         if not self.valid:
-            logger.error('Unable to render record: %s', simple_dict)
+            logger.error('Unable to render record: %s', self)
             return
-        return self.render_record()
+        return '\n'.join([record.render_template()
+                          for record in self.records])
 
 
 class BaseRecordPackage(RecordPackage):
