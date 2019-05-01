@@ -7,11 +7,10 @@ interpretations. Db Files can be produced from the interpretation
 from collections import ChainMap
 import re
 import logging
-import functools
 import warnings
 import xml.etree.ElementTree as ET
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from copy import deepcopy
 
 from jinja2 import Environment, PackageLoader
@@ -41,7 +40,7 @@ class ElementCollector(dict):
 
         Parameters
         ----------
-        value : :class:`~pytmc.Symbol`, :class:`~pytmc.DataType`,or :class:`~pytmc.SubItem`.
+        value : :class:`.Symbol`, :class:`.DataType`, :class:`.SubItem`.
             The instance to add to the ElementCollector
         '''
         name = value.name
@@ -140,7 +139,7 @@ class TmcFile:
                                  "Property/[Name='ApplicationName']")
         element_value = element.find('./Value').text
         # Parse the value for the port number and convert
-        port = int(re.search('(\d+)', element_value).group())
+        port = int(re.search(r'(\d+)', element_value).group())
         return port
 
     def isolate_Symbols(self):
@@ -359,10 +358,11 @@ class TmcFile:
                 # a record package not based on the data type. This will be
                 # needed for customizing specific records and supporting our
                 # own data types such as motor
-                brp =  TwincatTypeRecordPackage.from_chain(self.ads_port,
-                                                           chain=singular_chain)
+                brp = TwincatTypeRecordPackage.from_chain(self.ads_port,
+                                                          chain=singular_chain)
             except Exception:
-                logger.exception("Error creating record from %s", singular_chain)
+                logger.exception("Error creating record from %s",
+                                 singular_chain)
             else:
                 self.all_RecordPackages.append(brp)
 
@@ -546,7 +546,8 @@ class TmcChain:
                 extras.append(deepcopy(chain))
         so_far.extend(extras)
 
-        for term, term_index in zip(master_list[0], range(len(master_list[0]))):
+        for term, term_index in zip(master_list[0],
+                                    range(len(master_list[0]))):
             for i in range(replicate_count):
                 index = term_index * replicate_count + i
                 so_far[index].append([term])
@@ -598,7 +599,6 @@ class TmcChain:
             raise ChainNotSingularError
 
         new_config = Configuration(config=[])
-        cfg_title = ""
         for entry in self.chain:
             new_config.concat(entry.pragma, cc_symbol=cc_symbol)
 
@@ -1045,7 +1045,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
     dtyp = '"asynInt8'
-    field_defaults = {'FTVL' : '"CHAR"', 'NELM': '"81"'}
+    field_defaults = {'FTVL': '"CHAR"', 'NELM': '"81"'}
 
     def generate_input_record(self):
         record = super().generate_input_record()
