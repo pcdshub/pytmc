@@ -196,5 +196,5 @@ def example_singular_tmc_chains(light_leaf_bool_pragma_string,
 
 def lint_record(dbd_file, record):
     assert record.valid
-    linted = epics.lint_db(dbd=dbd_file, db=record.render_record())
+    linted = epics.lint_db(dbd=dbd_file, db=record.render_records())
     assert not len(linted.errors)
