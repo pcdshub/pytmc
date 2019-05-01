@@ -647,8 +647,8 @@ class RecordPackage:
     Optionally, ``RecordPackage`` can have a ``configure`` method which does
     the necessary setup before the record can be configured.
     """
-    _required_keys = {'pv', 'type', 'field'}
-    _required_fields = {'DTYP', }
+    _required_keys = {'pv'}
+    _required_fields = {}
 
     def __init__(self, ads_port, chain=None, origin=None):
         """
