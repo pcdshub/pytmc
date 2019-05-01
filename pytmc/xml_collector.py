@@ -8,6 +8,7 @@ from collections import ChainMap
 import re
 import logging
 import functools
+import warnings
 import xml.etree.ElementTree as ET
 
 from collections import defaultdict, namedtuple
@@ -353,9 +354,17 @@ class TmcFile:
         packages. requires self.all_singular_TmcChains to be populated.
         """
         for singular_chain in self.all_singular_TmcChains:
-            brp = BaseRecordPackage(self.ads_port, chain=singular_chain)
-            #brp = BaseRecordPackage(chain=singular_chain, origin=chain)
-            self.all_RecordPackages.append(brp)
+            try:
+                # TODO: Look for a special pragma that will route the chain to
+                # a record package not based on the data type. This will be
+                # needed for customizing specific records and supporting our
+                # own data types such as motor
+                brp =  TwincatTypeRecordPackage.from_chain(self.ads_port,
+                                                           chain=singular_chain)
+            except Exception:
+                logger.exception("Error creating record from %s", singular_chain)
+            else:
+                self.all_RecordPackages.append(brp)
 
     def configure_packages(self):
         """
@@ -629,53 +638,6 @@ class TmcChain:
         return "TmcChain: " + str(self.name_list)
 
 
-RecordSpec = namedtuple('RecordSpec',
-                        ['input_record_type', 'output_record_type',
-                         'data_type'])
-
-data_types = {
-    'scalar': {
-        'BOOL': RecordSpec('bi', 'bo', 'asynInt32'),
-        'BYTE': RecordSpec('longin', 'longout', 'asynInt32'),
-        'SINT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'USINT': RecordSpec('longin', 'longout', 'asynInt32'),
-
-        'WORD': RecordSpec('longin', 'longout', 'asynInt32'),
-        'INT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'UINT': RecordSpec('longin', 'longout', 'asynInt32'),
-
-        'DWORD': RecordSpec('longin', 'longout', 'asynInt32'),
-        'DINT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'UDINT': RecordSpec('longin', 'longout', 'asynInt32'),
-        'ENUM': RecordSpec('mbbi', 'mbbo', 'asynInt32'),
-
-        'REAL': RecordSpec('ai', 'ao', 'asynFloat64'),
-        'LREAL': RecordSpec('ai', 'ao', 'asynFloat64'),
-    },
-    'array': {
-        # Assumes ArrayIn/ArrayOut will be appended
-        'BOOL': RecordSpec('waveform', 'waveform', 'asynInt8'),
-        'BYTE': RecordSpec('waveform', 'waveform', 'asynInt8'),
-        'SINT': RecordSpec('waveform', 'waveform', 'asynInt8'),
-        'USINT': RecordSpec('waveform', 'waveform', 'asynInt8'),
-
-        'WORD': RecordSpec('waveform', 'waveform', 'asynInt16'),
-        'INT': RecordSpec('waveform', 'waveform', 'asynInt16'),
-        'UINT': RecordSpec('waveform', 'waveform', 'asynInt16'),
-
-        'DWORD': RecordSpec('waveform', 'waveform', 'asynInt32'),
-        'DINT': RecordSpec('waveform', 'waveform', 'asynInt32'),
-        'UDINT': RecordSpec('waveform', 'waveform', 'asynInt32'),
-        'ENUM': RecordSpec('waveform', 'waveform', 'asynInt16'),  # -> Int32?
-
-        'REAL': RecordSpec('waveform', 'waveform', 'asynFloat32'),
-        'LREAL': RecordSpec('waveform', 'waveform', 'asynFloat64'),
-
-        'STRING': RecordSpec('waveform', 'waveform', 'asynInt8'),
-    },
-}
-
-
 class RecordPackage:
     """
     Base class to be inherited by all other RecordPackages
@@ -792,6 +754,19 @@ class RecordPackage:
             return
         return '\n'.join([record.render_template()
                           for record in self.records])
+
+    @classmethod
+    def from_chain(cls, *args, chain, **kwargs):
+        """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
+        last = chain.last
+        if last.is_array:
+            spec = WaveformRecordPackage
+        elif last.tc_type in {'STRING'}:
+            spec = StringRecordPackage
+        else:
+            spec = data_types[last.tc_type]
+        # Create a RecordPackage from the chain
+        return spec(*args, chain=chain, **kwargs)
 
 
 class TwincatTypeRecordPackage(RecordPackage):
@@ -1067,3 +1042,31 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     dtyp = '"asynInt8"'
     field_defaults = {'FTVL' : '"CHAR"', 'NELM': '"81"'}
 
+
+def BaseRecordPackage(port, chain=None, **kwargs):
+    """
+    Create a TwincatTypeRecordPackage based on the provided chain
+    """
+    warnings.warn("BaseRecordPackage will be deprecated in future releases "
+                  "use TwincatTypeRecordPackage.from_chain instead")
+    return TwincatTypeRecordPackage.from_chain(port, chain=chain, **kwargs)
+
+
+data_types = {
+    'BOOL': BinaryRecordPackage,
+    'BYTE': IntegerRecordPackage,
+    'SINT': IntegerRecordPackage,
+    'USINT': IntegerRecordPackage,
+
+    'WORD': IntegerRecordPackage,
+    'INT': IntegerRecordPackage,
+    'UINT': IntegerRecordPackage,
+
+    'DWORD': IntegerRecordPackage,
+    'DINT': IntegerRecordPackage,
+    'UDINT': IntegerRecordPackage,
+    'ENUM': EnumRecordPackage,
+
+    'REAL': FloatRecordPackage,
+    'LREAL': FloatRecordPackage,
+}
