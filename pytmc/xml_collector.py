@@ -893,7 +893,11 @@ class TwincatTypeRecordPackage(RecordPackage):
             Description of input record
         """
         # Base record with defaults
-        record = EPICSRecord(self.pvname,
+        if self.pvname and not self.pvname.endswith('RBV'):
+            pvname = self.pvname + '_RBV'
+        else:
+            pvname = self.pvname
+        record = EPICSRecord(pvname,
                              self.input_rtyp,
                              fields=self.field_defaults)
 
