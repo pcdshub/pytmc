@@ -4,6 +4,7 @@ xml_collector.py
 This file contains the objects for intaking TMC files and generating python
 interpretations. Db Files can be produced from the interpretation
 """
+from collections import ChainMap
 import re
 import logging
 import functools
@@ -16,7 +17,7 @@ from jinja2 import Environment, PackageLoader
 
 from . import Symbol, DataType, SubItem, epics
 from .xml_obj import Configuration
-
+from .record import EPICSRecord
 
 logger = logging.getLogger(__name__)
 
@@ -754,10 +755,7 @@ class RecordPackage:
                 cfg_dict.setdefault('field', {})
                 tag = row['tag']
                 cfg_dict['field'][tag['f_name']] = tag['f_set']
-            if row['title'] == 'info':
-                cfg_dict['info'] = True
 
-        cfg_dict.setdefault('info', False)
         return cfg_dict
 
     @property
@@ -796,48 +794,57 @@ class RecordPackage:
                           for record in self.records])
 
 
-class BaseRecordPackage(RecordPackage):
+class TwincatTypeRecordPackage(RecordPackage):
     """
-    BaseRecordPackage includes some basic funcionality that should be shared
-    across most versions. This includes things like common methods so things
-    like validation can be configured at the __init__ with an instance
-    variable. Overwrite/inherit features as necessary.
+    The common parent for all RecordPackages for basic Twincat types
 
+    This main purpose of this class is to handle the parsing of the pragma
+    chains that will be shared among all variable types. This includes setting
+    the appropriate asyn port together and handling the "io" directionality. If
+    you have a :class:`.TmcChain` but are not certain which class is
+    appropriate use the :meth:`.from_chain` class constructor and the correct
+    subclass will be chosen based on the given variable information
+
+    In order to subclass:
+
+    1. :attr:`.input_rtyp` and :attr:`.output_rtyp` need to be provided. These
+       are the EPICS RTYPs that are necessary for input and output variables.
+    2. If there are default values for fields, these can be provided in the
+       :attr:`.field_defaults`. Setting this on a subclass will only override
+       fields in parent classes that are redundant. In other words,
+       ``default_fields`` are inherited if not explicitly overwritten. Also
+       note that these defaults are applied to both the input and output
+       records.
+    3. :attr:`.dtyp` needs to be set to the appropriate value for the Twincat
+       type.
+    4. The :meth:`.generate_input_record` and :meth:`.generate_output_record`
+       functions can be subclasses if further customisation is needed. This is
+       not required.
     """
+    field_defaults = {'PINI': 1, 'TSE': -2}
+    dtyp = NotImplemented
+    input_rtyp = NotImplemented
+    output_rtyp = NotImplemented
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # List of methods defined in the class
-        self.guess_methods_list = [
-            self.guess_PINI,
-            self.guess_TSE,
-            self.guess_type,
-            self.guess_io,
-            self.guess_DTYP,
-            self.guess_INP_OUT,
-            self.guess_SCAN,
-            self.guess_ONAM,
-            self.guess_ZNAM,
-            self.guess_PREC,
-            self.guess_FTVL,
-            self.guess_NELM,
-        ]
-
         # use form list of dicts,1st list has 1 entry per requirement
         # dict has form {'path':[],'target':n} where n is any variable
         self.validation_list = None
 
-        # Load jinja templates
-        self.jinja_env = Environment(
-            loader=PackageLoader("pytmc", "templates"),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.record_template = self.jinja_env.get_template(
-            "asyn_standard_record.jinja2"
-        )
-        self.file_template = self.jinja_env.get_template(
-            "asyn_standard_file.jinja2"
-        )
+    def __init_subclass__(cls, **kwargs):
+        """Magic to have field_defaults be the combination of hierarchy"""
+        super().__init_subclass__(**kwargs)
+        # Create an empty set of defaults if not provided
+        if not hasattr(cls, 'field_defaults'):
+            cls.field_defaults = {}
+        # Walk backwards through class hierarchy
+        for parent in reversed(cls.mro()):
+            # When we find a class with field_defaults append our own
+            if hasattr(parent, 'field_defaults'):
+                cls.field_defaults = dict(ChainMap(cls.field_defaults,
+                                                   parent.field_defaults))
+                return
 
     def apply_config_validation(self):
         """
@@ -871,55 +878,6 @@ class BaseRecordPackage(RecordPackage):
     def configure(self):
         """Configure the ``BaseRecordPackage`` for rendering"""
         self.generate_naive_config()
-        self.guess_all()
-
-
-    def render_record(self):
-        """
-        Returns
-        -------
-        string
-            Jinja rendered entry for this BaseRecordPackage
-        """
-        return self.record_template.render(**simple_dict)
-
-    def _skip_if_field_set(field):
-        '''
-        decorator: skip a `guess` function if `field` is already set
-
-        Parameters
-        ----------
-        field : str
-            The field name
-        '''
-        def wrapper(func):
-            @functools.wraps(func)
-            def wrapped(self, *args, **kwargs):
-                try:
-                    field_value, = self.cfg.get_config_fields(field)
-                    return False
-                except ValueError:
-                    pass
-                return func(self, *args, **kwargs)
-            return wrapped
-        return wrapper
-
-    @_skip_if_field_set('PINI')
-    def guess_PINI(self):
-        """
-        Add process-on-init (PINI) field
-        """
-        self.cfg.add_config_field("PINI", '"1"')
-        return True
-
-    @_skip_if_field_set('TSE')
-    def guess_TSE(self):
-        """
-        Add timestamp event (TSE) field
-        """
-        # TSE=-2: the device support provides the time stamp from the hardware
-        self.cfg.add_config_field("TSE", "-2")
-        return True
 
     @property
     def io_direction(self):
@@ -936,301 +894,176 @@ class BaseRecordPackage(RecordPackage):
         ValueError
             If unable to determine IO direction
         """
-        io, = self.cfg.get_config_lines('io')
-        io = io['tag']
-        if 'o' in io:
-            return 'output'
-        else:
-            return 'input'
-
-    def guess_type(self):
-        """
-        Add information indicating record type (e.g. ai, bo, waveform, etc.)
-
-        Returns
-        -------
-        bool
-            Return a boolean that is true iff a change has been made.
-        """
-        try:
-            ty, = self.cfg.get_config_lines('type')
-            return False
-        except ValueError:
-            pass
-
-        try:
-            direction = self.io_direction
-        except ValueError:
-            return False
-
-        last = self.chain.last
-
-        scalar_key = ('array'
-                      if last.is_array or last.tc_type in {'STRING'}
-                      else 'scalar')
-
-        try:
-            spec = data_types[scalar_key][last.tc_type]
-        except KeyError:
-            return False
-
-        rtyp = (spec.input_record_type
-                if direction == 'input'
-                else spec.output_record_type)
-
-        self.cfg.add_config_line("type", rtyp)
-        return True
-
-    def guess_io(self):
-        """
-        Add information indicating io direction if it is not provided.
-
-        Returns
-        -------
-        bool
-            Return a boolean that is true iff a change has been made.
-
-        """
         try:
             io, = self.cfg.get_config_lines('io')
-            return False
+            io = io['tag']
+            if 'o' in io:
+                return 'output'
         except ValueError:
-            self.cfg.add_config_line("io", "io")
-            return True
+            logger.warning("No io direction specified for %r", self)
+        return 'input'
 
-    @_skip_if_field_set('DTYP')
-    def guess_DTYP(self):
+    @property
+    def _asyn_port_spec(self):
+        """Asyn port specification without io direction"""
+        return f'"@asyn($(PORT),0,1)ADSPORT={self.ads_port}/{self.tcname}'
+
+    def generate_input_record(self):
         """
-        Add field specifying DTYP.
+        Generate the record to read values into to the IOC
+
+        Returns
+        -------
+        record: :class:`.EpicsRecord`
+            Description of input record
+        """
+        # Base record with defaults
+        record = EPICSRecord(self.pvname,
+                             self.input_rtyp,
+                             fields=self.field_defaults)
+
+        # Add our port
+        record.fields['INP'] = self._asyn_port_spec + '?"'
+        record.fields['DTYP'] = self.dtyp
+        record.fields['SCAN'] = '"I/O Intr"'
+
+        # Update with given pragamas
+        record.fields.update(self.cfg_as_dict().get('field', {}))
+        return record
+
+    def generate_output_record(self):
+        """
+        Generate the record to write values back to the PLC
+
+        This will only be called if the ``io_direction`` is set to ``"output"`.
+
+        Returns
+        -------
+        record: :class:`.EpicsRecord`
+            Description of output record
+        """
+        # Base record with defaults
+        record = EPICSRecord(self.pvname,
+                             self.output_rtyp,
+                             fields=self.field_defaults)
+        # Add our port
+        record.fields['DTYP'] = self.dtyp
+        record.fields['OUT'] = self._asyn_port_spec + '="'
+
+        # Update with given pragamas
+        record.fields.update(self.cfg_as_dict().get('field', {}))
+        return record
+
+    @property
+    def records(self):
+        """All records that will be created in the package"""
+        records = [self.generate_input_record()]
+        if self.io_direction == 'output':
+            records.append(self.generate_output_record())
+        return records
+
+
+class BinaryRecordPackage(TwincatTypeRecordPackage):
+    """Create a set of records for a binary Twincat Variable"""
+    input_rtyp = 'bi'
+    output_rtyp = 'bo'
+    dtyp = '"asynInt32"'
+    field_defaults = {'ZNAM': '"Zero"', 'ONAM': '"One"'}
+
+
+class IntegerRecordPackage(TwincatTypeRecordPackage):
+    """Create a set of records for an integer Twincat Variable"""
+    input_rtyp = 'longin'
+    output_rtyp = 'longout'
+    dtyp = '"asynInt32"'
+
+
+class FloatRecordPackage(TwincatTypeRecordPackage):
+    """Create a set of records for a floating point Twincat Variable"""
+    input_rtyp = 'ai'
+    output_rtyp = 'ao'
+    dtyp = '"asynFloat64"'
+    field_defaults = {'PREC': '"3"'}
+
+
+class EnumRecordPackage(TwincatTypeRecordPackage):
+    """Create a set of record for a floating point Twincat Variable"""
+    input_rtyp = 'mbbi'
+    output_rtyp = 'mbbo'
+    dtyp = '"asynInt32"'
+
+
+class WaveformRecordPackage(TwincatTypeRecordPackage):
+    input_rtyp = 'waveform'
+    output_rtyp = 'waveform'
+
+    @property
+    def ftvl(self):
+        """Field type of value"""
+        ftvl = {'BOOL': '"CHAR"',
+                'INT': '"SHORT"',
+                'ENUM': '"SHORT"',
+                'DINT': '"LONG"',
+                'REAL': '"FLOAT"',
+                'LREAL': '"DOUBLE"'}
+        return ftvl[self.chain.last.tc_type]
+
+    @property
+    def nelm(self):
+        """Number of elements in record"""
+        return self.chain.last.iterable_length
+
+    @property
+    def dtyp(self):
+        """
+        Add field specifying DTYP without specifying array direction
 
         The following is taken from the EPICS wiki: "This field specifies the
         device type for the record. Each record type has its own set of device
         support routines which are specified in devSup.ASCII. If a record type
         does not have any associated device support, DTYP and DSET are
         meaningless."
-
-        Returns
-        -------
-        bool
-            Return a boolean that is True iff a change has been made.
-        """
-        try:
-            direction = self.io_direction
-        except ValueError:
-            return False
-
-        last = self.chain.last
-        scalar_key = ('array'
-                      if last.is_array or last.tc_type in {'STRING'}
-                      else 'scalar')
-
-        try:
-            spec = data_types[scalar_key][last.tc_type]
-        except KeyError:
-            return False
-
-        direction_suffix = ''
-        if scalar_key == 'array':
-            direction_suffix = ('ArrayIn'
-                                if direction == 'input'
-                                else 'ArrayOut')
-
-        self.cfg.add_config_field("DTYP", '"{}"'.format(spec.data_type + direction_suffix))
-        return True
-
-    @_skip_if_field_set('INP')
-    @_skip_if_field_set('OUT')
-    def guess_INP_OUT(self):
-        """
-        Construct, add, INP or OUT field
-        Fields will have this form:
-        "@asyn($(PORT),0,1)ADSPORT=851/Main.bEnableUpdateSine="
-
-        Returns
-        -------
-        bool
-            Return a boolean that is true iff a change has been made.
         """
 
-        io, = self.cfg.get_config_lines('io')
-        io = io['tag']
-        name_list = self.chain.name_list
-        name = '.'.join(name_list)
-        assign_symbol = ""
-        field_type = ""
-        if 'i' in io and 'o' in io:
-            assign_symbol = "?"
-            if self.chain.last.is_array or self.chain.last.is_str:
-                field_type = 'INP'
-            else:
-                field_type = 'OUT'
-        elif 'i' in io:
-            assign_symbol = "?"
-            field_type = 'INP'
-        elif 'o' in io:
-            assign_symbol = "="
-            if self.chain.last.is_array or self.chain.last.is_str:
-                field_type = 'INP'
-            else:
-                field_type = 'OUT'
+        # Assumes ArrayIn/ArrayOut will be appended
+        data_types = {'BOOL': '"asynInt8',
+                      'BYTE': '"asynInt8',
+                      'SINT': '"asynInt8',
+                      'USINT': '"asynInt8',
 
-        try:
-            dtyp, = self.cfg.get_config_fields('DTYP')
-            dtyp = dtyp['tag']['f_set']
-        except (ValueError, KeyError):
-            return False
+                      'WORD': '"asynInt16',
+                      'INT': '"asynInt16',
+                      'UINT': '"asynInt16',
 
-        self.cfg.add_config_field(
-            field_type,
-            f'@asyn($(PORT),0,1)ADSPORT={self.ads_port}/{name}{assign_symbol}'
-        )
-        return True
+                      'DWORD': '"asynInt32',
+                      'DINT': '"asynInt32',
+                      'UDINT': '"asynInt32',
+                      'ENUM': '"asynInt16',  # -> Int32?
 
-    @_skip_if_field_set('SCAN')
-    def guess_SCAN(self):
-        """
-        add field for SCAN field
+                      'REAL': '"asynFloat32',
+                      'LREAL': '"asynFloat64'}
 
-        Returns
-        -------
-        bool
-            Return a boolean that is true iff a change has been made.
-        """
+        return data_types[self.chain.last.tc_type]
 
-        io, = self.cfg.get_config_lines('io')
-        if 'i' in io['tag'] and 'o' in io['tag']:
-            self.cfg.add_config_field("SCAN", '"Passive"')
-            self.cfg.add_config_line("info", True)
-            return True
+    def generate_input_record(self):
+        record = super().generate_input_record()
+        record.fields['DTYP'] += 'ArrayIn"'
+        record.fields['FTVL'] = self.ftvl
+        record.fields['NELM'] = self.nelm
+        return record
 
-        elif 'i' in io['tag']:
-            fast_i_set = {'BOOL'}
-            if self.chain.last.tc_type in fast_i_set:
-                self.cfg.add_config_field("SCAN", '"I/O Intr"')
-                return True
-            else:
-                self.cfg.add_config_field("SCAN", '".5 second"')
-                return True
-        elif 'o' in io['tag']:
-            self.cfg.add_config_field("SCAN", '"Passive"')
-            return True
+    def generate_output_record(self):
+        record = super().generate_output_record()
+        record.fields['DTYP'] += 'ArrayOut"'
+        record.fields['FTVL'] = self.ftvl
+        record.fields['NELM'] = self.nelm
+        return record
 
-        return False
 
-    # guess lines below this comment are not always used (context specific)
+class StringRecordPackage(TwincatTypeRecordPackage):
+    """RecordPackage for broadcasting string values"""
+    input_rtyp = 'waveform'
+    output_rtyp = 'waveform'
+    dtyp = '"asynInt8"'
+    field_defaults = {'FTVL' : '"CHAR"', 'NELM': '"81"'}
 
-    @_skip_if_field_set('ONAM')
-    def guess_ONAM(self):
-        """
-        Add ONAM fields for booleans
-
-        Returns
-        -------
-        bool
-            Return a boolean that is true iff a change has been made.
-        """
-        if self.chain.last.tc_type in {'BOOL'}:
-            self.cfg.add_config_field("ONAM", "One")
-            return True
-        return False
-
-    @_skip_if_field_set('ZNAM')
-    def guess_ZNAM(self):
-        """
-        Add ZNAM fields for booleans
-
-        Returns
-        -------
-        bool
-            Return a boolean that is true iff a change has been made.
-        """
-        if self.chain.last.tc_type in {'BOOL'}:
-            self.cfg.add_config_field("ZNAM", "Zero")
-            return True
-
-        return False
-
-    @_skip_if_field_set('PREC')
-    def guess_PREC(self):
-        """
-        Add precision field for the ai/ao type
-
-        Returns
-        -------
-        bool
-            Return a boolean that is true iff a change has been made.
-        """
-        try:
-            epics_type, = self.cfg.get_config_lines("type")
-        except ValueError:
-            # raise MissingConfigError
-            return False
-
-        float_set = {'ai', 'ao'}
-        if epics_type['tag'] in float_set:
-            self.cfg.add_config_field("PREC", '"3"')
-            return True
-
-        return False
-
-    @_skip_if_field_set('FTVL')
-    def guess_FTVL(self):
-        """
-        Add datatype specification field for waveforms
-        """
-        if self.chain.last.is_array:
-            tc_type = self.chain.last.tc_type
-            if tc_type == "BOOL":
-                self.cfg.add_config_field("FTVL", '"CHAR"')
-                return True
-            INT_set = {"INT", "ENUM"}
-            if tc_type in INT_set:
-                self.cfg.add_config_field("FTVL", '"SHORT"')
-                return True
-            DINT_set = {"DINT"}
-            if tc_type in DINT_set:
-                self.cfg.add_config_field("FTVL", '"LONG"')
-                return True
-            if tc_type == "REAL":
-                self.cfg.add_config_field("FTVL", '"FLOAT"')
-                return True
-            if tc_type == "LREAL":
-                self.cfg.add_config_field("FTVL", '"DOUBLE"')
-                return True
-
-        if self.chain.last.is_str:
-            self.cfg.add_config_field("FTVL", '"CHAR"')
-            return True
-
-        return False
-
-    @_skip_if_field_set('NELM')
-    def guess_NELM(self):
-        """
-        Add data length secification for waveforms
-        """
-        if self.chain.last.is_array or self.chain.last.is_str:
-            length = self.chain.last.iterable_length
-            self.cfg.add_config_field("NELM", length)
-            return True
-
-        return False
-
-    def guess_all(self):
-        """
-        Cycle through guessing methods until none can be applied.
-        guess_methods_list is a list of functions.
-        """
-        complete = False
-        count = 0
-        while not complete:
-            count += 1
-            assert count < 20
-            complete = True
-            for method in self.guess_methods_list:
-                if method() is True:
-                    complete = False
-
-    def render_record(self):
-        simple_dict = self.cfg_as_dict()
-        return self.record_template.render(**simple_dict)
