@@ -329,7 +329,8 @@ def test_TmcFile_fullbuild(string_tmc_path):
     z = tmc.render()
     print(z)
 
-
+# How do we support custom record building?
+@pytest.mark.xfail
 def test_TmcFile_render(generic_tmc_path):
     tmc = TmcFile(None)
     brp1 = BaseRecordPackage(851)
@@ -581,22 +582,23 @@ def test_BaseRecordPackage_apply_config_valid(sample_TmcChain):
 
 
 def test_BaseRecordPackage_cfg_as_dict():
-    brp = BaseRecordPackage(851)
+    brp = TwincatTypeRecordPackage(851)
     brp.cfg.add_config_line('pv', 'example_pv')
     brp.cfg.add_config_line('type', 'ao')
     brp.cfg.add_config_field('ABC', 'test 0')
     assert brp.cfg_as_dict() == {
         'pv': 'example_pv',
         'type': 'ao',
-        'info': False,
         'field': {
             'ABC': '"test 0"'
         }
     }
 
 
+# How do we support custom record building!
+@pytest.mark.xfail
 def test_BaseRecordPackage_render_record():
-    brp = BaseRecordPackage(851)
+    brp = TwincatTypeRecordPackage(851)
     brp.cfg.add_config_line('pv', 'example_pv')
     brp.cfg.add_config_line('type', 'ao')
     brp.cfg.add_config_field('DTYP', '"MyDTYP"')
@@ -718,6 +720,10 @@ def test_BaseRecordPackage_guess_type(example_singular_tmc_chains,
     assert field['tag'] == final_type
 
 
+
+# If no I/O is given in the pragma we no longer assume that this value is an io
+# field!
+@pytest.mark.xfail
 @pytest.mark.parametrize("tc_type, sing_index, final_io", [
     ("BOOL", 6, 'io'),
     ("INT", 6, 'io'),
@@ -1031,6 +1037,8 @@ def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
         assert out['tag']['f_set'] == final_NELM
 
 
+# Guess all is no longer a valid method
+@pytest.mark.xfail
 @pytest.mark.parametrize(
     "tc_type, sing_index, is_str, is_arr, final_NELM, spot_check, result", [
         ("INT", 6, False, False, None, "DTYP", '"asynInt32"'),
