@@ -1036,6 +1036,8 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
         record.fields['DTYP'] += 'ArrayOut"'
         record.fields['FTVL'] = self.ftvl
         record.fields['NELM'] = self.nelm
+        # Waveform records only have INP fields!
+        record.fields['INP'] = record.fields.pop('OUT')
         return record
 
 
