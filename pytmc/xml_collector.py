@@ -739,7 +739,7 @@ class RecordPackage:
     @property
     def records(self):
         """Generated :class:`.EPICSRecord` objects"""
-        return NotImplemented
+        raise NotImplementedError()
 
     def render_records(self):
         """
