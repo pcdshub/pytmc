@@ -777,7 +777,7 @@ class TwincatTypeRecordPackage(RecordPackage):
     the appropriate asyn port together and handling the "io" directionality. If
     you have a :class:`.TmcChain` but are not certain which class is
     appropriate use the :meth:`.from_chain` class constructor and the correct
-    subclass will be chosen based on the given variable information
+    subclass will be chosen based on the given variable information.
 
     In order to subclass:
 
