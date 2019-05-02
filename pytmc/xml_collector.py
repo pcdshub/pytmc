@@ -826,7 +826,7 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         Returns
         -------
-        List
+        list
             a list of the missing requirements
         """
         violations = []
