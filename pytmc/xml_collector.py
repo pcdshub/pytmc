@@ -905,7 +905,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['DTYP'] = self.dtyp
         record.fields['SCAN'] = '"I/O Intr"'
 
-        # Update with given pragamas
+        # Update with given pragmas
         record.fields.update(self.cfg_as_dict().get('field', {}))
         return record
 
