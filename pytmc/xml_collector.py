@@ -751,7 +751,7 @@ class RecordPackage:
         if not self.valid:
             logger.error('Unable to render record: %s', self)
             return
-        return '\n'.join([record.render_template()
+        return '\n\n'.join([record.render_template().strip()
                           for record in self.records])
 
     @classmethod
