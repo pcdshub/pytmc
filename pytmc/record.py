@@ -25,4 +25,4 @@ class EPICSRecord:
         return self.record_template.render(record=self)
 
     def __repr__(self):
-        return f"EPICSRecord ({self.pvname}, RTYP={self.record_type})"
+        return f"EPICSRecord({self.pvname!r}, record_type={self.record_type!r})"
