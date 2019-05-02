@@ -7,7 +7,7 @@ class EPICSRecord:
     def __init__(self, pvname, record_type, fields=None, template=None):
         self.pvname = pvname
         self.record_type = record_type
-        self.fields = dict(fields) or dict()
+        self.fields = dict(fields) if fields is not None else {}
         self.template = template or 'asyn_standard_record.jinja2'
 
         # Load jinja templates
