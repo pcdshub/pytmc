@@ -965,7 +965,7 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
 
 
 class EnumRecordPackage(TwincatTypeRecordPackage):
-    """Create a set of record for an ENUM Twincat Variable"""
+    """Create a set of record for a ENUM Twincat Variable"""
     input_rtyp = 'mbbi'
     output_rtyp = 'mbbo'
     dtyp = '"asynInt32"'
