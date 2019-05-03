@@ -972,6 +972,7 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
 
 
 class WaveformRecordPackage(TwincatTypeRecordPackage):
+    """Create a set of records for a Twincat Array"""
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
 
