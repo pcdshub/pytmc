@@ -1045,7 +1045,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     """RecordPackage for broadcasting string values"""
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
-    dtyp = '"asynInt8'
+    dtyp = '"asynOctetRead'
     field_defaults = {'FTVL': '"CHAR"', 'NELM': '"81"'}
 
     def generate_input_record(self):
