@@ -719,8 +719,8 @@ def test_BaseRecordPackage_guess_io(example_singular_tmc_chains,
     ("ENUM", 'i', True, '"asynInt16ArrayIn"'),
     ("ENUM", 'io', True, '"asynInt16ArrayOut"'),
     # String
-    ("STRING", 'i', False, '"asynInt8ArrayIn"'),
-    ("STRING", 'io', False, '"asynInt8ArrayOut"'),
+    ("STRING", 'i', False, '"asynOctetRead"'),
+    ("STRING", 'io', False, '"asynOctetWrite"'),
 ])
 def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
                                       tc_type, io, is_array, final_DTYP):
