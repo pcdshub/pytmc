@@ -546,7 +546,7 @@ class TmcChain:
                 extras.append(deepcopy(chain))
         so_far.extend(extras)
 
-        for term, term_index in enumerate(master_list[0]):
+        for term_index, term in enumerate(master_list[0]):
             for i in range(replicate_count):
                 index = term_index * replicate_count + i
                 so_far[index].append([term])
