@@ -740,10 +740,10 @@ def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
     record.cfg.add_config_line('io', io, overwrite=True)
     # If we are checking an input type check the first record
     if record.io_direction == 'input':
-        record.records[0].fields['DTYP'] == final_DTYP
+        assert record.records[0].fields['DTYP'] == final_DTYP
     # Otherwise check the output records
     else:
-        record.records[1].fields['DTYP'] == final_DTYP
+        assert record.records[1].fields['DTYP'] == final_DTYP
 
 @pytest.mark.parametrize("tc_type, sing_index, field_type, final_INP_OUT", [
     ("BOOL",  0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),
