@@ -432,7 +432,7 @@ class TmcFile:
         """
         rec_list = []
         for pack in self.all_RecordPackages:
-            record_str = pack.render_records()
+            record_str = pack.render()
             if record_str:
                 rec_list.append(record_str)
 
@@ -740,7 +740,7 @@ class RecordPackage:
         """Generated :class:`.EPICSRecord` objects"""
         raise NotImplementedError()
 
-    def render_records(self):
+    def render(self):
         """
         Returns
         -------

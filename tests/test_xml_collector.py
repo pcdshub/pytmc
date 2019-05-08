@@ -619,7 +619,7 @@ def test_BaseRecordPackage_render_record():
     }\
     """
     target_response = textwrap.dedent(target_response).strip()
-    assert target_response == brp.render_record()
+    assert target_response == brp.render()
 
 
 def test_BaseRecordPackage_PINI():
