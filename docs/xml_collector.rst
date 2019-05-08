@@ -18,10 +18,14 @@ TmcChain
 .. autoclass:: pytmc.xml_collector.TmcChain
    :members:
 
-BaseRecordPackage
-+++++++++++++++++
-.. autoclass:: pytmc.xml_collector.BaseRecordPackage
+
+RecordPackage
++++++++++++++
+.. autoclass:: pytmc.xml_collector.RecordPackage
    :members:
 
 
-
+TwincatRecordPackage
+++++++++++++++++++++
+.. autoclass:: pytmc.xml_collector.TwincatTypeRecordPackage
+   :members:
