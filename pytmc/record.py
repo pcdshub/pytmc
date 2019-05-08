@@ -20,7 +20,7 @@ class EPICSRecord:
             self.template
         )
 
-    def render_template(self):
+    def render(self):
         """Render the provided template"""
         return self.record_template.render(record=self)
 

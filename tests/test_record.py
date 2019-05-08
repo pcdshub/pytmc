@@ -8,7 +8,7 @@ def test_epics_record_render():
                          'ONAM': 'In'}}
 
     ec = EPICSRecord(**kwargs)
-    record = ec.render_template()
+    record = ec.render()
     print(record)  # For debug purposes
     assert kwargs['pvname'] in record
     assert kwargs['record_type'] in record
