@@ -912,7 +912,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         """
         Generate the record to write values back to the PLC
 
-        This will only be called if the ``io_direction`` is set to ``"output"`.
+        This will only be called if the ``io_direction`` is set to ``"output"``.
 
         Returns
         -------
