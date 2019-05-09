@@ -1,4 +1,5 @@
 from pytmc.record import EPICSRecord
+from pytmc.epics import lint_db
 
 
 def test_epics_record_render():
@@ -15,3 +16,15 @@ def test_epics_record_render():
     for key, value in kwargs['fields'].items():
         assert key in record
         assert value in record
+
+
+def test_epics_record_with_linter(dbd_file):
+    kwargs = {'pvname': 'Tst:pv',
+              'record_type': 'bi',
+              'fields': {'ZNAM': '"Out"',
+                         'ONAM': '"In"',
+                         'DTYP': '"Raw Soft Channel"'}}
+    ec = EPICSRecord(**kwargs)
+    record = ec.render()
+    linted = lint_db(dbd=dbd_file, db=record)
+    assert not (linted.errors)
