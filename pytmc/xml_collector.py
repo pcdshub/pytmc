@@ -469,7 +469,7 @@ class TmcChain:
         """
         full_list = []
         for entry in self.chain:
-            logger.debug(str(entry))
+            logger.debug('Forkmap entry: %s', entry)
             if entry.pragma is None:
                 full_list.append([])
             else:
