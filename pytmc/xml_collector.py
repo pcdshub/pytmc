@@ -566,21 +566,20 @@ class TmcChain:
             List of TmcChains. Each chain is bound to one of the possible paths
             given the configurations available at each step.
         """
-        name_sequences = self._recursive_permute(self.forkmap())
+        forkmap = self.forkmap()
+        name_sequences = self._recursive_permute(forkmap)
         logging.debug(str(name_sequences))
+        if any(config.pragma is None for config in self.chain):
+            return []
+
         results = []
-        append = True
+
         for seq in name_sequences:
             new_TmcChain = deepcopy(self)
+            results.append(new_TmcChain)
+
             for config, select_name in zip(new_TmcChain.chain, seq):
-                if config.pragma is not None:
-                    config.pragma.fix_to_config_name(select_name[0])
-                else:
-                    append = False
-            if append:
-                results.append(new_TmcChain)
-            else:
-                append = True
+                config.pragma.fix_to_config_name(select_name[0])
         return results
 
     def naive_config(self, cc_symbol=":"):
