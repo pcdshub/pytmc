@@ -207,8 +207,9 @@ class Configuration:
 
         specific_configs = self._config_by_name(formatted_config_lines)
 
+        item = {'title': self.cfg_header, 'tag': config_name}
         for spec_config in specific_configs:
-            if {'title': self.cfg_header, 'tag': config_name} in spec_config:
+            if item in spec_config:
                 return spec_config
 
         return []
