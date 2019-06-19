@@ -818,7 +818,7 @@ class BaseElement:
         if self.element is None:
             name = "None"
         else:
-            name = "<xml(" + self.element.find("./Name").text + ")>"
+            name = "<xml(" + self.name + ")>"
 
         return "{}(element={})".format(
             self.__class__.__name__,
@@ -838,9 +838,8 @@ class BaseElement:
             The name of the variable
         '''
         if self._cached_name is None:
-            return self._get_subfield("Name").text
-        else:
-            return self._cached_name
+            self._cached_name = self._get_subfield("Name").text
+        return self._cached_name
 
     @name.setter
     def name(self, name):
