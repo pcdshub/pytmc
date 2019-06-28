@@ -1,4 +1,5 @@
 """Individual EPICS Database Record creation"""
+from collections import OrderedDict
 from jinja2 import Environment, PackageLoader
 
 
@@ -7,7 +8,7 @@ class EPICSRecord:
     def __init__(self, pvname, record_type, fields=None, template=None):
         self.pvname = pvname
         self.record_type = record_type
-        self.fields = dict(fields) if fields is not None else {}
+        self.fields = OrderedDict(fields) if fields is not None else {}
         self.template = template or 'asyn_standard_record.jinja2'
 
         # Load jinja templates
@@ -22,6 +23,9 @@ class EPICSRecord:
 
     def render(self):
         """Render the provided template"""
+        for field, value in list(self.fields.items()):
+            self.fields[field] = str(value).strip('"')
+
         return self.record_template.render(record=self)
 
     def __repr__(self):
