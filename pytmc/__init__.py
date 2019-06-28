@@ -3,6 +3,8 @@ import logging
 from ._version import get_versions
 from .record import RecordPackage, EPICSRecord
 from .pragmas import Configuration
+from . import pragmas
+from . import parser
 from . import epics
 
 logger = logging.getLogger(__name__)

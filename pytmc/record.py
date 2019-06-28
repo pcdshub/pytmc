@@ -108,7 +108,7 @@ class RecordPackage:
         elif data_type.is_enum:
             spec = EnumRecordPackage
         else:
-            spec = data_types[last.base_type]
+            spec = data_types[last.type]
         # Create a RecordPackage from the chain
         return spec(*args, chain=chain, **kwargs)
 
@@ -317,7 +317,7 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
                 'DINT': '"LONG"',
                 'REAL': '"FLOAT"',
                 'LREAL': '"DOUBLE"'}
-        return ftvl[self.chain.last.base_type]
+        return ftvl[self.chain.last.type]
 
     @property
     def nelm(self):
@@ -354,7 +354,7 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
                       'REAL': '"asynFloat32',
                       'LREAL': '"asynFloat64'}
 
-        return data_types[self.chain.last.base_type]
+        return data_types[self.chain.last.type]
 
     def generate_input_record(self):
         record = super().generate_input_record()
@@ -391,15 +391,6 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         # Waveform records only have INP fields!
         record.fields['INP'] = record.fields.pop('OUT')
         return record
-
-
-def BaseRecordPackage(port, chain=None, **kwargs):
-    """
-    Create a TwincatTypeRecordPackage based on the provided chain
-    """
-    warnings.warn("BaseRecordPackage will be deprecated in future releases "
-                  "use TwincatTypeRecordPackage.from_chain instead")
-    return TwincatTypeRecordPackage.from_chain(port, chain=chain, **kwargs)
 
 
 data_types = {
