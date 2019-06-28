@@ -207,7 +207,7 @@ class TmcFile:
         # resolve str
         for sym_name in self.all_Symbols:
             sym = self.all_Symbols[sym_name]
-            sym_type_str = sym.tc_type
+            sym_type_str = sym.base_type
             try:
                 if self.all_DataTypes[sym_type_str].is_enum:
                     sym.is_enum = True
@@ -218,7 +218,7 @@ class TmcFile:
         for datatype_name in self.all_SubItems:
             for subitem_name in self.all_SubItems[datatype_name]:
                 subitem = self.all_SubItems[datatype_name][subitem_name]
-                subitem_type_str = subitem.tc_type
+                subitem_type_str = subitem.base_type
                 try:
                     if self.all_DataTypes[subitem_type_str].is_enum:
                         subitem.is_enum = True
@@ -276,7 +276,7 @@ class TmcFile:
         target_SubItems = []
 
         # If this is a user defined datatype
-        DataType_str = root.tc_type
+        DataType_str = root.base_type
         if DataType_str in self.all_DataTypes:
 
             # Accumulate list of SubItems in this Subitem/Symbol
@@ -645,78 +645,17 @@ class RecordPackage:
     Optionally, ``RecordPackage`` can have a ``configure`` method which does
     the necessary setup before the record can be configured.
     """
-    _required_keys = {'pv'}
+    _required_keys = {}
     _required_fields = {}
 
     def __init__(self, ads_port, chain=None, origin=None):
         """
         All subclasses should use super on their init method.
         """
-        # Just fills in a default
-        self.cfg = Configuration(config=[])
-
-        self.chain = chain  # TmcChain instance - so I could add methods there
-
-        # TmcChain instance-do I need this? unclear
-        self.origin_chain = origin
-        # ^could be relevant for init fields
-        # Will continue without this for now
-
+        self.pvname = chain.pvname
+        self.tcname = chain.tcname
+        self.chain = chain
         self.ads_port = ads_port
-
-    @property
-    def pvname(self):
-        """
-        Returns
-        -------
-        pvname : str or None
-            The PV name associated with the RecordPackage
-        """
-        try:
-            return self.cfg.get_config_lines('pv')[0]['tag']
-        except (TypeError, KeyError, IndexError):
-            pass
-
-    @property
-    def tcname(self):
-        """Complete variable name in Twincat Project"""
-        return '.'.join(self.chain.name_list)
-
-    def configure(self):
-        """
-        Configure the record before it is rendered
-
-        This can optionally be implemented by subclass if additional
-        configuration is needed for a ``RecordPackage``. Exceptions raised by
-        this method will be caught and the ``RecordPackage`` will not be
-        rendered
-        """
-        pass
-
-    def cfg_as_dict(self):
-        """
-        Produce a jinja-template-compatible dictionary describing this
-        RecordPackage.
-
-        Returns
-        -------
-        dict
-            return a dict. Keys are the fields of the jinja template. Contains
-            special 'field' key where the value is a dictionary with f_name and
-            f_set as the key/value pairs respectively.
-        """
-        cfg_dict = {}
-        for row in self.cfg.config:
-            if row['title'] == 'pv':
-                cfg_dict['pv'] = row['tag']
-            if row['title'] == 'type':
-                cfg_dict['type'] = row['tag']
-            if row['title'] == 'field':
-                cfg_dict.setdefault('field', {})
-                tag = row['tag']
-                cfg_dict['field'][tag['f_name']] = tag['f_set']
-
-        return cfg_dict
 
     @property
     def valid(self):
@@ -726,11 +665,10 @@ class RecordPackage:
         bool
             Returns true if this record is fully specified and valid.
         """
-        simple_dict = self.cfg_as_dict()
-        has_required_keys = all(simple_dict.get(key)
+        has_required_keys = all(self.chain.config.get(key)
                                 for key in self._required_keys)
 
-        fields = simple_dict.get('field', {})
+        fields = self.chain.config.get('field', {})
         has_required_fields = all(fields.get(key)
                                   for key in self._required_fields)
         return has_required_keys and has_required_fields
@@ -757,12 +695,15 @@ class RecordPackage:
     def from_chain(cls, *args, chain, **kwargs):
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         last = chain.last
-        if last.is_array:
+        data_type = last.data_type_class
+        if data_type.is_array:
             spec = WaveformRecordPackage
-        elif last.tc_type in {'STRING'}:
+        elif data_type.is_string:
             spec = StringRecordPackage
+        elif data_type.is_enum:
+            spec = EnumRecordPackage
         else:
-            spec = data_types[last.tc_type]
+            spec = data_types[last.base_type]
         # Create a RecordPackage from the chain
         return spec(*args, chain=chain, **kwargs)
 
@@ -799,12 +740,6 @@ class TwincatTypeRecordPackage(RecordPackage):
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # use form list of dicts,1st list has 1 entry per requirement
-        # dict has form {'path':[],'target':n} where n is any variable
-        self.validation_list = None
-
     def __init_subclass__(cls, **kwargs):
         """Magic to have field_defaults be the combination of hierarchy"""
         super().__init_subclass__(**kwargs)
@@ -818,39 +753,6 @@ class TwincatTypeRecordPackage(RecordPackage):
                 cls.field_defaults = dict(ChainMap(cls.field_defaults,
                                                    parent.field_defaults))
                 return
-
-    def apply_config_validation(self):
-        """
-        Apply the guessing module. Assert that the proper fields exist.
-
-        Returns
-        -------
-        list
-            a list of the missing requirements
-        """
-        violations = []
-        for req in self.validation_list:
-            if not self.cfg.seek(**req):
-                violations.append(req)
-
-        return violations
-
-    def generate_naive_config(self):
-        """
-        Create config dictionary from current chain. Move from lowest to
-        highest level to create config (highest level has highest precedence).
-
-        Overwrites self.cfg
-
-        Returns
-        -------
-        None
-        """
-        self.cfg = self.chain.naive_config()
-
-    def configure(self):
-        """Configure the ``BaseRecordPackage`` for rendering"""
-        self.generate_naive_config()
 
     @property
     def io_direction(self):
@@ -867,13 +769,9 @@ class TwincatTypeRecordPackage(RecordPackage):
         ValueError
             If unable to determine IO direction
         """
-        try:
-            io, = self.cfg.get_config_lines('io')
-            io = io['tag']
-            if 'o' in io:
-                return 'output'
-        except ValueError:
-            logger.warning("No io direction specified for %r", self)
+        io = self.chain.config.get('io', 'i')
+        if 'o' in io:
+            return 'output'
         return 'input'
 
     @property
@@ -905,7 +803,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['SCAN'] = '"I/O Intr"'
 
         # Update with given pragmas
-        record.fields.update(self.cfg_as_dict().get('field', {}))
+        record.fields.update(self.chain.config.get('field', {}))
         return record
 
     def generate_output_record(self):
@@ -928,7 +826,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['OUT'] = self._asyn_port_spec + '="'
 
         # Update with given pragmas
-        record.fields.update(self.cfg_as_dict().get('field', {}))
+        record.fields.update(self.chain.config.get('field', {}))
         return record
 
     @property
@@ -969,6 +867,36 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
     output_rtyp = 'mbbo'
     dtyp = '"asynInt32"'
 
+    mbb_fields = [
+        ('ZRVL', 'ZRST'),
+        ('ONVL', 'ONST'),
+        ('TWVL', 'TWST'),
+        ('THVL', 'THST'),
+        ('FRVL', 'FRST'),
+        ('FVVL', 'FVST'),
+        ('SXVL', 'SXST'),
+        ('SVVL', 'SVST'),
+        ('EIVL', 'EIST'),
+        ('NIVL', 'NIST'),
+        ('TEVL', 'TEST'),
+        ('ELVL', 'ELST'),
+        ('TVVL', 'TVST'),
+        ('TTVL', 'TTST'),
+        ('FTVL', 'FTST'),
+        ('FFVL', 'FFST'),
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        data_type = self.chain.last.data_type_class
+
+        self.field_defaults = dict(self.field_defaults)
+        for (val_field, string_field), (val, string) in zip(
+                self.mbb_fields,
+                sorted(data_type.enum_dict.items())):
+            self.field_defaults.setdefault(val_field, val)
+            self.field_defaults.setdefault(string_field, string)
+
 
 class WaveformRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a Twincat Array"""
@@ -984,7 +912,7 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
                 'DINT': '"LONG"',
                 'REAL': '"FLOAT"',
                 'LREAL': '"DOUBLE"'}
-        return ftvl[self.chain.last.tc_type]
+        return ftvl[self.chain.last.base_type]
 
     @property
     def nelm(self):
@@ -1021,7 +949,7 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
                       'REAL': '"asynFloat32',
                       'LREAL': '"asynFloat64'}
 
-        return data_types[self.chain.last.tc_type]
+        return data_types[self.chain.last.base_type]
 
     def generate_input_record(self):
         record = super().generate_input_record()
