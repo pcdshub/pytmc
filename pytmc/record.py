@@ -96,11 +96,8 @@ class RecordPackage:
         return '\n\n'.join([record.render().strip()
                           for record in self.records])
 
-    @classmethod
-    def from_chain(cls, *args, chain, **kwargs):
-        """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
-        last = chain.last
-        data_type = last.data_type_class
+    @staticmethod
+    def from_data_type(*args, data_type, **kwargs):
         if data_type.is_array:
             spec = WaveformRecordPackage
         elif data_type.is_string:
@@ -108,9 +105,14 @@ class RecordPackage:
         elif data_type.is_enum:
             spec = EnumRecordPackage
         else:
-            spec = data_types[last.type]
-        # Create a RecordPackage from the chain
-        return spec(*args, chain=chain, **kwargs)
+            spec = data_types[data_type.type]
+        return spec(*args, **kwargs)
+
+    @staticmethod
+    def from_chain(*args, chain, **kwargs):
+        """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
+        return RecordPackage.from_data_type(
+            *args, data_type=chain.last.data_type_class, chain=chain, **kwargs)
 
 
 class TwincatTypeRecordPackage(RecordPackage):
@@ -182,7 +184,7 @@ class TwincatTypeRecordPackage(RecordPackage):
     @property
     def _asyn_port_spec(self):
         """Asyn port specification without io direction"""
-        return f'"@asyn($(PORT),0,1)ADSPORT={self.ads_port}/{self.tcname}'
+        return f'@asyn($(PORT),0,1)ADSPORT={self.ads_port}/{self.tcname}'
 
     def generate_input_record(self):
         """
@@ -203,9 +205,9 @@ class TwincatTypeRecordPackage(RecordPackage):
                              fields=self.field_defaults)
 
         # Add our port
-        record.fields['INP'] = self._asyn_port_spec + '?"'
+        record.fields['INP'] = self._asyn_port_spec + '?'
         record.fields['DTYP'] = self.dtyp
-        record.fields['SCAN'] = '"I/O Intr"'
+        record.fields['SCAN'] = 'I/O Intr'
 
         # Update with given pragmas
         record.fields.update(self.chain.config.get('field', {}))
@@ -228,7 +230,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                              fields=self.field_defaults)
         # Add our port
         record.fields['DTYP'] = self.dtyp
-        record.fields['OUT'] = self._asyn_port_spec + '="'
+        record.fields['OUT'] = self._asyn_port_spec + '='
 
         # Update with given pragmas
         record.fields.update(self.chain.config.get('field', {}))
@@ -247,30 +249,30 @@ class BinaryRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a binary Twincat Variable"""
     input_rtyp = 'bi'
     output_rtyp = 'bo'
-    dtyp = '"asynInt32"'
-    field_defaults = {'ZNAM': '"Zero"', 'ONAM': '"One"'}
+    dtyp = 'asynInt32'
+    field_defaults = {'ZNAM': 'Zero', 'ONAM': 'One'}
 
 
 class IntegerRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for an integer Twincat Variable"""
     input_rtyp = 'longin'
     output_rtyp = 'longout'
-    dtyp = '"asynInt32"'
+    dtyp = 'asynInt32'
 
 
 class FloatRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a floating point Twincat Variable"""
     input_rtyp = 'ai'
     output_rtyp = 'ao'
-    dtyp = '"asynFloat64"'
-    field_defaults = {'PREC': '"3"'}
+    dtyp = 'asynFloat64'
+    field_defaults = {'PREC': '3'}
 
 
 class EnumRecordPackage(TwincatTypeRecordPackage):
     """Create a set of record for a ENUM Twincat Variable"""
     input_rtyp = 'mbbi'
     output_rtyp = 'mbbo'
-    dtyp = '"asynInt32"'
+    dtyp = 'asynInt32'
 
     mbb_fields = [
         ('ZRVL', 'ZRST'),
@@ -311,18 +313,18 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
     @property
     def ftvl(self):
         """Field type of value"""
-        ftvl = {'BOOL': '"CHAR"',
-                'INT': '"SHORT"',
-                'ENUM': '"SHORT"',
-                'DINT': '"LONG"',
-                'REAL': '"FLOAT"',
-                'LREAL': '"DOUBLE"'}
+        ftvl = {'BOOL': 'CHAR',
+                'INT': 'SHORT',
+                'ENUM': 'SHORT',
+                'DINT': 'LONG',
+                'REAL': 'FLOAT',
+                'LREAL': 'DOUBLE'}
         return ftvl[self.chain.last.type]
 
     @property
     def nelm(self):
         """Number of elements in record"""
-        return self.chain.last.iterable_length
+        return self.chain.last.length
 
     @property
     def dtyp(self):
@@ -337,35 +339,35 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
         """
 
         # Assumes ArrayIn/ArrayOut will be appended
-        data_types = {'BOOL': '"asynInt8',
-                      'BYTE': '"asynInt8',
-                      'SINT': '"asynInt8',
-                      'USINT': '"asynInt8',
+        data_types = {'BOOL': 'asynInt8',
+                      'BYTE': 'asynInt8',
+                      'SINT': 'asynInt8',
+                      'USINT': 'asynInt8',
 
-                      'WORD': '"asynInt16',
-                      'INT': '"asynInt16',
-                      'UINT': '"asynInt16',
+                      'WORD': 'asynInt16',
+                      'INT': 'asynInt16',
+                      'UINT': 'asynInt16',
 
-                      'DWORD': '"asynInt32',
-                      'DINT': '"asynInt32',
-                      'UDINT': '"asynInt32',
-                      'ENUM': '"asynInt16',  # -> Int32?
+                      'DWORD': 'asynInt32',
+                      'DINT': 'asynInt32',
+                      'UDINT': 'asynInt32',
+                      'ENUM': 'asynInt16',  # -> Int32?
 
-                      'REAL': '"asynFloat32',
-                      'LREAL': '"asynFloat64'}
+                      'REAL': 'asynFloat32',
+                      'LREAL': 'asynFloat64'}
 
         return data_types[self.chain.last.type]
 
     def generate_input_record(self):
         record = super().generate_input_record()
-        record.fields['DTYP'] += 'ArrayIn"'
+        record.fields['DTYP'] += 'ArrayIn'
         record.fields['FTVL'] = self.ftvl
         record.fields['NELM'] = self.nelm
         return record
 
     def generate_output_record(self):
         record = super().generate_output_record()
-        record.fields['DTYP'] += 'ArrayOut"'
+        record.fields['DTYP'] += 'ArrayOut'
         record.fields['FTVL'] = self.ftvl
         record.fields['NELM'] = self.nelm
         # Waveform records only have INP fields!
@@ -377,17 +379,17 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     """RecordPackage for broadcasting string values"""
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
-    dtyp = '"asynOctet'
-    field_defaults = {'FTVL': '"CHAR"', 'NELM': '"81"'}
+    dtyp = 'asynOctet'
+    field_defaults = {'FTVL': 'CHAR', 'NELM': '81'}
 
     def generate_input_record(self):
         record = super().generate_input_record()
-        record.fields['DTYP'] += 'Read"'
+        record.fields['DTYP'] += 'Read'
         return record
 
     def generate_output_record(self):
         record = super().generate_output_record()
-        record.fields['DTYP'] += 'Write"'
+        record.fields['DTYP'] += 'Write'
         # Waveform records only have INP fields!
         record.fields['INP'] = record.fields.pop('OUT')
         return record
@@ -410,4 +412,6 @@ data_types = {
 
     'REAL': FloatRecordPackage,
     'LREAL': FloatRecordPackage,
+
+    'STRING': StringRecordPackage,
 }

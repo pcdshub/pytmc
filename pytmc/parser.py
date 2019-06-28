@@ -477,7 +477,17 @@ class Link(TwincatItem):
 
 class BuiltinDataType:
     def __init__(self, typename):
-        self.typename = typename
+        self.type = typename
+
+    @property
+    def length(self):
+        logger.debug('TODO')
+        return 1
+
+    @property
+    def enum_dict(self):
+        return {int(item.enum_value): item.enum_text
+                for item in getattr(self, 'EnumInfo', [])}
 
     @property
     def is_enum(self):
@@ -485,7 +495,7 @@ class BuiltinDataType:
 
     @property
     def is_string(self):
-        return self.typename == 'STRING' or self.typename.startswith('STRING(')
+        return self.type == 'STRING' or self.type.startswith('STRING(')
 
     @property
     def is_array(self):
