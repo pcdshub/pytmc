@@ -126,7 +126,7 @@ def summary(args):
 
     if args.debug:
         # for interactive debugging ease-of-use, import `parse`
-        from tcparse import parse  # noqa
+        from pytmc.parser import parse  # noqa
         try:
             from IPython import embed
         except ImportError:
