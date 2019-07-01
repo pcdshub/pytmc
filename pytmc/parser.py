@@ -140,7 +140,7 @@ class TwincatItem:
         '''
         root = pathlib.Path(self.filename).parent
         rel_path = pathlib.PureWindowsPath(path)
-        return (root / rel_path).absolute()
+        return (root / rel_path).resolve()
 
     def find(self, cls):
         '''
@@ -1002,7 +1002,7 @@ def case_insensitive_path(path):
     '''
     path = pathlib.Path(path)
     if path.exists():
-        return path
+        return path.resolve()
 
     new_path = pathlib.Path(path.parts[0])
     for part in path.parts[1:]:
@@ -1017,7 +1017,7 @@ def case_insensitive_path(path):
                 ) from None
         new_path = new_path / part
 
-    return new_path
+    return new_path.resolve()
 
 
 def separate_children_by_tag(children):
