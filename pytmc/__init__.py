@@ -14,6 +14,10 @@ del get_versions
 
 __all__ = [
     'Configuration',
+    'EPICSRecord',
+    'RecordPackage',
     'epics',
     'logger',
+    'parser',
+    'pragmas',
 ]

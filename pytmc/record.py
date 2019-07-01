@@ -1,9 +1,7 @@
 """
 Record generation and templating
 """
-import re
 import logging
-import warnings
 
 from jinja2 import Environment, PackageLoader
 
@@ -38,7 +36,8 @@ class EPICSRecord:
         return self.record_template.render(record=self)
 
     def __repr__(self):
-        return f"EPICSRecord({self.pvname!r}, record_type={self.record_type!r})"
+        return (f"EPICSRecord({self.pvname!r}, "
+                f"record_type={self.record_type!r})")
 
 
 class RecordPackage:
@@ -217,7 +216,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         """
         Generate the record to write values back to the PLC
 
-        This will only be called if the ``io_direction`` is set to ``"output"``.
+        This will only be called if the ``io_direction`` is set to ``"output"``
 
         Returns
         -------

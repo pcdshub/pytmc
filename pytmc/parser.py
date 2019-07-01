@@ -285,7 +285,6 @@ class TcModuleClass(_TwincatProjectSubItem):
     '''
     [TMC] The top-level TMC file
     '''
-    ...
     def get_data_type(self, type_name):
         data_types = self.DataTypes[0].types
         try:

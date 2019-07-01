@@ -7,11 +7,7 @@ interpretations. Db Files can be produced from the interpretation
 import itertools
 import logging
 import re
-import warnings
 
-from jinja2 import Environment, PackageLoader
-
-from collections import ChainMap, OrderedDict
 from . import parser
 from .record import RecordPackage
 
@@ -108,6 +104,7 @@ class Configuration:
         self.pragma_text = pragma_text
         self.config_lines = split_pytmc_pragma(pragma_text)
         self.configs = dict(separate_configs_by_pv(self.config_lines))
+
 
 def dictify_config(conf):
     fields = {

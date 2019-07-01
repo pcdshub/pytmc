@@ -31,7 +31,8 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
-        '-d', '--depth', type=int, help='Recursive limit for exploring the file',
+        '-d', '--depth', type=int,
+        help='Recursive limit for exploring the file',
         default=7
     )
 
@@ -45,7 +46,7 @@ def build_arg_parser(parser=None):
 
 
 def recursive(branch, level=1, indent_size=4, indent=0):
-    if branch == None:
+    if branch is None:
         return
     if level == 0:
         return

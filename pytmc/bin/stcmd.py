@@ -9,7 +9,6 @@ import argparse
 import getpass
 import logging
 import pathlib
-import sys
 
 import jinja2
 
@@ -180,7 +179,8 @@ def render(args):
             db_filename = f'{plc.filename.stem}.db'
             db_path = pathlib.Path(args.db_path) / db_filename
             with open(db_path, 'wt') as db_file:
-                db_file.write('\n\n'.join(rec.render() for rec in other_records))
+                db_file.write('\n\n'.join(rec.render()
+                                          for rec in other_records))
             additional_db_files.append({'file': db_filename, 'macros': ''})
 
     # TODO one last hack

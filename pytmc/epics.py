@@ -4,7 +4,6 @@ import pyPDB.dbdlint as _dbdlint
 from pyPDB.dbdlint import DBSyntaxError
 
 
-
 class LinterResults(_dbdlint.Results):
     '''
     Container for dbdlint results, with easier-to-access attributes
