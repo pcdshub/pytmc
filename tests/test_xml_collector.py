@@ -102,7 +102,7 @@ def test_record_package_from_chain(chain, tc_type, is_array, final_type,
 def test_dtype(chain, tc_type, io, is_array, final_DTYP):
     chain.data_type = make_mock_type(tc_type, is_array=is_array, length=3)
     chain.config['io'] = io
-    record = RecordPackage.from_chain(chain, ads_port=851)
+    record = RecordPackage.from_chain(chain=chain, ads_port=851)
     # If we are checking an input type check the first record
     if record.io_direction == 'input':
         assert record.records[0].fields['DTYP'] == final_DTYP
@@ -142,7 +142,7 @@ def test_input_output_scan(chain, dbd_file, tc_type, sing_index, field_type,
     chain.data_type = make_mock_type(tc_type, is_array=False)
     chain.config['io'] = 'io'
     chain.tcname = 'a.b.c'
-    record = RecordPackage.from_chain(chain, ads_port=851)
+    record = RecordPackage.from_chain(chain=chain, ads_port=851)
 
     # chain must be broken into singular
     if tc_type == "STRING":
@@ -172,7 +172,7 @@ def test_input_output_scan(chain, dbd_file, tc_type, sing_index, field_type,
 def test_bool_naming(chain, tc_type, sing_index, final_ZNAM, final_ONAM, ret):
     chain.data_type = make_mock_type(tc_type)
     chain.config['io'] = 'io'
-    record = RecordPackage.from_chain(chain, ads_port=851)
+    record = RecordPackage.from_chain(chain=chain, ads_port=851)
 
     for rec in record.records:
         assert rec.fields.get('ZNAM') == final_ZNAM
@@ -187,7 +187,7 @@ def test_BaseRecordPackage_guess_PREC(chain, tc_type, sing_index, final_PREC,
                                       ret):
     chain.data_type = make_mock_type(tc_type)
     chain.config['io'] = 'io'
-    record = RecordPackage.from_chain(chain, ads_port=851)
+    record = RecordPackage.from_chain(chain=chain, ads_port=851)
     for rec in record.records:
         assert rec.fields.get('PREC') == final_PREC
 
@@ -230,7 +230,7 @@ def test_BaseRecordPackage_guess_FTVL(chain, tc_type, io, is_str, is_arr,
     chain.data_type = make_mock_type(tc_type, is_array=is_arr,
                                      is_string=is_str, length=3)
     chain.config['io'] = io
-    record = RecordPackage.from_chain(chain, ads_port=851)
+    record = RecordPackage.from_chain(chain=chain, ads_port=851)
     for rec in record.records:
         assert rec.fields.get('FTVL') == final_FTVL
 
@@ -248,6 +248,6 @@ def test_BaseRecordPackage_guess_NELM(chain, tc_type, sing_index, is_str,
     chain.data_type = make_mock_type(tc_type, is_array=is_arr,
                                      is_string=is_str,
                                      length=final_NELM)
-    record = RecordPackage.from_chain(chain, ads_port=851)
+    record = RecordPackage.from_chain(chain=chain, ads_port=851)
     for rec in record.records:
         assert rec.fields.get('NELM') == final_NELM

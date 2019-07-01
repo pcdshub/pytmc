@@ -1,13 +1,17 @@
+'''
+TMC, XTI, tsproj parsing utilities
+'''
 import collections
 import logging
 import os
 import pathlib
-import re
 import types
 
 import lxml
 import lxml.etree
 
+from .code import (get_pou_call_blocks, program_name_from_declaration,
+                   variables_from_declaration)
 # Registry of all TwincatItem-based classes
 TWINCAT_TYPES = {}
 USE_FILE_AS_PATH = object()
@@ -15,43 +19,21 @@ USE_FILE_AS_PATH = object()
 logger = logging.getLogger(__name__)
 
 
-def separate_children_by_tag(children):
+def parse(fn, *, parent=None):
     '''
-    Take in a list of `TwincatItem`, categorize each by their XML tag, and
-    return a dictionary keyed on tag.
-
-    For example::
-
-        <a> <a> <b> <b>
-
-    Would become::
-
-        {'a': [<a>, <a>],
-         'b': [<b>, <b>]
-         }
-
-    Parameters
-    ----------
-    children : list
-        list of TwincatItem
+    Parse a given tsproj, xti, or tmc file.
 
     Returns
     -------
-    dict
-        Categorized children
+    item : TwincatItem
     '''
-    d = collections.defaultdict(list)
-    for child in children:
-        d[child.tag].append(child)
+    fn = case_insensitive_path(fn)
 
-    return d
+    with open(fn, 'rt') as f:
+        tree = lxml.etree.parse(f)
 
-
-def strip_namespace(tag):
-    '''
-    Strip off {{namespace}} from: {{namespace}}tag
-    '''
-    return lxml.etree.QName(tag).localname
+    root = tree.getroot()
+    return TwincatItem.parse(root, filename=fn, parent=parent)
 
 
 def element_to_class_name(element):
@@ -293,6 +275,164 @@ class TcModuleClass(_TwincatProjectSubItem):
             return BuiltinDataType(type_name)
 
 
+class OwnerA(TwincatItem):
+    '''
+    [XTC] For a Link between VarA and VarB, this is the parent of VarA
+    '''
+    ...
+
+
+class OwnerB(TwincatItem):
+    '''
+    [XTC] For a Link between VarA and VarB, this is the parent of VarB
+    '''
+    ...
+
+
+class Link(TwincatItem):
+    '[XTI] Links between NC/PLC/IO'
+    def post_init(self):
+        self.a = (self.find_ancestor(OwnerA).name, self.attributes.get('VarA'))
+        self.b = (self.find_ancestor(OwnerB).name, self.attributes.get('VarB'))
+
+
+class Project(TwincatItem):
+    '''
+    [tsproj] A project which contains Plc, Io, Mappings, etc.
+    '''
+    _load_path = pathlib.Path('_Config') / 'PLC'
+
+    @property
+    def ams_id(self):
+        '''
+        The AMS ID of the configured target
+        '''
+        return self.attributes.get('TargetNetId', '')
+
+    @property
+    def target_ip(self):
+        '''
+        A guess of the target IP, based on the AMS ID
+        '''
+        ams_id = self.ams_id
+        if ams_id.endswith('.1.1'):
+            return ams_id[:-4]
+        return ams_id  # :(
+
+
+class TcSmProject(TwincatItem):
+    '''
+    [tsproj] A top-level TwinCAT tsproj
+    '''
+    @property
+    def plcs(self):
+        'The nested projects (virtual PLC project) contained in this Project'
+        return [plc for plc in self.find(Plc)
+                if plc.project is not None]
+
+
+class TcSmItem(TwincatItem):
+    '''
+    [XTI] Top-level container for XTI files
+
+    Further broken down into classes such as `TcSmItem_CNcSafTaskDef`, the
+    latter portion being derived from the `ClassName` attribute in the XML
+    file.
+    '''
+    ...
+
+
+class Plc(TwincatItem):
+    '''
+    [XTI] A Plc Project
+    '''
+
+    Project: list
+
+    def post_init(self):
+        self.namespaces = {}
+        if hasattr(self, 'Project'):
+            proj = self.Project[0]
+        else:
+            self.project = None
+            self.tmc = None
+            # Some <Plc>s are merely containers for nested project
+            # definitions in separate XTI files. Ignore those for now, as
+            # they will be loaded later.
+            return
+
+        self.project_path = self.get_relative_path(
+            proj.attributes['PrjFilePath'])
+        self.tmc_path = self.get_relative_path(
+            proj.attributes['TmcFilePath'])
+        self.project = (parse(self.project_path, parent=self)
+                        if self.project_path.exists()
+                        else None)
+        self.tmc = (parse(self.tmc_path, parent=self)
+                    if self.tmc_path.exists()
+                    else None)
+
+        self.source_filenames = [
+            self.project.get_relative_path(compile.attributes['Include'])
+            for compile in self.find(Compile)
+            if 'Include' in compile.attributes
+        ]
+
+        self.source = {
+            str(fn.relative_to(self.project.filename.parent)):
+            parse(fn, parent=self)
+            for fn in self.source_filenames
+        }
+
+        self.pou_by_name = {
+            plc_obj.POU[0].program_name: plc_obj.POU[0]
+            for plc_obj in self.source.values()
+            if hasattr(plc_obj, 'POU')
+            and plc_obj.POU[0].program_name
+        }
+
+        self.gvl_by_name = {
+            plc_obj.GVL[0].name: plc_obj.GVL[0]
+            for plc_obj in self.source.values()
+            if hasattr(plc_obj, 'GVL')
+            and plc_obj.GVL[0].name
+        }
+
+        self.namespaces.update(self.pou_by_name)
+        self.namespaces.update(self.gvl_by_name)
+
+    def find(self, cls):
+        yield from super().find(cls)
+        if self.project is not None:
+            yield from self.project.find(cls)
+
+        for _, ns in self.namespaces.items():
+            if isinstance(ns, cls):
+                yield ns
+
+        if self.tmc is not None:
+            yield from self.tmc.find(cls)
+
+
+class TcSmItem_CNestedPlcProjDef(TcSmItem, Plc):
+    '''
+    [XTI] Nested PLC project definition (i.e., a virtual PLC project)
+
+    Contains POUs and a parsed version of the tmc
+    '''
+    ...
+
+
+class Compile(TwincatItem):
+    '''
+    [XTI] A code entry in a nested/virtual PLC project
+
+    File to load is marked with 'Include'
+    May be TcTTO, TcPOU, TcDUT, GVL, etc.
+    '''
+    ...
+
+
 class _TmcItem(_TwincatProjectSubItem):
     '''
     [TMC] Any item found in a TMC file
@@ -304,7 +444,7 @@ class _TmcItem(_TwincatProjectSubItem):
 
 
 class DataTypes(_TmcItem):
-    'TMC'
+    '[TMC] Container of DataType'
     def post_init(self):
         self.types = {
             dtype.qualified_type: dtype
@@ -325,6 +465,7 @@ class Type(_TmcItem):
 
 
 class EnumInfo(_TmcItem):
+    '[TMC] Enum values, strings, and associated comments'
     Text: list
     Enum: list
     Comment: list
@@ -343,6 +484,7 @@ class EnumInfo(_TmcItem):
 
 
 class ArrayInfo(_TmcItem):
+    '[TMC] Array information for a DataType or Symbol'
     def post_init(self):
         lbound = (int(self.LBound[0].text)
                   if hasattr(self, 'LBound')
@@ -361,7 +503,7 @@ class ArrayInfo(_TmcItem):
 
 
 class DataType(_TmcItem):
-    'TMC'
+    '[TMC] A DataType with SubItems, likely representing a structure'
     Name: list
     EnumInfo: list
     SubItem: list
@@ -412,7 +554,7 @@ class DataType(_TmcItem):
 
 
 class SubItem(_TmcItem):
-    'TMC'
+    '[TMC] One element of a DataType'
     Type: list
 
     @property
@@ -483,28 +625,8 @@ class Property(_TmcItem):
         return f'<Property {self.key}={self.value!r}>'
 
 
-class OwnerA(TwincatItem):
-    '''
-    [XTC] For a Link between VarA and VarB, this is the parent of VarA
-    '''
-    ...
-
-
-class OwnerB(TwincatItem):
-    '''
-    [XTC] For a Link between VarA and VarB, this is the parent of VarB
-    '''
-    ...
-
-
-class Link(TwincatItem):
-    '[XTI] Links between NC/PLC/IO'
-    def post_init(self):
-        self.a = (self.find_ancestor(OwnerA).name, self.attributes.get('VarA'))
-        self.b = (self.find_ancestor(OwnerB).name, self.attributes.get('VarB'))
-
-
 class BuiltinDataType:
+    '[TMC] A built-in data type such as STRING, INT, REAL, etc.'
     def __init__(self, typename, *, length=1):
         if '(' in typename:
             typename, length = typename.split('(')
@@ -845,52 +967,6 @@ class Encoder(TwincatItem):
                     yield f'{child.tag}:{key}', value
 
 
-class Project(TwincatItem):
-    '''
-    [tsproj] A project which contains Plc, Io, Mappings, etc.
-    '''
-    _load_path = pathlib.Path('_Config') / 'PLC'
-
-    @property
-    def ams_id(self):
-        '''
-        The AMS ID of the configured target
-        '''
-        return self.attributes.get('TargetNetId', '')
-
-    @property
-    def target_ip(self):
-        '''
-        A guess of the target IP, based on the AMS ID
-        '''
-        ams_id = self.ams_id
-        if ams_id.endswith('.1.1'):
-            return ams_id[:-4]
-        return ams_id  # :(
-
-
-class TcSmProject(TwincatItem):
-    '''
-    [tsproj] A top-level TwinCAT tsproj
-    '''
-    @property
-    def plcs(self):
-        'The nested projects (virtual PLC project) contained in this Project'
-        return [plc for plc in self.find(Plc)
-                if plc.project is not None]
-
-
-class TcSmItem(TwincatItem):
-    '''
-    [XTI] Top-level container for XTI files
-
-    Further broken down into classes such as `TcSmItem_CNcSafTaskDef`, the
-    latter portion being derived from the `ClassName` attribute in the XML
-    file.
-    '''
-    ...
-
-
 class Device(TwincatItem):
     '''
     [XTI] Top-level IO device container
@@ -903,97 +979,6 @@ class Box(TwincatItem):
     [XTI] A box / module
     '''
     _load_path = USE_FILE_AS_PATH
-
-
-class Plc(TwincatItem):
-    '''
-    [XTI] A Plc Project
-    '''
-
-    Project: list
-
-    def post_init(self):
-        self.namespaces = {}
-        if hasattr(self, 'Project'):
-            proj = self.Project[0]
-        else:
-            self.project = None
-            self.tmc = None
-            # Some <Plc>s are merely containers for nested project
-            # definitions in separate XTI files. Ignore those for now, as
-            # they will be loaded later.
-            return
-
-        self.project_path = self.get_relative_path(
-            proj.attributes['PrjFilePath'])
-        self.tmc_path = self.get_relative_path(
-            proj.attributes['TmcFilePath'])
-        self.project = (parse(self.project_path, parent=self)
-                        if self.project_path.exists()
-                        else None)
-        self.tmc = (parse(self.tmc_path, parent=self)
-                    if self.tmc_path.exists()
-                    else None)
-
-        self.source_filenames = [
-            self.project.get_relative_path(compile.attributes['Include'])
-            for compile in self.find(Compile)
-            if 'Include' in compile.attributes
-        ]
-
-        self.source = {
-            str(fn.relative_to(self.project.filename.parent)):
-            parse(fn, parent=self)
-            for fn in self.source_filenames
-        }
-
-        self.pou_by_name = {
-            plc_obj.POU[0].program_name: plc_obj.POU[0]
-            for plc_obj in self.source.values()
-            if hasattr(plc_obj, 'POU')
-            and plc_obj.POU[0].program_name
-        }
-
-        self.gvl_by_name = {
-            plc_obj.GVL[0].name: plc_obj.GVL[0]
-            for plc_obj in self.source.values()
-            if hasattr(plc_obj, 'GVL')
-            and plc_obj.GVL[0].name
-        }
-
-        self.namespaces.update(self.pou_by_name)
-        self.namespaces.update(self.gvl_by_name)
-
-    def find(self, cls):
-        yield from super().find(cls)
-        if self.project is not None:
-            yield from self.project.find(cls)
-
-        for key, ns in self.namespaces.items():
-            if isinstance(ns, cls):
-                yield ns
-
-        if self.tmc is not None:
-            yield from self.tmc.find(cls)
-
-
-class TcSmItem_CNestedPlcProjDef(TcSmItem, Plc):
-    '''
-    [XTI] Nested PLC project definition (i.e., a virtual PLC project)
-
-    Contains POUs and a parsed version of the tmc
-    '''
-    ...
-
-
-class Compile(TwincatItem):
-    '''
-    [XTI] A code entry in a nested/virtual PLC project
-
-    File to load is marked with 'Include'
-    May be TcTTO, TcPOU, TcDUT, GVL, etc.
-    '''
-    ...
 
 
 class RemoteConnections(TwincatItem):
@@ -1017,173 +1002,6 @@ class RemoteConnections(TwincatItem):
         self.by_name = keyed_on('Name')
         self.by_address = keyed_on('Address')
         self.by_ams_id = keyed_on('NetId')
-
-
-def program_name_from_declaration(declaration):
-    '''
-    Determine a program name from a given declaration
-
-    Looks for::
-
-        PROGRAM <program_name>
-    '''
-    for line in declaration.splitlines():
-        line = line.strip()
-        if line.lower().startswith('program '):
-            return line.split(' ')[1]
-
-
-def lines_between(text, start_marker, end_marker, *, include_blank=False):
-    '''
-    From a block of text, yield all lines between `start_marker` and
-    `end_marker`
-
-    Parameters
-    ----------
-    text : str
-        The block of text
-    start_marker : str
-        The block-starting marker to match
-    end_marker : str
-        The block-ending marker to match
-    include_blank : bool, optional
-        Skip yielding blank lines
-    '''
-    found_start = False
-    start_marker = start_marker.lower()
-    end_marker = end_marker.lower()
-    for line in text.splitlines():
-        if line.strip().lower() == start_marker:
-            found_start = True
-        elif line.strip().lower() == end_marker:
-            break
-        elif found_start and (line.strip() or include_blank):
-            yield line
-
-
-def variables_from_declaration(declaration, *, start_marker='var'):
-    '''
-    Find all variable declarations given a declaration text block
-
-    Parameters
-    ----------
-    declaration : str
-        The declaration code
-    start_marker : str, optional
-        The default works with POUs, which have a variable block in
-        VAR/END_VAR.  Can be adjusted for GVL 'var_global' as well.
-
-    Returns
-    -------
-    variables : dict
-        {'var': {'type': 'TYPE', 'spec': '%I'}, ...}
-    '''
-    variables = {}
-    in_type = False
-    for line in lines_between(declaration, start_marker, 'end_var'):
-        line = line.strip()
-        if in_type:
-            if line.lower().startswith('end_type'):
-                in_type = False
-            continue
-
-        words = line.split(' ')
-        if words[0].lower() == 'type':
-            # type <type_name> :
-            # struct
-            # ...
-            # end_struct
-            # end_type
-            in_type = True
-            continue
-
-        # <names> : <dtype>
-        names, dtype = line.split(':', 1)
-
-        if ':=' in dtype:
-            # <names> : <dtype> := <value>
-            dtype, value = dtype.split(':=', 1)
-        else:
-            value = None
-
-        try:
-            at_idx = names.lower().split(' ').index('at')
-        except ValueError:
-            specifiers = []
-        else:
-            # <names> AT <specifiers> : <dtype> := <value>
-            words = names.split(' ')
-            specifiers = words[at_idx + 1:]
-            names = ' '.join(words[:at_idx])
-
-        var_metadata = {
-            'type': dtype.strip('; '),
-            'spec': ' '.join(specifiers),
-        }
-        if value is not None:
-            var_metadata['value'] = value.strip('; ')
-
-        for name in names.split(','):
-            variables[name.strip()] = var_metadata
-
-    return variables
-
-
-def get_pou_call_blocks(declaration, implementation):
-    '''
-    Find all call blocks given a specific POU declaration and implementation.
-    Note that this function is not "smart". Further calls will be squashed into
-    one.  Control flow is not respected.
-
-    Given the following declaration::
-
-        PROGRAM Main
-        VAR
-                M1: FB_DriveVirtual;
-                M1Link: FB_NcAxis;
-                bLimitFwdM1 AT %I*: BOOL;
-                bLimitBwdM1 AT %I*: BOOL;
-
-        END_VAR
-
-    and implementation::
-
-        M1Link(En := TRUE);
-        M1(En := TRUE,
-           bEnable := TRUE,
-           bLimitFwd := bLimitFwdM1,
-           bLimitBwd := bLimitBwdM1,
-           Axis := M1Link.axis);
-
-        M1(En := FALSE);
-
-    This function would return the following dictionary::
-
-        {'M1': {'En': 'FALSE',
-          'bEnable': 'TRUE',
-          'bLimitFwd': 'bLimitFwdM1',
-          'bLimitBwd': 'bLimitBwdM1',
-          'Axis': 'M1Link.axis'},
-         'M1Link': {'En': 'TRUE'}
-         }
-
-    '''
-    variables = variables_from_declaration(declaration)
-    blocks = collections.defaultdict(dict)
-
-    # Match two groups: (var) := (value)
-    # Only works for simple variable assignments.
-    arg_value_re = re.compile(r'([a-zA-Z0-9_]+)\s*:=\s*([a-zA-Z0-9_\.]+)')
-
-    for var in variables:
-        # Find: ^VAR(.*);
-        reg = re.compile(r'^\s*' + var + r'\s*\(\s*((?:.*?\n?)+)\)\s*;',
-                         re.MULTILINE)
-        for match in reg.findall(implementation):
-            call_body = ' '.join(line.strip() for line in match.splitlines())
-            blocks[var].update(**dict(arg_value_re.findall(call_body)))
-
-    return dict(blocks)
 
 
 def case_insensitive_path(path):
@@ -1229,18 +1047,40 @@ def case_insensitive_path(path):
     return new_path
 
 
-def parse(fn, *, parent=None):
+def separate_children_by_tag(children):
     '''
-    Parse a given tsproj, xti, or tmc file.
+    Take in a list of `TwincatItem`, categorize each by their XML tag, and
+    return a dictionary keyed on tag.
+
+    For example::
+
+        <a> <a> <b> <b>
+
+    Would become::
+
+        {'a': [<a>, <a>],
+         'b': [<b>, <b>]
+         }
+
+    Parameters
+    ----------
+    children : list
+        list of TwincatItem
 
     Returns
     -------
-    item : TwincatItem
+    dict
+        Categorized children
     '''
-    fn = case_insensitive_path(fn)
+    d = collections.defaultdict(list)
+    for child in children:
+        d[child.tag].append(child)
 
-    with open(fn, 'rt') as f:
-        tree = lxml.etree.parse(f)
+    return d
 
-    root = tree.getroot()
-    return TwincatItem.parse(root, filename=fn, parent=parent)
+
+def strip_namespace(tag):
+    '''
+    Strip off {{namespace}} from: {{namespace}}tag
+    '''
+    return lxml.etree.QName(tag).localname
