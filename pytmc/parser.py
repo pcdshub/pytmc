@@ -585,6 +585,13 @@ class Symbol(_TmcItem):
         for item in self.data_type.walk():
             yield [self] + item
 
+    @property
+    def array_info(self):
+        try:
+            return self.ArrayInfo[0]
+        except (AttributeError, IndexError):
+            return None
+
 
 class Symbol_FB_MotionStage(Symbol):
     '''

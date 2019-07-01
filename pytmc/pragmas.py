@@ -196,8 +196,21 @@ def chains_from_symbol(symbol):
             yield chain, configs
 
 
-def record_packages_from_symbol(symbol):
+def record_packages_from_symbol(symbol, *, unroll=False):
     for chain, configs in chains_from_symbol(symbol):
         chain = SingularChain(chain=chain, configs=configs)
-        # print(chain)
-        yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
+
+        data_type = chain.data_type
+        array_info = getattr(chain.last, 'array_info', None)
+        if unroll and (data_type.is_enum and array_info is not None):
+            # TODO: proof-of-concept only unrolls enum when last in chain;
+            # also, it's unclear as of yet how to support this on the IOC side
+            pvname = chain.pvname
+            tcname = chain.tcname
+            for idx in range(*array_info.bounds):
+                chain.tcname = f'{tcname}[{idx}]'
+                chain.pvname = f'{pvname}_{idx}'
+                yield RecordPackage.from_chain(symbol.module.ads_port,
+                                               chain=chain)
+        else:
+            yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
