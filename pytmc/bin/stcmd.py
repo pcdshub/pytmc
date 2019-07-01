@@ -136,9 +136,6 @@ def render(args):
         value : str or None
             The first value found, if any
         '''
-        if pytmc is None:
-            return None
-
         for config in pytmc_info[motor]:
             matches = config.get_config_lines(key)
             if matches:
@@ -158,14 +155,13 @@ def render(args):
         name = name.replace(' ', args.delim)
         return args.prefix + args.delim, name.replace('_', args.delim)
 
-    if pytmc is not None:
-        pytmc_info = {
-            motor: [Configuration(prop.value)
-                    for prop in motor.find(Property)
-                    if prop.key == 'pytmc'
-                    ]
-            for motor, _ in motors
-        }
+    pytmc_info = {
+        motor: [Configuration(prop.value)
+                for prop in motor.find(Property)
+                if prop.key == 'pytmc'
+                ]
+        for motor, _ in motors
+    }
 
     template_motors = [
         dict(axisconfig='',
@@ -192,10 +188,6 @@ def render(args):
         raise RuntimeError('Only single PLC projects supported currently')
 
     if args.all_records:
-        if pytmc is None:
-            logger.error('pytmc unavailable; cannot use --all-records.')
-            sys.exit(1)
-
         rendered_db = render_pytmc(plc.tmc.filename, dbd=args.dbd)
         if not rendered_db:
             logger.info('No additional records from pytmc found in %s',
