@@ -8,68 +8,68 @@ import ast
 import logging
 import pathlib
 
-from pytmc import parser
+from .. import parser
 
 
 DESCRIPTION = __doc__
 
 
-def build_arg_parser(parser=None):
-    if parser is None:
-        parser = argparse.ArgumentParser(
+def build_arg_parser(argparser=None):
+    if argparser is None:
+        argparser = argparse.ArgumentParser(
             description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter
         )
 
-    parser.add_argument(
+    argparser.add_argument(
         'tsproj_project', type=str,
         help='Path to .tsproj project'
     )
 
-    parser.add_argument(
+    argparser.add_argument(
         '--all', '-a',
         action='store_true',
         help='All possible information'
     )
 
-    parser.add_argument(
+    argparser.add_argument(
         '--plcs', '-p',
         action='store_true',
         help='Show plcs'
     )
 
-    parser.add_argument(
+    argparser.add_argument(
         '--nc', '-n',
         action='store_true',
         help='Show NC axes'
     )
 
-    parser.add_argument(
+    argparser.add_argument(
         '--symbols', '-s',
         action='store_true',
         help='Show symbols'
     )
 
-    parser.add_argument(
+    argparser.add_argument(
         '--links', '-l',
         action='store_true',
         help='Show links'
     )
 
-    parser.add_argument(
+    argparser.add_argument(
         '--log',
         default='INFO',
         type=str,
         help='Python logging level (e.g. DEBUG, INFO, WARNING)'
     )
 
-    parser.add_argument(
+    argparser.add_argument(
         '--debug', '-d',
         action='store_true',
         help='Access'
     )
 
-    return parser
+    return argparser
 
 
 def summary(args):
