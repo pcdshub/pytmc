@@ -1,3 +1,3 @@
 [submodule "tests/projects/vonhamos-motion"]
 	path = tests/projects/vonhamos-motion
-	url = ../vonhamos-motion
+	url = ../../pcdshub/vonhamos-motion
