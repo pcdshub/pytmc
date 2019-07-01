@@ -14,7 +14,7 @@ import sys
 import jinja2
 
 from ..pragmas import Configuration
-from .db import process, LinterError
+from . import db
 
 from ..parser import parse, Symbol_FB_MotionStage, Property, Project
 
@@ -83,22 +83,6 @@ def build_arg_parser(parser=None):
     )
 
     return parser
-
-
-def render_pytmc(tmc_file, *, dbd=None, allow_errors=False,
-                 show_error_context=True):
-    with open(tmc_file, 'r') as tmc_file:
-        tmc_file_obj = pytmc.TmcFile(tmc_file)
-
-    try:
-        process(
-            tmc_file_obj, dbd_file=dbd, allow_errors=allow_errors,
-            show_error_context=show_error_context,
-        )
-    except LinterError:
-        sys.exit(1)
-
-    return tmc_file_obj.render()
 
 
 def render(args):
@@ -188,15 +172,15 @@ def render(args):
         raise RuntimeError('Only single PLC projects supported currently')
 
     if args.all_records:
-        rendered_db = render_pytmc(plc.tmc.filename, dbd=args.dbd)
-        if not rendered_db:
+        other_records = db.process(plc.tmc, dbd_file=args.dbd)
+        if not other_records:
             logger.info('No additional records from pytmc found in %s',
                         plc.tmc.filename)
         else:
             db_filename = f'{plc.filename.stem}.db'
             db_path = pathlib.Path(args.db_path) / db_filename
             with open(db_path, 'wt') as db_file:
-                db_file.write(rendered_db)
+                db_file.write('\n\n'.join(rec.render() for rec in other_records))
             additional_db_files.append({'file': db_filename, 'macros': ''})
 
     # TODO one last hack
