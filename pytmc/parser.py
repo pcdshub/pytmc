@@ -252,9 +252,8 @@ class TwincatItem:
 
 
 class _TwincatProjectSubItem(TwincatItem):
-    '''
-    [XTI, TMC, ...] A base class for items that appear in virtual PLC projects
-    '''
+    '[XTI/TMC/...] A base class for items that appear in virtual PLC projects'
+
     @property
     def project(self):
         'The nested project (virtual PLC project) associated with the item'
@@ -264,9 +263,7 @@ class _TwincatProjectSubItem(TwincatItem):
 
 
 class TcModuleClass(_TwincatProjectSubItem):
-    '''
-    [TMC] The top-level TMC file
-    '''
+    '[TMC] The top-level TMC file'
     DataTypes: list
 
     def get_data_type(self, type_name):
@@ -278,16 +275,12 @@ class TcModuleClass(_TwincatProjectSubItem):
 
 
 class OwnerA(TwincatItem):
-    '''
-    [XTC] For a Link between VarA and VarB, this is the parent of VarA
-    '''
+    '[XTC] For a Link between VarA and VarB, this is the parent of VarA'
     ...
 
 
 class OwnerB(TwincatItem):
-    '''
-    [XTC] For a Link between VarA and VarB, this is the parent of VarB
-    '''
+    '[XTC] For a Link between VarA and VarB, this is the parent of VarB'
     ...
 
 
@@ -299,9 +292,7 @@ class Link(TwincatItem):
 
 
 class Project(TwincatItem):
-    '''
-    [tsproj] A project which contains Plc, Io, Mappings, etc.
-    '''
+    '[tsproj] A project which contains Plc, Io, Mappings, etc.'
     _load_path = pathlib.Path('_Config') / 'PLC'
 
     @property
@@ -323,9 +314,7 @@ class Project(TwincatItem):
 
 
 class TcSmProject(TwincatItem):
-    '''
-    [tsproj] A top-level TwinCAT tsproj
-    '''
+    '[tsproj] A top-level TwinCAT tsproj'
     @property
     def plcs(self):
         'The nested projects (virtual PLC project) contained in this Project'
@@ -345,9 +334,7 @@ class TcSmItem(TwincatItem):
 
 
 class Plc(TwincatItem):
-    '''
-    [XTI] A Plc Project
-    '''
+    '[XTI] A Plc Project'
 
     Project: list
 
@@ -436,9 +423,7 @@ class Compile(TwincatItem):
 
 
 class _TmcItem(_TwincatProjectSubItem):
-    '''
-    [TMC] Any item found in a TMC file
-    '''
+    '[TMC] Any item found in a TMC file'
     @property
     def tmc(self):
         'The TcModuleClass (TMC) associated with the item'
@@ -455,9 +440,7 @@ class DataTypes(_TmcItem):
 
 
 class Type(_TmcItem):
-    '''
-    [TMC] DataTypes/DataType/SubItem/Type
-    '''
+    '[TMC] DataTypes/DataType/SubItem/Type'
 
     @property
     def qualified_type(self):
@@ -722,9 +705,7 @@ class Symbol(_TmcItem):
 
 
 class Symbol_FB_MotionStage(Symbol):
-    '''
-    [TMC] A customized Symbol, representing only FB_MotionStage
-    '''
+    '[TMC] A customized Symbol, representing only FB_MotionStage'
     def _repr_info(self):
         '__repr__ information'
         repr_info = super()._repr_info()
@@ -821,16 +802,12 @@ class Symbol_FB_MotionStage(Symbol):
 
 
 class GVL(_TwincatProjectSubItem):
-    '''
-    [XTI] A Global Variable List
-    '''
+    '[XTI] A Global Variable List'
     ...
 
 
 class POU(_TwincatProjectSubItem):
-    '''
-    [XTI] A Program Organization Unit
-    '''
+    '[XTI] A Program Organization Unit'
 
     # TODO: may fail when mixed with ladder logic?
     Declaration: list
@@ -882,9 +859,7 @@ class AxisPara(TwincatItem):
 
 
 class NC(TwincatItem):
-    '''
-    [tsproj or XTI] Top-level NC
-    '''
+    '[tsproj or XTI] Top-level NC'
     _load_path = pathlib.Path('_Config') / 'NC'
 
     def post_init(self):
@@ -907,9 +882,7 @@ class NC(TwincatItem):
 
 
 class Axis(TwincatItem):
-    '''
-    [XTI] A single NC axis
-    '''
+    '[XTI] A single NC axis'
     _load_path = pathlib.Path('_Config') / 'NC' / 'Axes'
 
     @property
@@ -974,23 +947,17 @@ class Encoder(TwincatItem):
 
 
 class Device(TwincatItem):
-    '''
-    [XTI] Top-level IO device container
-    '''
+    '[XTI] Top-level IO device container'
     _load_path = pathlib.Path('_Config') / 'IO'
 
 
 class Box(TwincatItem):
-    '''
-    [XTI] A box / module
-    '''
+    '[XTI] A box / module'
     _load_path = USE_FILE_AS_PATH
 
 
 class RemoteConnections(TwincatItem):
-    '''
-    [StaticRoutes] Routes contained in the TwinCat configuration
-    '''
+    '[StaticRoutes] Routes contained in the TwinCat configuration'
     def post_init(self):
         def to_dict(child):
             return {
@@ -1086,7 +1053,5 @@ def separate_children_by_tag(children):
 
 
 def strip_namespace(tag):
-    '''
-    Strip off {{namespace}} from: {{namespace}}tag
-    '''
+    'Strip off {{namespace}} from: {{namespace}}tag'
     return lxml.etree.QName(tag).localname
