@@ -17,17 +17,20 @@ dbLoadDatabase("dbd/{{binary_name}}.dbd")
 
 cd "$(TOP)/db"
 
-epicsEnvSet("MOTOR_PORT",    "{{motor_port}}")
 epicsEnvSet("ASYN_PORT",     "{{asyn_port}}")
-epicsEnvSet("PREFIX",        "{{prefix}}{{delim}}")
-epicsEnvSet("ECM_NUMAXES",   "{{motors|length}}")
-epicsEnvSet("NUMAXES",       "{{motors|length}}")
-
 epicsEnvSet("IPADDR",        "{{plc_ip}}")
 epicsEnvSet("AMSID",         "{{plc_ams_id}}")
 epicsEnvSet("IPPORT",        "{{plc_ads_port}}")
 
 adsAsynPortDriverConfigure("$(ASYN_PORT)","$(IPADDR)","$(AMSID)","$(IPPORT)", 1000, 0, 0, 50, 100, 1000, 0)
+
+{% if motors %}
+
+epicsEnvSet("MOTOR_PORT",    "{{motor_port}}")
+epicsEnvSet("PREFIX",        "{{prefix}}{{delim}}")
+epicsEnvSet("ECM_NUMAXES",   "{{motors|length}}")
+epicsEnvSet("NUMAXES",       "{{motors|length}}")
+
 EthercatMCCreateController("$(MOTOR_PORT)", "$(ASYN_PORT)", "$(NUMAXES)", "200", "1000")
 
 #define ASYN_TRACE_ERROR     0x0001
@@ -72,6 +75,8 @@ dbLoadRecords("EthercatMCreadback.template", "PREFIX=$(MOTOR_PREFIX), MOTOR_NAME
 dbLoadRecords("EthercatMCdebug.template", "PREFIX=$(MOTOR_PREFIX), MOTOR_NAME=$(MOTOR_NAME), MOTOR_PORT=$(MOTOR_PORT), AXIS_NO=$(AXIS_NO), PREC=3")
 
 {% endfor %}
+{% endif %}
+
 {% for db in additional_db_files %}
 dbLoadRecords("db/{{ db.file }}", "{{ db.macros }}")
 
@@ -98,4 +103,3 @@ create_monitor_set( "$(IOC).req", 5, "" )
 
 # All IOCs should dump some common info after initial startup.
 < /reg/d/iocCommon/All/post_linux.cmd
-
