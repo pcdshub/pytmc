@@ -210,3 +210,7 @@ def main(*, cmdline_args=None):
     parser = build_arg_parser()
     _, _, template = render(parser.parse_args(cmdline_args))
     print(template)
+
+
+if __name__ == '__main__':
+    main()
