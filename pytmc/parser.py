@@ -89,6 +89,8 @@ class TwincatItem:
 
         self._add_children(element)
         self.post_init()
+        if self.name == '__FILENAME__':
+            self.name = self.filename.stem
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -710,7 +712,7 @@ class Symbol_FB_MotionStage(Symbol):
         '__repr__ information'
         repr_info = super()._repr_info()
         # Add on the NC axis name
-        repr_info.update(nc_axis=self.nc_axis.short_name)
+        repr_info.update(nc_axis=self.nc_axis.name)
         return repr_info
 
     @property
@@ -876,7 +878,7 @@ class NC(TwincatItem):
         }
 
         self.axis_by_name = {
-            pathlib.Path(axis.filename).stem: axis
+            axis.name: axis
             for axis in self.axes
         }
 
@@ -888,11 +890,6 @@ class Axis(TwincatItem):
     @property
     def axis_number(self):
         return self.attributes['Id']
-
-    @property
-    def short_name(self):
-        'A/B/C/Axis 1.xti -> Axis 1.xti'
-        return self.filename.stem
 
     @property
     def units(self):

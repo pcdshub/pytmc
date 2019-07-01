@@ -134,8 +134,7 @@ def render(args):
 
         # Fall back to using the NC axis name, replacing underscores/spaces
         # with the user-specified delimiter
-        name = nc_axis.short_name
-        name = name.replace(' ', args.delim)
+        name = nc_axis.name.replace(' ', args.delim)
         return args.prefix + args.delim, name.replace('_', args.delim)
 
     pytmc_info = {
@@ -150,7 +149,7 @@ def render(args):
         dict(axisconfig='',
              name=get_name(motor, nc_axis),
              axis_no=nc_axis.axis_number,
-             desc=f'{motor.name} / {nc_axis.short_name}',
+             desc=f'{motor.name} / {nc_axis.name}',
              egu=nc_axis.units,
              prec=get_pytmc(motor, nc_axis, 'precision') or '3',
              additional_fields=get_pytmc(motor, nc_axis,

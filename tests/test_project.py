@@ -46,5 +46,5 @@ def test_fb_motionstage_linking(project):
         print('NC to PLC link', inst.nc_to_plc_link)
 
         nc_axis = inst.nc_axis
-        print('Short NC axis name', nc_axis.short_name)
+        print('Short NC axis name', nc_axis.name)
         print('NC axis', nc_axis)

@@ -108,7 +108,7 @@ def summary(args):
         print('--- NC axes:')
         for nc in project.find(parser.NC):
             for axis_id, axis in sorted(nc.axis_by_id.items()):
-                print(f'    {axis_id}.) {axis.short_name!r}:')
+                print(f'    {axis_id}.) {axis.name!r}:')
                 for category, info in axis.summarize():
                     try:
                         info = ast.literal_eval(info)
