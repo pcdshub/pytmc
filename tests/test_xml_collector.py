@@ -33,16 +33,17 @@ def make_mock_type(name, is_array=False, is_enum=False, is_string=False,
 
 
 
-class TestSingularChain(pragmas.SingularChain):
+class _SingularChain(pragmas.SingularChain):
+    'Singular chain with overridable data_type, for testing'
     data_type = None
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='module')
 def chain():
     tmc = parser.parse(conftest.TMC_ROOT / 'xtes_sxr_plc.tmc')
     symbols = list(pragmas.find_pytmc_symbols(tmc))
     chain, configs = list(pragmas.chains_from_symbol(symbols[1]))[0]
-    schain = TestSingularChain(chain, configs)
+    schain = _SingularChain(chain, configs)
     schain.data_type = schain.last.data_type
     return schain
 
@@ -98,12 +99,10 @@ def test_record_package_from_chain(chain, tc_type, is_array, final_type,
     ("STRING", 'i', False, 'asynOctetRead'),
     ("STRING", 'io', False, 'asynOctetWrite'),
 ])
-def test_BaseRecordPackage_guess_DTYP(chain, tc_type, io, is_array,
-                                      final_DTYP):
+def test_dtype(chain, tc_type, io, is_array, final_DTYP):
     chain.data_type = make_mock_type(tc_type, is_array=is_array, length=3)
     chain.config['io'] = io
-    record = RecordPackage.from_data_type(851, chain=chain,
-                                          data_type=chain.data_type)
+    record = RecordPackage.from_chain(chain, ads_port=851)
     # If we are checking an input type check the first record
     if record.io_direction == 'input':
         assert record.records[0].fields['DTYP'] == final_DTYP
@@ -138,22 +137,14 @@ def test_BaseRecordPackage_guess_DTYP(chain, tc_type, io, is_array,
     ("STRING", 2, "INP", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c?',),
     ("STRING", 6, "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c=',),
 ])
-def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains, dbd_file,
-                                         tc_type, sing_index, field_type, final_INP_OUT):
-    # chain must be broken into singular
-    chain = example_singular_tmc_chains[0]
-    # tc_type is assignable because it isn't implemented in BaseElement
-    # this field must be added because it is typically derived from the .tmc
-    chain.last.type = tc_type
-    chain.last.is_array = False
-    if tc_type == "STRING":
-        chain.last.is_str = True
+def test_input_output_scan(chain, dbd_file, tc_type, sing_index, field_type,
+                           final_INP_OUT):
+    chain.data_type = make_mock_type(tc_type, is_array=False)
+    chain.config['io'] = 'io'
+    chain.tcname = 'a.b.c'
+    record = RecordPackage.from_chain(chain, ads_port=851)
 
-    record = BaseRecordPackage(851, chain)
-    record.cfg.add_config_line('io', 'io', overwrite=True)
-    for element, idx in zip(record.chain.chain, range(3)):
-        element.name = chr(97+idx)
-    record.generate_naive_config()
+    # chain must be broken into singular
     if tc_type == "STRING":
         if field_type == "OUT":
             assert record.records[1].fields.get("INP") == final_INP_OUT
@@ -169,38 +160,7 @@ def test_BaseRecordPackage_guess_INP_OUT(example_singular_tmc_chains, dbd_file,
 
     conftest.lint_record(dbd_file, record)
 
-
-# All input records should have SCAN = Passive
-@pytest.mark.parametrize("tc_type, sing_index", [
-    ("BOOL", 0),
-    ("BOOL", 2),
-    ("BOOL", 6),
-    ("INT", 0),
-    ("INT", 2),
-    ("INT", 6),
-    ("LREAL", 0),
-    ("LREAL", 2),
-    ("LREAL", 6),
-    ("STRING", 0),
-    ("STRING", 2),
-    ("STRING", 6),
-])
-def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
-                                      tc_type, sing_index):
-    # chain must be broken into singular
-    chain = example_singular_tmc_chains[0]
-    # tc_type is assignable because it isn't implemented in BaseElement
-    # this field must be added because it is typically derived from the .tmc
-    chain.last.type = tc_type
-    record = BaseRecordPackage(851, chain)
-    for element, idx in zip(record.chain.chain, range(3)):
-        element.name = chr(97+idx)
-    record.generate_naive_config()
-    record.cfg.add_config_line('io', 'io', overwrite=True)
-    logger.debug((record.chain.last.pragma.config))
-    # tc_type is assignable because it isn't implemented in BaseElement
-    # this field must be added because it is typically derived from the .tmc
-    logger.debug(str(record.cfg.config))
+    # Verify SCAN settings (replaces test_BaseRecordPackage_guess_SCAN)
     assert record.records[0].fields.get('SCAN') == 'I/O Intr'
     assert record.records[1].fields.get('SCAN') is None
 
@@ -209,13 +169,11 @@ def test_BaseRecordPackage_guess_SCAN(example_singular_tmc_chains,
     ("BOOL", 0, 'Zero', 'One', True),
     ("STRING", 0, None, None, False),
 ])
-def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
-                                        tc_type, sing_index, final_ZNAM, final_ONAM, ret):
-    chain = example_singular_tmc_chains[sing_index]
-    chain.last.type = tc_type
-    record = BaseRecordPackage(851, chain)
-    for element, idx in zip(record.chain.chain, range(3)):
-        element.name = chr(97+idx)
+def test_bool_naming(chain, tc_type, sing_index, final_ZNAM, final_ONAM, ret):
+    chain.data_type = make_mock_type(tc_type)
+    chain.config['io'] = 'io'
+    record = RecordPackage.from_chain(chain, ads_port=851)
+
     for rec in record.records:
         assert rec.fields.get('ZNAM') == final_ZNAM
         assert rec.fields.get('ONAM') == final_ONAM
@@ -225,15 +183,11 @@ def test_BaseRecordPackage_guess_OZ_NAM(example_singular_tmc_chains,
     ("LREAL", 0, '3', True),
     ("STRING", 0, None, False),
 ])
-def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
-                                      tc_type, sing_index, final_PREC, ret):
-    chain = example_singular_tmc_chains[sing_index]
-    chain.last.type = tc_type
-    record = BaseRecordPackage(851, chain)
-    record.generate_naive_config()
-    for element, idx in zip(record.chain.chain, range(3)):
-        element.name = chr(97+idx)
-    print(record.cfg.config)
+def test_BaseRecordPackage_guess_PREC(chain, tc_type, sing_index, final_PREC,
+                                      ret):
+    chain.data_type = make_mock_type(tc_type)
+    chain.config['io'] = 'io'
+    record = RecordPackage.from_chain(chain, ads_port=851)
     for rec in record.records:
         assert rec.fields.get('PREC') == final_PREC
 
@@ -271,19 +225,12 @@ def test_BaseRecordPackage_guess_PREC(example_singular_tmc_chains,
     ("STRING", 'o', True, False, 'CHAR'),
     ("STRING", 'io', True, False, 'CHAR'),
 ])
-def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
-                                      tc_type, io, is_str, is_arr, final_FTVL,
-                                      dbd_file):
-    chain = example_singular_tmc_chains[0]
-    chain.last.type = tc_type
-    chain.last.is_array = is_arr
-    chain.last.is_str = is_str
-    chain.last.length = 3
-    record = BaseRecordPackage(851, chain)
-    for element, idx in zip(record.chain.chain, range(3)):
-        element.name = chr(97+idx)
-    record.generate_naive_config()
-    record.cfg.add_config_line('io', io, overwrite=True)
+def test_BaseRecordPackage_guess_FTVL(chain, tc_type, io, is_str, is_arr,
+                                      final_FTVL, dbd_file):
+    chain.data_type = make_mock_type(tc_type, is_array=is_arr,
+                                     is_string=is_str, length=3)
+    chain.config['io'] = io
+    record = RecordPackage.from_chain(chain, ads_port=851)
     for rec in record.records:
         assert rec.fields.get('FTVL') == final_FTVL
 
@@ -296,16 +243,11 @@ def test_BaseRecordPackage_guess_FTVL(example_singular_tmc_chains,
     ("LREAL", 0, False, True, '9'),
     ("STRING", 0, True, False, '81'),
 ])
-def test_BaseRecordPackage_guess_NELM(example_singular_tmc_chains,
-                                      tc_type, sing_index, is_str, is_arr, final_NELM):
-    chain = example_singular_tmc_chains[sing_index]
-    chain.last.type = tc_type
-    chain.last.is_array = is_arr
-    chain.last.is_str = is_str
-    chain.last.length = final_NELM
-    record = BaseRecordPackage(851, chain)
-    for element, idx in zip(record.chain.chain, range(3)):
-        element.name = chr(97+idx)
-    record.generate_naive_config()
+def test_BaseRecordPackage_guess_NELM(chain, tc_type, sing_index, is_str,
+                                      is_arr, final_NELM):
+    chain.data_type = make_mock_type(tc_type, is_array=is_arr,
+                                     is_string=is_str,
+                                     length=final_NELM)
+    record = RecordPackage.from_chain(chain, ads_port=851)
     for rec in record.records:
         assert rec.fields.get('NELM') == final_NELM

@@ -109,7 +109,7 @@ class RecordPackage:
         return spec(*args, **kwargs)
 
     @staticmethod
-    def from_chain(*args, chain, **kwargs):
+    def from_chain(chain, *args, **kwargs):
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         return RecordPackage.from_data_type(
             *args, data_type=chain.data_type, chain=chain, **kwargs)
