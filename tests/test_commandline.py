@@ -1,5 +1,5 @@
-from pytmc.stcmd import main as stcmd_main
-from pytmc.summary import main as summary_main
+from pytmc.bin.stcmd import main as stcmd_main
+from pytmc.bin.summary import main as summary_main
 
 
 def test_summary(project_filename):

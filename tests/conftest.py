@@ -4,7 +4,7 @@ import pathlib
 import pytest
 
 import pytmc
-from pytmc import epics
+from pytmc import epics, parser
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +25,16 @@ def dbd_file():
                 ids=[f.name for f in TMC_FILES])
 def tmc_filename(request):
     return request.param
+
+
+@pytest.fixture(params=list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj')))
+def project_filename(request):
+    return request.param
+
+
+@pytest.fixture(scope='function')
+def project(project_filename):
+    return parser.parse(project_filename)
 
 
 def lint_record(dbd_file, record):
