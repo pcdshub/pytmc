@@ -240,7 +240,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
                     <Property>
                         <Name>pytmc</Name>
                         <Value>
-    pv: PRESS;
+    pv: iPRESS;
 	io: i;
     </Value>
                     </Property>
