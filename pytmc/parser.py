@@ -277,12 +277,12 @@ class TcModuleClass(_TwincatProjectSubItem):
 
 
 class OwnerA(TwincatItem):
-    '[XTC] For a Link between VarA and VarB, this is the parent of VarA'
+    '[XTI] For a Link between VarA and VarB, this is the parent of VarA'
     ...
 
 
 class OwnerB(TwincatItem):
-    '[XTC] For a Link between VarA and VarB, this is the parent of VarB'
+    '[XTI] For a Link between VarA and VarB, this is the parent of VarB'
     ...
 
 
