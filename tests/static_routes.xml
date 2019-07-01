@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TcConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <RemoteConnections>
+        <Route>
+            <Name>LAMP-VACUUM</Name>
+            <Address>172.21.37.140</Address>
+            <NetId>5.21.50.18.1.1</NetId>
+            <Type>TCP_IP</Type>
+        </Route>
+        <Route>
+            <Name>AMO-BASE</Name>
+            <Address>172.21.37.114</Address>
+            <NetId>5.17.65.196.1.1</NetId>
+            <Type>TCP_IP</Type>
+        </Route>
+    </RemoteConnections>
+</TcConfig>

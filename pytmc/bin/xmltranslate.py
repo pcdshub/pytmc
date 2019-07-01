@@ -20,26 +20,28 @@ import textwrap
 import argparse
 
 
-parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawTextHelpFormatter
-)
-parser.add_argument(
-    'input_file', metavar="INPUT", type=str, help='input file'
-)
+def build_arg_parser(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser(
+            description=__doc__,
+            formatter_class=argparse.RawTextHelpFormatter
+        )
+    parser.add_argument(
+        'input_file', metavar="INPUT", type=str, help='input file'
+    )
 
-parser.add_argument(
-    '-d', '--depth', type=int, help='Recursive limit for exploring the file',
-    default=7
-)
+    parser.add_argument(
+        '-d', '--depth', type=int, help='Recursive limit for exploring the file',
+        default=7
+    )
 
-parser.add_argument(
-    '-i', '--indent_size', metavar="INDENT",
-    type=int, help='Indent size for output formatting',
-    default=4
-)
+    parser.add_argument(
+        '-i', '--indent_size', metavar="INDENT",
+        type=int, help='Indent size for output formatting',
+        default=4
+    )
 
-args = parser.parse_args()
+    return parser
 
 
 def recursive(branch, level=1, indent_size=4, indent=0):
@@ -64,11 +66,16 @@ def recursive(branch, level=1, indent_size=4, indent=0):
         recursive(limb, level-1, indent_size, indent+1)
 
 
-def main():
+def translate(args):
     tree = ET.parse(args.input_file)
     root = tree.getroot()
     recursive(root, args.depth, args.indent_size)
 
 
-if __name__ == "__main__":
+def main(*, cmdline_args=None):
+    parser = build_arg_parser()
+    return translate(parser.parse_args(cmdline_args))
+
+
+if __name__ == '__main__':
     main()

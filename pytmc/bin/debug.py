@@ -11,7 +11,7 @@ from qtpy import QtWidgets
 from qtpy.QtCore import Qt, Signal
 
 import pytmc
-from .pytmc import process
+from .db import process
 
 
 description = __doc__
@@ -246,11 +246,12 @@ def show_qt_interface(tmc, dbd):
     sys.exit(app.exec_())
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=description,
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+def build_arg_parser(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser(
+            description=description,
+            formatter_class=argparse.RawTextHelpFormatter
+        )
 
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,
@@ -275,12 +276,13 @@ def main():
         help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
     )
 
-    args = parser.parse_args()
+    return parser
 
+
+def create_debug_window(args):
     logging.basicConfig()
     pytmc_logger = logging.getLogger('pytmc')
     pytmc_logger.setLevel(args.log)
-    args = parser.parse_args()
 
     tmc = pytmc.TmcFile(args.tmc_file)
 
@@ -291,6 +293,11 @@ def main():
 
     process(tmc)
     show_qt_interface(tmc, dbd)
+
+
+def main(*, cmdline_args=None):
+    parser = build_arg_parser()
+    return create_debug_window(parser.parse_args(cmdline_args))
 
 
 if __name__ == '__main__':

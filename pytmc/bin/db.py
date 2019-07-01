@@ -1,7 +1,7 @@
 """
-"pytmc" is a command line utility for generating epics records files from
-TwinCAT3 .tmc files. This program is designed to work in conjunction with
-ESSS' m-epics-twincat-ads driver.
+"pytmc-db" is a command line utility for generating epics records files from
+TwinCAT3 .tmc files. This program is designed to work in conjunction with ESS's
+m-epics-twincat-ads driver.
 """
 
 import argparse
@@ -68,11 +68,12 @@ def process(tmc_file_obj, *, dbd_file=None, allow_errors=False,
     return tmc_file_obj
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=description,
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+def build_arg_parser(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser(
+            description=description,
+            formatter_class=argparse.RawTextHelpFormatter
+        )
 
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,
@@ -117,7 +118,10 @@ def main():
         help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
     )
 
-    args = parser.parse_args()
+    return parser
+
+
+def make_db(args):
     pytmc_logger = logging.getLogger('pytmc')
     pytmc_logger.setLevel(args.log)
     with open(args.tmc_file, 'r') as tmc_file:
@@ -132,8 +136,17 @@ def main():
         sys.exit(1)
 
     db_string = tmc_file_obj.render()
-    with open(args.record_file, 'wt') as record_file:
-        record_file.write(db_string)
+
+    if args.record_file == '-':
+        print(db_string)
+    else:
+        with open(args.record_file, 'wt') as record_file:
+            record_file.write(db_string)
+
+
+def main(*, cmdline_args=None):
+    parser = build_arg_parser()
+    return make_db(parser.parse_args(cmdline_args))
 
 
 if __name__ == '__main__':
