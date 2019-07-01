@@ -267,6 +267,8 @@ class TcModuleClass(_TwincatProjectSubItem):
     '''
     [TMC] The top-level TMC file
     '''
+    DataTypes: list
+
     def get_data_type(self, type_name):
         data_types = self.DataTypes[0].types
         try:
@@ -485,6 +487,10 @@ class EnumInfo(_TmcItem):
 
 class ArrayInfo(_TmcItem):
     '[TMC] Array information for a DataType or Symbol'
+    LBound: list
+    UBound: list
+    Elements: list
+
     def post_init(self):
         lbound = (int(self.LBound[0].text)
                   if hasattr(self, 'LBound')
