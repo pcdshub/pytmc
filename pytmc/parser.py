@@ -387,8 +387,8 @@ class SubItem(_TmcItem):
     Type: list
 
     @property
-    def data_type_class(self):
-        return self.tmc.get_data_type(self.qualified_base_type)
+    def data_type(self):
+        return self.tmc.get_data_type(self.qualified_type_name)
 
     @property
     def type(self):
@@ -396,14 +396,14 @@ class SubItem(_TmcItem):
         return self.Type[0].text
 
     @property
-    def qualified_base_type(self):
+    def qualified_type_name(self):
         'The base type, including the namespace'
         type_ = self.Type[0]
         namespace = type_.attributes.get("Namespace", None)
         return f'{namespace}.{type_.text}' if namespace else type_.text
 
     def walk(self):
-        yield from self.data_type_class.walk()
+        yield from self.data_type.walk()
 
 
 class Module(_TmcItem):
@@ -477,7 +477,7 @@ class Link(TwincatItem):
 
 class BuiltinDataType:
     def __init__(self, typename):
-        self.type = typename
+        self.name = typename
 
     @property
     def length(self):
@@ -495,7 +495,7 @@ class BuiltinDataType:
 
     @property
     def is_string(self):
-        return self.type == 'STRING' or self.type.startswith('STRING(')
+        return self.name == 'STRING' or self.name.startswith('STRING(')
 
     @property
     def is_array(self):
@@ -519,20 +519,20 @@ class Symbol(_TmcItem):
     BaseType: list
 
     @property
-    def type(self):
+    def type_name(self):
         'The base type'
         return self.BaseType[0].text
 
     @property
-    def qualified_base_type(self):
+    def qualified_type_name(self):
         'The base type, including the namespace'
         type_ = self.BaseType[0]
         namespace = type_.attributes.get("Namespace", None)
         return f'{namespace}.{type_.text}' if namespace else type_.text
 
     @property
-    def data_type_class(self):
-        return self.tmc.get_data_type(self.qualified_base_type)
+    def data_type(self):
+        return self.tmc.get_data_type(self.qualified_type_name)
 
     @property
     def module(self):
@@ -543,14 +543,14 @@ class Symbol(_TmcItem):
     def info(self):
         return dict(name=self.name,
                     bit_size=self.BitSize[0].text,
-                    type=self.type,
-                    qualified_base_type=self.qualified_base_type,
+                    type=self.type_name,
+                    qualified_type_name=self.qualified_type_name,
                     bit_offs=self.BitOffs[0].text,
                     module=self.module.name,
                     )
 
     def walk(self):
-        for item in self.data_type_class.walk():
+        for item in self.data_type.walk():
             yield [self] + item
 
 

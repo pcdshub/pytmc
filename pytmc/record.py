@@ -105,14 +105,14 @@ class RecordPackage:
         elif data_type.is_enum:
             spec = EnumRecordPackage
         else:
-            spec = data_types[data_type.type]
+            spec = data_types[data_type.name]
         return spec(*args, **kwargs)
 
     @staticmethod
     def from_chain(*args, chain, **kwargs):
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         return RecordPackage.from_data_type(
-            *args, data_type=chain.last.data_type_class, chain=chain, **kwargs)
+            *args, data_type=chain.data_type, chain=chain, **kwargs)
 
 
 class TwincatTypeRecordPackage(RecordPackage):
@@ -295,7 +295,7 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        data_type = self.chain.last.data_type_class
+        data_type = self.chain.data_type
 
         self.field_defaults = dict(self.field_defaults)
         for (val_field, string_field), (val, string) in zip(
@@ -319,12 +319,12 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
                 'DINT': 'LONG',
                 'REAL': 'FLOAT',
                 'LREAL': 'DOUBLE'}
-        return ftvl[self.chain.last.type]
+        return ftvl[self.chain.data_type.name]
 
     @property
     def nelm(self):
         """Number of elements in record"""
-        return self.chain.last.length
+        return self.chain.data_type.length
 
     @property
     def dtyp(self):
@@ -356,7 +356,7 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
                       'REAL': 'asynFloat32',
                       'LREAL': 'asynFloat64'}
 
-        return data_types[self.chain.last.type]
+        return data_types[self.chain.data_type.name]
 
     def generate_input_record(self):
         record = super().generate_input_record()

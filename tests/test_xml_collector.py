@@ -16,12 +16,35 @@ from . import conftest
 logger = logging.getLogger(__name__)
 
 
+def make_mock_type(name, is_array=False, is_enum=False, is_string=False,
+                   enum_dict=None, length=1):
+    if name.startswith('STRING'):
+        is_string = True
+
+    return types.SimpleNamespace(
+        name=name,
+        is_array=is_array,
+        is_enum=is_enum,
+        is_string=is_string,
+        walk=[],
+        enum_dict=enum_dict or {},
+        length=length
+    )
+
+
+
+class TestSingularChain(pragmas.SingularChain):
+    data_type = None
+
+
 @pytest.fixture(scope='function')
 def chain():
     tmc = parser.parse(conftest.TMC_ROOT / 'xtes_sxr_plc.tmc')
     symbols = list(pragmas.find_pytmc_symbols(tmc))
     chain, configs = list(pragmas.chains_from_symbol(symbols[1]))[0]
-    return pragmas.SingularChain(chain, configs)
+    schain = TestSingularChain(chain, configs)
+    schain.data_type = schain.last.data_type
+    return schain
 
 
 @pytest.mark.parametrize("tc_type, is_array, final_type", [
@@ -41,71 +64,53 @@ def chain():
 ])
 def test_record_package_from_chain(chain, tc_type, is_array, final_type,
                                    monkeypatch):
-    data_type = types.SimpleNamespace(
-        type=tc_type, is_array=is_array, is_enum=False, is_string=False,
-        walk=[], enum_dict={})
+    chain.data_type = make_mock_type(tc_type, is_array=is_array)
     record = RecordPackage.from_data_type(851, chain=chain,
-                                          data_type=data_type)
+                                          data_type=chain.data_type)
     assert isinstance(record, final_type)
 
 
 @pytest.mark.parametrize("tc_type, io, is_array, final_DTYP", [
-    # BOOl
     ("BOOL", 'i', False, 'asynInt32'),
     ("BOOL", 'io', False, 'asynInt32'),
     ("BOOL", 'i', True, 'asynInt8ArrayIn'),
     ("BOOL", 'io', True, 'asynInt8ArrayOut'),
-    # INT
     ("INT", 'i', False, 'asynInt32'),
     ("INT", 'io', False, 'asynInt32'),
     ("INT", 'i', True, 'asynInt16ArrayIn'),
     ("INT", 'io', True, 'asynInt16ArrayOut'),
-    # DINT
     ("DINT", 'i', False, 'asynInt32'),
     ("DINT", 'io', False, 'asynInt32'),
     ("DINT", 'i', True, 'asynInt32ArrayIn'),
     ("DINT", 'io', True, 'asynInt32ArrayOut'),
-    # REAL
     ("REAL", 'i', False, 'asynFloat64'),
     ("REAL", 'io', False, 'asynFloat64'),
     ("REAL", 'i', True, 'asynFloat32ArrayIn'),
     ("REAL", 'io', True, '"asynFloat32ArrayOut'),
-    # LREAL
     ("LREAL", 'i', False, 'asynFloat64'),
     ("LREAL", 'io', False, 'asynFloat64'),
     ("LREAL", 'i', True, 'asynFloat64ArrayIn'),
     ("LREAL", 'io', True, 'asynFloat64ArrayOut'),
-    # ENUM
     ("ENUM", 'i', False, 'asynInt32'),
     ("ENUM", 'io', False, 'asynInt32'),
     ("ENUM", 'i', True, 'asynInt16ArrayIn'),
     ("ENUM", 'io', True, 'asynInt16ArrayOut'),
-    # String
     ("STRING", 'i', False, 'asynOctetRead'),
     ("STRING", 'io', False, 'asynOctetWrite'),
 ])
-def test_BaseRecordPackage_guess_DTYP(example_singular_tmc_chains,
-                                      tc_type, io, is_array, final_DTYP):
-    # chain must be broken into singular
-    chain = example_singular_tmc_chains[0]
-    # tc_type is assignable because it isn't implemented in BaseElement
-    # this field must be added because it is typically derived from the .tmc
-    chain.last.is_array = is_array
-    chain.last.length = 3
-    chain.last.type = tc_type
-    record = BaseRecordPackage(851, chain)
-    logger.debug((record.chain.last.pragma.config))
-    record.generate_naive_config()
-    logger.debug((record.cfg.config))
-    for element, idx in zip(record.chain.chain, range(3)):
-        element.name = chr(97+idx)
-    record.cfg.add_config_line('io', io, overwrite=True)
+def test_BaseRecordPackage_guess_DTYP(chain, tc_type, io, is_array,
+                                      final_DTYP):
+    chain.data_type = make_mock_type(tc_type, is_array=is_array, length=3)
+    chain.config['io'] = io
+    record = RecordPackage.from_data_type(851, chain=chain,
+                                          data_type=chain.data_type)
     # If we are checking an input type check the first record
     if record.io_direction == 'input':
         assert record.records[0].fields['DTYP'] == final_DTYP
     # Otherwise check the output records
     else:
         assert record.records[1].fields['DTYP'] == final_DTYP
+
 
 @pytest.mark.parametrize("tc_type, sing_index, field_type, final_INP_OUT", [
     ("BOOL", 0, "OUT", '"@asyn($(PORT),0,1)ADSPORT=851/a.b.c="'),

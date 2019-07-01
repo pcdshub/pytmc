@@ -174,9 +174,14 @@ class SingularChain:
         self.config = squash_configs(*configs)
         self.pvname = ':'.join(self.config['pv'])
 
+    @property
+    def data_type(self):
+        return self.last.data_type
+
     def __repr__(self):
         return (f'<{self.__class__.__name__} pvname={self.pvname!r} '
-                f'tcname={self.tcname!r} config={self.config})')
+                f'tcname={self.tcname!r} config={self.config} '
+                f'data_type={self.data_type!r})')
 
 
 def find_pytmc_symbols(tmc):
