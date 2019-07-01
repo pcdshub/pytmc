@@ -25,7 +25,6 @@ epicsEnvSet("IPPORT",        "{{plc_ads_port}}")
 adsAsynPortDriverConfigure("$(ASYN_PORT)","$(IPADDR)","$(AMSID)","$(IPPORT)", 1000, 0, 0, 50, 100, 1000, 0)
 
 {% if motors %}
-
 epicsEnvSet("MOTOR_PORT",    "{{motor_port}}")
 epicsEnvSet("PREFIX",        "{{prefix}}{{delim}}")
 epicsEnvSet("ECM_NUMAXES",   "{{motors|length}}")
@@ -76,9 +75,8 @@ dbLoadRecords("EthercatMCdebug.template", "PREFIX=$(MOTOR_PREFIX), MOTOR_NAME=$(
 
 {% endfor %}
 {% endif %}
-
 {% for db in additional_db_files %}
-dbLoadRecords("db/{{ db.file }}", "{{ db.macros }}")
+dbLoadRecords("{{ db.file }}", "{{ db.macros }}")
 
 {% endfor %}
 cd "$(TOP)"
