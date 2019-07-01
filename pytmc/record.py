@@ -94,7 +94,7 @@ class RecordPackage:
             logger.error('Unable to render record: %s', self)
             return
         return '\n\n'.join([record.render().strip()
-                          for record in self.records])
+                            for record in self.records])
 
     @staticmethod
     def from_data_type(*args, data_type, **kwargs):
@@ -109,7 +109,7 @@ class RecordPackage:
         return spec(*args, **kwargs)
 
     @staticmethod
-    def from_chain(chain, *args, **kwargs):
+    def from_chain(*args, chain, **kwargs):
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         return RecordPackage.from_data_type(
             *args, data_type=chain.data_type, chain=chain, **kwargs)

@@ -12,7 +12,8 @@ import warnings
 from jinja2 import Environment, PackageLoader
 
 from collections import ChainMap, OrderedDict
-from pytmc import parser
+from . import parser
+from .record import RecordPackage
 
 logger = logging.getLogger(__name__)
 
