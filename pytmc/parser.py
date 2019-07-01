@@ -343,6 +343,24 @@ class EnumInfo(_TmcItem):
         return self.Comment[0].text if hasattr(self, 'Comment') else ''
 
 
+class ArrayInfo(_TmcItem):
+    def post_init(self):
+        lbound = (int(self.LBound[0].text)
+                  if hasattr(self, 'LBound')
+                  else 0)
+
+        elements = (int(self.Elements[0].text)
+                    if hasattr(self, 'Elements')
+                    else 1)
+
+        ubound = (int(self.UBound[0].text)
+                  if hasattr(self, 'UBound')
+                  else lbound + elements)
+
+        self.bounds = (lbound, ubound)
+        self.elements = elements
+
+
 class DataType(_TmcItem):
     'TMC'
     Name: list
@@ -380,6 +398,18 @@ class DataType(_TmcItem):
     @property
     def is_string(self):
         return False
+
+    @property
+    def array_info(self):
+        try:
+            return self.ArrayInfo[0]
+        except (AttributeError, IndexError):
+            return None
+
+    @property
+    def length(self):
+        array_info = self.array_info
+        return array_info.elements if array_info else 1
 
 
 class SubItem(_TmcItem):
@@ -476,13 +506,13 @@ class Link(TwincatItem):
 
 
 class BuiltinDataType:
-    def __init__(self, typename):
-        self.name = typename
+    def __init__(self, typename, *, length=1):
+        if '(' in typename:
+            typename, length = typename.split('(')
+            length = int(length.rstrip(')'))
 
-    @property
-    def length(self):
-        logger.debug('TODO')
-        return 1
+        self.name = typename
+        self.length = length
 
     @property
     def enum_dict(self):
@@ -495,11 +525,14 @@ class BuiltinDataType:
 
     @property
     def is_string(self):
-        return self.name == 'STRING' or self.name.startswith('STRING(')
+        return self.name == 'STRING'
 
     @property
     def is_array(self):
-        return len(getattr(self, 'ArrayInfo', [])) > 0
+        # TODO: you can have an array of STRING(80), for example
+        # the length would be reported as 80 here, and the DataType would have
+        # ArrayInfo
+        return self.length > 1 and not self.is_string
 
     def walk(self):
         yield []
