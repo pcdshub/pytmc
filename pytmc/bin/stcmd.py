@@ -15,7 +15,7 @@ import jinja2
 from ..pragmas import Configuration
 from . import db
 
-from ..parser import parse, Symbol_FB_MotionStage, Property, Project
+from ..parser import parse, Symbol_FB_MotionStage, Property
 
 
 description = __doc__
@@ -160,9 +160,6 @@ def render(args):
         for motor, nc_axis in motors
     ]
 
-    # TODO: for now, only support a single virtual PLC for all motors
-    ads_port = motors[0][0].module.ads_port if motors else 851
-
     additional_db_files = []
     try:
         plc, = project.plcs
@@ -182,9 +179,6 @@ def render(args):
                                           for rec in other_records))
             additional_db_files.append({'file': db_filename, 'macros': ''})
 
-    # TODO one last hack
-    ams_proj = plc.find_ancestor(Project)
-
     template_args = dict(
         binary_name=args.binary,
         name=args.name,
@@ -194,9 +188,9 @@ def render(args):
 
         motor_port='PLC_ADS',
         asyn_port='ASYN_PLC',
-        plc_ams_id=ams_proj.ams_id,
-        plc_ip=ams_proj.target_ip,
-        plc_ads_port=ads_port,
+        plc_ams_id=plc.ams_project.ams_id,
+        plc_ip=plc.ams_project.target_ip,
+        plc_ads_port=plc.ams_project.port,
 
         motors=template_motors,
         additional_db_files=additional_db_files,

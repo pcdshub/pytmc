@@ -36,7 +36,7 @@ def parse(fn, *, parent=None):
     return TwincatItem.parse(root, filename=fn, parent=parent)
 
 
-def element_to_class_name(element):
+def element_to_class_name(element, *, parent=None):
     '''
     Determine the Python class name for an element
 
@@ -51,13 +51,27 @@ def element_to_class_name(element):
     '''
 
     tag = strip_namespace(element.tag)
-    if tag == 'TcSmItem':
-        return f'{tag}_' + element.attrib['ClassName'], TcSmItem
+    extension = os.path.splitext(element.base)[-1].lower()
+
+    if tag == 'Project':
+        if isinstance(parent, TcSmProject):
+            return 'TopLevelProject', TwincatItem
+        if 'File' in element.attrib:
+            # File to be loaded will contain PrjFilePath
+            return 'PlcProjectContainer', TwincatItem
+        if 'PrjFilePath' in element.attrib:
+            return 'PlcProjectContainer', TwincatItem
+        if isinstance(parent, (Plc, TcSmItem)):
+            return 'PlcProject', TwincatItem
+        return 'Project', TwincatItem
+
     if tag == 'Symbol':
         base_type, = element.xpath('BaseType')
         return f'{tag}_' + base_type.text, Symbol
-    if os.path.splitext(element.base)[-1].lower() == '.tmc':
+
+    if extension == '.tmc':
         return tag, _TmcItem
+
     return tag, TwincatItem
 
 
@@ -109,15 +123,14 @@ class TwincatItem:
         return parent
 
     @property
-    def qualified_path(self):
+    def path(self):
         'Path of classes required to get to this instance'
         hier = [self]
         parent = self.parent
         while parent:
             hier.append(parent)
             parent = parent.parent
-        return '/'.join(strip_namespace(item.__class__.__name__)
-                        for item in reversed(hier))
+        return '/'.join(item.__class__.__name__ for item in reversed(hier))
 
     def find_ancestor(self, cls):
         '''
@@ -159,8 +172,12 @@ class TwincatItem:
 
     def _add_children(self, element):
         'A hook for adding all children'
-        for child in element.iterchildren():
-            self._add_child(child)
+        for child_element in element.iterchildren():
+            child = self._parse_child(child_element)
+            if child is not None:
+                self.children.append(child)
+            if hasattr(child, '_squash_children'):
+                self._squash_child(child)
 
         by_tag = separate_children_by_tag(self.children)
         self.children_by_tag = types.SimpleNamespace(**by_tag)
@@ -168,14 +185,13 @@ class TwincatItem:
             if not hasattr(self, key):
                 setattr(self, key, value)
 
-    def _add_child(self, element):
+    def _parse_child(self, element):
         'Add a single child to the list of children'
         if isinstance(element, lxml.etree._Comment):
             self.comments.append(element.text)
             return
 
         child = self.parse(element, parent=self, filename=self.filename)
-        self.children.append(child)
 
         # Two ways for names to come in:
         # 1. the child has a tag of 'Name', with its text being our name
@@ -190,6 +206,16 @@ class TwincatItem:
             ...
         else:
             child.name = name
+        return child
+
+    def _squash_child(self, child):
+        for grandchild in list(child.children):
+            if any(isinstance(grandchild, squashed_type)
+                   for squashed_type in child._squash_children):
+                self.children.append(grandchild)
+                grandchild.container = child
+                grandchild.parent = self
+                child.children.remove(grandchild)
 
     @staticmethod
     def parse(element, parent=None, filename=None):
@@ -209,7 +235,7 @@ class TwincatItem:
         item : TwincatItem
         '''
 
-        classname, base = element_to_class_name(element)
+        classname, base = element_to_class_name(element, parent=parent)
 
         try:
             cls = TWINCAT_TYPES[classname]
@@ -247,7 +273,7 @@ class TwincatItem:
             full_path = (parent_root / pathlib.Path(parent.filename).stem /
                          filename)
         else:
-            project = parent.find_ancestor(Project)
+            project = parent.find_ancestor(TopLevelProject)
             project_root = pathlib.Path(project.filename).parent
             full_path = project_root / cls._load_path / filename
         return parse(full_path, parent=parent)
@@ -259,9 +285,7 @@ class _TwincatProjectSubItem(TwincatItem):
     @property
     def project(self):
         'The nested project (virtual PLC project) associated with the item'
-        # TODO this is wrong... can't consistently find Mappings...
-        ancestor = self.find_ancestor(TcSmItem_CNestedPlcProjDef)
-        return ancestor if ancestor else self.find_ancestor(Plc)
+        return self.find_ancestor(Plc)
 
 
 class TcModuleClass(_TwincatProjectSubItem):
@@ -278,12 +302,10 @@ class TcModuleClass(_TwincatProjectSubItem):
 
 class OwnerA(TwincatItem):
     '[XTI] For a Link between VarA and VarB, this is the parent of VarA'
-    ...
 
 
 class OwnerB(TwincatItem):
     '[XTI] For a Link between VarA and VarB, this is the parent of VarB'
-    ...
 
 
 class Link(TwincatItem):
@@ -293,9 +315,24 @@ class Link(TwincatItem):
         self.b = (self.find_ancestor(OwnerB).name, self.attributes.get('VarB'))
 
 
-class Project(TwincatItem):
+class TopLevelProject(TwincatItem):
+    ...
+
+
+class PlcProject(TwincatItem):
+    ...
+
+
+class PlcProjectContainer(TwincatItem):
     '[tsproj] A project which contains Plc, Io, Mappings, etc.'
     _load_path = pathlib.Path('_Config') / 'PLC'
+
+    @property
+    def port(self):
+        '''
+        The ADS port for the project
+        '''
+        return self.attributes.get('AmsPort', '')
 
     @property
     def ams_id(self):
@@ -328,33 +365,38 @@ class TcSmItem(TwincatItem):
     '''
     [XTI] Top-level container for XTI files
 
-    Further broken down into classes such as `TcSmItem_CNcSafTaskDef`, the
-    latter portion being derived from the `ClassName` attribute in the XML
-    file.
+    Visual Studio-level configuration changes the project layout significantly,
+    with individual XTI files being created for axes, PLCs, etc. instead of
+    updating the original tsproj file.
+
+    The additional, optional, level of indirection here can make walking the
+    tree frustrating. So, we squash these TcSmItems - skipping over them in the
+    hierarchy - and pushing its children into its parent.
+
+    The original container `TcSmItem` is accessible in those items through the
+    `.container` attribute.
     '''
-    ...
+    _squash_children = [TwincatItem]
 
 
 class Plc(TwincatItem):
     '[XTI] A Plc Project'
 
-    Project: list
+    PlcProjectContainer: list
 
     def post_init(self):
         self.namespaces = {}
-        if hasattr(self, 'Project'):
-            proj = self.Project[0]
+        if hasattr(self, 'PlcProjectContainer'):
+            proj = self.PlcProjectContainer[0]
+        elif hasattr(self, 'TcSmItem'):
+            proj = self.TcSmItem[0].PlcProject[0]
         else:
-            self.project = None
-            self.tmc = None
-            # Some <Plc>s are merely containers for nested project
-            # definitions in separate XTI files. Ignore those for now, as
-            # they will be loaded later.
-            return
+            raise RuntimeError('Unable to find project?')
 
-        self.project_path = self.get_relative_path(
+        self.ams_project = proj
+        self.project_path = proj.get_relative_path(
             proj.attributes['PrjFilePath'])
-        self.tmc_path = self.get_relative_path(
+        self.tmc_path = proj.get_relative_path(
             proj.attributes['TmcFilePath'])
         self.project = (parse(self.project_path, parent=self)
                         if self.project_path.exists()
@@ -405,15 +447,6 @@ class Plc(TwincatItem):
             yield from self.tmc.find(cls)
 
 
-class TcSmItem_CNestedPlcProjDef(TcSmItem, Plc):
-    '''
-    [XTI] Nested PLC project definition (i.e., a virtual PLC project)
-
-    Contains POUs and a parsed version of the tmc
-    '''
-    ...
-
-
 class Compile(TwincatItem):
     '''
     [XTI] A code entry in a nested/virtual PLC project
@@ -421,7 +454,6 @@ class Compile(TwincatItem):
     File to load is marked with 'Include'
     May be TcTTO, TcPOU, TcDUT, GVL, etc.
     '''
-    ...
 
 
 class _TmcItem(_TwincatProjectSubItem):
@@ -805,7 +837,6 @@ class Symbol_FB_MotionStage(Symbol):
 
 class GVL(_TwincatProjectSubItem):
     '[XTI] A Global Variable List'
-    ...
 
 
 class POU(_TwincatProjectSubItem):
@@ -857,7 +888,6 @@ class AxisPara(TwincatItem):
 
     Has information on units, acceleration, deadband, etc.
     '''
-    ...
 
 
 class NC(TwincatItem):
@@ -867,10 +897,6 @@ class NC(TwincatItem):
     def post_init(self):
         # Axes can be stored directly in the tsproj:
         self.axes = getattr(self, 'Axis', [])
-        if not self.axes:
-            # Or they can be stored in a separate file, 'NC.xti':
-            self.axes = [item.Axis[0] for item in getattr(self, 'TcSmItem', [])
-                         ]
 
         self.axis_by_id = {
             int(axis.attributes['Id']): axis
@@ -925,7 +951,6 @@ class EncPara(TwincatItem):
     Includes such parameters as ScaleFactorNumerator, ScaleFactorDenominator,
     and so on.
     '''
-    ...
 
 
 class Encoder(TwincatItem):
@@ -1044,7 +1069,7 @@ def separate_children_by_tag(children):
     '''
     d = collections.defaultdict(list)
     for child in children:
-        d[strip_namespace(child.tag)].append(child)
+        d[child.__class__.__name__].append(child)
 
     return d
 

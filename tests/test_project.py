@@ -14,7 +14,7 @@ def test_summarize(project):
     assert project.root is project
     for cls in [parser.Axis, parser.Encoder]:
         for inst in project.find(cls):
-            print(inst.qualified_path)
+            print(inst.path)
             print('-----------------')
             pprint.pprint(dict(inst.summarize()))
 
