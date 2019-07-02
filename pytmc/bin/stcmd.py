@@ -12,10 +12,10 @@ import pathlib
 
 import jinja2
 
-from ..pragmas import Configuration
 from . import db
+from .. import pragmas
 
-from ..parser import parse, Symbol_FB_MotionStage, Property
+from ..parser import parse, Symbol, Symbol_FB_MotionStage, Property, separate_by_classname
 
 
 description = __doc__
@@ -84,6 +84,48 @@ def build_arg_parser(parser=None):
     return parser
 
 
+def get_name(obj, args):
+    'Returns: (motor_prefix, motor_name)'
+    # First check if there is a pytmc pragma
+    configs = pragmas.all_configs([obj])
+    if configs:
+        config = pragmas.squash_configs(*configs)
+        # PV name specified in the pragma - use it as-is
+        return '', args.delim.join(config['pv'])
+
+    if hasattr(obj, 'nc_axis'):
+        nc_axis = obj.nc_axis
+        # Fall back to using the NC axis name, replacing underscores/spaces
+        # with the user-specified delimiter
+        name = nc_axis.name.replace(' ', args.delim)
+        return args.prefix + args.delim, name.replace('_', args.delim)
+    return '', obj.name
+
+
+def jinja_filters(args):
+    'All jinja filters'
+    # TODO all can be cached based on object, if necessary
+
+    @jinja2.evalcontextfilter
+    def epics_prefix(eval_ctx, obj):
+        return get_name(obj, args)[0]
+
+    @jinja2.evalcontextfilter
+    def epics_suffix(eval_ctx, obj):
+        return get_name(obj, args)[1]
+
+    @jinja2.evalcontextfilter
+    def pragma(eval_ctx, obj, key, default=''):
+        configs = pragmas.all_configs([obj])
+        if configs:
+            config = pragmas.squash_configs(*configs)
+            return config.get(key, default)
+        return default
+
+    return {k: v for k, v in locals().items()
+            if not k.startswith('_')}
+
+
 def render(args):
     logger = logging.getLogger('pytmc')
     logger.setLevel(args.log)
@@ -104,61 +146,12 @@ def render(args):
     if not args.prefix:
         args.prefix = args.name.upper()
 
+    jinja_env.filters.update(**jinja_filters(args))
+
     template = jinja_env.get_template(args.template)
 
     project = parse(args.tsproj_project)
-    motors = [(motor, motor.nc_axis)
-              for motor in project.find(Symbol_FB_MotionStage)]
-
-    def get_pytmc(motor, nc_axis, key):
-        '''
-        Find a pytmc pragma by key
-
-        Returns
-        -------
-        value : str or None
-            The first value found, if any
-        '''
-        for config in pytmc_info[motor]:
-            matches = config.get_config_lines(key)
-            if matches:
-                return matches[0]['tag']
-
-    def get_name(motor, nc_axis):
-        'Returns: (motor_prefix, motor_name)'
-        # First check if there is a pytmc pragma
-        tmc_name = get_pytmc(motor, nc_axis, 'pv')
-        if tmc_name is not None:
-            # PV name specified in the pragma - use it as-is
-            return '', tmc_name
-
-        # Fall back to using the NC axis name, replacing underscores/spaces
-        # with the user-specified delimiter
-        name = nc_axis.name.replace(' ', args.delim)
-        return args.prefix + args.delim, name.replace('_', args.delim)
-
-    pytmc_info = {
-        motor: [Configuration(prop.value)
-                for prop in motor.find(Property)
-                if prop.key == 'pytmc'
-                ]
-        for motor, _ in motors
-    }
-
-    template_motors = [
-        dict(axisconfig='',
-             name=get_name(motor, nc_axis),
-             axis_no=nc_axis.axis_number,
-             desc=f'{motor.name} / {nc_axis.name}',
-             egu=nc_axis.units,
-             prec=get_pytmc(motor, nc_axis, 'precision') or '3',
-             additional_fields=get_pytmc(motor, nc_axis,
-                                         'additional_fields') or '',
-             amplifier_flags=get_pytmc(motor, nc_axis,
-                                       'amplifier_flags') or '0',
-             )
-        for motor, nc_axis in motors
-    ]
+    symbols = separate_by_classname(project.find(Symbol))
 
     additional_db_files = []
     try:
@@ -192,11 +185,11 @@ def render(args):
         plc_ip=plc.ams_project.target_ip,
         plc_ads_port=plc.ams_project.port,
 
-        motors=template_motors,
         additional_db_files=additional_db_files,
+        symbols=symbols,
     )
 
-    return project, motors, template.render(**template_args)
+    return project, symbols, template.render(**template_args)
 
 
 def main(*, cmdline_args=None):

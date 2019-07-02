@@ -24,11 +24,11 @@ epicsEnvSet("IPPORT",        "{{plc_ads_port}}")
 
 adsAsynPortDriverConfigure("$(ASYN_PORT)","$(IPADDR)","$(AMSID)","$(IPPORT)", 1000, 0, 0, 50, 100, 1000, 0)
 
-{% if motors %}
+{% if symbols.Symbol_FB_MotionStage %}
 epicsEnvSet("MOTOR_PORT",    "{{motor_port}}")
 epicsEnvSet("PREFIX",        "{{prefix}}{{delim}}")
-epicsEnvSet("ECM_NUMAXES",   "{{motors|length}}")
-epicsEnvSet("NUMAXES",       "{{motors|length}}")
+epicsEnvSet("ECM_NUMAXES",   "{{symbols.Symbol_FB_MotionStage|length}}")
+epicsEnvSet("NUMAXES",       "{{symbols.Symbol_FB_MotionStage|length}}")
 
 EthercatMCCreateController("$(MOTOR_PORT)", "$(ASYN_PORT)", "$(NUMAXES)", "200", "1000")
 
@@ -57,16 +57,16 @@ asynSetTraceInfoMask("$(ASYN_PORT)", -1, 5)
 #define AMPLIFIER_ON_FLAG_WHEN_HOMING  2
 #define AMPLIFIER_ON_FLAG_USING_CNEN   4
 
-{% for motor in motors %}
-epicsEnvSet("AXISCONFIG",      "{{motor.axisconfig}}")
-epicsEnvSet("AXIS_NO",         "{{motor.axis_no}}")
-epicsEnvSet("DESC",            "{{motor.desc}}")
-epicsEnvSet("EGU",             "{{motor.egu}}")
-epicsEnvSet("PREC",            "{{motor.prec}}")
-epicsEnvSet("ECAXISFIELDINIT", "{{motor.additional_fields}}")
-epicsEnvSet("AMPLIFIER_FLAGS", "{{motor.amplifier_flags}}")
-epicsEnvSet("MOTOR_PREFIX",    "{{motor.name[0]}}")
-epicsEnvSet("MOTOR_NAME",      "{{motor.name[1]}}")
+{% for motor in symbols.Symbol_FB_MotionStage | sort(attribute='nc_axis.axis_number') %}
+epicsEnvSet("AXIS_NO",         "{{motor.nc_axis.axis_number}}")
+epicsEnvSet("MOTOR_PREFIX",    "{{motor|epics_prefix}}")
+epicsEnvSet("MOTOR_NAME",      "{{motor|epics_suffix}}")
+epicsEnvSet("DESC",            "{{motor.name}} / {{motor.nc_axis.name}}")
+epicsEnvSet("EGU",             "{{motor.nc_axis.units}}")
+epicsEnvSet("PREC",            "{{motor|pragma('precision', 3) }}")
+epicsEnvSet("AXISCONFIG",      "{{motor|pragma('axisconfig', '')}}")
+epicsEnvSet("ECAXISFIELDINIT", "{{motor|pragma('additional_fields', '') }}")
+epicsEnvSet("AMPLIFIER_FLAGS", "{{motor|pragma('amplifier_flags', '') }}")
 
 EthercatMCCreateAxis("$(MOTOR_PORT)", "$(AXIS_NO)", "$(AMPLIFIER_FLAGS)", "$(AXISCONFIG)")
 dbLoadRecords("EthercatMC.template", "PREFIX=$(MOTOR_PREFIX), MOTOR_NAME=$(MOTOR_NAME), R=$(MOTOR_NAME)-, MOTOR_PORT=$(MOTOR_PORT), ASYN_PORT=$(ASYN_PORT), AXIS_NO=$(AXIS_NO), DESC=$(DESC), PREC=$(PREC) $(ECAXISFIELDINIT)")

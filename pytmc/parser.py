@@ -179,7 +179,7 @@ class TwincatItem:
             if hasattr(child, '_squash_children'):
                 self._squash_child(child)
 
-        by_tag = separate_children_by_tag(self.children)
+        by_tag = separate_by_classname(self.children)
         self.children_by_tag = types.SimpleNamespace(**by_tag)
         for key, value in by_tag.items():
             if not hasattr(self, key):
@@ -316,7 +316,7 @@ class Link(TwincatItem):
 
 
 class TopLevelProject(TwincatItem):
-    ...
+    '[tsproj] '
 
 
 class PlcProject(TwincatItem):
@@ -538,13 +538,15 @@ class DataType(_TmcItem):
             return f'{name_attrs["Namespace"]}.{self.name}'
         return self.name
 
-    def walk(self):
+    def walk(self, condition=None):
         if not hasattr(self, 'SubItem'):
-            yield [self]
+            if condition is None or condition(self):
+                yield [self]
         else:
             for subitem in self.SubItem:
                 for item in subitem.walk():
-                    yield [self, subitem] + item
+                    if condition is None or all(condition(it) for it in item):
+                        yield [self, subitem] + item
 
     @property
     def enum_dict(self):
@@ -596,8 +598,8 @@ class SubItem(_TmcItem):
         namespace = type_.attributes.get("Namespace", None)
         return f'{namespace}.{type_.text}' if namespace else type_.text
 
-    def walk(self):
-        yield from self.data_type.walk()
+    def walk(self, condition=None):
+        yield from self.data_type.walk(condition=condition)
 
 
 class Module(_TmcItem):
@@ -678,7 +680,7 @@ class BuiltinDataType:
         # ArrayInfo
         return self.length > 1 and not self.is_string
 
-    def walk(self):
+    def walk(self, condition=None):
         yield []
 
 
@@ -726,9 +728,10 @@ class Symbol(_TmcItem):
                     module=self.module.name,
                     )
 
-    def walk(self):
+    def walk(self, condition=None):
         for item in self.data_type.walk():
-            yield [self] + item
+            if condition is None or all(condition(it) for it in item):
+                yield [self] + item
 
     @property
     def array_info(self):
@@ -915,7 +918,7 @@ class Axis(TwincatItem):
 
     @property
     def axis_number(self):
-        return self.attributes['Id']
+        return int(self.attributes['Id'])
 
     @property
     def units(self):
@@ -1042,10 +1045,10 @@ def case_insensitive_path(path):
     return new_path.resolve()
 
 
-def separate_children_by_tag(children):
+def separate_by_classname(children):
     '''
-    Take in a list of `TwincatItem`, categorize each by their XML tag, and
-    return a dictionary keyed on tag.
+    Take in a list of `TwincatItem`, categorize each by their class name (based
+    on XML tag), and return a dictionary keyed on that.
 
     For example::
 

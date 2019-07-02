@@ -184,16 +184,22 @@ class SingularChain:
 
 def find_pytmc_symbols(tmc):
     for symbol in tmc.find(parser.Symbol):
-        if any(prop.name == 'pytmc' for prop in symbol.find(parser.Property)):
+        if has_pragma(symbol):
             yield symbol
+
+
+def has_pragma(item, *, name='pytmc'):
+    return any(prop.name == 'pytmc' for prop in item.find(parser.Property))
 
 
 def chains_from_symbol(symbol):
     for full_chain in symbol.walk():
         for item_and_config in all_configs(full_chain):
             chain = [item for item, _ in item_and_config]
-            configs = [config for _, config in item_and_config]
-            yield chain, configs
+            # TODO this is very inefficient
+            if all(has_pragma(it) for it in chain):
+                configs = [config for _, config in item_and_config]
+                yield chain, configs
 
 
 def record_packages_from_symbol(symbol, *, unroll=False):
