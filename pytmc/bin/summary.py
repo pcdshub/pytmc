@@ -40,6 +40,12 @@ def build_arg_parser(argparser=None):
     )
 
     argparser.add_argument(
+        '--boxes', '-b',
+        action='store_true',
+        help='Show boxes'
+    )
+
+    argparser.add_argument(
         '--plcs', '-p',
         action='store_true',
         help='Show plcs'
@@ -119,15 +125,23 @@ def summary(args):
 
     if args.symbols or args.all:
         print('--- Symbols:')
-        for symbol in project.find(parser.Symbol):
+        symbols = list(project.find(parser.Symbol))
+        for symbol in symbols:
             info = symbol.info
             print('    {name} : {qualified_type_name} ({bit_offs} {bit_size})'
                   ''.format(**info))
         print()
 
+    if args.boxes or args.all:
+        print('--- Boxes:')
+        boxes = list(project.find(parser.Box))
+        for box in boxes:
+            print(f'    {box.attributes["Id"]}.) {box.name}')
+
     if args.nc or args.all:
         print('--- NC axes:')
-        for nc in project.find(parser.NC):
+        ncs = list(project.find(parser.NC))
+        for nc in ncs:
             for axis_id, axis in sorted(nc.axis_by_id.items()):
                 print(f'    {axis_id}.) {axis.name!r}:')
                 for category, info in axis.summarize():
@@ -140,7 +154,8 @@ def summary(args):
 
     if args.links or args.all:
         print('--- Links:')
-        for i, link in enumerate(project.find(parser.Link), 1):
+        links = list(project.find(parser.Link))
+        for i, link in enumerate(links, 1):
             print(f'    {i}.) A {link.a}')
             print(f'          B {link.b}')
         print()
@@ -149,8 +164,12 @@ def summary(args):
         outline(project)
 
     if args.debug:
-        # for interactive debugging ease-of-use, import `parse`
-        from pytmc.parser import parse  # noqa
+        # for interactive debugging ease-of-use:
+        import pytmc  # noqa
+        from pytmc.parser import TwincatItem, TWINCAT_TYPES  # noqa
+        globals().update(**{k: v for k, v in TWINCAT_TYPES.items()
+                            if not k.startswith('__')}
+                         )
         try:
             from IPython import embed
         except ImportError:
