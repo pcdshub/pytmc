@@ -7,6 +7,7 @@ import argparse
 import ast
 import logging
 import pathlib
+import sys
 
 from .. import parser
 
@@ -30,6 +31,12 @@ def build_arg_parser(argparser=None):
         '--all', '-a',
         action='store_true',
         help='All possible information'
+    )
+
+    argparser.add_argument(
+        '--outline',
+        action='store_true',
+        help='Outline XML'
     )
 
     argparser.add_argument(
@@ -72,6 +79,18 @@ def build_arg_parser(argparser=None):
     return argparser
 
 
+def outline(item, *, depth=0, f=sys.stdout):
+    indent = '  ' * depth
+    num_children = len(item.children)
+    has_container = 'C' if hasattr(item, 'container') else ' '
+    flags = ''.join((has_container, ))
+    name = item.name or ''
+    print(f'{flags}{indent}{item.__class__.__name__} {name} '
+          f'[{num_children}]', file=f)
+    for child in item.children:
+        outline(child, depth=depth + 1, f=f)
+
+
 def summary(args):
     logger = logging.getLogger('pytmc')
     logger.setLevel(args.log)
@@ -101,7 +120,9 @@ def summary(args):
     if args.symbols or args.all:
         print('--- Symbols:')
         for symbol in project.find(parser.Symbol):
-            print(f'    {symbol.info}')
+            info = symbol.info
+            print('    {name} : {qualified_type_name} ({bit_offs} {bit_size})'
+                  ''.format(**info))
         print()
 
     if args.nc or args.all:
@@ -123,6 +144,9 @@ def summary(args):
             print(f'    {i}.) A {link.a}')
             print(f'          B {link.b}')
         print()
+
+    if args.outline:
+        outline(project)
 
     if args.debug:
         # for interactive debugging ease-of-use, import `parse`
