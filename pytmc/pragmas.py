@@ -80,6 +80,27 @@ def split_field(string):
 
 
 def separate_configs_by_pv(config_lines):
+    '''
+    Take in a pre-parsed pragma such as::
+
+        [{'title': 'pv', 'tag': 'a'},
+         {'title': 'io', 'tag': 'io_for_a'},
+         {'title': 'pv', 'tag': 'b'},
+         {'title': 'io', 'tag': 'io_for_a'},
+         ]
+
+    Which was generated from::
+
+        pv: a
+        io: io_for_a
+        pv: b
+        io: io_for_b
+
+    And yield the following::
+
+        ('a', [{'title': 'io', 'tag': 'io_for_a'}])
+        ('b', [{'title': 'io', 'tag': 'io_for_b'}])
+    '''
     pv, config = None, None
 
     for line in config_lines:
@@ -98,8 +119,6 @@ def separate_configs_by_pv(config_lines):
 
 
 class Configuration:
-    _cfg_header = 'pv'
-
     def __init__(self, pragma_text):
         self.pragma_text = pragma_text
         self.config_lines = split_pytmc_pragma(pragma_text)
@@ -107,6 +126,22 @@ class Configuration:
 
 
 def dictify_config(conf):
+    '''
+    Make a raw config list into an easier-to-use dictionary
+
+    Example::
+        [{'title': 'pv', 'tag': 'a'},
+         {'title': 'io', 'tag': 'io_for_a'},
+         {'title': 'field', 'tag': {'f_name': 'fieldname', 'f_set': 'value'}},
+         ]
+
+    Becomes::
+
+        {'pv': 'a',
+         'io': 'io_for_a',
+         'field': {'fieldname': 'value'}}
+    '''
+
     fields = {
         item['tag']['f_name']: item['tag']['f_set']
         for item in conf
@@ -120,6 +155,9 @@ def dictify_config(conf):
 
 
 def all_configs(chain):
+    '''
+    Generate all possible configuration combinations
+    '''
     result = []
     for item in chain:
         if isinstance(item, parser.DataType):
@@ -150,6 +188,13 @@ def all_configs(chain):
 
 
 def squash_configs(*configs):
+    '''
+    Take a list of configurations, and squash them into one dictionary
+
+    The key 'pv' will be a list of all PV segments found.
+
+    Later configurations override prior ones.
+    '''
     squashed = {'pv': [], 'field': {}}
     for config in configs:
         pv_segment = config.pop('pv', None)
@@ -164,11 +209,16 @@ def squash_configs(*configs):
 
 
 class SingularChain:
+    '''
+    A chain of data types, all with pytmc pragmas, representing a single piece
+    of data that should be accessible via EPICS/ADS
+    '''
     def __init__(self, chain, configs):
         self.chain = list(chain)
         self.last = self.chain[-1]
         self.tcname = '.'.join(part.name for part in self.chain)
 
+        self.configs = configs
         self.config = squash_configs(*configs)
         self.pvname = ':'.join(self.config['pv'])
 
@@ -183,29 +233,30 @@ class SingularChain:
 
 
 def find_pytmc_symbols(tmc):
+    'Find all symbols in a tmc file that contain pragmas'
     for symbol in tmc.find(parser.Symbol):
         if has_pragma(symbol):
             yield symbol
 
 
 def has_pragma(item, *, name='pytmc'):
+    'Does `item` have a pragma titled `name`?'
     return any(prop.name == 'pytmc' for prop in item.find(parser.Property))
 
 
 def chains_from_symbol(symbol):
+    'Build all SingularChain '
     for full_chain in symbol.walk():
         for item_and_config in all_configs(full_chain):
             chain = [item for item, _ in item_and_config]
             # TODO this is very inefficient
             if all(has_pragma(it) for it in chain):
                 configs = [config for _, config in item_and_config]
-                yield chain, configs
+                yield SingularChain(chain=chain, configs=configs)
 
 
 def record_packages_from_symbol(symbol, *, unroll=False):
-    for chain, configs in chains_from_symbol(symbol):
-        chain = SingularChain(chain=chain, configs=configs)
-
+    for chain in chains_from_symbol(symbol):
         data_type = chain.data_type
         array_info = getattr(chain.last, 'array_info', None)
         if unroll and (data_type.is_enum and array_info is not None):

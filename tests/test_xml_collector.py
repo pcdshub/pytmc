@@ -42,8 +42,8 @@ class _SingularChain(pragmas.SingularChain):
 def chain():
     tmc = parser.parse(conftest.TMC_ROOT / 'xtes_sxr_plc.tmc')
     symbols = list(pragmas.find_pytmc_symbols(tmc))
-    chain, configs = list(pragmas.chains_from_symbol(symbols[1]))[0]
-    schain = _SingularChain(chain, configs)
+    chain = list(pragmas.chains_from_symbol(symbols[1]))[0]
+    schain = _SingularChain(chain=chain.chain, configs=chain.configs)
     schain.data_type = schain.last.data_type
     return schain
 
