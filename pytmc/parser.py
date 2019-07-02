@@ -1044,7 +1044,7 @@ def separate_children_by_tag(children):
     '''
     d = collections.defaultdict(list)
     for child in children:
-        d[child.tag].append(child)
+        d[strip_namespace(child.tag)].append(child)
 
     return d
 
