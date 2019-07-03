@@ -257,8 +257,8 @@ def chains_from_symbol(symbol, *, pragma='pytmc'):
             yield SingularChain(chain=chain, configs=configs)
 
 
-def record_packages_from_symbol(symbol, *, unroll=False):
-    for chain in chains_from_symbol(symbol):
+def record_packages_from_symbol(symbol, *, unroll=False, pragma='pytmc'):
+    for chain in chains_from_symbol(symbol, pragma=pragma):
         data_type = chain.data_type
         array_info = getattr(chain.last, 'array_info', None)
         if unroll and (data_type.is_enum and array_info is not None):
