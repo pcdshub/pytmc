@@ -95,7 +95,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.chains[record.tcname] = record
             try:
                 record_text = record.render()
-                linter_results = (pytmc.epics.lint_db(dbd, record_text)
+                linter_results = (pytmc.linter.lint_db(dbd, record_text)
                                   if dbd and record_text else None)
                 record_text = _annotate_record_text(linter_results,
                                                     record_text)
@@ -298,7 +298,7 @@ def create_debug_window(args):
     if args.dbd is None:
         dbd = None
     else:
-        dbd = pytmc.epics.DbdFile(args.dbd)
+        dbd = pytmc.linter.DbdFile(args.dbd)
 
     show_qt_interface(tmc, dbd)
 

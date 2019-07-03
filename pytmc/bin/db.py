@@ -10,7 +10,7 @@ import sys
 
 from collections import defaultdict
 
-from .. import epics, parser
+from .. import linter, parser
 from ..pragmas import find_pytmc_symbols, record_packages_from_symbol
 
 
@@ -40,7 +40,7 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
 
     Returns
     -------
-    pytmc.epics.LinterResults
+    pytmc.linter.LinterResults
         Results from the linting process
 
     Raises
@@ -50,10 +50,10 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
 
     See also
     --------
-    pytmc.epics.lint_db
+    pytmc.linter.lint_db
     '''
     db_text = '\n\n'.join(record.render() for record in packages)
-    results = epics.lint_db(dbd=dbd_file, db=db_text, **linter_options)
+    results = linter.lint_db(dbd=dbd_file, db=db_text, **linter_options)
     if remove_invalid_fields:
         all_invalid_fields = [
             error['format_args']

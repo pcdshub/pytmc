@@ -1,5 +1,5 @@
 from pytmc.record import EPICSRecord
-from pytmc.epics import lint_db
+from pytmc.linter import lint_db
 
 
 def test_epics_record_render():

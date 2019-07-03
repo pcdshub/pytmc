@@ -4,7 +4,7 @@ import pathlib
 import pytest
 
 import pytmc
-from pytmc import epics, parser
+from pytmc import linter, parser
 
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ INVALID_TMC_FILES = list((TMC_ROOT / 'invalid').glob('*.tmc'))
 
 @pytest.fixture(scope='module')
 def dbd_file():
-    return pytmc.epics.DbdFile(DBD_FILE)
+    return pytmc.linter.DbdFile(DBD_FILE)
 
 
 @pytest.fixture(params=TMC_FILES,
@@ -39,5 +39,5 @@ def project(project_filename):
 
 def lint_record(dbd_file, record):
     assert record.valid
-    linted = epics.lint_db(dbd=dbd_file, db=record.render())
+    linted = linter.lint_db(dbd=dbd_file, db=record.render())
     assert not len(linted.errors)
