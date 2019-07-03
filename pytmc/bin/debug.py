@@ -32,7 +32,7 @@ def _grep_record_names(text):
     def split_rtyp(line):
         line = line.split('record(', 1)[1].rstrip('")')
         rtyp, record = line.split(',', 1)
-        record = record.strip('"\'')
+        record = record.strip('"\' ')
         return f'{record} ({rtyp})'
 
     return [split_rtyp(record)
@@ -91,9 +91,8 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.chains = {}
         self.records = {}
 
-        for record in tmc.all_RecordPackages:
-            chain_label = ' '.join(record.chain.name_list)
-            self.chains[chain_label] = record
+        for record in process(tmc):
+            self.chains[record.tcname] = record
             try:
                 record_text = record.render()
                 linter_results = (pytmc.epics.lint_db(dbd, record_text)
@@ -162,7 +161,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             return
 
         record = current.data(Qt.UserRole)
-        if isinstance(record, pytmc.xml_collector.BaseRecordPackage):
+        if isinstance(record, pytmc.record.RecordPackage):
             self.item_selected.emit(record)
         elif isinstance(record, str):  # {chain: record}
             chain = record
@@ -171,8 +170,10 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     def _update_config_info(self, record):
         'Slot - update config information when a new record is selected'
+        chain = record.chain
+
         self.config_info.clear()
-        self.config_info.setRowCount(len(record.cfg.config))
+        self.config_info.setRowCount(len(chain.chain))
 
         def add_dict_to_table(row, d):
             for key, value in d.items():
@@ -186,10 +187,18 @@ class TmcSummary(QtWidgets.QMainWindow):
                     add_dict_to_table(row, value)
 
         columns = {}
-        for row, line in enumerate(record.cfg.config):
-            add_dict_to_table(row, line)
+        for row, (item, config) in enumerate(chain.item_to_config.items()):
+            add_dict_to_table(row, {k: v for k, v in config.items()
+                                    if k != 'field'})
+            fields = config.get('field', {})
+            add_dict_to_table(row, {f'field_{k}': v
+                                    for k, v in fields.items()
+                                    if k != 'field'}
+                              )
 
         self.config_info.setHorizontalHeaderLabels(list(columns))
+        self.config_info.setVerticalHeaderLabels(
+            list(item.name for item in chain.item_to_config))
 
         self.config_info.setColumnCount(
             max(columns.values()) + 1
@@ -284,14 +293,13 @@ def create_debug_window(args):
     pytmc_logger = logging.getLogger('pytmc')
     pytmc_logger.setLevel(args.log)
 
-    tmc = pytmc.TmcFile(args.tmc_file)
+    tmc = pytmc.parser.parse(args.tmc_file)
 
     if args.dbd is None:
         dbd = None
     else:
         dbd = pytmc.epics.DbdFile(args.dbd)
 
-    process(tmc)
     show_qt_interface(tmc, dbd)
 
 
