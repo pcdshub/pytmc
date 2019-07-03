@@ -154,35 +154,21 @@ def dictify_config(conf):
     return config
 
 
-def all_configs(chain):
+def all_configs(chain, *, pragma='pytmc'):
     '''
     Generate all possible configuration combinations
     '''
     result = []
     for item in chain:
-        if isinstance(item, parser.DataType):
-            # DataType is not required to have a pragma, but SubItems are
-            # required to generate a record.
-            continue
-        elif not hasattr(item, 'Properties'):
-            return []
-
-        properties = item.Properties[0]
-        pragmas = [
-            prop for prop in getattr(properties, 'Property', [])
-            if prop.name == 'pytmc'
-        ]
-
+        pragmas = get_pragma(item, name=pragma)
         if not pragmas:
             return []
 
-        pragma, = pragmas
-        result.append(
-            [(item, dictify_config(config))
-             for pvname, config in
-             Configuration(pragma.value).configs.items()
-             ]
-        )
+        result.append([
+            (item, dictify_config(config))
+            for pvname, config in separate_configs_by_pv(
+                split_pytmc_pragma('\n'.join(pragmas)))
+        ])
 
     return list(itertools.product(*result))
 
@@ -239,20 +225,27 @@ def find_pytmc_symbols(tmc):
             yield symbol
 
 
+def get_pragma(item, *, name='pytmc'):
+    'Get all pragmas with a certain tag'
+    if hasattr(item, 'Properties'):
+        properties = item.Properties[0]
+        for prop in getattr(properties, 'Property', []):
+            if prop.name == name:
+                yield prop.value
+
+
 def has_pragma(item, *, name='pytmc'):
     'Does `item` have a pragma titled `name`?'
-    return any(prop.name == 'pytmc' for prop in item.find(parser.Property))
+    return any(True for _ in get_pragma(item, name=name))
 
 
-def chains_from_symbol(symbol):
+def chains_from_symbol(symbol, *, pragma='pytmc'):
     'Build all SingularChain '
-    for full_chain in symbol.walk():
+    for full_chain in symbol.walk(condition=has_pragma):
         for item_and_config in all_configs(full_chain):
             chain = [item for item, _ in item_and_config]
-            # TODO this is very inefficient
-            if all(has_pragma(it) for it in chain):
-                configs = [config for _, config in item_and_config]
-                yield SingularChain(chain=chain, configs=configs)
+            configs = [config for _, config in item_and_config]
+            yield SingularChain(chain=chain, configs=configs)
 
 
 def record_packages_from_symbol(symbol, *, unroll=False):

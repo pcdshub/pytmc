@@ -142,6 +142,7 @@ def test_input_output_scan(chain, dbd_file, tc_type, sing_index, field_type,
     chain.data_type = make_mock_type(tc_type, is_array=False)
     chain.config['io'] = 'io'
     chain.tcname = 'a.b.c'
+    chain.pvname = 'pvname'
     record = RecordPackage.from_chain(chain=chain, ads_port=851)
 
     # chain must be broken into singular

@@ -539,14 +539,13 @@ class DataType(_TmcItem):
         return self.name
 
     def walk(self, condition=None):
-        if not hasattr(self, 'SubItem'):
-            if condition is None or condition(self):
-                yield [self]
-        else:
+        if hasattr(self, 'SubItem'):
             for subitem in self.SubItem:
+                if condition and not condition(subitem):
+                    continue
                 for item in subitem.walk():
                     if condition is None or all(condition(it) for it in item):
-                        yield [self, subitem] + item
+                        yield [subitem] + item
 
     @property
     def enum_dict(self):
@@ -729,7 +728,7 @@ class Symbol(_TmcItem):
                     )
 
     def walk(self, condition=None):
-        for item in self.data_type.walk():
+        for item in self.data_type.walk(condition=condition):
             if condition is None or all(condition(it) for it in item):
                 yield [self] + item
 
