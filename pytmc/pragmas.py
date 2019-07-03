@@ -209,6 +209,22 @@ class SingularChain:
     item_to_config : dict
         Keys would be `TwincatItem`s such as Symbol, and values would be
         dictionary configurations from parsed pytmc pragmas.
+
+    Attributes
+    ----------
+    item_to_config : dict
+    chain : list
+        The chain of items (i.e., item_to_config keys)
+    tcname : str
+        The full TwinCAT name of the item
+    pvname : str
+        The user-specified PV name
+    last : list
+        The last item, which determines the overall data type
+    data_type : DataType
+        The data type of the last item
+    config : dict
+        The final configuration based on the full chain of configurations
     '''
     def __init__(self, item_to_config):
         self.item_to_config = item_to_config
@@ -217,10 +233,7 @@ class SingularChain:
         self.data_type = self.chain[-1].data_type
         self.tcname = '.'.join(part.name for part in self.chain)
 
-        self.configs = [
-            dict(config) for config in self.item_to_config.values()
-        ]
-        self.config = squash_configs(*self.configs)
+        self.config = squash_configs(*list(item_to_config.values()))
         self.pvname = ':'.join(self.config['pv'])
 
     def __repr__(self):
