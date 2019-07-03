@@ -58,12 +58,14 @@ def element_to_class_name(element, *, parent=None):
             return 'TopLevelProject', TwincatItem
         if 'File' in element.attrib:
             # File to be loaded will contain PrjFilePath
-            return 'PlcProjectContainer', TwincatItem
+            return 'Plc', TwincatItem
         if 'PrjFilePath' in element.attrib:
-            return 'PlcProjectContainer', TwincatItem
+            return 'Plc', TwincatItem
         if isinstance(parent, (Plc, TcSmItem)):
             return 'PlcProject', TwincatItem
         return 'Project', TwincatItem
+    if tag == 'Plc':
+        return 'TopLevelPlc', TwincatItem
 
     if tag == 'Symbol':
         base_type, = element.xpath('BaseType')
@@ -323,42 +325,13 @@ class PlcProject(TwincatItem):
     ...
 
 
-class PlcProjectContainer(TwincatItem):
-    '[tsproj] A project which contains Plc, Io, Mappings, etc.'
-    _load_path = pathlib.Path('_Config') / 'PLC'
-
-    @property
-    def port(self):
-        '''
-        The ADS port for the project
-        '''
-        return self.attributes.get('AmsPort', '')
-
-    @property
-    def ams_id(self):
-        '''
-        The AMS ID of the configured target
-        '''
-        return self.attributes.get('TargetNetId', '')
-
-    @property
-    def target_ip(self):
-        '''
-        A guess of the target IP, based on the AMS ID
-        '''
-        ams_id = self.ams_id
-        if ams_id.endswith('.1.1'):
-            return ams_id[:-4]
-        return ams_id  # :(
-
-
 class TcSmProject(TwincatItem):
     '[tsproj] A top-level TwinCAT tsproj'
     @property
     def plcs(self):
-        'The nested projects (virtual PLC project) contained in this Project'
-        return [plc for plc in self.find(Plc)
-                if plc.project is not None]
+        'The virtual PLC projects contained in this TcSmProject'
+        for top_level_plc in self.find(TopLevelPlc):
+            yield from top_level_plc.projects.values()
 
 
 class TcSmItem(TwincatItem):
@@ -379,25 +352,35 @@ class TcSmItem(TwincatItem):
     _squash_children = [TwincatItem]
 
 
-class Plc(TwincatItem):
-    '[XTI] A Plc Project'
+class TopLevelPlc(TwincatItem):
+    '[XTI] Top-level PLC, contains one or more projects'
 
     PlcProjectContainer: list
 
     def post_init(self):
-        self.namespaces = {}
-        if hasattr(self, 'PlcProjectContainer'):
-            proj = self.PlcProjectContainer[0]
+        if hasattr(self, 'Plc'):
+            projects = self.Plc
         elif hasattr(self, 'TcSmItem'):
-            proj = self.TcSmItem[0].PlcProject[0]
+            projects = self.TcSmItem[0].PlcProject
         else:
             raise RuntimeError('Unable to find project?')
 
-        self.ams_project = proj
-        self.project_path = proj.get_relative_path(
-            proj.attributes['PrjFilePath'])
-        self.tmc_path = proj.get_relative_path(
-            proj.attributes['TmcFilePath'])
+        self.projects = {
+            project.name: project
+            for project in projects
+        }
+
+
+class Plc(TwincatItem):
+    '[tsproj] A project which contains Plc, Io, Mappings, etc.'
+    _load_path = pathlib.Path('_Config') / 'PLC'
+
+    def post_init(self):
+        self.namespaces = {}
+        self.project_path = self.get_relative_path(
+            self.attributes['PrjFilePath'])
+        self.tmc_path = self.get_relative_path(
+            self.attributes['TmcFilePath'])
         self.project = (parse(self.project_path, parent=self)
                         if self.project_path.exists()
                         else None)
@@ -433,6 +416,30 @@ class Plc(TwincatItem):
 
         self.namespaces.update(self.pou_by_name)
         self.namespaces.update(self.gvl_by_name)
+
+    @property
+    def port(self):
+        '''
+        The ADS port for the project
+        '''
+        return self.attributes.get('AmsPort', '')
+
+    @property
+    def ams_id(self):
+        '''
+        The AMS ID of the configured target
+        '''
+        return self.attributes.get('TargetNetId', '')
+
+    @property
+    def target_ip(self):
+        '''
+        A guess of the target IP, based on the AMS ID
+        '''
+        ams_id = self.ams_id
+        if ams_id.endswith('.1.1'):
+            return ams_id[:-4]
+        return ams_id  # :(
 
     def find(self, cls):
         yield from super().find(cls)

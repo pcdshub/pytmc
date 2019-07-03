@@ -181,9 +181,9 @@ def render(args):
 
         motor_port='PLC_ADS',
         asyn_port='ASYN_PLC',
-        plc_ams_id=plc.ams_project.ams_id,
-        plc_ip=plc.ams_project.target_ip,
-        plc_ads_port=plc.ams_project.port,
+        plc_ams_id=plc.ams_id,
+        plc_ip=plc.target_ip,
+        plc_ads_port=plc.port,
 
         additional_db_files=additional_db_files,
         symbols=symbols,
