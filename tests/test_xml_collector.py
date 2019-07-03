@@ -1,12 +1,11 @@
 import logging
-import textwrap
 import types
 
 import pytest
 
-from pytmc import epics, parser, pragmas
+from pytmc import parser, pragmas
 
-from pytmc.record import (RecordPackage, TwincatTypeRecordPackage,
+from pytmc.record import (RecordPackage,
                           BinaryRecordPackage, IntegerRecordPackage,
                           EnumRecordPackage, FloatRecordPackage,
                           WaveformRecordPackage, StringRecordPackage)

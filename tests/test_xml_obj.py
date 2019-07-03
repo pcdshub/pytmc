@@ -1,10 +1,7 @@
 import pytest
 import logging
 
-import xml.etree.ElementTree as ET
-
 from pytmc.pragmas import split_pytmc_pragma, separate_configs_by_pv
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +67,6 @@ def branch_bool_pragma_string_empty(branch_bool_pragma_string):
             pv:"""
 
 
-
 @pytest.fixture(scope='function')
 def branch_connection_pragma_string():
     return """
@@ -99,7 +95,7 @@ def branch_skip_pragma_string():
 ])
 def test_config_lines(leaf_bool_pragma_string_w_semicolon,
                       leaf_bool_pragma_string_single_line, model_set):
-    if model_set is 0:
+    if model_set == 0:
         string = leaf_bool_pragma_string_w_semicolon
         test = [
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
@@ -120,7 +116,7 @@ def test_config_lines(leaf_bool_pragma_string_w_semicolon,
             {'title': 'ensure', 'tag': 'that'},
             {'title': 'semicolons', 'tag': 'work'},
         ]
-    if model_set is 1:
+    if model_set == 1:
         string = leaf_bool_pragma_string_single_line
         test = [{'title': "pv", 'tag': 'pv_name'}]
 

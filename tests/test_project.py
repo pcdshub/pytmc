@@ -1,5 +1,4 @@
 import pytest
-import pytmc
 import pprint
 
 from pytmc import parser
