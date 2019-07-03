@@ -4,7 +4,7 @@ import types
 
 import pytest
 
-from pytmc import epics, parser, Configuration, pragmas
+from pytmc import epics, parser, pragmas
 
 from pytmc.record import (RecordPackage, TwincatTypeRecordPackage,
                           BinaryRecordPackage, IntegerRecordPackage,
@@ -58,8 +58,7 @@ def chain():
 def test_record_package_from_chain(chain, tc_type, is_array, final_type,
                                    monkeypatch):
     chain.data_type = make_mock_type(tc_type, is_array=is_array)
-    record = RecordPackage.from_data_type(851, chain=chain,
-                                          data_type=chain.data_type)
+    record = RecordPackage.from_chain(851, chain=chain)
     assert isinstance(record, final_type)
 
 

@@ -96,7 +96,9 @@ class RecordPackage:
                             for record in self.records])
 
     @staticmethod
-    def from_data_type(*args, data_type, **kwargs):
+    def from_chain(*args, chain, **kwargs):
+        """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
+        data_type = chain.data_type
         if data_type.is_array:
             spec = WaveformRecordPackage
         elif data_type.is_string:
@@ -105,13 +107,7 @@ class RecordPackage:
             spec = EnumRecordPackage
         else:
             spec = data_types[data_type.name]
-        return spec(*args, **kwargs)
-
-    @staticmethod
-    def from_chain(*args, chain, **kwargs):
-        """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
-        return RecordPackage.from_data_type(
-            *args, data_type=chain.data_type, chain=chain, **kwargs)
+        return spec(*args, chain=chain, **kwargs)
 
 
 class TwincatTypeRecordPackage(RecordPackage):
