@@ -33,19 +33,11 @@ def make_mock_type(name, is_array=False, is_enum=False, is_string=False,
 
 
 
-class _SingularChain(pragmas.SingularChain):
-    'Singular chain with overridable data_type, for testing'
-    data_type = None
-
-
 @pytest.fixture(scope='module')
 def chain():
     tmc = parser.parse(conftest.TMC_ROOT / 'xtes_sxr_plc.tmc')
     symbols = list(pragmas.find_pytmc_symbols(tmc))
-    chain = list(pragmas.chains_from_symbol(symbols[1]))[0]
-    schain = _SingularChain(chain=chain.chain, configs=chain.configs)
-    schain.data_type = schain.last.data_type
-    return schain
+    return list(pragmas.chains_from_symbol(symbols[1]))[0]
 
 
 @pytest.mark.parametrize("tc_type, is_array, final_type", [

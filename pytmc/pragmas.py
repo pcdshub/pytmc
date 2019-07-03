@@ -214,15 +214,12 @@ class SingularChain:
     def __init__(self, chain, configs):
         self.chain = list(chain)
         self.last = self.chain[-1]
+        self.data_type = self.last.data_type
         self.tcname = '.'.join(part.name for part in self.chain)
 
         self.configs = configs
         self.config = squash_configs(*configs)
         self.pvname = ':'.join(self.config['pv'])
-
-    @property
-    def data_type(self):
-        return self.last.data_type
 
     def __repr__(self):
         return (f'<{self.__class__.__name__} pvname={self.pvname!r} '
