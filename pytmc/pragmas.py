@@ -154,9 +154,21 @@ def dictify_config(conf):
     return config
 
 
-def all_configs(chain, *, pragma='pytmc'):
+def expand_configurations_from_chain(chain, *, pragma='pytmc'):
     '''
     Generate all possible configuration combinations
+
+    For example, from a chain with two items::
+
+        [item1, item2]
+
+    The latter of which has a configuration that creates two PVs (specified by
+    configuration dictionaries config1, config2), this function will return::
+
+        [
+            [(item1, config1), (item2, config1)],
+            [(item1, config1), (item2, config2)],
+        ]
     '''
     result = []
     for item in chain:
@@ -242,7 +254,7 @@ def has_pragma(item, *, name='pytmc'):
 def chains_from_symbol(symbol, *, pragma='pytmc'):
     'Build all SingularChain '
     for full_chain in symbol.walk(condition=has_pragma):
-        for item_and_config in all_configs(full_chain):
+        for item_and_config in expand_configurations_from_chain(full_chain):
             chain = [item for item, _ in item_and_config]
             configs = [config for _, config in item_and_config]
             yield SingularChain(chain=chain, configs=configs)
