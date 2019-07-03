@@ -118,13 +118,6 @@ def separate_configs_by_pv(config_lines):
         yield pv, config
 
 
-class Configuration:
-    def __init__(self, pragma_text):
-        self.pragma_text = pragma_text
-        self.config_lines = split_pytmc_pragma(pragma_text)
-        self.configs = dict(separate_configs_by_pv(self.config_lines))
-
-
 def dictify_config(conf):
     '''
     Make a raw config list into an easier-to-use dictionary
@@ -210,15 +203,24 @@ class SingularChain:
     '''
     A chain of data types, all with pytmc pragmas, representing a single piece
     of data that should be accessible via EPICS/ADS
+
+    Parameters
+    ----------
+    item_to_config : dict
+        Keys would be `TwincatItem`s such as Symbol, and values would be
+        dictionary configurations from parsed pytmc pragmas.
     '''
-    def __init__(self, chain, configs):
-        self.chain = list(chain)
+    def __init__(self, item_to_config):
+        self.item_to_config = item_to_config
+        self.chain = list(self.item_to_config)
         self.last = self.chain[-1]
-        self.data_type = self.last.data_type
+        self.data_type = self.chain[-1].data_type
         self.tcname = '.'.join(part.name for part in self.chain)
 
-        self.configs = configs
-        self.config = squash_configs(*configs)
+        self.configs = [
+            dict(config) for config in self.item_to_config.values()
+        ]
+        self.config = squash_configs(*self.configs)
         self.pvname = ':'.join(self.config['pv'])
 
     def __repr__(self):
@@ -252,9 +254,7 @@ def chains_from_symbol(symbol, *, pragma='pytmc'):
     'Build all SingularChain '
     for full_chain in symbol.walk(condition=has_pragma):
         for item_and_config in expand_configurations_from_chain(full_chain):
-            chain = [item for item, _ in item_and_config]
-            configs = [config for _, config in item_and_config]
-            yield SingularChain(chain=chain, configs=configs)
+            yield SingularChain(dict(item_and_config))
 
 
 def record_packages_from_symbol(symbol, *, unroll=False, pragma='pytmc'):

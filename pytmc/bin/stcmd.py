@@ -15,7 +15,7 @@ import jinja2
 from . import db
 from .. import pragmas
 
-from ..parser import parse, Symbol, Symbol_FB_MotionStage, Property, separate_by_classname
+from ..parser import parse, Symbol, separate_by_classname
 
 
 description = __doc__

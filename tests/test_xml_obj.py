@@ -3,7 +3,7 @@ import logging
 
 import xml.etree.ElementTree as ET
 
-from pytmc import Configuration
+from pytmc.pragmas import split_pytmc_pragma, separate_configs_by_pv
 from collections import defaultdict
 
 logger = logging.getLogger(__name__)
@@ -97,8 +97,8 @@ def branch_skip_pragma_string():
     (0),
     (1),
 ])
-def test_Configuration_config_lines(leaf_bool_pragma_string_w_semicolon,
-                                    leaf_bool_pragma_string_single_line, model_set):
+def test_config_lines(leaf_bool_pragma_string_w_semicolon,
+                      leaf_bool_pragma_string_single_line, model_set):
     if model_set is 0:
         string = leaf_bool_pragma_string_w_semicolon
         test = [
@@ -124,20 +124,17 @@ def test_Configuration_config_lines(leaf_bool_pragma_string_w_semicolon,
         string = leaf_bool_pragma_string_single_line
         test = [{'title': "pv", 'tag': 'pv_name'}]
 
-    print(type(string))
-    print(string)
-    cfg = Configuration(string)
-    assert cfg.config_lines == test
+    assert split_pytmc_pragma(string) == test
 
 
-def test_Configuration_neaten_field(leaf_bool_pragma_string):
-    cfg = Configuration(leaf_bool_pragma_string)
-    assert cfg.config_lines[2]['tag'] == {'f_name': 'ZNAM', 'f_set': 'SINGLE'}
+def test_neaten_field(leaf_bool_pragma_string):
+    config_lines = split_pytmc_pragma(leaf_bool_pragma_string)
+    assert config_lines[2]['tag'] == {'f_name': 'ZNAM', 'f_set': 'SINGLE'}
 
 
-def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
-    cfg = Configuration(leaf_bool_pragma_string)
-    assert cfg.config_lines == [
+def test_formatted_config_lines(leaf_bool_pragma_string):
+    config_lines = split_pytmc_pragma(leaf_bool_pragma_string)
+    assert config_lines == [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
         {'title': 'type', 'tag': 'bo'},
         {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
@@ -156,9 +153,10 @@ def test_Configuration_formatted_config_lines(leaf_bool_pragma_string):
     ]
 
 
-def test_Configuration_config_by_name(leaf_bool_pragma_string):
-    cfg = Configuration(leaf_bool_pragma_string)
-    assert cfg.configs == {
+def test_config_by_name(leaf_bool_pragma_string):
+    config_lines = split_pytmc_pragma(leaf_bool_pragma_string)
+    configs = dict(separate_configs_by_pv(config_lines))
+    assert configs == {
         'TEST:MAIN:NEW_VAR_OUT': [
             {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
             {'title': 'type', 'tag': 'bo'},
@@ -181,17 +179,19 @@ def test_Configuration_config_by_name(leaf_bool_pragma_string):
     }
 
 
-def test_Configuration_config_names(leaf_bool_pragma_string):
-    cfg = Configuration(leaf_bool_pragma_string)
-    assert set(cfg.configs) == {
+def test_config_names(leaf_bool_pragma_string):
+    config_lines = split_pytmc_pragma(leaf_bool_pragma_string)
+    configs = dict(separate_configs_by_pv(config_lines))
+    assert set(configs) == {
         "TEST:MAIN:NEW_VAR_OUT",
         "TEST:MAIN:NEW_VAR_IN"
     }
 
 
-def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
-    cfg = Configuration(leaf_bool_pragma_string)
-    assert cfg.configs['TEST:MAIN:NEW_VAR_OUT'] == [
+def test_fix_to_config_name(leaf_bool_pragma_string):
+    config_lines = split_pytmc_pragma(leaf_bool_pragma_string)
+    configs = dict(separate_configs_by_pv(config_lines))
+    assert configs['TEST:MAIN:NEW_VAR_OUT'] == [
         {'title': 'pv', 'tag': 'TEST:MAIN:NEW_VAR_OUT'},
         {'title': 'type', 'tag': 'bo'},
         {'title': 'field', 'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}},
@@ -203,9 +203,10 @@ def test_Configuration_fix_to_config_name(leaf_bool_pragma_string):
     ]
 
 
-def test_Configuration_get_config_lines(leaf_bool_pragma_string):
-    cfg = Configuration(leaf_bool_pragma_string)
-    assert cfg.configs['TEST:MAIN:NEW_VAR_OUT'] == [
+def test_get_config_lines(leaf_bool_pragma_string):
+    config_lines = split_pytmc_pragma(leaf_bool_pragma_string)
+    configs = dict(separate_configs_by_pv(config_lines))
+    assert configs['TEST:MAIN:NEW_VAR_OUT'] == [
         {'tag': 'TEST:MAIN:NEW_VAR_OUT', 'title': 'pv'},
         {'tag': 'bo', 'title': 'type'},
         {'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}, 'title': 'field'},
@@ -216,7 +217,7 @@ def test_Configuration_get_config_lines(leaf_bool_pragma_string):
         {'tag': 'True', 'title': 'init'},
     ]
 
-    assert cfg.configs['TEST:MAIN:NEW_VAR_IN'] == [
+    assert configs['TEST:MAIN:NEW_VAR_IN'] == [
          {'tag': 'TEST:MAIN:NEW_VAR_IN', 'title': 'pv'},
          {'tag': 'bi', 'title': 'type'},
          {'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}, 'title': 'field'},
