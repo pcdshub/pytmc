@@ -12,7 +12,7 @@ import pathlib
 
 import jinja2
 
-from . import db
+from . import db, util
 from .. import pragmas
 
 from ..parser import parse, Symbol, separate_by_classname
@@ -71,6 +71,12 @@ def build_arg_parser(parser=None):
     parser.add_argument(
         '--delim', type=str, default=':',
         help='Preferred PV delimiter'
+    )
+
+    parser.add_argument(
+        '--debug', '-d',
+        action='store_true',
+        help='Post-stcmd, open an interactive Python session'
     )
 
     parser.add_argument(
@@ -203,12 +209,28 @@ def render(args):
         symbols=symbols,
     )
 
+    if args.debug:
+        util.python_debug_session(
+            namespace=locals(),
+            message=('Variables: project, symbols, plc, template.'
+                     )
+        )
+
     return project, symbols, template.render(**template_args)
 
 
 def main(*, cmdline_args=None):
     parser = build_arg_parser()
-    _, _, template = render(parser.parse_args(cmdline_args))
+    args = parser.parse_args(cmdline_args)
+    try:
+        _, _, template = render(args)
+    except Exception as ex:
+        if args.debug:
+            util.python_debug_session(
+                namespace=locals(),
+                message=f'Failed: {type(ex)} {ex}'
+            )
+
     print(template)
 
 

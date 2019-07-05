@@ -10,6 +10,7 @@ import pathlib
 import sys
 
 from .. import parser
+from . import util
 
 
 DESCRIPTION = __doc__
@@ -79,7 +80,7 @@ def build_arg_parser(argparser=None):
     argparser.add_argument(
         '--debug', '-d',
         action='store_true',
-        help='Access'
+        help='Post-summary, open an interactive Python session'
     )
 
     return argparser
@@ -164,19 +165,12 @@ def summary(args):
         outline(project)
 
     if args.debug:
-        # for interactive debugging ease-of-use:
-        import pytmc  # noqa
-        from pytmc.parser import TwincatItem, TWINCAT_TYPES  # noqa
-        globals().update(**{k: v for k, v in TWINCAT_TYPES.items()
-                            if not k.startswith('__')}
-                         )
-        try:
-            from IPython import embed
-        except ImportError:
-            import pdb
-            pdb.set_trace()
-        else:
-            embed()
+        util.python_debug_session(
+            namespace=locals(),
+            message=('The top-level project is accessible as `project`, and '
+                     'TWINCAT_TYPES are in the IPython namespace as well.'
+                     )
+        )
 
     return project
 
