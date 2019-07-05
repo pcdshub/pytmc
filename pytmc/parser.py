@@ -333,6 +333,11 @@ class TcSmProject(TwincatItem):
         for top_level_plc in self.find(TopLevelPlc):
             yield from top_level_plc.projects.values()
 
+    @property
+    def plcs_by_name(self):
+        'The virtual PLC projects in a dictionary keyed by name'
+        return {plc.name: plc for plc in self.plcs}
+
 
 class TcSmItem(TwincatItem):
     '''

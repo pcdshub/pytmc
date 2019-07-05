@@ -34,6 +34,11 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
+        '--plc', type=str, default=None,
+        help='PLC project name, if multiple exist'
+    )
+
+    parser.add_argument(
         '-p', '--prefix', type=str, default=None,
         help='PV prefix for the IOC'
     )
@@ -156,8 +161,17 @@ def render(args):
     additional_db_files = []
     try:
         plc, = project.plcs
-    except TypeError:
-        raise RuntimeError('Only single PLC projects supported currently')
+    except ValueError:
+        by_name = project.plcs_by_name
+        if not args.plc:
+            raise RuntimeError(f'Only single PLC projects supported.  '
+                               f'Use --plc and choose from {list(by_name)}')
+
+        try:
+            plc = project.plcs_by_name[args.plc]
+        except KeyError:
+            raise RuntimeError(f'PLC project {args.plc!r} not found. '
+                               f'Projects: {list(by_name)}')
 
     if args.all_records:
         other_records = db.process(plc.tmc, dbd_file=args.dbd)
