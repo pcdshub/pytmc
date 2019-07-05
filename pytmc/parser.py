@@ -287,7 +287,7 @@ class _TwincatProjectSubItem(TwincatItem):
     '[XTI/TMC/...] A base class for items that appear in virtual PLC projects'
 
     @property
-    def project(self):
+    def plc(self):
         'The nested project (virtual PLC project) associated with the item'
         return self.find_ancestor(Plc)
 
@@ -763,7 +763,7 @@ class Symbol(_TmcItem):
 
     @property
     def module(self):
-        'The Module containing the Symbol'
+        'The TMC Module containing the Symbol'
         return self.find_ancestor(Module)
 
     @property
@@ -868,7 +868,7 @@ class Symbol_FB_MotionStage(Symbol):
 
         links = [
             link
-            for link in self.root.find(Link)
+            for link in self.module.find(Link)
             if f'^{linked_to_full.lower()}' in link.attributes['VarA'].lower()
             and 'NcToPlc' in link.attributes['VarA']
         ]

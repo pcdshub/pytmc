@@ -19,7 +19,7 @@ def test_summarize(project):
 
     for inst in project.find(parser.Symbol):
         pprint.pprint(inst.info)
-        inst.project
+        inst.plc
 
 
 def test_module_ads_port(project):
