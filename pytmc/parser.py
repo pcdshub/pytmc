@@ -460,7 +460,7 @@ class Plc(TwincatItem):
     def links(self):
         return [link
                 for mapping in self.Mappings
-                for link in mapping.find(Link)
+                for link in mapping.find(Link, recurse=False)
                 ]
 
     @property
@@ -832,7 +832,7 @@ class Symbol_FB_MotionStage(Symbol):
     def pou(self):
         'The POU program associated with the Symbol'
         # TODO: hack
-        for pou in self.root.find(POU):
+        for pou in self.root.find(POU, recurse=False):
             if pou.name == self.program_name:
                 return pou
         # return self.project.pou_by_name[self.program_name]
@@ -877,7 +877,7 @@ class Symbol_FB_MotionStage(Symbol):
 
         expected = ('^' + linked_to_full.lower(), '.nctoplc')
         links = [link
-                 for link in self.plc.find(Link)
+                 for link in self.plc.find(Link, recurse=False)
                  if all(s in link.a[1].lower() for s in expected)
                  ]
 
@@ -898,7 +898,7 @@ class Symbol_FB_MotionStage(Symbol):
 
         task_name, axis_section, axis_name = parent_name
 
-        nc, = list(nc for nc in self.root.find(NC)
+        nc, = list(nc for nc in self.root.find(NC, recurse=False)
                    if nc.SafTask[0].name == task_name)
         nc_axis = nc.axis_by_name[axis_name]
         # link nc_axis and FB_MotionStage?
@@ -1003,7 +1003,7 @@ class Axis(TwincatItem):
 
     def summarize(self):
         yield from self.attributes.items()
-        for param in self.find(AxisPara):
+        for param in self.find(AxisPara, recurse=False):
             yield from param.attributes.items()
             for child in param._children:
                 for key, value in child.attributes.items():
@@ -1031,7 +1031,7 @@ class Encoder(TwincatItem):
     '''
     def summarize(self):
         yield 'EncType', self.attributes['EncType']
-        for param in self.find(EncPara):
+        for param in self.find(EncPara, recurse=False):
             yield from param.attributes.items()
             for child in param._children:
                 for key, value in child.attributes.items():
