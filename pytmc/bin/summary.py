@@ -88,13 +88,13 @@ def build_arg_parser(argparser=None):
 
 def outline(item, *, depth=0, f=sys.stdout):
     indent = '  ' * depth
-    num_children = len(item.children)
+    num_children = len(item._children)
     has_container = 'C' if hasattr(item, 'container') else ' '
     flags = ''.join((has_container, ))
     name = item.name or ''
     print(f'{flags}{indent}{item.__class__.__name__} {name} '
           f'[{num_children}]', file=f)
-    for child in item.children:
+    for child in item._children:
         outline(child, depth=depth + 1, f=f)
 
 

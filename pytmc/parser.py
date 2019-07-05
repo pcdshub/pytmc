@@ -93,9 +93,9 @@ class TwincatItem:
         filename : pathlib.Path, optional
         '''
         self.attributes = dict(element.attrib)
-        self.children = []
+        self._children = []
+        self.children = None  # populated later
         self.comments = []
-        self.children_by_tag = None
         self.element = element
         self.filename = filename
         self.name = name
@@ -165,7 +165,7 @@ class TwincatItem:
         ----------
         cls : TwincatItem
         '''
-        for child in self.children:
+        for child in self._children:
             if isinstance(child, cls):
                 yield child
                 if not recurse:
@@ -181,8 +181,8 @@ class TwincatItem:
                 continue
             self._add_child(child_element)
 
-        by_tag = separate_by_classname(self.children)
-        self.children_by_tag = types.SimpleNamespace(**by_tag)
+        by_tag = separate_by_classname(self._children)
+        self.children = types.SimpleNamespace(**by_tag)
         for key, value in by_tag.items():
             if not hasattr(self, key):
                 setattr(self, key, value)
@@ -192,18 +192,18 @@ class TwincatItem:
         if child is None:
             return
 
-        self.children.append(child)
+        self._children.append(child)
 
         if not hasattr(child, '_squash_children'):
             return
 
-        for grandchild in list(child.children):
+        for grandchild in list(child._children):
             if any(isinstance(grandchild, squashed_type)
                    for squashed_type in child._squash_children):
-                self.children.append(grandchild)
+                self._children.append(grandchild)
                 grandchild.container = child
                 grandchild.parent = self
-                child.children.remove(grandchild)
+                child._children.remove(grandchild)
 
     @staticmethod
     def parse(element, parent=None, filename=None):
@@ -259,7 +259,7 @@ class TwincatItem:
         return {
             'name': self.name,
             'attributes': self.attributes,
-            'children': self.children,
+            'children': self._children,
             'text': self.text,
         }
 
@@ -400,9 +400,9 @@ class TopLevelPlc(TwincatItem):
         for mapping in getattr(self, 'Mappings', []):
             for project in projects:
                 if project.filename == mapping.filename:
-                    self.children.remove(mapping)
+                    self._children.remove(mapping)
                     project.Mappings = [mapping]
-                    project.children.append(mapping)
+                    project._children.append(mapping)
                     continue
 
 
@@ -1005,7 +1005,7 @@ class Axis(TwincatItem):
         yield from self.attributes.items()
         for param in self.find(AxisPara):
             yield from param.attributes.items()
-            for child in param.children:
+            for child in param._children:
                 for key, value in child.attributes.items():
                     yield f'{child.tag}:{key}', value
 
@@ -1033,7 +1033,7 @@ class Encoder(TwincatItem):
         yield 'EncType', self.attributes['EncType']
         for param in self.find(EncPara):
             yield from param.attributes.items()
-            for child in param.children:
+            for child in param._children:
                 for key, value in child.attributes.items():
                     yield f'{child.tag}:{key}', value
 
@@ -1054,13 +1054,13 @@ class RemoteConnections(TwincatItem):
         def to_dict(child):
             return {
                 item.tag: item.text
-                for item in child.children
+                for item in child._children
             }
 
         def keyed_on(key):
             return {
                 getattr(child, key)[0].text: to_dict(child)
-                for child in self.children
+                for child in self._children
                 if hasattr(child, key)
             }
 
