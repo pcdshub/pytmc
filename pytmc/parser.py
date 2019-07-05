@@ -105,8 +105,6 @@ class TwincatItem:
 
         self._add_children(element)
         self.post_init()
-        if self.name == '__FILENAME__':
-            self.name = self.filename.stem
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -159,7 +157,7 @@ class TwincatItem:
         rel_path = pathlib.PureWindowsPath(path)
         return (root / rel_path).resolve()
 
-    def find(self, cls):
+    def find(self, cls, *, recurse=True):
         '''
         Find any descendents that are instances of cls
 
@@ -170,16 +168,18 @@ class TwincatItem:
         for child in self.children:
             if isinstance(child, cls):
                 yield child
-            yield from child.find(cls)
+                if not recurse:
+                    return
+
+            yield from child.find(cls, recurse=recurse)
 
     def _add_children(self, element):
         'A hook for adding all children'
         for child_element in element.iterchildren():
-            child = self._parse_child(child_element)
-            if child is not None:
-                self.children.append(child)
-            if hasattr(child, '_squash_children'):
-                self._squash_child(child)
+            if isinstance(child_element, lxml.etree._Comment):
+                self.comments.append(child_element.text)
+                continue
+            self._add_child(child_element)
 
         by_tag = separate_by_classname(self.children)
         self.children_by_tag = types.SimpleNamespace(**by_tag)
@@ -187,30 +187,16 @@ class TwincatItem:
             if not hasattr(self, key):
                 setattr(self, key, value)
 
-    def _parse_child(self, element):
-        'Add a single child to the list of children'
-        if isinstance(element, lxml.etree._Comment):
-            self.comments.append(element.text)
+    def _add_child(self, element):
+        child = self.parse(element, parent=self, filename=self.filename)
+        if child is None:
             return
 
-        child = self.parse(element, parent=self, filename=self.filename)
+        self.children.append(child)
 
-        # Two ways for names to come in:
-        # 1. the child has a tag of 'Name', with its text being our name
-        if child.tag == 'Name' and child.text and self.parent:
-            name = child.text.strip()
-            self.name = name
+        if not hasattr(child, '_squash_children'):
+            return
 
-        # 2. the child has an attribute key 'Name'
-        try:
-            name = child.attributes.pop('Name').strip()
-        except KeyError:
-            ...
-        else:
-            child.name = name
-        return child
-
-    def _squash_child(self, child):
         for grandchild in list(child.children):
             if any(isinstance(grandchild, squashed_type)
                    for squashed_type in child._squash_children):
@@ -250,7 +236,23 @@ class TwincatItem:
             filename = element.attrib['File']
             return cls.from_file(filename, parent=parent)
 
-        return cls(element, parent=parent, filename=filename)
+        # Two ways for names to come in:
+        # 1. a child has a tag of 'Name', with its text being our name
+        names = [child.text for child in element.iterchildren()
+                 if child.tag == 'Name' and child.text]
+        name = names[0] if names else None
+
+        # 2. the child has an attribute key 'Name'
+        try:
+            name = element.attrib['Name'].strip()
+        except KeyError:
+            ...
+
+        # A special identifier __FILENAME__ means to replace the name
+        if name == '__FILENAME__':
+            name = filename.stem
+
+        return cls(element, parent=parent, filename=filename, name=name)
 
     def _repr_info(self):
         '__repr__ information'
@@ -327,16 +329,23 @@ class PlcProject(TwincatItem):
 
 class TcSmProject(TwincatItem):
     '[tsproj] A top-level TwinCAT tsproj'
+    def post_init(self):
+        self.top_level_plc, = list(self.find(TopLevelPlc, recurse=False))
+
     @property
     def plcs(self):
         'The virtual PLC projects contained in this TcSmProject'
-        for top_level_plc in self.find(TopLevelPlc):
-            yield from top_level_plc.projects.values()
+        yield from self.top_level_plc.projects.values()
 
     @property
     def plcs_by_name(self):
         'The virtual PLC projects in a dictionary keyed by name'
         return {plc.name: plc for plc in self.plcs}
+
+    @property
+    def plcs_by_link_name(self):
+        'The virtual PLC projects in a dictionary keyed by link name'
+        return {plc.link_name: plc for plc in self.plcs}
 
 
 class TcSmItem(TwincatItem):
@@ -363,6 +372,8 @@ class TopLevelPlc(TwincatItem):
     PlcProjectContainer: list
 
     def post_init(self):
+        # TODO: this appears to cover all bases, but perhaps it could be
+        # refactored out
         if hasattr(self, 'Plc'):
             projects = self.Plc
         elif hasattr(self, 'TcSmItem'):
@@ -375,12 +386,31 @@ class TopLevelPlc(TwincatItem):
             for project in projects
         }
 
+        self.projects_by_link_name = {
+            project.link_name: project
+            for project in projects
+        }
+
+        # Fix to squash hack: squashed Mappings belong to the individual
+        # projects, not this TopLevelPlc
+        for mapping in getattr(self, 'Mappings', []):
+            for project in projects:
+                if project.filename == mapping.filename:
+                    self.children.remove(mapping)
+                    project.Mappings = [mapping]
+                    project.children.append(mapping)
+                    continue
+
 
 class Plc(TwincatItem):
     '[tsproj] A project which contains Plc, Io, Mappings, etc.'
     _load_path = pathlib.Path('_Config') / 'PLC'
 
     def post_init(self):
+        self.link_name = (self.Instance[0].name
+                          if hasattr(self, 'Instance')
+                          else self.name)
+
         self.namespaces = {}
         self.project_path = self.get_relative_path(
             self.attributes['PrjFilePath'])
@@ -423,6 +453,13 @@ class Plc(TwincatItem):
         self.namespaces.update(self.gvl_by_name)
 
     @property
+    def links(self):
+        return {link.a: link.b
+                for mapping in self.Mappings
+                for link in mapping.find(Link)
+                }
+
+    @property
     def port(self):
         '''
         The ADS port for the project
@@ -446,17 +483,17 @@ class Plc(TwincatItem):
             return ams_id[:-4]
         return ams_id  # :(
 
-    def find(self, cls):
-        yield from super().find(cls)
+    def find(self, cls, *, recurse=True):
+        yield from super().find(cls, recurse=recurse)
         if self.project is not None:
-            yield from self.project.find(cls)
+            yield from self.project.find(cls, recurse=recurse)
 
         for _, ns in self.namespaces.items():
             if isinstance(ns, cls):
                 yield ns
 
         if self.tmc is not None:
-            yield from self.tmc.find(cls)
+            yield from self.tmc.find(cls, recurse=recurse)
 
 
 class Compile(TwincatItem):
@@ -751,6 +788,13 @@ class Symbol(_TmcItem):
         except (AttributeError, IndexError):
             return None
 
+    @property
+    def links(self):
+        return {link.a: link.b
+                for link in self.project.links
+                if self.name
+                }
+
 
 class Symbol_FB_MotionStage(Symbol):
     '[TMC] A customized Symbol, representing only FB_MotionStage'
@@ -758,7 +802,11 @@ class Symbol_FB_MotionStage(Symbol):
         '__repr__ information'
         repr_info = super()._repr_info()
         # Add on the NC axis name
-        repr_info.update(nc_axis=self.nc_axis.name)
+        try:
+            repr_info['nc_axis'] = self.nc_axis.name
+        except Exception as ex:
+            repr_info['nc_axis'] = repr(ex)
+
         return repr_info
 
     @property
@@ -820,7 +868,7 @@ class Symbol_FB_MotionStage(Symbol):
 
         links = [
             link
-            for link in self.project.find(Link)
+            for link in self.root.find(Link)
             if f'^{linked_to_full.lower()}' in link.attributes['VarA'].lower()
             and 'NcToPlc' in link.attributes['VarA']
         ]

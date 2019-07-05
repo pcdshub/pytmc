@@ -98,7 +98,7 @@ def build_arg_parser(parser=None):
 def get_name(obj, args):
     'Returns: (motor_prefix, motor_name)'
     # First check if there is a pytmc pragma
-    configs = pragmas.all_configs([obj])
+    configs = pragmas.expand_configurations_from_chain([obj])
     if configs:
         config = pragmas.squash_configs(*configs)
         # PV name specified in the pragma - use it as-is
@@ -127,7 +127,7 @@ def jinja_filters(args):
 
     @jinja2.evalcontextfilter
     def pragma(eval_ctx, obj, key, default=''):
-        configs = pragmas.all_configs([obj])
+        configs = pragmas.expand_configurations_from_chain([obj])
         if configs:
             config = pragmas.squash_configs(*configs)
             return config.get(key, default)
@@ -209,28 +209,34 @@ def render(args):
         symbols=symbols,
     )
 
-    if args.debug:
+    stashed_exception = None
+    try:
+        rendered = template.render(**template_args)
+    except Exception as ex:
+        stashed_exception = ex
+        rendered = None
+
+    if not args.debug:
+        if stashed_exception is not None:
+            raise stashed_exception
+    else:
+        message = ['Variables: project, symbols, plc, template. ']
+        if stashed_exception is not None:
+            message.append(f'Exception: {type(stashed_exception)} '
+                           f'{stashed_exception}')
+
         util.python_debug_session(
             namespace=locals(),
-            message=('Variables: project, symbols, plc, template.'
-                     )
+            message='\n'.join(message)
         )
 
-    return project, symbols, template.render(**template_args)
+    return project, symbols, rendered
 
 
 def main(*, cmdline_args=None):
     parser = build_arg_parser()
     args = parser.parse_args(cmdline_args)
-    try:
-        _, _, template = render(args)
-    except Exception as ex:
-        if args.debug:
-            util.python_debug_session(
-                namespace=locals(),
-                message=f'Failed: {type(ex)} {ex}'
-            )
-
+    _, _, template = render(args)
     print(template)
 
 
