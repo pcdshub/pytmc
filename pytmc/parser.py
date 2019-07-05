@@ -317,6 +317,10 @@ class Link(TwincatItem):
     def post_init(self):
         self.a = (self.find_ancestor(OwnerA).name, self.attributes.get('VarA'))
         self.b = (self.find_ancestor(OwnerB).name, self.attributes.get('VarB'))
+        self.link = [self.a, self.b]
+
+    def __repr__(self):
+        return f'<Link a={self.a} b={self.b}>'
 
 
 class TopLevelProject(TwincatItem):
@@ -454,10 +458,10 @@ class Plc(TwincatItem):
 
     @property
     def links(self):
-        return {link.a: link.b
+        return [link
                 for mapping in self.Mappings
                 for link in mapping.find(Link)
-                }
+                ]
 
     @property
     def port(self):
@@ -788,12 +792,17 @@ class Symbol(_TmcItem):
         except (AttributeError, IndexError):
             return None
 
-    @property
-    def links(self):
-        return {link.a: link.b
-                for link in self.project.links
-                if self.name
-                }
+    def get_links(self, *, strict=False):
+        sym_name = '^' + self.name.lower()
+        dotted_name = sym_name + '.'
+        plc = self.plc
+        plc_name = plc.link_name
+        for link in plc.links:
+            if any(owner == plc_name and
+                   (var.lower().endswith(sym_name) or
+                    not strict and dotted_name in var.lower())
+                   for owner, var in link.link):
+                yield link
 
 
 class Symbol_FB_MotionStage(Symbol):
@@ -866,12 +875,11 @@ class Symbol_FB_MotionStage(Symbol):
         '''
         _, linked_to_full = self.linked_to
 
-        links = [
-            link
-            for link in self.module.find(Link)
-            if f'^{linked_to_full.lower()}' in link.attributes['VarA'].lower()
-            and 'NcToPlc' in link.attributes['VarA']
-        ]
+        expected = ('^' + linked_to_full.lower(), '.nctoplc')
+        links = [link
+                 for link in self.plc.find(Link)
+                 if all(s in link.a[1].lower() for s in expected)
+                 ]
 
         if not links:
             raise RuntimeError(f'No NC link to FB_MotionStage found for '
