@@ -909,6 +909,18 @@ class GVL(_TwincatProjectSubItem):
     '[XTI] A Global Variable List'
 
 
+class ST(_TwincatProjectSubItem):
+    '[XTI] Structured text'
+
+
+class Implementation(_TwincatProjectSubItem):
+    '[XTI] Code implementation'
+
+
+class Declaration(_TwincatProjectSubItem):
+    '[XTI] Code declaration'
+
+
 class POU(_TwincatProjectSubItem):
     '[XTI] A Program Organization Unit'
 

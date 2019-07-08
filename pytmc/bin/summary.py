@@ -47,6 +47,12 @@ def build_arg_parser(argparser=None):
     )
 
     argparser.add_argument(
+        '--code', '-c',
+        action='store_true',
+        help='Show code'
+    )
+
+    argparser.add_argument(
         '--plcs', '-p',
         action='store_true',
         help='Show plcs'
@@ -75,6 +81,12 @@ def build_arg_parser(argparser=None):
         default='INFO',
         type=str,
         help='Python logging level (e.g. DEBUG, INFO, WARNING)'
+    )
+
+    argparser.add_argument(
+        '--markdown',
+        action='store_true',
+        help='Make output more markdown-friendly, for easier sharing'
     )
 
     argparser.add_argument(
@@ -109,11 +121,36 @@ def summary(args):
 
     project = parser.parse(proj_path)
 
+    def heading(text):
+        print(text)
+        print('=' * len(text))
+
+    def sub_heading(text):
+        print(text)
+        print('-' * len(text))
+
+    def sub_sub_heading(text, level=3):
+        if args.markdown:
+            print('#' * level, text)
+        else:
+            print(' ' * level, '-', text)
+        print()
+
+    def text_block(text, indent=4, language='vhdl'):
+        if args.markdown:
+            print(f'```{language}')
+            print(text)
+            print(f'```')
+        else:
+            for line in text.splitlines():
+                print(' ' * indent, line)
+        print()
+
     if args.plcs or args.all:
         for i, plc in enumerate(project.plcs, 1):
-            print(f'--- PLC Project ({i}): {plc.project_path.stem}')
-            print(f'    Project path: {plc.project_path}')
-            print(f'    TMC path:     {plc.tmc_path}')
+            heading(f'PLC Project ({i}): {plc.project_path.stem}')
+            print(f'Project path: {plc.project_path}')
+            print(f'TMC path:     {plc.tmc_path}')
             print(f'')
             proj_info = [('Source files', plc.source_filenames),
                          ('POUs', plc.pou_by_name),
@@ -125,6 +162,24 @@ def summary(args):
                     print(f'    {category}:')
                     for j, text in enumerate(items, 1):
                         print(f'        {j}.) {text}')
+                    print()
+
+            if args.code:
+                for fn, source in plc.source.items():
+                    sub_heading(f'{fn} ({source.tag})')
+                    for decl_or_impl in source.find((parser.ST,
+                                                     parser.Declaration,
+                                                     parser.Implementation)):
+                        parent = decl_or_impl.parent
+                        path_to_source = []
+                        while parent is not source:
+                            if parent.name is not None:
+                                path_to_source.insert(0, parent.name)
+                            parent = parent.parent
+                        sub_sub_heading(f'{".".join(path_to_source)}: {parent.tag} '
+                                        f'{decl_or_impl.tag}')
+                        text_block(decl_or_impl.text)
+                    print()
                     print()
 
     if args.symbols or args.all:
