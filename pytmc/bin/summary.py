@@ -104,6 +104,9 @@ def summary(args):
     logging.basicConfig()
 
     proj_path = pathlib.Path(args.tsproj_project)
+    if proj_path.suffix.lower() not in ('.tsproj', ):
+        raise ValueError('Expected a .tsproj file')
+
     project = parser.parse(proj_path)
 
     if args.plcs or args.all:
