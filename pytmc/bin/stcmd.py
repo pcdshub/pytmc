@@ -54,8 +54,9 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
-        '--all-records', default=False, action='store_true',
-        help='Parse the TMC file for non-motor records as well'
+        '--only-motor', action='store_true',
+        help=('Parse the project only for motor records, skipping other '
+              'variables with pytmc pragmas')
     )
 
     parser.add_argument(
@@ -179,7 +180,7 @@ def render(args):
             raise RuntimeError(f'PLC project {args.plc!r} not found. '
                                f'Projects: {list(by_name)}')
 
-    if args.all_records:
+    if not args.only_motor:
         other_records = db.process(plc.tmc, dbd_file=args.dbd)
         if not other_records:
             logger.info('No additional records from pytmc found in %s',
@@ -187,6 +188,8 @@ def render(args):
         else:
             db_filename = f'{plc.filename.stem}.db'
             db_path = pathlib.Path(args.db_path) / db_filename
+            logger.info('Found %d additional records; writing to %s',
+                        len(other_records), db_path)
             with open(db_path, 'wt') as db_file:
                 db_file.write('\n\n'.join(rec.render()
                                           for rec in other_records))
