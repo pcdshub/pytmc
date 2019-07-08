@@ -18,13 +18,13 @@ from .. import pragmas
 from ..parser import parse, Symbol, separate_by_classname
 
 
-description = __doc__
+DESCRIPTION = __doc__
 
 
 def build_arg_parser(parser=None):
     if parser is None:
         parser = argparse.ArgumentParser(
-            description=description,
+            description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter
         )
 

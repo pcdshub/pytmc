@@ -15,7 +15,7 @@ from ..pragmas import find_pytmc_symbols, record_packages_from_symbol
 
 
 logger = logging.getLogger(__name__)
-description = __doc__
+DESCRIPTION = __doc__
 
 
 class LinterError(Exception):
@@ -132,7 +132,7 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
 def build_arg_parser(parser=None):
     if parser is None:
         parser = argparse.ArgumentParser(
-            description=description,
+            description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter
         )
 

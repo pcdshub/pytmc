@@ -14,7 +14,7 @@ import pytmc
 from .db import process
 
 
-description = __doc__
+DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
 
 
@@ -258,7 +258,7 @@ def show_qt_interface(tmc, dbd):
 def build_arg_parser(parser=None):
     if parser is None:
         parser = argparse.ArgumentParser(
-            description=description,
+            description=DESCRIPTION,
             formatter_class=argparse.RawTextHelpFormatter
         )
 
