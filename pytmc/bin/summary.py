@@ -187,7 +187,7 @@ def summary(args):
                     print()
 
     if args.symbols or args.all:
-        print('--- Symbols:')
+        sub_heading('Symbols')
         symbols = list(project.find(parser.Symbol))
         for symbol in symbols:
             info = symbol.info
@@ -196,13 +196,13 @@ def summary(args):
         print()
 
     if args.boxes or args.all:
-        print('--- Boxes:')
+        sub_heading('Boxes')
         boxes = list(project.find(parser.Box))
         for box in boxes:
             print(f'    {box.attributes["Id"]}.) {box.name}')
 
     if args.nc or args.all:
-        print('--- NC axes:')
+        sub_heading('NC axes')
         ncs = list(project.find(parser.NC))
         for nc in ncs:
             for axis_id, axis in sorted(nc.axis_by_id.items()):
@@ -216,7 +216,7 @@ def summary(args):
                 print()
 
     if args.links or args.all:
-        print('--- Links:')
+        sub_heading('Links')
         links = list(project.find(parser.Link))
         for i, link in enumerate(links, 1):
             print(f'    {i}.) A {link.a}')
