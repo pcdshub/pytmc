@@ -187,8 +187,9 @@ class TmcSummary(QtWidgets.QMainWindow):
                     add_dict_to_table(row, value)
 
         columns = {}
-        for row, (pv, (item, config)) in enumerate(zip(chain.config['pv'],
-                                                       chain.item_to_config.items())):
+
+        items = zip(chain.config['pv'], chain.item_to_config.items())
+        for row, (pv, (item, config)) in enumerate(items):
             info_dict = dict(pv=pv)
             info_dict.update({k: v for k, v in config.items() if k != 'field'})
             add_dict_to_table(row, info_dict)
@@ -266,7 +267,7 @@ def build_arg_parser(parser=None):
 
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,
-        help='Path to interpreted .tmc file'
+        help='Path to .tmc file'
     )
 
     parser.add_argument(
