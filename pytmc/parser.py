@@ -169,7 +169,7 @@ class TwincatItem:
             if isinstance(child, cls):
                 yield child
                 if not recurse:
-                    return
+                    continue
 
             yield from child.find(cls, recurse=recurse)
 
