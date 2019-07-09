@@ -124,10 +124,12 @@ def summary(args):
     def heading(text):
         print(text)
         print('=' * len(text))
+        print()
 
     def sub_heading(text):
         print(text)
         print('-' * len(text))
+        print()
 
     def sub_sub_heading(text, level=3):
         if args.markdown:
@@ -149,8 +151,8 @@ def summary(args):
     if args.plcs or args.all:
         for i, plc in enumerate(project.plcs, 1):
             heading(f'PLC Project ({i}): {plc.project_path.stem}')
-            print(f'Project path: {plc.project_path}')
-            print(f'TMC path:     {plc.tmc_path}')
+            print(f'    Project path: {plc.project_path}')
+            print(f'    TMC path:     {plc.tmc_path}')
             print(f'')
             proj_info = [('Source files', plc.source_filenames),
                          ('POUs', plc.pou_by_name),
@@ -170,16 +172,18 @@ def summary(args):
                     for decl_or_impl in source.find((parser.ST,
                                                      parser.Declaration,
                                                      parser.Implementation)):
+                        if not decl_or_impl.text.strip():
+                            continue
+
                         parent = decl_or_impl.parent
                         path_to_source = []
                         while parent is not source:
                             if parent.name is not None:
                                 path_to_source.insert(0, parent.name)
                             parent = parent.parent
-                        sub_sub_heading(f'{".".join(path_to_source)}: {parent.tag} '
+                        sub_sub_heading(f'{".".join(path_to_source)}: '
                                         f'{decl_or_impl.tag}')
                         text_block(decl_or_impl.text)
-                    print()
                     print()
 
     if args.symbols or args.all:
