@@ -131,10 +131,10 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
 
 def build_arg_parser(parser=None):
     if parser is None:
-        parser = argparse.ArgumentParser(
-            description=DESCRIPTION,
-            formatter_class=argparse.RawTextHelpFormatter
-        )
+        parser = argparse.ArgumentParser()
+
+    parser.description = DESCRIPTION
+    parser.formatter_class = argparse.RawTextHelpFormatter
 
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,

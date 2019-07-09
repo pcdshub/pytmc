@@ -23,10 +23,10 @@ DESCRIPTION = __doc__
 
 def build_arg_parser(parser=None):
     if parser is None:
-        parser = argparse.ArgumentParser(
-            description=DESCRIPTION,
-            formatter_class=argparse.RawTextHelpFormatter
-        )
+        parser = argparse.ArgumentParser()
+
+    parser.description = DESCRIPTION
+    parser.formatter_class = argparse.RawTextHelpFormatter
 
     parser.add_argument(
         'tsproj_project', type=str,
