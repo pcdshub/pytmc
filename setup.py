@@ -44,6 +44,7 @@ setup(
             'pytmc-debug = pytmc.bin.debug:main',
             'pytmc-stcmd = pytmc.bin.stcmd:main',
             'pytmc-summary = pytmc.bin.summary:main',
+            'pytmc-types = pytmc.bin.types:main',
             'pytmc-xmltranslate = pytmc.bin.xmltranslate:main',
         ]
     },

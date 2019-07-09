@@ -21,6 +21,8 @@ from .xmltranslate import (build_arg_parser as build_translate_arg_parser,
                            translate as translate_main)
 from .debug import (build_arg_parser as build_debug_arg_parser,
                     create_debug_window as debug_main)
+from .types import (build_arg_parser as build_types_arg_parser,
+                    create_types_window as types_main)
 
 DESCRIPTION = __doc__
 
@@ -35,6 +37,7 @@ COMMANDS = {
     'summary': (build_summary_arg_parser, summary_main),
     'db': (build_db_arg_parser, db_main),
     'debug': (build_debug_arg_parser, debug_main),
+    'types': (build_types_arg_parser, types_main),
     'translate': (build_translate_arg_parser, translate_main),
 }
 
