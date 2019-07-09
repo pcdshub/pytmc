@@ -187,9 +187,11 @@ class TmcSummary(QtWidgets.QMainWindow):
                     add_dict_to_table(row, value)
 
         columns = {}
-        for row, (item, config) in enumerate(chain.item_to_config.items()):
-            add_dict_to_table(row, {k: v for k, v in config.items()
-                                    if k != 'field'})
+        for row, (pv, (item, config)) in enumerate(zip(chain.config['pv'],
+                                                       chain.item_to_config.items())):
+            info_dict = dict(pv=pv)
+            info_dict.update({k: v for k, v in config.items() if k != 'field'})
+            add_dict_to_table(row, info_dict)
             fields = config.get('field', {})
             add_dict_to_table(row, {f'field_{k}': v
                                     for k, v in fields.items()

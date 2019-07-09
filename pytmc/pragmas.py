@@ -188,9 +188,7 @@ def squash_configs(*configs):
     '''
     squashed = {'pv': [], 'field': {}}
     for config in configs:
-        pv_segment = config.pop('pv', None)
-        if pv_segment:
-            squashed['pv'].append(pv_segment)
+        squashed['pv'].append(config.pop('pv', None))
         fields = config.pop('field', None)
         if fields:
             squashed['field'].update(fields)
@@ -234,7 +232,7 @@ class SingularChain:
         self.tcname = '.'.join(part.name for part in self.chain)
 
         self.config = squash_configs(*list(item_to_config.values()))
-        self.pvname = ':'.join(self.config['pv'])
+        self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv'])
 
     def __repr__(self):
         return (f'<{self.__class__.__name__} pvname={self.pvname!r} '
