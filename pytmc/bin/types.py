@@ -107,12 +107,11 @@ class TmcTypes(QtWidgets.QMainWindow):
         list_widget.clear()
 
         dtype = self.types[idx]
-        if hasattr(dtype, 'SubItem'):
-            for subitem in dtype.SubItem:
-                item = QtWidgets.QListWidgetItem(f'{subitem.name} : '
-                                                 f'{subitem.data_type.name}')
-                item.setData(Qt.UserRole, subitem.data_type)
-                list_widget.addItem(item)
+        for subitem in getattr(dtype, 'SubItem', []):
+            item = QtWidgets.QListWidgetItem(
+                f'{subitem.name} : {subitem.data_type.name}')
+            item.setData(Qt.UserRole, subitem.data_type)
+            list_widget.addItem(item)
 
     def _add_list(self):
         item_list = QtWidgets.QListWidget()
@@ -149,6 +148,7 @@ def show_qt_interface(tmc):
     '''
     app = QtWidgets.QApplication([])
     interface = TmcTypes(tmc)
+    interface.setMinimumSize(600, 400)
     interface.show()
     sys.exit(app.exec_())
 
