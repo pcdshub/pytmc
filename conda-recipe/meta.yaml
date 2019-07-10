@@ -19,6 +19,7 @@ requirements:
     - python {{PY_VER}}*,>=3
     - jinja2
     - pypdb
+    - lxml
 
 test:
   imports:

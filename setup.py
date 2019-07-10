@@ -40,8 +40,12 @@ setup(
     entry_points = {
         'console_scripts': [
             'pytmc = pytmc.bin.pytmc:main',
-            'pytmc-debug = pytmc.bin.pytmc_debug:main',
-            'xmltranslate = pytmc.bin.xmltranslate:main',
+            'pytmc-db = pytmc.bin.db:main',
+            'pytmc-debug = pytmc.bin.debug:main',
+            'pytmc-stcmd = pytmc.bin.stcmd:main',
+            'pytmc-summary = pytmc.bin.summary:main',
+            'pytmc-types = pytmc.bin.types:main',
+            'pytmc-xmltranslate = pytmc.bin.xmltranslate:main',
         ]
     },
     package_data={

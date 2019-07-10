@@ -1,2 +1,3 @@
 Jinja2
+lxml
 git+https://github.com/epicsdeb/pypdb.git

@@ -1,6 +1,6 @@
 record({{record.record_type}}, "{{record.pvname}}"){
 {% block add_fields  %}{% endblock %}
 {% for f in record.fields%}
-  field({{f}}, {{record.fields[f]}})
+  field({{f}}, "{{record.fields[f]}}")
 {% endfor %}
 }

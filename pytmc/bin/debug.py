@@ -11,10 +11,10 @@ from qtpy import QtWidgets
 from qtpy.QtCore import Qt, Signal
 
 import pytmc
-from .pytmc import process
+from .db import process
 
 
-description = __doc__
+DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +32,7 @@ def _grep_record_names(text):
     def split_rtyp(line):
         line = line.split('record(', 1)[1].rstrip('")')
         rtyp, record = line.split(',', 1)
-        record = record.strip('"\'')
+        record = record.strip('"\' ')
         return f'{record} ({rtyp})'
 
     return [split_rtyp(record)
@@ -91,12 +91,11 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.chains = {}
         self.records = {}
 
-        for record in tmc.all_RecordPackages:
-            chain_label = ' '.join(record.chain.name_list)
-            self.chains[chain_label] = record
+        for record in process(tmc):
+            self.chains[record.tcname] = record
             try:
                 record_text = record.render()
-                linter_results = (pytmc.epics.lint_db(dbd, record_text)
+                linter_results = (pytmc.linter.lint_db(dbd, record_text)
                                   if dbd and record_text else None)
                 record_text = _annotate_record_text(linter_results,
                                                     record_text)
@@ -162,7 +161,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             return
 
         record = current.data(Qt.UserRole)
-        if isinstance(record, pytmc.xml_collector.BaseRecordPackage):
+        if isinstance(record, pytmc.record.RecordPackage):
             self.item_selected.emit(record)
         elif isinstance(record, str):  # {chain: record}
             chain = record
@@ -171,8 +170,10 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     def _update_config_info(self, record):
         'Slot - update config information when a new record is selected'
+        chain = record.chain
+
         self.config_info.clear()
-        self.config_info.setRowCount(len(record.cfg.config))
+        self.config_info.setRowCount(len(chain.chain))
 
         def add_dict_to_table(row, d):
             for key, value in d.items():
@@ -186,10 +187,21 @@ class TmcSummary(QtWidgets.QMainWindow):
                     add_dict_to_table(row, value)
 
         columns = {}
-        for row, line in enumerate(record.cfg.config):
-            add_dict_to_table(row, line)
+
+        items = zip(chain.config['pv'], chain.item_to_config.items())
+        for row, (pv, (item, config)) in enumerate(items):
+            info_dict = dict(pv=pv)
+            info_dict.update({k: v for k, v in config.items() if k != 'field'})
+            add_dict_to_table(row, info_dict)
+            fields = config.get('field', {})
+            add_dict_to_table(row, {f'field_{k}': v
+                                    for k, v in fields.items()
+                                    if k != 'field'}
+                              )
 
         self.config_info.setHorizontalHeaderLabels(list(columns))
+        self.config_info.setVerticalHeaderLabels(
+            list(item.name for item in chain.item_to_config))
 
         self.config_info.setColumnCount(
             max(columns.values()) + 1
@@ -246,15 +258,16 @@ def show_qt_interface(tmc, dbd):
     sys.exit(app.exec_())
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=description,
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+def build_arg_parser(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser()
+
+    parser.description = DESCRIPTION
+    parser.formatter_class = argparse.RawTextHelpFormatter
 
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,
-        help='Path to interpreted .tmc file'
+        help='Path to .tmc file'
     )
 
     parser.add_argument(
@@ -275,22 +288,27 @@ def main():
         help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
     )
 
-    args = parser.parse_args()
+    return parser
 
+
+def create_debug_window(args):
     logging.basicConfig()
     pytmc_logger = logging.getLogger('pytmc')
     pytmc_logger.setLevel(args.log)
-    args = parser.parse_args()
 
-    tmc = pytmc.TmcFile(args.tmc_file)
+    tmc = pytmc.parser.parse(args.tmc_file)
 
     if args.dbd is None:
         dbd = None
     else:
-        dbd = pytmc.epics.DbdFile(args.dbd)
+        dbd = pytmc.linter.DbdFile(args.dbd)
 
-    process(tmc)
     show_qt_interface(tmc, dbd)
+
+
+def main(*, cmdline_args=None):
+    parser = build_arg_parser()
+    return create_debug_window(parser.parse_args(cmdline_args))
 
 
 if __name__ == '__main__':
