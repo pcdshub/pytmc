@@ -4,6 +4,7 @@ doctr
 pytest
 sphinx
 sphinx-rtd-theme
+sphinx-argparse
 sphinxcontrib-websupport
 sphinx_autodoc_typehints
 flake8

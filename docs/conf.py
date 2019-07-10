@@ -30,7 +30,7 @@ module_path = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     os.pardir,
     'pytmc',
-    
+
 )
 sys.path.insert(0,module_path)
 '''
@@ -54,6 +54,7 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
+    'sphinxarg.ext',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
