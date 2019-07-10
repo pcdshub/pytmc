@@ -230,7 +230,8 @@ class SingularChain:
         self.tcname = '.'.join(part.name for part in self.chain)
 
         self.config = squash_configs(*list(item_to_config.values()))
-        self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv'])
+        self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv']
+                               if pv_segment)
 
     def __repr__(self):
         return (f'<{self.__class__.__name__} pvname={self.pvname!r} '
