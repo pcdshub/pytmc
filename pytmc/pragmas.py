@@ -1,8 +1,6 @@
 """
-xml_collector.py
-
-This file contains the objects for intaking TMC files and generating python
-interpretations. Db Files can be produced from the interpretation
+This file contains the objects for taking in pytmc-parsed TMC files and
+generating Python-level configuration information.
 """
 import itertools
 import logging
@@ -262,12 +260,13 @@ def has_pragma(item, *, name='pytmc'):
 
 
 def chains_from_symbol(symbol, *, pragma='pytmc'):
-    'Build all SingularChain '
+    'Build all SingularChain instances from a Symbol'
     for full_chain in symbol.walk(condition=has_pragma):
         for item_and_config in expand_configurations_from_chain(full_chain):
             yield SingularChain(dict(item_and_config))
 
 
 def record_packages_from_symbol(symbol, *, pragma='pytmc'):
+    'Create all record packages from a given Symbol'
     for chain in chains_from_symbol(symbol, pragma=pragma):
         yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)

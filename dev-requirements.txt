@@ -6,3 +6,4 @@ sphinx
 sphinx-rtd-theme
 sphinxcontrib-websupport
 sphinx_autodoc_typehints
+flake8
