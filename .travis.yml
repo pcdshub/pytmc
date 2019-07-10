@@ -41,7 +41,7 @@ script:
       pushd docs
       make html
       popd
-      doctr deploy . --built-docs docs/build/html --deploy-branch-name gh-pages --command "touch .nojekyll; git add .nojekyll"
+      doctr deploy . --built-docs docs/_build/html --deploy-branch-name gh-pages --command "touch .nojekyll; git add .nojekyll"
     fi
 after_success:
   - codecov
