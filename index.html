@@ -17,41 +17,35 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pytmc  documentation" href="#"/>
-        <link rel="next" title="User Guide" href="user_guide.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="user_guide.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -88,7 +82,11 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source_code.html">Source Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.pragmas">pytmc.pragmas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.record">pytmc.record</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.parser">pytmc.parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.linter">pytmc.linter</a></li>
 </ul>
 
             
@@ -100,7 +98,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="#">pytmc</a>
@@ -108,9 +106,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -160,9 +159,9 @@
 from Beckhoff’s TwinCAT3 projects.</p>
 <p>Pytmc is developed with these <a class="reference external" href="https://pcdshub.github.io/development.html">guidelines</a> in mind.</p>
 <p>The source code is hosted on <a class="reference external" href="https://github.com/slaclab/pytmc">github</a>.</p>
-<p>Issues and requests can be posted on the <a class="reference external" href="https://github.com/slaclab/pytmc/issues">github issue tracker</a>. Use the <code class="docutils literal"><span class="pre">bug</span></code> tag for issues
-with intended features and the <code class="docutils literal"><span class="pre">enhancement</span></code> tag can be used for feature
-requests. The <code class="docutils literal"><span class="pre">question</span></code> tag will be treated like an ‘enhancements’ tag for
+<p>Issues and requests can be posted on the <a class="reference external" href="https://github.com/slaclab/pytmc/issues">github issue tracker</a>. Use the <code class="docutils literal notranslate"><span class="pre">bug</span></code> tag for issues
+with intended features and the <code class="docutils literal notranslate"><span class="pre">enhancement</span></code> tag can be used for feature
+requests. The <code class="docutils literal notranslate"><span class="pre">question</span></code> tag will be treated like an ‘enhancements’ tag for
 the documentation but regular questions can be posted there as well.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
@@ -181,13 +180,24 @@ the documentation but regular questions can be posted there as well.</p>
 <li class="toctree-l3"><a class="reference internal" href="installation.html#installing-for-development">Installing for development</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Terminal Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Command-line Usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#using-pytmc">Using pytmc</a></li>
-<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#command-line-arguments">Command line arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#using-xmltranslate">Using xmltranslate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-db">pytmc-db</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-stcmd">pytmc-stcmd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-xmltranslate">pytmc-xmltranslate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-debug">pytmc-debug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-summary">pytmc-summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-types">pytmc-types</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html#templates">Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#stcmd-default-cmd">stcmd_default.cmd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#asyn-standard-file-jinja2">asyn_standard_file.jinja2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#asyn-standard-record-jinja2">asyn_standard_record.jinja2</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pragma_usage.html">Annotating a TwinCAT3 project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#data-and-record-types">Data and Record Types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#pragma-syntax">Pragma syntax</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#declaring-top-level-variables">Declaring top level variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
@@ -197,32 +207,18 @@ the documentation but regular questions can be posted there as well.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="source_code.html">Source Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="xml_obj.html">xml_obj.py</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="xml_obj.html#symbol">Symbol</a></li>
-<li class="toctree-l3"><a class="reference internal" href="xml_obj.html#datatype">DataType</a></li>
-<li class="toctree-l3"><a class="reference internal" href="xml_obj.html#subitem">SubItem</a></li>
-<li class="toctree-l3"><a class="reference internal" href="xml_obj.html#baseelement">BaseElement</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="xml_collector.html">xml_collector.py</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="xml_collector.html#tmcfile">TmcFile</a></li>
-<li class="toctree-l3"><a class="reference internal" href="xml_collector.html#elementcollector">ElementCollector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="xml_collector.html#tmcchain">TmcChain</a></li>
-<li class="toctree-l3"><a class="reference internal" href="xml_collector.html#baserecordpackage">BaseRecordPackage</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.pragmas">pytmc.pragmas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.record">pytmc.record</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.parser">pytmc.parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html#module-pytmc.linter">pytmc.linter</a></li>
 </ul>
 </div>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -238,11 +234,11 @@ the documentation but regular questions can be posted there as well.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, SLAC National Accelerator Laboratory.
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -255,37 +251,15 @@ the documentation but regular questions can be posted there as well.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>
