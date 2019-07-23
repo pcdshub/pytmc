@@ -163,7 +163,6 @@ def render(args):
     template = jinja_env.get_template(args.template)
 
     project = parse(args.tsproj_project)
-    symbols = separate_by_classname(project.find(Symbol))
 
     additional_db_files = []
     try:
@@ -179,6 +178,8 @@ def render(args):
         except KeyError:
             raise RuntimeError(f'PLC project {args.plc!r} not found. '
                                f'Projects: {list(by_name)}')
+
+    symbols = separate_by_classname(plc.find(Symbol))
 
     if not args.only_motor:
         other_records = db.process(plc.tmc, dbd_file=args.dbd)
