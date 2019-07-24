@@ -145,6 +145,9 @@ def main(tsproj_project, use_markdown=False, show_all=False,
             heading(f'PLC Project ({i}): {plc.project_path.stem}')
             print(f'    Project path: {plc.project_path}')
             print(f'    TMC path:     {plc.tmc_path}')
+            print(f'    AMS ID:       {plc.ams_id}')
+            print(f'    IP Address:   {plc.target_ip} (* based on AMS ID)')
+            print(f'    Port:         {plc.port}')
             print(f'')
             proj_info = [('Source files', plc.source_filenames),
                          ('POUs', plc.pou_by_name),

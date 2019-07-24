@@ -324,7 +324,24 @@ class Link(TwincatItem):
 
 
 class TopLevelProject(TwincatItem):
-    '[tsproj] '
+    '[tsproj] Containing Io, System, Motion, TopLevelPlc, etc.'
+
+    @property
+    def ams_id(self):
+        '''
+        The AMS ID of the configured target
+        '''
+        return self.attributes.get('TargetNetId', '')
+
+    @property
+    def target_ip(self):
+        '''
+        A guess of the target IP, based on the AMS ID
+        '''
+        ams_id = self.ams_id
+        if ams_id.endswith('.1.1'):
+            return ams_id[:-4]
+        return ams_id  # :(
 
 
 class PlcProject(TwincatItem):
@@ -475,6 +492,7 @@ class Plc(TwincatItem):
         '''
         The AMS ID of the configured target
         '''
+        return self.find_ancestor(TopLevelProject).ams_id
         return self.attributes.get('TargetNetId', '')
 
     @property
@@ -482,10 +500,7 @@ class Plc(TwincatItem):
         '''
         A guess of the target IP, based on the AMS ID
         '''
-        ams_id = self.ams_id
-        if ams_id.endswith('.1.1'):
-            return ams_id[:-4]
-        return ams_id  # :(
+        return self.find_ancestor(TopLevelProject).target_ip
 
     def find(self, cls, *, recurse=True):
         yield from super().find(cls, recurse=recurse)
