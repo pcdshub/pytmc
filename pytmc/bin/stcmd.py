@@ -136,8 +136,9 @@ def jinja_filters(**user_config):
             if not k.startswith('_')}
 
 
-def main(tsproj_project, *, name=None, prefix=None, template_filename,
-         plc_name, dbd, db_path, only_motor=False, binary_name, delim=':',
+def main(tsproj_project, *, name=None, prefix=None,
+         template_filename='stcmd_default.cmd', plc_name=None, dbd=None,
+         db_path='.', only_motor=False, binary_name='ads', delim=':',
          debug=False):
     jinja_env = jinja2.Environment(
         loader=jinja2.PackageLoader("pytmc", "templates"),

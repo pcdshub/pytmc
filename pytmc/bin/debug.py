@@ -5,6 +5,7 @@ interprets TwinCAT3 .tmc files.
 
 import argparse
 import logging
+import pathlib
 import sys
 
 from qtpy import QtWidgets
@@ -241,21 +242,25 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.item_list.addItem(item)
 
 
-def show_qt_interface(tmc, dbd):
+def create_debug_gui(tmc, dbd=None):
     '''
     Show the results of tmc processing in a Qt gui
 
     Parameters
     ----------
-    tmc : TmcFile
+    tmc : TmcFile, str, pathlib.Path
         The tmc file to show
     dbd : DbdFile, optional
         The dbd file to lint against
     '''
-    app = QtWidgets.QApplication([])
-    interface = TmcSummary(tmc, dbd)
-    interface.show()
-    sys.exit(app.exec_())
+
+    if isinstance(tmc, (str, pathlib.Path)):
+        tmc = pytmc.parser.parse(tmc)
+
+    if dbd is not None and not isinstance(dbd, pytmc.linter.DbdFile):
+        dbd = pytmc.linter.DbdFile(dbd)
+
+    return TmcSummary(tmc, dbd)
 
 
 def build_arg_parser(parser=None):
@@ -282,9 +287,7 @@ def build_arg_parser(parser=None):
 
 
 def main(tmc_file, *, dbd=None):
-    tmc = pytmc.parser.parse(tmc_file)
-
-    if dbd is not None:
-        dbd = pytmc.linter.DbdFile(dbd)
-
-    show_qt_interface(tmc, dbd)
+    app = QtWidgets.QApplication([])
+    interface = create_debug_gui(tmc_file, dbd)
+    interface.show()
+    sys.exit(app.exec_())

@@ -4,6 +4,7 @@ tmc file.
 """
 
 import argparse
+import pathlib
 import sys
 
 from qtpy import QtWidgets
@@ -127,22 +128,25 @@ class TmcTypes(QtWidgets.QMainWindow):
         return item_list
 
 
-def show_qt_interface(tmc):
+def create_types_gui(tmc):
     '''
     Show the data type information gui
 
     Parameters
     ----------
-    tmc : TmcFile
+    tmc : TmcFile, str, pathlib.Path
         The tmc file to show
     '''
-    app = QtWidgets.QApplication([])
+    if isinstance(tmc, (str, pathlib.Path)):
+        tmc = pytmc.parser.parse(tmc)
+
     interface = TmcTypes(tmc)
     interface.setMinimumSize(600, 400)
+    return interface
+
+
+def main(tmc_file, *, dbd=None):
+    app = QtWidgets.QApplication([])
+    interface = create_types_gui(tmc_file)
     interface.show()
     sys.exit(app.exec_())
-
-
-def main(tmc_file):
-    tmc = pytmc.parser.parse(tmc_file)
-    show_qt_interface(tmc)
