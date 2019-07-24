@@ -271,45 +271,20 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
-        '--dbd',
-        '-d',
+        '-d', '--dbd',
         default=None,
         type=str,
         help=('Specify an expanded .dbd file for validating fields '
               '(requires pyPDB)')
     )
 
-    parser.add_argument(
-        '--log',
-        '-l',
-        metavar="LOG_LEVEL",
-        default=30,  # WARN level messages
-        type=int,
-        help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
-    )
-
     return parser
 
 
-def create_debug_window(args):
-    logging.basicConfig()
-    pytmc_logger = logging.getLogger('pytmc')
-    pytmc_logger.setLevel(args.log)
+def main(tmc_file, *, dbd=None):
+    tmc = pytmc.parser.parse(tmc_file)
 
-    tmc = pytmc.parser.parse(args.tmc_file)
-
-    if args.dbd is None:
-        dbd = None
-    else:
-        dbd = pytmc.linter.DbdFile(args.dbd)
+    if dbd is not None:
+        dbd = pytmc.linter.DbdFile(dbd)
 
     show_qt_interface(tmc, dbd)
-
-
-def main(*, cmdline_args=None):
-    parser = build_arg_parser()
-    return create_debug_window(parser.parse_args(cmdline_args))
-
-
-if __name__ == '__main__':
-    main()

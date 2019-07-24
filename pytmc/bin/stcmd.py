@@ -19,6 +19,7 @@ from ..parser import parse, Symbol, separate_by_classname
 
 
 DESCRIPTION = __doc__
+logger = logging.getLogger(__name__)
 
 
 def build_arg_parser(parser=None):
@@ -34,7 +35,7 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
-        '--plc', type=str, default=None,
+        '--plc', type=str, default=None, dest='plc_name',
         help='PLC project name, if multiple exist'
     )
 
@@ -44,12 +45,14 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
-        '--binary', type=str, default='adsMotion',
+        '--binary', type=str, dest='binary_name',
+        default='adsMotion',
         help='IOC application binary name'
     )
 
     parser.add_argument(
-        '-n', '--name', type=str, default=None,
+        '-n', '--name', type=str,
+        default=None,
         help='IOC name (defaults to project name)'
     )
 
@@ -81,50 +84,45 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
-        '--template', type=str, default='stcmd_default.cmd',
+        '--template', type=str, dest='template_filename',
+        default='stcmd_default.cmd',
         help='st.cmd Jinja2 template',
-    )
-
-    parser.add_argument(
-        '--log',
-        '-l',
-        default='INFO',
-        type=str,
-        help='Python logging level (e.g. DEBUG, INFO, WARNING)'
     )
 
     return parser
 
 
-def get_name(obj, args):
+def get_name(obj, user_config):
     'Returns: (motor_prefix, motor_name)'
     # First check if there is a pytmc pragma
     configs = pragmas.expand_configurations_from_chain([obj])
+    delim = user_config['delim']
+    prefix = user_config['prefix']
     if configs:
         config = pragmas.squash_configs(*configs)
         # PV name specified in the pragma - use it as-is
-        return '', args.delim.join(config['pv'])
+        return '', delim.join(config['pv'])
 
     if hasattr(obj, 'nc_axis'):
         nc_axis = obj.nc_axis
         # Fall back to using the NC axis name, replacing underscores/spaces
         # with the user-specified delimiter
-        name = nc_axis.name.replace(' ', args.delim)
-        return args.prefix + args.delim, name.replace('_', args.delim)
+        name = nc_axis.name.replace(' ', delim)
+        return prefix + delim, name.replace('_', delim)
     return '', obj.name
 
 
-def jinja_filters(args):
+def jinja_filters(**user_config):
     'All jinja filters'
     # TODO all can be cached based on object, if necessary
 
     @jinja2.evalcontextfilter
     def epics_prefix(eval_ctx, obj):
-        return get_name(obj, args)[0]
+        return get_name(obj, user_config)[0]
 
     @jinja2.evalcontextfilter
     def epics_suffix(eval_ctx, obj):
-        return get_name(obj, args)[1]
+        return get_name(obj, user_config)[1]
 
     @jinja2.evalcontextfilter
     def pragma(eval_ctx, obj, key, default=''):
@@ -138,57 +136,55 @@ def jinja_filters(args):
             if not k.startswith('_')}
 
 
-def render(args):
-    logger = logging.getLogger('pytmc')
-    logger.setLevel(args.log)
-
-    pytmc_logger = logging.getLogger('pytmc')
-    pytmc_logger.setLevel(args.log)
-    logging.basicConfig()
-
+def main(tsproj_project, *, name=None, prefix=None, template_filename,
+         plc_name, dbd, db_path, only_motor=False, binary_name, delim=':',
+         debug=False):
     jinja_env = jinja2.Environment(
         loader=jinja2.PackageLoader("pytmc", "templates"),
         trim_blocks=True,
         lstrip_blocks=True,
     )
 
-    if not args.name:
-        args.name = pathlib.Path(args.tsproj_project).stem
+    if not name:
+        name = pathlib.Path(tsproj_project).stem
 
-    if not args.prefix:
-        args.prefix = args.name.upper()
+    if not prefix:
+        prefix = name.upper()
 
-    jinja_env.filters.update(**jinja_filters(args))
+    jinja_env.filters.update(
+        **jinja_filters(delim=delim, prefix=prefix, name=name)
+    )
 
-    template = jinja_env.get_template(args.template)
+    template = jinja_env.get_template(template_filename)
 
-    project = parse(args.tsproj_project)
+    project = parse(tsproj_project)
+    symbols = separate_by_classname(project.find(Symbol))
 
     additional_db_files = []
     try:
         plc, = project.plcs
     except ValueError:
         by_name = project.plcs_by_name
-        if not args.plc:
+        if not plc_name:
             raise RuntimeError(f'Only single PLC projects supported.  '
                                f'Use --plc and choose from {list(by_name)}')
 
         try:
-            plc = project.plcs_by_name[args.plc]
+            plc = project.plcs_by_name[plc_name]
         except KeyError:
-            raise RuntimeError(f'PLC project {args.plc!r} not found. '
+            raise RuntimeError(f'PLC project {plc_name!r} not found. '
                                f'Projects: {list(by_name)}')
 
     symbols = separate_by_classname(plc.find(Symbol))
 
-    if not args.only_motor:
-        other_records = db.process(plc.tmc, dbd_file=args.dbd)
+    if not only_motor:
+        other_records = db.process(plc.tmc, dbd_file=dbd)
         if not other_records:
             logger.info('No additional records from pytmc found in %s',
                         plc.tmc.filename)
         else:
             db_filename = f'{plc.filename.stem}.db'
-            db_path = pathlib.Path(args.db_path) / db_filename
+            db_path = pathlib.Path(db_path) / db_filename
             logger.info('Found %d additional records; writing to %s',
                         len(other_records), db_path)
             with open(db_path, 'wt') as db_file:
@@ -197,10 +193,10 @@ def render(args):
             additional_db_files.append({'file': db_filename, 'macros': ''})
 
     template_args = dict(
-        binary_name=args.binary,
-        name=args.name,
-        prefix=args.prefix,
-        delim=args.delim,
+        binary_name=binary_name,
+        name=name,
+        prefix=prefix,
+        delim=delim,
         user=getpass.getuser(),
 
         motor_port='PLC_ADS',
@@ -220,9 +216,10 @@ def render(args):
         stashed_exception = ex
         rendered = None
 
-    if not args.debug:
+    if not debug:
         if stashed_exception is not None:
             raise stashed_exception
+        print(rendered)
     else:
         message = ['Variables: project, symbols, plc, template. ']
         if stashed_exception is not None:
@@ -233,16 +230,3 @@ def render(args):
             namespace=locals(),
             message='\n'.join(message)
         )
-
-    return project, symbols, rendered
-
-
-def main(*, cmdline_args=None):
-    parser = build_arg_parser()
-    args = parser.parse_args(cmdline_args)
-    _, _, template = render(args)
-    print(template)
-
-
-if __name__ == '__main__':
-    main()

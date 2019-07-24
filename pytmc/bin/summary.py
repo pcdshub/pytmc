@@ -5,7 +5,6 @@
 
 import argparse
 import ast
-import logging
 import pathlib
 import sys
 
@@ -29,62 +28,55 @@ def build_arg_parser(argparser=None):
     )
 
     argparser.add_argument(
-        '--all', '-a',
+        '--all', '-a', dest='show_all',
         action='store_true',
         help='All possible information'
     )
 
     argparser.add_argument(
-        '--outline',
+        '--outline', dest='show_outline',
         action='store_true',
         help='Outline XML'
     )
 
     argparser.add_argument(
-        '--boxes', '-b',
+        '--boxes', '-b', dest='show_boxes',
         action='store_true',
         help='Show boxes'
     )
 
     argparser.add_argument(
-        '--code', '-c',
+        '--code', '-c', dest='show_code',
         action='store_true',
         help='Show code'
     )
 
     argparser.add_argument(
-        '--plcs', '-p',
+        '--plcs', '-p', dest='show_plcs',
         action='store_true',
         help='Show plcs'
     )
 
     argparser.add_argument(
-        '--nc', '-n',
+        '--nc', '-n', dest='show_nc',
         action='store_true',
         help='Show NC axes'
     )
 
     argparser.add_argument(
-        '--symbols', '-s',
+        '--symbols', '-s', dest='show_symbols',
         action='store_true',
         help='Show symbols'
     )
 
     argparser.add_argument(
-        '--links', '-l',
+        '--links', '-l', dest='show_links',
         action='store_true',
         help='Show links'
     )
 
     argparser.add_argument(
-        '--log',
-        default='INFO',
-        type=str,
-        help='Python logging level (e.g. DEBUG, INFO, WARNING)'
-    )
-
-    argparser.add_argument(
-        '--markdown',
+        '--markdown', dest='use_markdown',
         action='store_true',
         help='Make output more markdown-friendly, for easier sharing'
     )
@@ -110,12 +102,12 @@ def outline(item, *, depth=0, f=sys.stdout):
         outline(child, depth=depth + 1, f=f)
 
 
-def summary(args):
-    logger = logging.getLogger('pytmc')
-    logger.setLevel(args.log)
-    logging.basicConfig()
+def main(tsproj_project, use_markdown=False, show_all=False,
+         show_outline=False, show_boxes=False, show_code=False,
+         show_plcs=False, show_nc=False, show_symbols=False, show_links=False,
+         log_level=None, debug=False):
 
-    proj_path = pathlib.Path(args.tsproj_project)
+    proj_path = pathlib.Path(tsproj_project)
     if proj_path.suffix.lower() not in ('.tsproj', ):
         raise ValueError('Expected a .tsproj file')
 
@@ -132,14 +124,14 @@ def summary(args):
         print()
 
     def sub_sub_heading(text, level=3):
-        if args.markdown:
+        if use_markdown:
             print('#' * level, text)
         else:
             print(' ' * level, '-', text)
         print()
 
     def text_block(text, indent=4, language='vhdl'):
-        if args.markdown:
+        if use_markdown:
             print(f'```{language}')
             print(text)
             print(f'```')
@@ -148,7 +140,7 @@ def summary(args):
                 print(' ' * indent, line)
         print()
 
-    if args.plcs or args.all:
+    if show_plcs or show_all:
         for i, plc in enumerate(project.plcs, 1):
             heading(f'PLC Project ({i}): {plc.project_path.stem}')
             print(f'    Project path: {plc.project_path}')
@@ -166,7 +158,7 @@ def summary(args):
                         print(f'        {j}.) {text}')
                     print()
 
-            if args.code:
+            if show_code:
                 for fn, source in plc.source.items():
                     sub_heading(f'{fn} ({source.tag})')
                     for decl_or_impl in source.find((parser.ST,
@@ -186,7 +178,7 @@ def summary(args):
                         text_block(decl_or_impl.text)
                     print()
 
-    if args.symbols or args.all:
+    if show_symbols or show_all:
         sub_heading('Symbols')
         symbols = list(project.find(parser.Symbol))
         for symbol in symbols:
@@ -195,13 +187,13 @@ def summary(args):
                   ''.format(**info))
         print()
 
-    if args.boxes or args.all:
+    if show_boxes or show_all:
         sub_heading('Boxes')
         boxes = list(project.find(parser.Box))
         for box in boxes:
             print(f'    {box.attributes["Id"]}.) {box.name}')
 
-    if args.nc or args.all:
+    if show_nc or show_all:
         sub_heading('NC axes')
         ncs = list(project.find(parser.NC))
         for nc in ncs:
@@ -215,7 +207,7 @@ def summary(args):
                     print(f'        {category} = {info!r}')
                 print()
 
-    if args.links or args.all:
+    if show_links or show_all:
         sub_heading('Links')
         links = list(project.find(parser.Link))
         for i, link in enumerate(links, 1):
@@ -223,10 +215,10 @@ def summary(args):
             print(f'          B {link.b}')
         print()
 
-    if args.outline:
+    if show_outline:
         outline(project)
 
-    if args.debug:
+    if debug:
         util.python_debug_session(
             namespace=locals(),
             message=('The top-level project is accessible as `project`, and '
@@ -235,13 +227,3 @@ def summary(args):
         )
 
     return project
-
-
-def main(*, cmdline_args=None):
-    parser = build_arg_parser()
-    args = parser.parse_args(cmdline_args)
-    return summary(args)
-
-
-if __name__ == '__main__':
-    main()

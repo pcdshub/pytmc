@@ -4,7 +4,6 @@ tmc file.
 """
 
 import argparse
-import logging
 import sys
 
 from qtpy import QtWidgets
@@ -26,15 +25,6 @@ def build_arg_parser(parser=None):
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,
         help='Path to .tmc file'
-    )
-
-    parser.add_argument(
-        '--log',
-        '-l',
-        metavar="LOG_LEVEL",
-        default=30,  # WARN level messages
-        type=int,
-        help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
     )
 
     return parser
@@ -153,19 +143,6 @@ def show_qt_interface(tmc):
     sys.exit(app.exec_())
 
 
-def create_types_window(args):
-    logging.basicConfig()
-    pytmc_logger = logging.getLogger('pytmc')
-    pytmc_logger.setLevel(args.log)
-
-    tmc = pytmc.parser.parse(args.tmc_file)
+def main(tmc_file):
+    tmc = pytmc.parser.parse(tmc_file)
     show_qt_interface(tmc)
-
-
-def main(*, cmdline_args=None):
-    parser = build_arg_parser()
-    return create_types_window(parser.parse_args(cmdline_args))
-
-
-if __name__ == '__main__':
-    main()
