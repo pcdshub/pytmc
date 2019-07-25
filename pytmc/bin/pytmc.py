@@ -13,7 +13,8 @@ import logging
 DESCRIPTION = __doc__
 
 
-MODULES = ('summary', 'stcmd', 'db', 'xmltranslate', 'debug', 'types')
+MODULES = ('summary', 'stcmd', 'db', 'xmltranslate', 'debug', 'types',
+           'iocboot')
 
 
 def _try_import(module):

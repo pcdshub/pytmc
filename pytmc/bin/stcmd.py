@@ -154,7 +154,7 @@ def main(tsproj_project, *, name=None, prefix=None,
         [
             jinja2.PackageLoader("pytmc", "templates"),
             jinja2.FileSystemLoader(template_path),
-         ]
+        ]
     )
     jinja_env = jinja2.Environment(
         loader=jinja_loader,
