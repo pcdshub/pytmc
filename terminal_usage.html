@@ -102,13 +102,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#pytmc-debug">pytmc-debug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-debug">pytmc-debug</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#pytmc-summary">pytmc-summary</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#pytmc-types">pytmc-types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-types">pytmc-types</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#templates">Templates</a><ul>
@@ -205,7 +212,6 @@ TwinCAT3 .tmc files. This program is designed to work in conjunction with ESS’
 m-epics-twincat-ads driver.</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">db</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">error</span><span class="o">-</span><span class="n">context</span><span class="p">]</span>
-                <span class="p">[</span><span class="o">--</span><span class="n">log</span> <span class="n">LOG_LEVEL</span><span class="p">]</span>
                 <span class="n">INPUT</span> <span class="p">[</span><span class="n">OUTPUT</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -234,10 +240,6 @@ m-epics-twincat-ads driver.</p>
 <dd><p>Do not show db file context around errors</p>
 <p>Default: False</p>
 </dd>
-<dt><kbd>--log, -l</kbd></dt>
-<dd><p>Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO</p>
-<p>Default: 30</p>
-</dd>
 </dl>
 </div>
 </div>
@@ -247,9 +249,9 @@ m-epics-twincat-ads driver.</p>
 EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <p>Relies on the existence (and linking) of FB_MotionStage function blocks.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">stcmd</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">binary</span> <span class="n">BINARY</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NAME</span><span class="p">]</span>
-                   <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">motor</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">path</span> <span class="n">DB_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span>
-                   <span class="p">[</span><span class="o">--</span><span class="n">delim</span> <span class="n">DELIM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">template</span> <span class="n">TEMPLATE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">log</span> <span class="n">LOG</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">stcmd</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">binary</span> <span class="n">BINARY_NAME</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">motor</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">path</span> <span class="n">DB_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">delim</span> <span class="n">DELIM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">template</span> <span class="n">TEMPLATE_FILENAME</span><span class="p">]</span>
                    <span class="n">tsproj_project</span>
 </pre></div>
 </div>
@@ -300,10 +302,6 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <dd><p>st.cmd Jinja2 template</p>
 <p>Default: “stcmd_default.cmd”</p>
 </dd>
-<dt><kbd>--log, -l</kbd></dt>
-<dd><p>Python logging level (e.g. DEBUG, INFO, WARNING)</p>
-<p>Default: “INFO”</p>
-</dd>
 </dl>
 </div>
 </div>
@@ -320,13 +318,13 @@ For a line of xml that appears as the following:
 <p>This tool was created for exploring .tpy files but is well suited to reading
 any xml formatted file.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">xmltranslate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DEPTH</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">INDENT</span><span class="p">]</span> <span class="n">INPUT</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">xmltranslate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DEPTH</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">INDENT_SIZE</span><span class="p">]</span> <span class="n">input_file</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
 <h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
 <dl class="option-list">
-<dt><kbd>INPUT</kbd></dt>
+<dt><kbd>input_file</kbd></dt>
 <dd><p>input file</p>
 </dd>
 </dl>
@@ -347,6 +345,28 @@ any xml formatted file.</p>
 </div>
 <div class="section" id="pytmc-debug">
 <h2>pytmc-debug<a class="headerlink" href="#pytmc-debug" title="Permalink to this headline">¶</a></h2>
+<p><p>“pytmc-debug” is a Qt interface that shows information about how pytmc
+interprets TwinCAT3 .tmc files.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">debug</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DBD</span><span class="p">]</span> <span class="n">INPUT</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>INPUT</kbd></dt>
+<dd><p>Path to .tmc file</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>-d, --dbd</kbd></dt>
+<dd><p>Specify an expanded .dbd file for validating fields (requires pyPDB)</p>
+</dd>
+</dl>
+</div>
 </div>
 <div class="section" id="pytmc-summary">
 <h2>pytmc-summary<a class="headerlink" href="#pytmc-summary" title="Permalink to this headline">¶</a></h2>
@@ -354,8 +374,7 @@ any xml formatted file.</p>
 .tsproj projects.</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">summary</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">all</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outline</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">boxes</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">code</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plcs</span><span class="p">]</span>
-                     <span class="p">[</span><span class="o">--</span><span class="n">nc</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">symbols</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">links</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">log</span> <span class="n">LOG</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">markdown</span><span class="p">]</span>
-                     <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">nc</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">symbols</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">links</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">markdown</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
                      <span class="n">tsproj_project</span>
 </pre></div>
 </div>
@@ -402,10 +421,6 @@ any xml formatted file.</p>
 <dd><p>Show links</p>
 <p>Default: False</p>
 </dd>
-<dt><kbd>--log</kbd></dt>
-<dd><p>Python logging level (e.g. DEBUG, INFO, WARNING)</p>
-<p>Default: “INFO”</p>
-</dd>
 <dt><kbd>--markdown</kbd></dt>
 <dd><p>Make output more markdown-friendly, for easier sharing</p>
 <p>Default: False</p>
@@ -419,6 +434,20 @@ any xml formatted file.</p>
 </div>
 <div class="section" id="pytmc-types">
 <h2>pytmc-types<a class="headerlink" href="#pytmc-types" title="Permalink to this headline">¶</a></h2>
+<p><p>“pytmc-types” is a Qt interface that shows DataType-related information from a
+tmc file.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">types</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">INPUT</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>INPUT</kbd></dt>
+<dd><p>Path to .tmc file</p>
+</dd>
+</dl>
+</div>
 </div>
 </div>
 <div class="section" id="templates">
