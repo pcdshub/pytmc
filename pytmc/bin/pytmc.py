@@ -25,12 +25,12 @@ def _build_commands():
     global DESCRIPTION
     result = {}
     for module in sorted(MODULES):
-        mod = _try_import(module)
         try:
-            result[module] = (mod.build_arg_parser, mod.main)
-        except AttributeError:
-            continue
+            mod = _try_import(module)
+        except ImportError:
+            ...
         else:
+            result[module] = (mod.build_arg_parser, mod.main)
             DESCRIPTION += f'\n    $ pytmc {module} --help'
 
     return result
