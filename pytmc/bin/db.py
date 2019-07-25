@@ -171,44 +171,25 @@ def build_arg_parser(parser=None):
         help='Do not show db file context around errors'
     )
 
-    parser.add_argument(
-        '--log',
-        '-l',
-        metavar="LOG_LEVEL",
-        default=30,  # WARN level messages
-        type=int,
-        help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
-    )
-
     return parser
 
 
-def make_db(args):
-    pytmc_logger = logging.getLogger('pytmc')
-    pytmc_logger.setLevel(args.log)
-    tmc = parser.parse(args.tmc_file)
+def main(tmc_file, record_file=None, *, dbd=None, allow_errors=False,
+         no_error_context=False):
+    tmc = parser.parse(tmc_file)
 
     try:
         records = process(
-            tmc, dbd_file=args.dbd, allow_errors=args.allow_errors,
-            show_error_context=not args.no_error_context,
+            tmc, dbd_file=dbd, allow_errors=allow_errors,
+            show_error_context=not no_error_context,
         )
     except LinterError:
         sys.exit(1)
 
     db_string = '\n\n'.join(record.render() for record in records)
 
-    if not args.record_file:
+    if not record_file:
         print(db_string)
     else:
-        with open(args.record_file, 'wt') as record_file:
+        with open(record_file, 'wt') as record_file:
             record_file.write(db_string)
-
-
-def main(*, cmdline_args=None):
-    parser = build_arg_parser()
-    return make_db(parser.parse_args(cmdline_args))
-
-
-if __name__ == '__main__':
-    main()

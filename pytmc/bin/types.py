@@ -4,7 +4,7 @@ tmc file.
 """
 
 import argparse
-import logging
+import pathlib
 import sys
 
 from qtpy import QtWidgets
@@ -26,15 +26,6 @@ def build_arg_parser(parser=None):
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,
         help='Path to .tmc file'
-    )
-
-    parser.add_argument(
-        '--log',
-        '-l',
-        metavar="LOG_LEVEL",
-        default=30,  # WARN level messages
-        type=int,
-        help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
     )
 
     return parser
@@ -137,35 +128,25 @@ class TmcTypes(QtWidgets.QMainWindow):
         return item_list
 
 
-def show_qt_interface(tmc):
+def create_types_gui(tmc):
     '''
     Show the data type information gui
 
     Parameters
     ----------
-    tmc : TmcFile
+    tmc : TmcFile, str, pathlib.Path
         The tmc file to show
     '''
-    app = QtWidgets.QApplication([])
+    if isinstance(tmc, (str, pathlib.Path)):
+        tmc = pytmc.parser.parse(tmc)
+
     interface = TmcTypes(tmc)
     interface.setMinimumSize(600, 400)
+    return interface
+
+
+def main(tmc_file, *, dbd=None):
+    app = QtWidgets.QApplication([])
+    interface = create_types_gui(tmc_file)
     interface.show()
     sys.exit(app.exec_())
-
-
-def create_types_window(args):
-    logging.basicConfig()
-    pytmc_logger = logging.getLogger('pytmc')
-    pytmc_logger.setLevel(args.log)
-
-    tmc = pytmc.parser.parse(args.tmc_file)
-    show_qt_interface(tmc)
-
-
-def main(*, cmdline_args=None):
-    parser = build_arg_parser()
-    return create_types_window(parser.parse_args(cmdline_args))
-
-
-if __name__ == '__main__':
-    main()

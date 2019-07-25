@@ -1,6 +1,15 @@
 language: python
 sudo: false
 
+services:
+    - xvfb
+
+addons:
+    apt:
+      packages:
+        - herbstluftwm
+        - libxkbcommon-x11-0
+
 env:
   global:
     - OFFICIAL_REPO="slaclab/pytmc"
@@ -30,6 +39,11 @@ install:
   - conda create -n pytmc-env python=$TRAVIS_PYTHON_VERSION pytmc pip
   - source activate pytmc-env
   - pip install -U pip -r dev-requirements.txt
+
+before_script:
+  # Run windows manager
+  - "herbstluftwm &"
+  - sleep 1
 
 script:
   - flake8 pytmc

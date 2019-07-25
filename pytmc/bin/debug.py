@@ -5,6 +5,7 @@ interprets TwinCAT3 .tmc files.
 
 import argparse
 import logging
+import pathlib
 import sys
 
 from qtpy import QtWidgets
@@ -241,21 +242,25 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.item_list.addItem(item)
 
 
-def show_qt_interface(tmc, dbd):
+def create_debug_gui(tmc, dbd=None):
     '''
     Show the results of tmc processing in a Qt gui
 
     Parameters
     ----------
-    tmc : TmcFile
+    tmc : TmcFile, str, pathlib.Path
         The tmc file to show
     dbd : DbdFile, optional
         The dbd file to lint against
     '''
-    app = QtWidgets.QApplication([])
-    interface = TmcSummary(tmc, dbd)
-    interface.show()
-    sys.exit(app.exec_())
+
+    if isinstance(tmc, (str, pathlib.Path)):
+        tmc = pytmc.parser.parse(tmc)
+
+    if dbd is not None and not isinstance(dbd, pytmc.linter.DbdFile):
+        dbd = pytmc.linter.DbdFile(dbd)
+
+    return TmcSummary(tmc, dbd)
 
 
 def build_arg_parser(parser=None):
@@ -271,45 +276,18 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
-        '--dbd',
-        '-d',
+        '-d', '--dbd',
         default=None,
         type=str,
         help=('Specify an expanded .dbd file for validating fields '
               '(requires pyPDB)')
     )
 
-    parser.add_argument(
-        '--log',
-        '-l',
-        metavar="LOG_LEVEL",
-        default=30,  # WARN level messages
-        type=int,
-        help='Python numeric logging level (e.g. 10 for DEBUG, 20 for INFO'
-    )
-
     return parser
 
 
-def create_debug_window(args):
-    logging.basicConfig()
-    pytmc_logger = logging.getLogger('pytmc')
-    pytmc_logger.setLevel(args.log)
-
-    tmc = pytmc.parser.parse(args.tmc_file)
-
-    if args.dbd is None:
-        dbd = None
-    else:
-        dbd = pytmc.linter.DbdFile(args.dbd)
-
-    show_qt_interface(tmc, dbd)
-
-
-def main(*, cmdline_args=None):
-    parser = build_arg_parser()
-    return create_debug_window(parser.parse_args(cmdline_args))
-
-
-if __name__ == '__main__':
-    main()
+def main(tmc_file, *, dbd=None):
+    app = QtWidgets.QApplication([])
+    interface = create_debug_gui(tmc_file, dbd)
+    interface.show()
+    sys.exit(app.exec_())
