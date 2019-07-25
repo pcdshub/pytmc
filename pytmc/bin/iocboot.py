@@ -11,10 +11,9 @@ import pathlib
 
 import jinja2
 
-from . import db, util
-from .. import pragmas
+from . import util
 
-from ..parser import parse, Symbol, separate_by_classname
+from ..parser import parse
 
 
 DESCRIPTION = __doc__
@@ -89,7 +88,6 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
     project = parse(tsproj_project)
 
     solution_path = tsproj_project.parent.parent
-    repo_path = solution_path.parent
 
     ioc_template_path = pathlib.Path(ioc_template_path)
     makefile_template_path = ioc_template_path / makefile_name
@@ -152,8 +150,8 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
                     raise stashed_exception
 
                 if makefile_path.exists() and not overwrite:
-                    raise RuntimeError('Must specify --overwrite to write over '
-                                       'existing Makefiles')
+                    raise RuntimeError('Must specify --overwrite to write over'
+                                       ' existing Makefiles')
                 with open(makefile_path, 'wt') as f:
                     print(rendered, file=f)
 
