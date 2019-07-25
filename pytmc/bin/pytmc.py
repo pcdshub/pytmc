@@ -24,14 +24,23 @@ def _try_import(module):
 def _build_commands():
     global DESCRIPTION
     result = {}
+    unavailable = []
+
     for module in sorted(MODULES):
         try:
             mod = _try_import(module)
-        except ImportError:
-            ...
+        except ImportError as ex:
+            unavailable.append((module, ex))
         else:
             result[module] = (mod.build_arg_parser, mod.main)
             DESCRIPTION += f'\n    $ pytmc {module} --help'
+
+    if unavailable:
+        DESCRIPTION += f'\n\n'
+
+        for module, ex in unavailable:
+            DESCRIPTION += (f'WARNING: pytmc {module!r} is unavailable due to:'
+                            f'\n\t{ex.__class__.__name__}: {ex}')
 
     return result
 
