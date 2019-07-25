@@ -1,9 +1,27 @@
+import pytest
+import sys
+
+import pytmc.bin.pytmc as pytmc_main
 from pytmc.bin.db import main as db_main
 from pytmc.bin.debug import create_debug_gui
 from pytmc.bin.stcmd import main as stcmd_main
 from pytmc.bin.summary import main as summary_main
 from pytmc.bin.types import create_types_gui
 from pytmc.bin.xmltranslate import main as xmltranslate_main
+
+
+def test_help_main(monkeypatch):
+    monkeypatch.setattr(sys, 'argv', ['--help'])
+    pytmc_main.main()
+
+
+@pytest.mark.parametrize('subcommand',
+                         pytmc_main.COMMANDS.keys()
+                         )
+def test_help_module(monkeypatch, subcommand):
+    monkeypatch.setattr(sys, 'argv', [subcommand, '--help'])
+    with pytest.raises(SystemExit):
+        pytmc_main.main()
 
 
 def test_summary(project_filename):
