@@ -6,7 +6,9 @@ Relies on the existence (and linking) of FB_MotionStage function blocks.
 """
 
 import argparse
+import collections
 import getpass
+import json
 import logging
 import pathlib
 
@@ -94,6 +96,21 @@ def build_arg_parser(parser=None):
         help='Location where templates are stored'
     )
 
+    parser.add_argument(
+        '--extra', type=str, action='append',
+        help=('Using VAR:=VALUE or VAR=VALUE, specify extra variables '
+              'to add to the template arguments. \nTakes precedence over '
+              'auto-generated variables.'
+              '\nUse VAR=VALUE one or more times to get a list'
+              '\nUse VAR:=VALUE once to force a scalar value.'
+              )
+    )
+
+    parser.add_argument(
+        '--extra-json', type=str, action='append',
+        help='Extra template arguments, defined in a JSON file'
+    )
+
     return parser
 
 
@@ -141,16 +158,56 @@ def jinja_filters(**user_config):
             if not k.startswith('_')}
 
 
+def extras_to_dict(extras):
+    d = collections.defaultdict(list)
+    for line in extras:
+        if '=' not in line:
+            raise ValueError('Extras must be in the form of VAR=VALUE')
+        if ':=' in line:
+            var, _, value = line.partition(':=')
+            d[var] = value
+        else:
+            var, _, value = line.partition('=')
+            d[var].append(value)
+    return dict(d)
+
+
+def _handle_extra_json(extra_json):
+    if not extra_json:
+        return {}
+
+    extra_json_path = pathlib.Path(extra_json).expanduser()
+    if extra_json_path.exists():
+        with open(extra_json_path) as f:
+            return json.load(f)
+    elif extra_json.startswith('{'):
+        return json.loads(extra_json)
+    raise ValueError('extra_json must either be a filename or a valid '
+                     'JSON string')
+
+
 def main(tsproj_project, *, name=None, prefix=None,
          template_filename='stcmd_default.cmd', plc_name=None, dbd=None,
          db_path='.', only_motor=False, binary_name='ads', delim=':',
-         template_path='.', debug=False):
+         template_path='.', debug=False, extra=None, extra_json=None):
+
+    argparse_extras = {}
+    if extra_json:
+        for item in extra_json:
+            argparse_extras.update(_handle_extra_json(item))
+
+    if extra is not None:
+        if not isinstance(extra, dict):
+            extra = extras_to_dict(extra)
+        argparse_extras.update(extra)
+
     jinja_loader = jinja2.ChoiceLoader(
         [
             jinja2.PackageLoader("pytmc", "templates"),
             jinja2.FileSystemLoader(template_path),
          ]
     )
+
     jinja_env = jinja2.Environment(
         loader=jinja_loader,
         trim_blocks=True,
@@ -220,6 +277,8 @@ def main(tsproj_project, *, name=None, prefix=None,
         additional_db_files=additional_db_files,
         symbols=symbols,
     )
+
+    template_args.update(argparse_extras)
 
     stashed_exception = None
     try:
