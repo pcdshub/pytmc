@@ -89,6 +89,11 @@ def build_arg_parser(parser=None):
         help='st.cmd Jinja2 template',
     )
 
+    parser.add_argument(
+        '--template-path', type=str, default='.',
+        help='Location where templates are stored'
+    )
+
     return parser
 
 
@@ -139,9 +144,15 @@ def jinja_filters(**user_config):
 def main(tsproj_project, *, name=None, prefix=None,
          template_filename='stcmd_default.cmd', plc_name=None, dbd=None,
          db_path='.', only_motor=False, binary_name='ads', delim=':',
-         debug=False):
+         template_path='.', debug=False):
+    jinja_loader = jinja2.ChoiceLoader(
+        [
+            jinja2.PackageLoader("pytmc", "templates"),
+            jinja2.FileSystemLoader(template_path),
+         ]
+    )
     jinja_env = jinja2.Environment(
-        loader=jinja2.PackageLoader("pytmc", "templates"),
+        loader=jinja_loader,
         trim_blocks=True,
         lstrip_blocks=True,
     )
