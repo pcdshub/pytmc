@@ -46,7 +46,7 @@ def build_arg_parser(parser=None):
 
     parser.add_argument(
         '--binary', type=str, dest='binary_name',
-        default='adsMotion',
+        default='adsIoc',
         help='IOC application binary name'
     )
 
