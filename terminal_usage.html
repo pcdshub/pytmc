@@ -252,7 +252,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">stcmd</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">binary</span> <span class="n">BINARY_NAME</span><span class="p">]</span>
                    <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">motor</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">path</span> <span class="n">DB_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span>
                    <span class="p">[</span><span class="o">--</span><span class="n">delim</span> <span class="n">DELIM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">template</span> <span class="n">TEMPLATE_FILENAME</span><span class="p">]</span>
-                   <span class="p">[</span><span class="o">--</span><span class="n">template</span><span class="o">-</span><span class="n">path</span> <span class="n">TEMPLATE_PATH</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">template</span><span class="o">-</span><span class="n">path</span> <span class="n">TEMPLATE_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span>
                    <span class="n">tsproj_project</span>
 </pre></div>
 </div>
@@ -306,6 +306,10 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <dt><kbd>--template-path</kbd></dt>
 <dd><p>Location where templates are stored</p>
 <p>Default: “.”</p>
+</dd>
+<dt><kbd>--allow-errors</kbd></dt>
+<dd><p>Allow non-fatal errors to be ignored</p>
+<p>Default: False</p>
 </dd>
 </dl>
 </div>
