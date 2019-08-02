@@ -94,6 +94,11 @@ def build_arg_parser(parser=None):
         help='Location where templates are stored'
     )
 
+    parser.add_argument(
+        '--allow-errors', action='store_true',
+        help='Allow non-fatal errors to be ignored'
+    )
+
     return parser
 
 
@@ -144,7 +149,7 @@ def jinja_filters(**user_config):
 def main(tsproj_project, *, name=None, prefix=None,
          template_filename='stcmd_default.cmd', plc_name=None, dbd=None,
          db_path='.', only_motor=False, binary_name='ads', delim=':',
-         template_path='.', debug=False):
+         template_path='.', debug=False, allow_errors=False):
     jinja_loader = jinja2.ChoiceLoader(
         [
             jinja2.PackageLoader("pytmc", "templates"),
@@ -204,6 +209,16 @@ def main(tsproj_project, *, name=None, prefix=None,
                                           for rec in other_records))
             additional_db_files.append({'file': db_filename, 'macros': ''})
 
+    ams_id = plc.ams_id
+    target_ip = plc.target_ip
+    if not allow_errors:
+        if not ams_id:
+            raise RuntimeError('AMS ID unset. Try --allow-errors if this is '
+                               'not an issue.')
+        if not target_ip:
+            raise RuntimeError('IP address unset. Try --allow-errors if this '
+                               'is not an issue.')
+
     template_args = dict(
         binary_name=binary_name,
         name=name,
@@ -213,8 +228,8 @@ def main(tsproj_project, *, name=None, prefix=None,
 
         motor_port='PLC_ADS',
         asyn_port='ASYN_PLC',
-        plc_ams_id=plc.ams_id,
-        plc_ip=plc.target_ip,
+        plc_ams_id=ams_id,
+        plc_ip=target_ip,
         plc_ads_port=plc.port,
 
         additional_db_files=additional_db_files,
