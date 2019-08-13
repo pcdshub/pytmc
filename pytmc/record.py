@@ -227,6 +227,10 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['DTYP'] = self.dtyp
         record.fields['OUT'] = self._asyn_port_spec + '='
 
+        # Remove timestamp source and process-on-init for output records:
+        record.fields.pop('TSE', None)
+        record.fields.pop('PINI', None)
+
         # Update with given pragmas
         record.fields.update(self.chain.config.get('field', {}))
         return record
