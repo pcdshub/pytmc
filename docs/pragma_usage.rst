@@ -78,17 +78,32 @@ colon. All parts thereafter are the 'tag' or the configuration state for this
 setting. Some title types such as `field` can have multiple settings for a
 single PV.
 
-A pragma with more specification might look like the following:
+A pragma could have multiple fields specified. For example, an `ai` record 
+`TEST:MAIN:SCALE` would be generated from the following, with a slope of
+2.0 and an offset of 1.0, updating only at a rate of once per second:
 
 .. code-block:: none 
    
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
-       field: SCAN 1 second
        io: i
+       field: SCAN 1 second
+       field: AOFF 1.0
+       field: ASLO 2.0
    '}
    scale : LREAL := 0.0;
 
+
+Reducing update rate
+''''''''''''''''''''
+
+By default, all records will have a scan rate of `I/O Intr`. This means that
+even if the value updates on every PLC cycle, EPICS will see (most) of those
+events.
+
+In the case of values that update quickly, it may be preferable to reduce
+the rate at which EPICS sees updates. This can be done by setting the
+`SCAN` field to poll at a fixed rate.
 
 Declaring top level variables
 ''''''''''''''''''''''''''''''
@@ -247,8 +262,18 @@ need to manually include them.
 SCAN
 ....
 The ``SCAN`` field is special. Pytmc will guess a scan field if not provided
-but like ``io`` and ``pv``, the correct setting may be subjective. We would
-encourage developers to be aware of this setting. Binary fields default to
-``I/O Intr`` for gets. All others default to a polling period of ``.5 second``
-for reads and ``Passive`` for gets.
+but like ``io`` and ``pv``, the correct setting is on a case-by-case basis.
+pytmc itself cannot know at what rate a variable will update on the PLC side.
 
+Valid options for this field are:
+
+.. code-block:: none
+   "Passive"
+   "I/O Intr"
+   "10 second"
+   "5 second"
+   "2 second"
+   "1 second"
+   ".5 second"
+   ".2 second"
+   ".1 second"
