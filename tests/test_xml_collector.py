@@ -86,8 +86,8 @@ def test_record_package_from_chain(chain, tc_type, is_array, final_type,
     ("ENUM", 'io', False, 'asynInt32'),
     ("ENUM", 'i', True, 'asynInt16ArrayIn'),
     ("ENUM", 'io', True, 'asynInt16ArrayOut'),
-    ("STRING", 'i', False, 'asynOctetRead'),
-    ("STRING", 'io', False, 'asynOctetWrite'),
+    ("STRING", 'i', False, 'asynInt8ArrayIn'),
+    ("STRING", 'io', False, 'asynInt8ArrayOut'),
 ])
 def test_dtype(chain, tc_type, io, is_array, final_DTYP):
     chain.data_type = make_mock_type(tc_type, is_array=is_array, length=3)
