@@ -7,6 +7,6 @@ pytest-qt
 qtpy
 sphinx
 sphinx-argparse
-sphinx-rtd-theme
-sphinx_autodoc_typehints
+sphinx_rtd_theme
+sphinx-autodoc-typehints
 sphinxcontrib-websupport

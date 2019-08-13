@@ -31,6 +31,7 @@ install:
   - conda install conda-build anaconda-client
   - conda update -q conda conda-build
   - conda config --add channels pcds-tag
+  - conda config --append channels conda-forge
   # Useful for debugging
   - conda info -a
   - conda build  -q conda-recipe --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
@@ -38,7 +39,7 @@ install:
   # Manage conda environment
   - conda create -n pytmc-env python=$TRAVIS_PYTHON_VERSION pytmc pip
   - source activate pytmc-env
-  - pip install -U pip -r dev-requirements.txt
+  - conda install --file dev-requirements.txt
 
 before_script:
   # Run windows manager
