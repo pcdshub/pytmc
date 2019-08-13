@@ -39,3 +39,27 @@ Python Usage
 Once installed pytmc and its components can be imported into a python program
 or shell like any normal python package. Consult the source code documentation
 for specifics. 
+
+
+Full IOC Creation
++++++++++++++++++
+
+(This is incomplete)
+
+.. code-block:: sh
+
+   $ git clone https://github.com/pcdshub/ads-ioc /path/to/ads-ioc
+   $ pytmc iocboot /path/to/plc.tsproj /path/to/ads-ioc/iocBoot/templates/
+   # Creates directories: ioc-plc-name1, ioc-plc-name2, ...
+   # Creates Makefiles: ioc-plc-name/Makefile
+
+   $ cd ioc-plc-name
+   $ vim Makefile
+   # Customize - if necessary - to add more db files or change pytmc stcmd options
+
+   $ make
+   # Shells out to pytmc stcmd;
+   # Creates st.cmd, ioc-plc-name.db, envPaths
+
+   $ ./st.cmd
+   # Runs IOC
