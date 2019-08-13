@@ -84,11 +84,8 @@ A pragma with more specification might look like the following:
    
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
-       type: ai
-       field: DTYP stream
        field: SCAN 1 second
-       io: input
-       str: %f
+       io: i
    '}
    scale : LREAL := 0.0;
 
@@ -102,19 +99,19 @@ instantiate a variable.
 
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
-       io: input
+       io: i
    '}
    scale : LREAL := 0.0;
 
 
 The developer must specify the PV name (``pv:`` line). All other fields are
-optional. We recommend that the user specif the direction of the
+optional. We recommend that the user specify the direction of the
 data (``io:`` line) however. 
 
 Pytmc needs no additional information but users have the option to override
-default settings manually. For example a developer can specify ``scan:`` field
-(configures how and when the value is updated) even though this is not
-required. For additional information on all the pragma fields, consult the 
+default settings manually. For example a developer can specify the ``SCAN``
+field , which configures how and when the value is updated, even though this is
+not required. For additional information on all the pragma fields, consult the 
 `Pragma fields`_ section.
 
 
@@ -176,11 +173,8 @@ specify their own version of the
   
    {attribute 'pytmc' := '
        pv: VALUE_F_R
-       type: ai
-       field: DTYP stream
        field: SCAN 1 second
-       io: input
-       str: %d
+       io: i
    '}  
    value_d : DINT; 
 
@@ -188,21 +182,20 @@ specify their own version of the
 Declaring bidirectional PVs
 '''''''''''''''''''''''''''
 In instances where a single TwinCAT variable should be able to be both written
-and read, multiple PVs can be specified. This allows multiple PVs to be tied to
-a single TwinCAT variable.
+and read, multiple PVs can be specified. This allows multiple EPICS records to
+be tied to a single TwinCAT variable.
 
 .. code-block:: none
 
    {attribute 'pytmc' := '
-       pv: TEST:MAIN:ULIMIT_R
+       pv: TEST:MAIN:ULIMIT
        io: io
    '}  
    upper_limit : DINT := 5000;
 
-When specifying multiple PVs, the configuration lines all apply to the nearest,
-previous ``pv`` line. For example in the code snippet above, ``type: ai`` will
-be applied to the ``TEST:MAIN:ULIMIT_R`` pv and the ``type: ao`` will be
-applied to ``TEST:MAIN:ULIMT_W``.
+
+In this case, two records will be generated: `TEST:MAIN:ULIMIT` and
+`TEST:MAIN:ULIMIT_RBV`.
 
 
 Pragma fields
@@ -222,11 +215,10 @@ PVs that are declared within the data type.
 
 io
 ..
-This is a guessed field that defaults to 'io'.Specify the whether the IOC is
-reading or writing this value. Values being sent from the PLC to the IOC should
-be marked as input with 'i' or 'input' and values being sent to the PLC from
-the IOC should be marked 'o' or 'output'.  Bidirectional PVs can be specified
-with 'io'.
+This is a guessed field that defaults to `'io'`.  Specify the whether the IOC
+is reading or writing this value. Values being sent from the PLC to the IOC
+should be marked as input with 'i' and values being sent to the PLC from the
+IOC should be marked 'o'.  Bidirectional PVs can be specified with 'io'.
 
 type
 ....
