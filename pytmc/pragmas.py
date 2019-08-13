@@ -243,7 +243,8 @@ def find_pytmc_symbols(tmc):
     'Find all symbols in a tmc file that contain pragmas'
     for symbol in tmc.find(parser.Symbol):
         if has_pragma(symbol):
-            yield symbol
+            if symbol.name.count('.') == 1:
+                yield symbol
 
 
 def get_pragma(item, *, name='pytmc'):
