@@ -215,18 +215,18 @@ In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
 
 Pragma fields
 '''''''''''''
-The lines of the pragma tell pytmc how to generate the db and proto. This
-section contains more specific descriptions of each of the configuration lines.
-Many are automatic with the exception of Pv
+Each line of the pragma indicates to pytmc how to generate the corresponding records
+in the database file output.
 
 pv
 ..
 This constructs the PV name that will represent this variable in EPICS. It is
 the only mandatory configuration line. This line can be used on specific
-variables as well as the instantiations of data types. When used on variables
-declared in the main scope, the PV for the variable will be generated verbatim.
-When used on instantiations, this string will be appended to the front of any
-PVs that are declared within the data type. 
+variables as well as the instantiations of data types. 
+
+When used on variables declared in the main scope, the PV for the variable will
+be generated verbatim.  When used on instantiations, this string will be
+appended to the front of any PVs that are declared within the data type. 
 
 io
 ..
@@ -235,29 +235,28 @@ is reading or writing this value. Values being sent from the PLC to the IOC
 should be marked as input with 'i' and values being sent to the PLC from the
 IOC should be marked 'o'.  Bidirectional PVs can be specified with 'io'.
 
-type
-....
-This is a guessed field and does not need manual specification. This specifies
-the EPICS record type. For more information about EPICS records, read this page
-from the `EPICS wiki <https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14>`_.
-Due to the ADS driver records for variables that aren't array-like are
-typically of type ai or ao.
-
 fields
 ......
-This is a guessed field and does not need manual specification. This specifies
-the lines that will be placed in the epics db as 'fields'.  Multiple field
-lines are allowed. These lines determine the PV's behaviors such as alarm
-limits and scanning frequency.  Each field specified in the db corresponds to a
-field line in the pragma.  Almost all PVs will have multiple fields and hence
-multiple field lines in the pragma. The field line has two sections, the field
-type and the argument. The field type is the first string of characters up
-until the first character of whitespace. It us usually an all-caps abbreviation
-like RVAL, DTYP or EGU. This determines the type of field being set. All
-characters after the first space are treated as the argument to the field. The
-argument can include any characters including spaces and is only broken on a
-new line. The INP and OUT fields are generated automatically so there is no
-need to manually include them.
+This specifies additional field(s) to be set on the generated EPICS record(s).
+Multiple field lines are allowed. These lines determine the PV's behaviors such
+as alarm limits and scanning frequency.  
+
+The format is as follows:
+
+.. code-block:: none
+
+   field: FIELD_NAME field value
+
+
+This would correspond to a field in the record being generated as follows:
+
+.. code-block:: none
+
+   record(ai, "my_record") {
+      ...
+      field(FIELD_NAME, "field value")
+   }
+
 
 SCAN
 ....
