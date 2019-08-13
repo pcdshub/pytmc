@@ -26,6 +26,14 @@ the variable you wish to mark. You can read more about the TwinCAT pragma
 system `here
 <https://infosys.beckhoff.com/english.php?content=../content/1033/tc3_plc_intro/9007201784297355.html&id=>`_.
 
+Best practices for SLAC projects are documented in the `PCDS confluence page
+<https://confluence.slac.stanford.edu/display/PCDS/TwinCAT+3+Git+Setup+and+Best+Practices>`_.
+
+Having issues with multiline pragmas and related things? See the `PCDS flight
+rules
+<https://confluence.slac.stanford.edu/display/PCDS/Beckhoff+Flight+Rules>`_.
+
+
 Python Usage
 ++++++++++++
 Once installed pytmc and its components can be imported into a python program
