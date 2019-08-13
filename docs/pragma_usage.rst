@@ -75,11 +75,11 @@ configuration for this variable.
 Pytmc uses a custom system of configuration where newlines and white space in
 a line is important. All lines begin with a title and the title ends before the
 colon. All parts thereafter are the 'tag' or the configuration state for this
-setting. Some title types such as `field` can have multiple settings for a
+setting. Some title types such as ``field`` can have multiple settings for a
 single PV.
 
-A pragma could have multiple fields specified. For example, an `ai` record 
-`TEST:MAIN:SCALE` would be generated from the following, with a slope of
+A pragma could have multiple fields specified. For example, an ``ai`` record 
+``TEST:MAIN:SCALE`` would be generated from the following, with a slope of
 2.0 and an offset of 1.0, updating only at a rate of once per second:
 
 .. code-block:: none 
@@ -97,7 +97,7 @@ A pragma could have multiple fields specified. For example, an `ai` record
 Reducing update rate
 ''''''''''''''''''''
 
-By default, all records will have a scan rate of `I/O Intr`. This means that
+By default, all records will have a scan rate of ``I/O Intr``. This means that
 even if the value updates on every PLC cycle, EPICS will see (most) of those
 events.
 
@@ -209,8 +209,8 @@ be tied to a single TwinCAT variable.
    upper_limit : DINT := 5000;
 
 
-In this case, two records will be generated: `TEST:MAIN:ULIMIT` and
-`TEST:MAIN:ULIMIT_RBV`.
+In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
+``TEST:MAIN:ULIMIT_RBV``.
 
 
 Pragma fields
@@ -268,6 +268,7 @@ pytmc itself cannot know at what rate a variable will update on the PLC side.
 Valid options for this field are:
 
 .. code-block:: none
+
    "Passive"
    "I/O Intr"
    "10 second"
