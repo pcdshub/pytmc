@@ -249,9 +249,10 @@ m-epics-twincat-ads driver.</p>
 EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <p>Relies on the existence (and linking) of FB_MotionStage function blocks.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">stcmd</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">binary</span> <span class="n">BINARY_NAME</span><span class="p">]</span>
-                   <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">motor</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">path</span> <span class="n">DB_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span>
-                   <span class="p">[</span><span class="o">--</span><span class="n">delim</span> <span class="n">DELIM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">template</span> <span class="n">TEMPLATE_FILENAME</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span><span class="o">-</span><span class="n">stcmd</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hashbang</span> <span class="n">HASHBANG</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">binary</span> <span class="n">BINARY_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">motor</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">path</span> <span class="n">DB_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">delim</span> <span class="n">DELIM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">template</span> <span class="n">TEMPLATE_FILENAME</span><span class="p">]</span>
                    <span class="p">[</span><span class="o">--</span><span class="n">template</span><span class="o">-</span><span class="n">path</span> <span class="n">TEMPLATE_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span>
                    <span class="n">tsproj_project</span>
 </pre></div>
@@ -272,6 +273,10 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </dd>
 <dt><kbd>-p, --prefix</kbd></dt>
 <dd><p>PV prefix for the IOC</p>
+</dd>
+<dt><kbd>--hashbang</kbd></dt>
+<dd><p>Indicates to the shell which binary to use for the st.cmd script</p>
+<p>Default: “../../bin/rhel7-x86_64/adsIoc”</p>
 </dd>
 <dt><kbd>--binary</kbd></dt>
 <dd><p>IOC application binary name</p>
@@ -463,7 +468,7 @@ tmc file.</p>
 <h1>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="stcmd-default-cmd">
 <h2>stcmd_default.cmd<a class="headerlink" href="#stcmd-default-cmd" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!../../bin/rhel7-x86_64/{{binary_name}}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!{{hashbang}}</span>
 
 <span class="o">&lt;</span> <span class="n">envPaths</span>
 <span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;IOCNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;{{name}}&quot;</span> <span class="p">)</span>
