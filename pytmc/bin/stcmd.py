@@ -45,6 +45,12 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
+        '--hashbang', type=str,
+        default='../../bin/rhel7-x86_64/adsIoc',
+        help='Indicates to the shell which binary to use for the st.cmd script'
+    )
+
+    parser.add_argument(
         '--binary', type=str, dest='binary_name',
         default='adsIoc',
         help='IOC application binary name'
@@ -149,12 +155,13 @@ def jinja_filters(**user_config):
 def main(tsproj_project, *, name=None, prefix=None,
          template_filename='stcmd_default.cmd', plc_name=None, dbd=None,
          db_path='.', only_motor=False, binary_name='ads', delim=':',
-         template_path='.', debug=False, allow_errors=False):
+         template_path='.', debug=False, allow_errors=False,
+         hashbang='../../bin/rhel7-x86_64/adsIoc'):
     jinja_loader = jinja2.ChoiceLoader(
         [
             jinja2.PackageLoader("pytmc", "templates"),
             jinja2.FileSystemLoader(template_path),
-         ]
+        ]
     )
     jinja_env = jinja2.Environment(
         loader=jinja_loader,
@@ -220,6 +227,7 @@ def main(tsproj_project, *, name=None, prefix=None,
                                'is not an issue.')
 
     template_args = dict(
+        hashbang=hashbang,
         binary_name=binary_name,
         name=name,
         prefix=prefix,
