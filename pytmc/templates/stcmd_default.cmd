@@ -1,4 +1,4 @@
-#!../../bin/rhel7-x86_64/{{binary_name}}
+#!{{hashbang}}
 
 < envPaths
 epicsEnvSet("IOCNAME", "{{name}}" )
