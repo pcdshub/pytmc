@@ -37,9 +37,8 @@ install:
   - conda build  -q conda-recipe --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
   - conda config --add channels "file://`pwd`/bld-dir"
   # Manage conda environment
-  - conda create -n pytmc-env python=$TRAVIS_PYTHON_VERSION pytmc pip
+  - conda create -n pytmc-env python=$TRAVIS_PYTHON_VERSION pytmc pip pyqt --file dev-requirements.txt
   - source activate pytmc-env
-  - conda install --file dev-requirements.txt
 
 before_script:
   # Run windows manager
