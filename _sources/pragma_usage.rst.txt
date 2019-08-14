@@ -47,6 +47,8 @@ TwinCAT data types and their corresponding record types are as follows:
 +-----------+--------------------------+-------------------------+--------------+-----------------+--------------------+-----------------------------------------+
 | LREAL     | -1.797693134862316e\+308 | 1.797693134862358e\+308 | 64 bit       | ai, ao          |  asynFloat64       | asynFloat64ArrayIn, AsynFloat64ArrayOut |
 +-----------+--------------------------+-------------------------+--------------+-----------------+--------------------+-----------------------------------------+
+| STRING    |                          |                         | Varies       | waveform        |  asynFloat64       | asynInt8ArrayIn, asynInt8ArrayOut       |
++-----------+--------------------------+-------------------------+--------------+-----------------+--------------------+-----------------------------------------+
 
 
 Lines marked as N/A are not supported by pytmc.
@@ -73,23 +75,35 @@ configuration for this variable.
 Pytmc uses a custom system of configuration where newlines and white space in
 a line is important. All lines begin with a title and the title ends before the
 colon. All parts thereafter are the 'tag' or the configuration state for this
-setting. Some title types such as `field` can have multiple settings for a
+setting. Some title types such as ``field`` can have multiple settings for a
 single PV.
 
-A pragma with more specification might look like the following:
+A pragma could have multiple fields specified. For example, an ``ai`` record 
+``TEST:MAIN:SCALE`` would be generated from the following, with a slope of
+2.0 and an offset of 1.0, updating only at a rate of once per second:
 
 .. code-block:: none 
    
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
-       type: ai
-       field: DTYP stream
+       io: i
        field: SCAN 1 second
-       io: input
-       str: %f
+       field: AOFF 1.0
+       field: ASLO 2.0
    '}
    scale : LREAL := 0.0;
 
+
+Reducing update rate
+''''''''''''''''''''
+
+By default, all records will have a scan rate of ``I/O Intr``. This means that
+even if the value updates on every PLC cycle, EPICS will see (most) of those
+events.
+
+In the case of values that update quickly, it may be preferable to reduce
+the rate at which EPICS sees updates. This can be done by setting the
+`SCAN` field to poll at a fixed rate.
 
 Declaring top level variables
 ''''''''''''''''''''''''''''''
@@ -100,19 +114,19 @@ instantiate a variable.
 
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
-       io: input
+       io: i
    '}
    scale : LREAL := 0.0;
 
 
 The developer must specify the PV name (``pv:`` line). All other fields are
-optional. We recommend that the user specif the direction of the
+optional. We recommend that the user specify the direction of the
 data (``io:`` line) however. 
 
 Pytmc needs no additional information but users have the option to override
-default settings manually. For example a developer can specify ``scan:`` field
-(configures how and when the value is updated) even though this is not
-required. For additional information on all the pragma fields, consult the 
+default settings manually. For example a developer can specify the ``SCAN``
+field , which configures how and when the value is updated, even though this is
+not required. For additional information on all the pragma fields, consult the 
 `Pragma fields`_ section.
 
 
@@ -174,11 +188,8 @@ specify their own version of the
   
    {attribute 'pytmc' := '
        pv: VALUE_F_R
-       type: ai
-       field: DTYP stream
        field: SCAN 1 second
-       io: input
-       str: %d
+       io: i
    '}  
    value_d : DINT; 
 
@@ -186,75 +197,83 @@ specify their own version of the
 Declaring bidirectional PVs
 '''''''''''''''''''''''''''
 In instances where a single TwinCAT variable should be able to be both written
-and read, multiple PVs can be specified. This allows multiple PVs to be tied to
-a single TwinCAT variable.
+and read, multiple PVs can be specified. This allows multiple EPICS records to
+be tied to a single TwinCAT variable.
 
 .. code-block:: none
 
    {attribute 'pytmc' := '
-       pv: TEST:MAIN:ULIMIT_R
+       pv: TEST:MAIN:ULIMIT
        io: io
    '}  
    upper_limit : DINT := 5000;
 
-When specifying multiple PVs, the configuration lines all apply to the nearest,
-previous ``pv`` line. For example in the code snippet above, ``type: ai`` will
-be applied to the ``TEST:MAIN:ULIMIT_R`` pv and the ``type: ao`` will be
-applied to ``TEST:MAIN:ULIMT_W``.
+
+In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
+``TEST:MAIN:ULIMIT_RBV``.
 
 
 Pragma fields
 '''''''''''''
-The lines of the pragma tell pytmc how to generate the db and proto. This
-section contains more specific descriptions of each of the configuration lines.
-Many are automatic with the exception of Pv
+Each line of the pragma indicates to pytmc how to generate the corresponding records
+in the database file output.
 
 pv
 ..
 This constructs the PV name that will represent this variable in EPICS. It is
 the only mandatory configuration line. This line can be used on specific
-variables as well as the instantiations of data types. When used on variables
-declared in the main scope, the PV for the variable will be generated verbatim.
-When used on instantiations, this string will be appended to the front of any
-PVs that are declared within the data type. 
+variables as well as the instantiations of data types. 
+
+When used on variables declared in the main scope, the PV for the variable will
+be generated verbatim.  When used on instantiations, this string will be
+appended to the front of any PVs that are declared within the data type. 
 
 io
 ..
-This is a guessed field that defaults to 'io'.Specify the whether the IOC is
-reading or writing this value. Values being sent from the PLC to the IOC should
-be marked as input with 'i' or 'input' and values being sent to the PLC from
-the IOC should be marked 'o' or 'output'.  Bidirectional PVs can be specified
-with 'io'.
-
-type
-....
-This is a guessed field and does not need manual specification. This specifies
-the EPICS record type. For more information about EPICS records, read this page
-from the `EPICS wiki <https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14>`_.
-Due to the ADS driver records for variables that aren't array-like are
-typically of type ai or ao.
+This is a guessed field that defaults to `'io'`.  Specify the whether the IOC
+is reading or writing this value. Values being sent from the PLC to the IOC
+should be marked as input with 'i' and values being sent to the PLC from the
+IOC should be marked 'o'.  Bidirectional PVs can be specified with 'io'.
 
 fields
 ......
-This is a guessed field and does not need manual specification. This specifies
-the lines that will be placed in the epics db as 'fields'.  Multiple field
-lines are allowed. These lines determine the PV's behaviors such as alarm
-limits and scanning frequency.  Each field specified in the db corresponds to a
-field line in the pragma.  Almost all PVs will have multiple fields and hence
-multiple field lines in the pragma. The field line has two sections, the field
-type and the argument. The field type is the first string of characters up
-until the first character of whitespace. It us usually an all-caps abbreviation
-like RVAL, DTYP or EGU. This determines the type of field being set. All
-characters after the first space are treated as the argument to the field. The
-argument can include any characters including spaces and is only broken on a
-new line. The INP and OUT fields are generated automatically so there is no
-need to manually include them.
+This specifies additional field(s) to be set on the generated EPICS record(s).
+Multiple field lines are allowed. These lines determine the PV's behaviors such
+as alarm limits and scanning frequency.  
+
+The format is as follows:
+
+.. code-block:: none
+
+   field: FIELD_NAME field value
+
+
+This would correspond to a field in the record being generated as follows:
+
+.. code-block:: none
+
+   record(ai, "my_record") {
+      ...
+      field(FIELD_NAME, "field value")
+   }
+
 
 SCAN
 ....
 The ``SCAN`` field is special. Pytmc will guess a scan field if not provided
-but like ``io`` and ``pv``, the correct setting may be subjective. We would
-encourage developers to be aware of this setting. Binary fields default to
-``I/O Intr`` for gets. All others default to a polling period of ``.5 second``
-for reads and ``Passive`` for gets.
+but like ``io`` and ``pv``, the correct setting is on a case-by-case basis.
+pytmc itself cannot know at what rate a variable will update on the PLC side.
 
+Valid options for this field are:
+
+.. code-block:: none
+
+   "Passive"
+   "I/O Intr"
+   "10 second"
+   "5 second"
+   "2 second"
+   "1 second"
+   ".5 second"
+   ".2 second"
+   ".1 second"

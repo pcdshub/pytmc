@@ -90,13 +90,13 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Annotating a TwinCAT3 project</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#data-and-record-types">Data and Record Types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pragma-syntax">Pragma syntax</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reducing-update-rate">Reducing update rate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-top-level-variables">Declaring top level variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-bidirectional-pvs">Declaring bidirectional PVs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pragma-fields">Pragma fields</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pv">pv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#io">io</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#type">type</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#fields">fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#scan">SCAN</a></li>
 </ul>
@@ -334,6 +334,14 @@ appended to variables in project files and library files.</p>
 <td><p>asynFloat64</p></td>
 <td><p>asynFloat64ArrayIn, AsynFloat64ArrayOut</p></td>
 </tr>
+<tr class="row-even"><td><p>STRING</p></td>
+<td></td>
+<td></td>
+<td><p>Varies</p></td>
+<td><p>waveform</p></td>
+<td><p>asynFloat64</p></td>
+<td><p>asynInt8ArrayIn, asynInt8ArrayOut</p></td>
+</tr>
 </tbody>
 </table>
 <p>Lines marked as N/A are not supported by pytmc.</p>
@@ -355,20 +363,30 @@ configuration for this variable.</p>
 <p>Pytmc uses a custom system of configuration where newlines and white space in
 a line is important. All lines begin with a title and the title ends before the
 colon. All parts thereafter are the ‘tag’ or the configuration state for this
-setting. Some title types such as <cite>field</cite> can have multiple settings for a
+setting. Some title types such as <code class="docutils literal notranslate"><span class="pre">field</span></code> can have multiple settings for a
 single PV.</p>
-<p>A pragma with more specification might look like the following:</p>
+<p>A pragma could have multiple fields specified. For example, an <code class="docutils literal notranslate"><span class="pre">ai</span></code> record
+<code class="docutils literal notranslate"><span class="pre">TEST:MAIN:SCALE</span></code> would be generated from the following, with a slope of
+2.0 and an offset of 1.0, updating only at a rate of once per second:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
     pv: TEST:MAIN:SCALE
-    type: ai
-    field: DTYP stream
+    io: i
     field: SCAN 1 second
-    io: input
-    str: %f
+    field: AOFF 1.0
+    field: ASLO 2.0
 &#39;}
 scale : LREAL := 0.0;
 </pre></div>
 </div>
+</div>
+<div class="section" id="reducing-update-rate">
+<h2>Reducing update rate<a class="headerlink" href="#reducing-update-rate" title="Permalink to this headline">¶</a></h2>
+<p>By default, all records will have a scan rate of <code class="docutils literal notranslate"><span class="pre">I/O</span> <span class="pre">Intr</span></code>. This means that
+even if the value updates on every PLC cycle, EPICS will see (most) of those
+events.</p>
+<p>In the case of values that update quickly, it may be preferable to reduce
+the rate at which EPICS sees updates. This can be done by setting the
+<cite>SCAN</cite> field to poll at a fixed rate.</p>
 </div>
 <div class="section" id="declaring-top-level-variables">
 <h2>Declaring top level variables<a class="headerlink" href="#declaring-top-level-variables" title="Permalink to this headline">¶</a></h2>
@@ -376,18 +394,18 @@ scale : LREAL := 0.0;
 instantiate a variable.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
     pv: TEST:MAIN:SCALE
-    io: input
+    io: i
 &#39;}
 scale : LREAL := 0.0;
 </pre></div>
 </div>
 <p>The developer must specify the PV name (<code class="docutils literal notranslate"><span class="pre">pv:</span></code> line). All other fields are
-optional. We recommend that the user specif the direction of the
+optional. We recommend that the user specify the direction of the
 data (<code class="docutils literal notranslate"><span class="pre">io:</span></code> line) however.</p>
 <p>Pytmc needs no additional information but users have the option to override
-default settings manually. For example a developer can specify <code class="docutils literal notranslate"><span class="pre">scan:</span></code> field
-(configures how and when the value is updated) even though this is not
-required. For additional information on all the pragma fields, consult the
+default settings manually. For example a developer can specify the <code class="docutils literal notranslate"><span class="pre">SCAN</span></code>
+field , which configures how and when the value is updated, even though this is
+not required. For additional information on all the pragma fields, consult the
 <a class="reference internal" href="#pragma-fields">Pragma fields</a> section.</p>
 </div>
 <div class="section" id="declaring-encapsulated-variables">
@@ -434,11 +452,8 @@ counter_b : counter;
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
     pv: VALUE_F_R
-    type: ai
-    field: DTYP stream
     field: SCAN 1 second
-    io: input
-    str: %d
+    io: i
 &#39;}
 value_d : DINT;
 </pre></div>
@@ -447,73 +462,72 @@ value_d : DINT;
 <div class="section" id="declaring-bidirectional-pvs">
 <h2>Declaring bidirectional PVs<a class="headerlink" href="#declaring-bidirectional-pvs" title="Permalink to this headline">¶</a></h2>
 <p>In instances where a single TwinCAT variable should be able to be both written
-and read, multiple PVs can be specified. This allows multiple PVs to be tied to
-a single TwinCAT variable.</p>
+and read, multiple PVs can be specified. This allows multiple EPICS records to
+be tied to a single TwinCAT variable.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
-    pv: TEST:MAIN:ULIMIT_R
+    pv: TEST:MAIN:ULIMIT
     io: io
 &#39;}
 upper_limit : DINT := 5000;
 </pre></div>
 </div>
-<p>When specifying multiple PVs, the configuration lines all apply to the nearest,
-previous <code class="docutils literal notranslate"><span class="pre">pv</span></code> line. For example in the code snippet above, <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">ai</span></code> will
-be applied to the <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT_R</span></code> pv and the <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">ao</span></code> will be
-applied to <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMT_W</span></code>.</p>
+<p>In this case, two records will be generated: <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT</span></code> and
+<code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT_RBV</span></code>.</p>
 </div>
 <div class="section" id="pragma-fields">
 <h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Permalink to this headline">¶</a></h2>
-<p>The lines of the pragma tell pytmc how to generate the db and proto. This
-section contains more specific descriptions of each of the configuration lines.
-Many are automatic with the exception of Pv</p>
+<p>Each line of the pragma indicates to pytmc how to generate the corresponding records
+in the database file output.</p>
 <div class="section" id="pv">
 <h3>pv<a class="headerlink" href="#pv" title="Permalink to this headline">¶</a></h3>
 <p>This constructs the PV name that will represent this variable in EPICS. It is
 the only mandatory configuration line. This line can be used on specific
-variables as well as the instantiations of data types. When used on variables
-declared in the main scope, the PV for the variable will be generated verbatim.
-When used on instantiations, this string will be appended to the front of any
-PVs that are declared within the data type.</p>
+variables as well as the instantiations of data types.</p>
+<p>When used on variables declared in the main scope, the PV for the variable will
+be generated verbatim.  When used on instantiations, this string will be
+appended to the front of any PVs that are declared within the data type.</p>
 </div>
 <div class="section" id="io">
 <h3>io<a class="headerlink" href="#io" title="Permalink to this headline">¶</a></h3>
-<p>This is a guessed field that defaults to ‘io’.Specify the whether the IOC is
-reading or writing this value. Values being sent from the PLC to the IOC should
-be marked as input with ‘i’ or ‘input’ and values being sent to the PLC from
-the IOC should be marked ‘o’ or ‘output’.  Bidirectional PVs can be specified
-with ‘io’.</p>
-</div>
-<div class="section" id="type">
-<h3>type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h3>
-<p>This is a guessed field and does not need manual specification. This specifies
-the EPICS record type. For more information about EPICS records, read this page
-from the <a class="reference external" href="https://wiki-ext.aps.anl.gov/epics/index.php/RRM_3-14">EPICS wiki</a>.
-Due to the ADS driver records for variables that aren’t array-like are
-typically of type ai or ao.</p>
+<p>This is a guessed field that defaults to <cite>‘io’</cite>.  Specify the whether the IOC
+is reading or writing this value. Values being sent from the PLC to the IOC
+should be marked as input with ‘i’ and values being sent to the PLC from the
+IOC should be marked ‘o’.  Bidirectional PVs can be specified with ‘io’.</p>
 </div>
 <div class="section" id="fields">
 <h3>fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h3>
-<p>This is a guessed field and does not need manual specification. This specifies
-the lines that will be placed in the epics db as ‘fields’.  Multiple field
-lines are allowed. These lines determine the PV’s behaviors such as alarm
-limits and scanning frequency.  Each field specified in the db corresponds to a
-field line in the pragma.  Almost all PVs will have multiple fields and hence
-multiple field lines in the pragma. The field line has two sections, the field
-type and the argument. The field type is the first string of characters up
-until the first character of whitespace. It us usually an all-caps abbreviation
-like RVAL, DTYP or EGU. This determines the type of field being set. All
-characters after the first space are treated as the argument to the field. The
-argument can include any characters including spaces and is only broken on a
-new line. The INP and OUT fields are generated automatically so there is no
-need to manually include them.</p>
+<p>This specifies additional field(s) to be set on the generated EPICS record(s).
+Multiple field lines are allowed. These lines determine the PV’s behaviors such
+as alarm limits and scanning frequency.</p>
+<p>The format is as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>field: FIELD_NAME field value
+</pre></div>
+</div>
+<p>This would correspond to a field in the record being generated as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>record(ai, &quot;my_record&quot;) {
+   ...
+   field(FIELD_NAME, &quot;field value&quot;)
+}
+</pre></div>
+</div>
 </div>
 <div class="section" id="scan">
 <h3>SCAN<a class="headerlink" href="#scan" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">SCAN</span></code> field is special. Pytmc will guess a scan field if not provided
-but like <code class="docutils literal notranslate"><span class="pre">io</span></code> and <code class="docutils literal notranslate"><span class="pre">pv</span></code>, the correct setting may be subjective. We would
-encourage developers to be aware of this setting. Binary fields default to
-<code class="docutils literal notranslate"><span class="pre">I/O</span> <span class="pre">Intr</span></code> for gets. All others default to a polling period of <code class="docutils literal notranslate"><span class="pre">.5</span> <span class="pre">second</span></code>
-for reads and <code class="docutils literal notranslate"><span class="pre">Passive</span></code> for gets.</p>
+but like <code class="docutils literal notranslate"><span class="pre">io</span></code> and <code class="docutils literal notranslate"><span class="pre">pv</span></code>, the correct setting is on a case-by-case basis.
+pytmc itself cannot know at what rate a variable will update on the PLC side.</p>
+<p>Valid options for this field are:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;Passive&quot;
+&quot;I/O Intr&quot;
+&quot;10 second&quot;
+&quot;5 second&quot;
+&quot;2 second&quot;
+&quot;1 second&quot;
+&quot;.5 second&quot;
+&quot;.2 second&quot;
+&quot;.1 second&quot;
+</pre></div>
+</div>
 </div>
 </div>
 </div>

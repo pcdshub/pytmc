@@ -87,6 +87,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#general-usage">General Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#marking-the-twincat-project">Marking the TwinCAT project</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#python-usage">Python Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#full-ioc-creation">Full IOC Creation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
@@ -170,25 +171,57 @@
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="general-usage">
 <h2>General Usage<a class="headerlink" href="#general-usage" title="Permalink to this headline">¶</a></h2>
-<p>Pytmc’s primary program can be invoked with the command <code class="docutils literal notranslate"><span class="pre">pytmc</span></code>. This utility
-takes the <code class="docutils literal notranslate"><span class="pre">*.tmc</span></code> file generated from a TwinCAT3 project and creates an epics
-DB file. In order for pytmc to work properly, the TwinCAT project and its
+<p>pytmc has various capabilities that can be accessed using the top-level <code class="docutils literal notranslate"><span class="pre">pytmc</span></code> program:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Generating EPICS database files (.db) based on a Beckhoff TwinCAT <code class="docutils literal notranslate"><span class="pre">.tmc</span></code> file (<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">db</span></code>)</p></li>
+<li><p>Introspecting <code class="docutils literal notranslate"><span class="pre">.tmc</span></code> files for their symbols and data types ( <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">debug</span></code> and <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">types</span></code>)</p></li>
+<li><p>Generating full EPICS IOCs based on a provided template (<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">iocboot</span></code> and <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">stcmd</span></code>)</p></li>
+<li><p>Parsing, introspecting, and summarizing full TwinCAT projects (<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">summary</span></code>)</p></li>
+<li><p>Outlining any TwinCAT XML file (<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">xmltranslate</span></code>)</p></li>
+</ol>
+</div></blockquote>
+<p>In order for pytmc to work properly, the TwinCAT project and its
 libraries require annotation. The resulting IOC depends upon EPICS ADS driver. This
 driver is provided by the <a class="reference external" href="https://europeanspallationsource.se/">European Spallation Source</a> and is hosted on their <a class="reference external" href="https://bitbucket.org/europeanspallationsource/m-epics-twincat-ads">bitbucket page</a>.</p>
 </div>
 <div class="section" id="marking-the-twincat-project">
 <h2>Marking the TwinCAT project<a class="headerlink" href="#marking-the-twincat-project" title="Permalink to this headline">¶</a></h2>
-<p>Marking the TwinCAT project determines how the epics record will be generated.
+<p>Marking the TwinCAT project determines how the EPICS record will be generated.
 The marking process uses custom attribute pragmas to designate variables for
 pytmc to process. The pragma should be applied just above the declaration of
 the variable you wish to mark. You can read more about the TwinCAT pragma
 system <a class="reference external" href="https://infosys.beckhoff.com/english.php?content=../content/1033/tc3_plc_intro/9007201784297355.html&amp;id=">here</a>.</p>
+<p>Best practices for SLAC projects are documented in the <a class="reference external" href="https://confluence.slac.stanford.edu/display/PCDS/TwinCAT+3+Git+Setup+and+Best+Practices">PCDS confluence page</a>.</p>
+<p>Having issues with multiline pragmas and related things? See the <a class="reference external" href="https://confluence.slac.stanford.edu/display/PCDS/Beckhoff+Flight+Rules">PCDS flight
+rules</a>.</p>
 </div>
 <div class="section" id="python-usage">
 <h2>Python Usage<a class="headerlink" href="#python-usage" title="Permalink to this headline">¶</a></h2>
 <p>Once installed pytmc and its components can be imported into a python program
 or shell like any normal python package. Consult the source code documentation
 for specifics.</p>
+</div>
+<div class="section" id="full-ioc-creation">
+<h2>Full IOC Creation<a class="headerlink" href="#full-ioc-creation" title="Permalink to this headline">¶</a></h2>
+<p>(This is incomplete)</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/pcdshub/ads-ioc /path/to/ads-ioc
+$ pytmc iocboot /path/to/plc.tsproj /path/to/ads-ioc/iocBoot/templates/
+<span class="c1"># Creates directories: ioc-plc-name1, ioc-plc-name2, ...</span>
+<span class="c1"># Creates Makefiles: ioc-plc-name/Makefile</span>
+
+$ <span class="nb">cd</span> ioc-plc-name
+$ vim Makefile
+<span class="c1"># Customize - if necessary - to add more db files or change pytmc stcmd options</span>
+
+$ make
+<span class="c1"># Shells out to pytmc stcmd;</span>
+<span class="c1"># Creates st.cmd, ioc-plc-name.db, envPaths</span>
+
+$ ./st.cmd
+<span class="c1"># Runs IOC</span>
+</pre></div>
+</div>
 </div>
 </div>
 
