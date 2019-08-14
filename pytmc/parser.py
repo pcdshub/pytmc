@@ -654,6 +654,13 @@ class SubItem(_TmcItem):
         return self.tmc.get_data_type(self.qualified_type_name)
 
     @property
+    def array_info(self):
+        try:
+            return self.ArrayInfo[0]
+        except (AttributeError, IndexError):
+            return None
+
+    @property
     def type(self):
         'The base type'
         return self.Type[0].text
