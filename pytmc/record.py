@@ -99,7 +99,7 @@ class RecordPackage:
     def from_chain(*args, chain, **kwargs):
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         data_type = chain.data_type
-        if data_type.is_array:
+        if data_type.is_array or chain.last.array_info:
             spec = WaveformRecordPackage
         elif data_type.is_string:
             spec = StringRecordPackage
@@ -323,7 +323,9 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
     @property
     def nelm(self):
         """Number of elements in record"""
-        return self.chain.data_type.length
+        if self.chain.data_type.is_array:
+            return self.chain.data_type.length
+        return self.chain.array_info.elements
 
     @property
     def dtyp(self):
