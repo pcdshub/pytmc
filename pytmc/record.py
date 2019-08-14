@@ -381,11 +381,17 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
     dtyp = 'asynInt8'
-    field_defaults = {'FTVL': 'CHAR', 'NELM': '81'}
+    field_defaults = {'FTVL': 'CHAR'}
+
+    @property
+    def nelm(self):
+        """Number of elements in record"""
+        return self.chain.data_type.length or '81'
 
     def generate_input_record(self):
         record = super().generate_input_record()
         record.fields['DTYP'] += 'ArrayIn'
+        record.fields['NELM'] = self.nelm
         return record
 
     def generate_output_record(self):
@@ -393,6 +399,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         # Waveform records only have INP fields!
         record.fields['DTYP'] += 'ArrayOut'
         record.fields['INP'] = record.fields.pop('OUT')
+        record.fields['NELM'] = self.nelm
         return record
 
 
