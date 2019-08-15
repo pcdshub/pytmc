@@ -114,9 +114,9 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
         message = '\n'.join(['Duplicate records encountered:'] +
                             [f'    {dupe} ({count})'
                              for dupe, count in sorted(dupes.items())])
-        logger.error(message)
         if not allow_errors:
             raise LinterError(message)
+        logger.error(message)
 
     if dbd_file is not None:
         results, rendered = validate_with_dbd(records, dbd_file)
