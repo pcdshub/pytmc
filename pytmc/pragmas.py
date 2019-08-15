@@ -227,6 +227,7 @@ class SingularChain:
         self.chain = list(self.item_to_config)
         self.last = self.chain[-1]
         self.data_type = self.chain[-1].data_type
+        self.array_info = self.chain[-1].array_info
         self.tcname = '.'.join(part.name for part in self.chain)
 
         self.config = squash_configs(*list(item_to_config.values()))
