@@ -105,6 +105,19 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
                for record in record_packages_from_symbol(symbol)
                ]
 
+    record_names = [record.pvname for record in records]
+    if len(record_names) != len(set(record_names)):
+        dupes = {name: record_names.count(name)
+                 for name in record_names
+                 if record_names.count(name) > 1
+                 }
+        message = '\n'.join(['Duplicate records encountered:'] +
+                            [f'    {dupe} ({count})'
+                             for dupe, count in sorted(dupes.items())])
+        if not allow_errors:
+            raise LinterError(message)
+        logger.error(message)
+
     if dbd_file is not None:
         results, rendered = validate_with_dbd(records, dbd_file)
         for warning in results.warnings:
