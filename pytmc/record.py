@@ -171,7 +171,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         ValueError
             If unable to determine IO direction
         """
-        io = self.chain.config.get('io', 'i')
+        io = self.chain.config.get('io', 'io')
         if 'o' in io:
             return 'output'
         return 'input'
