@@ -1,8 +1,12 @@
 '''
 Code parsing-related utilities
 '''
-import re
+import logging
 import collections
+import re
+
+
+logger = logging.getLogger(__name__)
 
 
 def program_name_from_declaration(declaration):
@@ -84,7 +88,11 @@ def variables_from_declaration(declaration, *, start_marker='var'):
             continue
 
         # <names> : <dtype>
-        names, dtype = line.split(':', 1)
+        try:
+            names, dtype = line.split(':', 1)
+        except ValueError:
+            logger.debug('Parsing failed for line: %r', line)
+            continue
 
         if ':=' in dtype:
             # <names> : <dtype> := <value>
