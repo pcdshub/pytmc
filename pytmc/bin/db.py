@@ -193,7 +193,7 @@ def main(tmc_file, record_file=None, *, dbd=None, allow_errors=False,
             tmc, dbd_file=dbd, allow_errors=allow_errors,
             show_error_context=not no_error_context,
         )
-    except LinterError as ex:
+    except LinterError:
         logger.exception(
             'Linter errors - failed to create database. To create the database'
             ' ignoring these errors, use the flag `--allow-errors`')
