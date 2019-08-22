@@ -134,9 +134,6 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
             if show_error_context:
                 _show_context_from_line(rendered, error['line'])
         if not results.success and not allow_errors:
-            logger.error('Linter errors - failed to create database. '
-                         'To disable this behavior, use the flag '
-                         '--allow-errors')
             raise LinterError('Failed to create database')
 
     return records
@@ -197,6 +194,9 @@ def main(tmc_file, record_file=None, *, dbd=None, allow_errors=False,
             show_error_context=not no_error_context,
         )
     except LinterError:
+        logger.exception(
+            'Linter errors - failed to create database. To create the database'
+            ' ignoring these errors, use the flag `--allow-errors`')
         sys.exit(1)
 
     db_string = '\n\n'.join(record.render() for record in records)
