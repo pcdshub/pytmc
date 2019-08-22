@@ -593,6 +593,16 @@ class ArrayInfo(_TmcItem):
         self.elements = elements
 
 
+class ExtendsType(_TmcItem):
+    '[TMC] A marker of inheritance / extension, found on DataType'
+
+    @property
+    def qualified_type(self):
+        if 'Namespace' in self.attributes:
+            return f'{self.attributes["Namespace"]}.{self.text}'
+        return self.text
+
+
 class DataType(_TmcItem):
     '[TMC] A DataType with SubItems, likely representing a structure'
     Name: list
@@ -607,6 +617,13 @@ class DataType(_TmcItem):
         return self.name
 
     def walk(self, condition=None):
+        extends_types = [
+            self.tmc.get_data_type(ext_type.qualified_type)
+            for ext_type in getattr(self, 'ExtendsType', [])
+        ]
+        for extend_type in extends_types:
+            yield from extend_type.walk(condition=condition)
+
         if hasattr(self, 'SubItem'):
             for subitem in self.SubItem:
                 if condition and not condition(subitem):
