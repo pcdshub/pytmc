@@ -8,6 +8,7 @@ import logging
 import pathlib
 import re
 import sys
+import types
 import textwrap
 
 from .. import parser
@@ -136,16 +137,20 @@ def lint_source(filename, source, verbose=False):
             )
 
         for offset, pragma in pragmas:
+            info = dict(
+                pragma=pragma,
+                filename=filename,
+                tag=source.tag,
+                line_number=offset_to_line_number.get(offset),
+                exception=None,
+            )
+
             try:
                 lint_pragma(pragma)
             except LinterError as ex:
-                ex.tag = source.tag
-                ex.filename = filename
-                ex.pragma = pragma
-                ex.line_number = offset_to_line_number[offset]
-                yield pragma, ex
-            else:
-                yield pragma, None
+                info['exception'] = ex
+
+            yield types.SimpleNamespace(**info)
 
 
 def main(filename, use_markdown=False, verbose=False):
@@ -158,22 +163,23 @@ def main(filename, use_markdown=False, verbose=False):
         for i, plc in enumerate(project.plcs, 1):
             util.heading(f'PLC Project ({i}): {plc.project_path.stem}')
             for fn, source in plc.source.items():
-                for pragma, ex in lint_source(fn, source, verbose=verbose):
+                for info in lint_source(fn, source, verbose=verbose):
                     pragma_count += 1
-                    if ex is not None:
+                    if info.exception is not None:
                         linter_errors += 1
                         logger.error('Linter error: %s\n%s:line %s: %s',
-                                     ex, fn, ex.line_number,
-                                     textwrap.indent(ex.pragma, '    '))
+                                     info.exception, info.filename,
+                                     info.line_number,
+                                     textwrap.indent(info.pragma, '    '))
     else:
         source = project
-        for pragma, ex in lint_source(filename, source, verbose=verbose):
+        for info in lint_source(filename, source, verbose=verbose):
             pragma_count += 1
-            if ex is not None:
+            if info.exception is not None:
                 linter_errors += 1
                 logger.error('Linter error: %s\n%s:line %s: %s',
-                             ex, filename, ex.line_number,
-                             textwrap.indent(ex.pragma, '    '))
+                             info.exception, info.filename, info.line_number,
+                             textwrap.indent(info.pragma, '    '))
 
     logger.info('Total pragmas found: %d Total linter errors: %d',
                 pragma_count, linter_errors)
