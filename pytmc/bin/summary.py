@@ -113,36 +113,9 @@ def main(tsproj_project, use_markdown=False, show_all=False,
 
     project = parser.parse(proj_path)
 
-    def heading(text):
-        print(text)
-        print('=' * len(text))
-        print()
-
-    def sub_heading(text):
-        print(text)
-        print('-' * len(text))
-        print()
-
-    def sub_sub_heading(text, level=3):
-        if use_markdown:
-            print('#' * level, text)
-        else:
-            print(' ' * level, '-', text)
-        print()
-
-    def text_block(text, indent=4, language='vhdl'):
-        if use_markdown:
-            print(f'```{language}')
-            print(text)
-            print(f'```')
-        else:
-            for line in text.splitlines():
-                print(' ' * indent, line)
-        print()
-
     if show_plcs or show_all:
         for i, plc in enumerate(project.plcs, 1):
-            heading(f'PLC Project ({i}): {plc.project_path.stem}')
+            util.heading(f'PLC Project ({i}): {plc.project_path.stem}')
             print(f'    Project path: {plc.project_path}')
             print(f'    TMC path:     {plc.tmc_path}')
             print(f'    AMS ID:       {plc.ams_id}')
@@ -163,7 +136,7 @@ def main(tsproj_project, use_markdown=False, show_all=False,
 
             if show_code:
                 for fn, source in plc.source.items():
-                    sub_heading(f'{fn} ({source.tag})')
+                    util.sub_heading(f'{fn} ({source.tag})')
                     for decl_or_impl in source.find((parser.ST,
                                                      parser.Declaration,
                                                      parser.Implementation)):
@@ -176,13 +149,18 @@ def main(tsproj_project, use_markdown=False, show_all=False,
                             if parent.name is not None:
                                 path_to_source.insert(0, parent.name)
                             parent = parent.parent
-                        sub_sub_heading(f'{".".join(path_to_source)}: '
-                                        f'{decl_or_impl.tag}')
-                        text_block(decl_or_impl.text)
+                        util.sub_sub_heading(
+                            f'{".".join(path_to_source)}: {decl_or_impl.tag}',
+                            use_markdown=use_markdown
+                        )
+                        util.text_block(
+                            decl_or_impl.text,
+                            markdown_language='vhdl' if use_markdown else None
+                        )
                     print()
 
     if show_symbols or show_all:
-        sub_heading('Symbols')
+        util.sub_heading('Symbols')
         symbols = list(project.find(parser.Symbol))
         for symbol in symbols:
             info = symbol.info
@@ -191,13 +169,13 @@ def main(tsproj_project, use_markdown=False, show_all=False,
         print()
 
     if show_boxes or show_all:
-        sub_heading('Boxes')
+        util.sub_heading('Boxes')
         boxes = list(project.find(parser.Box))
         for box in boxes:
             print(f'    {box.attributes["Id"]}.) {box.name}')
 
     if show_nc or show_all:
-        sub_heading('NC axes')
+        util.sub_heading('NC axes')
         ncs = list(project.find(parser.NC))
         for nc in ncs:
             for axis_id, axis in sorted(nc.axis_by_id.items()):
@@ -211,7 +189,7 @@ def main(tsproj_project, use_markdown=False, show_all=False,
                 print()
 
     if show_links or show_all:
-        sub_heading('Links')
+        util.sub_heading('Links')
         links = list(project.find(parser.Link))
         for i, link in enumerate(links, 1):
             print(f'    {i}.) A {link.a}')
