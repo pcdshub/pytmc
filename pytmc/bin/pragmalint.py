@@ -53,6 +53,10 @@ def build_arg_parser(argparser=None):
 
 
 def match_single_pragma(code):
+    '''
+    Given a block of code starting at a pragma, return the pragma up to its
+    closing curly brace.
+    '''
     curly_count = 0
     for i, char in enumerate(code):
         if char == '{':
@@ -69,6 +73,9 @@ def find_pragmas(code):
 
 
 def lint_pragma(pragma):
+    '''
+    Lint a pragma against the PRAGMA_RE regular expression. Raises LinterError
+    '''
     if 'pytmc' not in pragma:
         return
 
@@ -80,6 +87,9 @@ def lint_pragma(pragma):
 
 
 def _build_map_of_offset_to_line_number(source):
+    '''
+    For a multiline source file, return {character_pos: line}
+    '''
     start_index = 0
     index_to_line_number = {}
     # A slow and bad algorithm, but only to be used in parsing declarations
@@ -92,6 +102,9 @@ def _build_map_of_offset_to_line_number(source):
 
 
 def lint_source(filename, source, verbose=False):
+    '''
+    Lint `filename` given TwincatItem `source`.
+    '''
     heading_shown = False
 
     for decl in source.find(parser.Declaration):
@@ -137,9 +150,6 @@ def lint_source(filename, source, verbose=False):
 
 def main(filename, use_markdown=False, verbose=False):
     proj_path = pathlib.Path(filename)
-    # if proj_path.suffix.lower() not in ('.tsproj', ):
-    #     raise ValueError('Expected a .tsproj file')
-
     project = parser.parse(proj_path)
     pragma_count = 0
     linter_errors = 0
