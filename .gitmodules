@@ -1,3 +1,6 @@
 [submodule "tests/projects/vonhamos-motion"]
 	path = tests/projects/vonhamos-motion
 	url = ../../pcdshub/vonhamos-motion
+[submodule "tests/projects/lcls-plc-kfe-xgmd-vac"]
+	path = tests/projects/lcls-plc-kfe-xgmd-vac
+	url = ../../pcdshub/lcls-plc-kfe-xgmd-vac.git

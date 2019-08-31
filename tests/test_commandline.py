@@ -35,7 +35,10 @@ def test_pragmalint(project_filename):
 
 
 def test_stcmd(project_filename):
-    stcmd_main(project_filename)
+    kwargs = (dict(plc_name='plc_kfe_xgmd_vac')
+              if 'plc_kfe_xgmd_vac' in project_filename
+              else {})
+    stcmd_main(project_filename, **kwargs)
 
 
 def test_xmltranslate(project_filename):
