@@ -26,7 +26,7 @@ PRAGMA_RE = re.compile(
 )
 PRAGMA_LINE_RE = re.compile(r"(" + _FLEX_TERM_REGEX + ")", re.MULTILINE)
 PRAGMA_SETTING_RE = re.compile(r"^\s*(?P<title>[a-zA-z0-9]+):(?P<setting>.*)$")
-PRAGMA_PV_LINE_RE = re.compile(r"pv\S*:")
+PRAGMA_PV_LINE_RE = re.compile(r"pv\s*:")
 
 
 def build_arg_parser(argparser=None):
