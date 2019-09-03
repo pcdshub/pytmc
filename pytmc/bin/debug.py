@@ -92,7 +92,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.chains = {}
         self.records = {}
 
-        for record in process(tmc):
+        for record in process(tmc, allow_errors=True):
             self.chains[record.tcname] = record
             try:
                 record_text = record.render()
