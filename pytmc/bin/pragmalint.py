@@ -113,7 +113,7 @@ def lint_pragma(pragma):
 
     # There shall be at one config line at minimum
     # There shall be a config line for pv even if it's just "pv:"
-    if (config_lines_detected <= 0 or pv_line_detected != 1):
+    if (config_lines_detected <= 0 or pv_line_detected <= 0):
         raise LinterError()
 
     return match
