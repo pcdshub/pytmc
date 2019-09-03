@@ -96,9 +96,8 @@ def lint_pragma(pragma):
 
     config_lines = PRAGMA_LINE_RE.findall(pragma_setting)
     if len(config_lines) == 0:
-        # It is not acceptable to lack configuration lines
-        # At a minimum "pv: " must exist
-        raise LinterError()
+        raise LinterError("""It is not acceptable to lack configuration lines.
+        At a minimum "pv: " must exist""")
 
     config_lines_detected = 0
     pv_line_detected = 0
@@ -112,9 +111,12 @@ def lint_pragma(pragma):
                 pv_line_detected += 1
 
     # There shall be at one config line at minimum
+    if config_lines_detected <= 0:
+        raise LinterError("No configuration line(s) detected in a pragma.")
+    
     # There shall be a config line for pv even if it's just "pv:"
-    if (config_lines_detected <= 0 or pv_line_detected <= 0):
-        raise LinterError()
+    if pv_line_detected <= 0:
+        raise LinterError("No pv line(s) detected in a pragma") 
 
     return match
 
