@@ -148,7 +148,8 @@ def lint_source(filename, source, verbose=False):
         filename argument
 
     verbose : bool
-        ???
+        Show more context around the linting process, including all source file names and
+        number of pragmas found
     '''
     heading_shown = False
     for decl in source.find(parser.Declaration):
