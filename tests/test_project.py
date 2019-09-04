@@ -24,7 +24,7 @@ def test_summarize(project):
 
 def test_module_ads_port(project):
     for inst in project.find(parser.Module):
-        assert inst.ads_port == 851  # probably!
+        assert inst.ads_port == 851 or inst.ads_port == 852  # probably!
 
 
 @pytest.mark.xfail(reason='TODO / project')

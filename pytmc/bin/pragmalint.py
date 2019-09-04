@@ -14,16 +14,21 @@ import textwrap
 from .. import parser
 from . import util
 from .db import LinterError
-
+from ..pragmas import _FLEX_TERM_END
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
 
 PRAGMA_START_RE = re.compile('{attribute')
 PRAGMA_RE = re.compile(
-    r"^{\s*attribute[ \t]+'pytmc'[ \t]*:=[ \t]*'([\s\S]*)'}$",
+    r"^{\s*attribute[ \t]+'pytmc'[ \t]*:=[ \t]*'(?P<setting>[\s\S]*)'}$",
     re.MULTILINE
 )
+PRAGMA_LINE_RE = re.compile(
+    r"([^\r\n$;]*)", re.MULTILINE)
+PRAGMA_SETTING_RE =re.compile(
+    r"\s*(?P<title>[a-zA-Z0-9]+)\s*:\s*(?P<setting>.*?)\s*$")
+PRAGMA_PV_LINE_RE = re.compile(r"pv\s*:")
 
 
 def build_arg_parser(argparser=None):
@@ -84,6 +89,37 @@ def lint_pragma(pragma):
     match = PRAGMA_RE.match(pragma)
     if not match:
         raise LinterError()
+
+    try:
+        pragma_setting = match.groupdict()["setting"]
+    except KeyError:
+        # if no configuration region in the pragma was detected then fail
+        raise LinterError()
+
+    config_lines = PRAGMA_LINE_RE.findall(pragma_setting)
+    if len(config_lines) == 0:
+        raise LinterError("""It is not acceptable to lack configuration lines.
+        At a minimum "pv: " must exist""")
+
+    config_lines_detected = 0
+    pv_line_detected = 0
+
+    for line in config_lines:
+        line_match = PRAGMA_SETTING_RE.match(line)
+        if line_match:
+            config_lines_detected += 1
+            pv_match = PRAGMA_PV_LINE_RE.search(line)
+            if pv_match:
+                pv_line_detected += 1
+
+    # There shall be at one config line at minimum
+    if config_lines_detected <= 0:
+        raise LinterError("No configuration line(s) detected in a pragma.")
+    
+    # There shall be a config line for pv even if it's just "pv:"
+    if pv_line_detected <= 0:
+        raise LinterError("No pv line(s) detected in a pragma") 
+
     return match
 
 
@@ -105,9 +141,21 @@ def _build_map_of_offset_to_line_number(source):
 def lint_source(filename, source, verbose=False):
     '''
     Lint `filename` given TwincatItem `source`.
+
+    Parameters
+    ----------
+    filename : str
+        Target file name to be linted.
+
+    source : subclass of pytmc.parser.TwincatItem
+        Representation of TwinCAT project chunk in which to search for the
+        filename argument
+
+    verbose : bool
+        Show more context around the linting process, including all source file names and
+        number of pragmas found
     '''
     heading_shown = False
-
     for decl in source.find(parser.Declaration):
         if not decl.text.strip():
             continue
@@ -120,7 +168,6 @@ def lint_source(filename, source, verbose=False):
             if parent.name is not None:
                 path_to_source.insert(0, parent.name)
             parent = parent.parent
-
         pragmas = list(find_pragmas(decl.text))
         if not pragmas:
             continue
