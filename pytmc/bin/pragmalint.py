@@ -107,13 +107,8 @@ def lint_pragma(pragma):
     config_lines_detected = 0
     pv_line_detected = 0
 
-    print("#############################################")
-    print(pragma_setting)
-    print(config_lines)
-
     for line in config_lines:
         line_match = PRAGMA_SETTING_RE.match(line)
-        print(line_match)
         if line_match:
             config_lines_detected += 1
             pv_match = PRAGMA_PV_LINE_RE.search(line)
