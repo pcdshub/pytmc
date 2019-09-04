@@ -14,7 +14,7 @@ import textwrap
 from .. import parser
 from . import util
 from .db import LinterError
-from ..pragmas import _FLEX_TERM_END
+
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
@@ -24,9 +24,8 @@ PRAGMA_RE = re.compile(
     r"^{\s*attribute[ \t]+'pytmc'[ \t]*:=[ \t]*'(?P<setting>[\s\S]*)'}$",
     re.MULTILINE
 )
-PRAGMA_LINE_RE = re.compile(
-    r"([^\r\n$;]*)", re.MULTILINE)
-PRAGMA_SETTING_RE =re.compile(
+PRAGMA_LINE_RE = re.compile(r"([^\r\n$;]*)", re.MULTILINE)
+PRAGMA_SETTING_RE = re.compile(
     r"\s*(?P<title>[a-zA-Z0-9]+)\s*:\s*(?P<setting>.*?)\s*$")
 PRAGMA_PV_LINE_RE = re.compile(r"pv\s*:")
 
@@ -115,10 +114,10 @@ def lint_pragma(pragma):
     # There shall be at one config line at minimum
     if config_lines_detected <= 0:
         raise LinterError("No configuration line(s) detected in a pragma.")
-    
+
     # There shall be a config line for pv even if it's just "pv:"
     if pv_line_detected <= 0:
-        raise LinterError("No pv line(s) detected in a pragma") 
+        raise LinterError("No pv line(s) detected in a pragma")
 
     return match
 
@@ -152,8 +151,8 @@ def lint_source(filename, source, verbose=False):
         filename argument
 
     verbose : bool
-        Show more context around the linting process, including all source file names and
-        number of pragmas found
+        Show more context around the linting process, including all source file
+        names and number of pragmas found
     '''
     heading_shown = False
     for decl in source.find(parser.Declaration):
