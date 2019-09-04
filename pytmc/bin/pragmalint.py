@@ -26,9 +26,6 @@ PRAGMA_RE = re.compile(
 )
 PRAGMA_LINE_RE = re.compile(
     r"([^\r\n$;]*)", re.MULTILINE)
-#    r"([^"+"".join(_FLEX_TERM_END)+"]*)", re.MULTILINE)
-#    r"([^"+"".join(set("".join(_FLEX_TERM_END)))+"]*)", re.MULTILINE)
-#    r"([^" + "".join(_FLEX_TERM_END) + "]*)", re.MULTILINE)
 PRAGMA_SETTING_RE =re.compile(
     r"\s*(?P<title>[a-zA-Z0-9]+)\s*:\s*(?P<setting>.*?)\s*$")
 PRAGMA_PV_LINE_RE = re.compile(r"pv\s*:")
