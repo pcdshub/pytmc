@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 # Select special delimiter sequences and prepare them for re injection
-_FLEX_TERM_REGEX = "|".join([r";", r";;", r"[\n\r]", r"$"])
+_FLEX_TERM_END = [r";", r";;", r"[\n\r]", r"$"]
+_FLEX_TERM_REGEX = "|".join(_FLEX_TERM_END)
 
 # Break configuration str into list of lines paired w/ their delimiters
 _LINE_FINDER = re.compile(r"(?P<line>.+?)(?P<delim>" + _FLEX_TERM_REGEX + ")")

@@ -14,7 +14,7 @@ import textwrap
 from .. import parser
 from . import util
 from .db import LinterError
-from ..pragmas import _FLEX_TERM_REGEX
+from ..pragmas import _FLEX_TERM_END
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
@@ -24,8 +24,13 @@ PRAGMA_RE = re.compile(
     r"^{\s*attribute[ \t]+'pytmc'[ \t]*:=[ \t]*'(?P<setting>[\s\S]*)'}$",
     re.MULTILINE
 )
-PRAGMA_LINE_RE = re.compile(r"(" + _FLEX_TERM_REGEX + ")", re.MULTILINE)
-PRAGMA_SETTING_RE = re.compile(r"^\s*(?P<title>[a-zA-Z0-9]+)\s*:\s*(?P<setting>.*?)\s$")
+PRAGMA_LINE_RE = re.compile(
+    r"([^\r\n$;]*)", re.MULTILINE)
+#    r"([^"+"".join(_FLEX_TERM_END)+"]*)", re.MULTILINE)
+#    r"([^"+"".join(set("".join(_FLEX_TERM_END)))+"]*)", re.MULTILINE)
+#    r"([^" + "".join(_FLEX_TERM_END) + "]*)", re.MULTILINE)
+PRAGMA_SETTING_RE =re.compile(
+    r"\s*(?P<title>[a-zA-Z0-9]+)\s*:\s*(?P<setting>.*?)\s*$")
 PRAGMA_PV_LINE_RE = re.compile(r"pv\s*:")
 
 
@@ -102,8 +107,13 @@ def lint_pragma(pragma):
     config_lines_detected = 0
     pv_line_detected = 0
 
+    print("#############################################")
+    print(pragma_setting)
+    print(config_lines)
+
     for line in config_lines:
         line_match = PRAGMA_SETTING_RE.match(line)
+        print(line_match)
         if line_match:
             config_lines_detected += 1
             pv_match = PRAGMA_PV_LINE_RE.search(line)
