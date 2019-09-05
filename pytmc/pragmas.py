@@ -260,7 +260,8 @@ def get_pragma(item, *, name='pytmc'):
 
 def has_pragma(item, *, name='pytmc'):
     'Does `item` have a pragma titled `name`?'
-    return any(True for _ in get_pragma(item, name=name))
+    return any(True for pragma in get_pragma(item, name=name)
+               if pragma is not None)
 
 
 def chains_from_symbol(symbol, *, pragma='pytmc'):
