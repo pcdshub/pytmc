@@ -14,7 +14,7 @@ DESCRIPTION = __doc__
 
 
 MODULES = ('summary', 'stcmd', 'db', 'xmltranslate', 'debug', 'types',
-           'iocboot')
+           'iocboot', 'pragmalint')
 
 
 def _try_import(module):

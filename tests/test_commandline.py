@@ -4,6 +4,7 @@ import sys
 import pytmc.bin.pytmc as pytmc_main
 from pytmc.bin.db import main as db_main
 from pytmc.bin.debug import create_debug_gui
+from pytmc.bin.pragmalint import main as pragmalint_main
 from pytmc.bin.stcmd import main as stcmd_main
 from pytmc.bin.summary import main as summary_main
 from pytmc.bin.types import create_types_gui
@@ -29,8 +30,15 @@ def test_summary(project_filename):
                  use_markdown=True)
 
 
+def test_pragmalint(project_filename):
+    pragmalint_main(project_filename, verbose=True, use_markdown=True)
+
+
 def test_stcmd(project_filename):
-    stcmd_main(project_filename)
+    kwargs = (dict(plc_name='plc_kfe_xgmd_vac')
+              if 'plc_kfe_xgmd_vac' in project_filename
+              else {})
+    stcmd_main(project_filename, **kwargs)
 
 
 def test_xmltranslate(project_filename):
