@@ -111,13 +111,21 @@ def build_arg_parser(parser=None):
 def get_name(obj, user_config):
     'Returns: (motor_prefix, motor_name)'
     # First check if there is a pytmc pragma
-    configs = pragmas.expand_configurations_from_chain([obj])
+    item_and_config = pragmas.expand_configurations_from_chain([obj])
     delim = user_config['delim']
     prefix = user_config['prefix']
-    if configs:
-        config = pragmas.squash_configs(*configs)
+    if item_and_config:
+        item_to_config = dict(item_and_config[0])
+        config = pragmas.squash_configs(*item_to_config.values())
         # PV name specified in the pragma - use it as-is
-        return '', delim.join(config['pv'])
+        if 'pv' in config:
+            pv = delim.join(config['pv'])
+            if delim in pv:
+                pv_parts = pv.split(delim)
+                prefix = delim.join(pv_parts[:-1]) + delim
+                suffix = pv_parts[-1]
+                return prefix, suffix
+            return '', pv
 
     if hasattr(obj, 'nc_axis'):
         nc_axis = obj.nc_axis
@@ -142,9 +150,10 @@ def jinja_filters(**user_config):
 
     @jinja2.evalcontextfilter
     def pragma(eval_ctx, obj, key, default=''):
-        configs = pragmas.expand_configurations_from_chain([obj])
-        if configs:
-            config = pragmas.squash_configs(*configs)
+        item_and_config = pragmas.expand_configurations_from_chain([obj])
+        if item_and_config:
+            item_to_config = dict(item_and_config[0])
+            config = pragmas.squash_configs(*item_to_config.values())
             return config.get(key, default)
         return default
 
