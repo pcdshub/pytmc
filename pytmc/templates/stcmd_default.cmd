@@ -57,7 +57,7 @@ asynSetTraceInfoMask("$(ASYN_PORT)", -1, 5)
 #define AMPLIFIER_ON_FLAG_WHEN_HOMING  2
 #define AMPLIFIER_ON_FLAG_USING_CNEN   4
 
-{% for motor in symbols.Symbol_FB_MotionStage | sort(attribute='nc_axis.axis_number') %}
+{% for motor in symbols.Symbol_DUT_MotionStage | sort(attribute='nc_axis.axis_number') %}
 epicsEnvSet("AXIS_NO",         "{{motor.nc_axis.axis_number}}")
 epicsEnvSet("MOTOR_PREFIX",    "{{motor|epics_prefix}}")
 epicsEnvSet("MOTOR_NAME",      "{{motor|epics_suffix}}")

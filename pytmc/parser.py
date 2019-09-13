@@ -844,8 +844,8 @@ class Symbol(_TmcItem):
                 yield link
 
 
-class Symbol_FB_MotionStage(Symbol):
-    '[TMC] A customized Symbol, representing only FB_MotionStage'
+class Symbol_DUT_MotionStage(Symbol):
+    '[TMC] A customized Symbol, representing only DUT_MotionStage'
     def _repr_info(self):
         '__repr__ information'
         repr_info = super()._repr_info()
@@ -868,60 +868,21 @@ class Symbol_FB_MotionStage(Symbol):
         return self.name.split('.')[1]
 
     @property
-    def pou(self):
-        'The POU program associated with the Symbol'
-        # TODO: hack
-        for pou in self.root.find(POU, recurse=False):
-            if pou.name == self.program_name:
-                return pou
-        # return self.project.pou_by_name[self.program_name]
-
-    @property
-    def call_block(self):
-        '''
-        A dictionary representation of the call
-
-        For example::
-            M1(a := 1, b := 2);
-
-        Becomes::
-            {'a': '1', 'b': '2'}
-        '''
-        return self.pou.call_blocks[self.motor_name]
-
-    @property
-    def linked_to(self):
-        '''
-        Where the axis is linked to, determined by the call block in the POU
-        where the AXIS_REF is defined
-
-        Returns
-        -------
-        linked_to : str
-            e.g., M1
-        linked_to_full : str
-            e.g., Main.M1
-        '''
-        linked_to = self.call_block['stMotionStage']
-        return linked_to, self.pou.get_fully_qualified_name(linked_to)
-
-    @property
     def nc_to_plc_link(self):
         '''
         The Link for NcToPlc
 
-        That is, how the NC axis is connected to the FB_MotionStage
+        That is, how the NC axis is connected to the DUT_MotionStage
         '''
-        _, linked_to_full = self.linked_to
-
-        expected = ('^' + linked_to_full.lower(), '.nctoplc')
+        expected = ('^' + self.program_name.lower() + self.motor_name.lower(),
+                    '.nctoplc')
         links = [link
                  for link in self.plc.find(Link, recurse=False)
                  if all(s in link.a[1].lower() for s in expected)
                  ]
 
         if not links:
-            raise RuntimeError(f'No NC link to FB_MotionStage found for '
+            raise RuntimeError(f'No NC link to DUT_MotionStage found for '
                                f'{self.name!r} (^{linked_to_full})')
 
         link, = links
@@ -929,7 +890,7 @@ class Symbol_FB_MotionStage(Symbol):
 
     @property
     def nc_axis(self):
-        'The NC `Axis` associated with the FB_MotionStage'
+        'The NC `Axis` associated with the DUT_MotionStage'
         link = self.nc_to_plc_link
         parent_name = link.parent.name.split('^')
         if parent_name[0] == 'TINC':
