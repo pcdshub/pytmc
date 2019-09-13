@@ -100,7 +100,8 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
         if plcs is not None and plc_name not in plcs:
             continue
 
-        ioc_path = pathlib.Path(f'{prefix}{plc_name}').absolute()
+        ioc_name = plc_name.replace('_', '-')
+        ioc_path = pathlib.Path(f'{prefix}{ioc_name}').absolute()
         if not dry_run:
             os.makedirs(ioc_path, exist_ok=True)
         makefile_path = ioc_path / 'Makefile'
