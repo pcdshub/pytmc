@@ -874,8 +874,7 @@ class Symbol_DUT_MotionStage(Symbol):
 
         That is, how the NC axis is connected to the DUT_MotionStage
         '''
-        expected = ('^' + self.program_name.lower() + self.motor_name.lower(),
-                    '.nctoplc')
+        expected = ('^' + self.name.lower(), '.nctoplc')
         links = [link
                  for link in self.plc.find(Link, recurse=False)
                  if all(s in link.a[1].lower() for s in expected)
@@ -883,7 +882,7 @@ class Symbol_DUT_MotionStage(Symbol):
 
         if not links:
             raise RuntimeError(f'No NC link to DUT_MotionStage found for '
-                               f'{self.name!r} (^{linked_to_full})')
+                               f'{self.name!r}')
 
         link, = links
         return link
