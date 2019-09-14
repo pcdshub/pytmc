@@ -24,11 +24,11 @@ epicsEnvSet("IPPORT",        "{{plc_ads_port}}")
 
 adsAsynPortDriverConfigure("$(ASYN_PORT)","$(IPADDR)","$(AMSID)","$(IPPORT)", 1000, 0, 0, 50, 100, 1000, 0)
 
-{% if symbols.Symbol_FB_MotionStage %}
+{% if symbols.Symbol_DUT_MotionStage %}
 epicsEnvSet("MOTOR_PORT",    "{{motor_port}}")
 epicsEnvSet("PREFIX",        "{{prefix}}{{delim}}")
-epicsEnvSet("ECM_NUMAXES",   "{{symbols.Symbol_FB_MotionStage|length}}")
-epicsEnvSet("NUMAXES",       "{{symbols.Symbol_FB_MotionStage|length}}")
+epicsEnvSet("ECM_NUMAXES",   "{{symbols.Symbol_DUT_MotionStage|length}}")
+epicsEnvSet("NUMAXES",       "{{symbols.Symbol_DUT_MotionStage|length}}")
 
 EthercatMCCreateController("$(MOTOR_PORT)", "$(ASYN_PORT)", "$(NUMAXES)", "200", "1000")
 
