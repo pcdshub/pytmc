@@ -109,7 +109,27 @@ def build_arg_parser(parser=None):
 
 
 def get_name(obj, user_config):
-    'Returns: (motor_prefix, motor_name)'
+    '''
+    Get an EPICS prefix and record name for a given TwincatItem
+
+    This function only looks at a single TwincatItem, not from an entire chain
+    of items. It allows certain special symbols (e.g., DUT_MotionStage) to
+    optionally not have a PV pragma, as it can default to the NC axis name
+    instead.
+
+    Parameters
+    ----------
+    obj : TwincatItem
+        The item to get an EPICS name for
+    user_config : dict
+        Configuration passed in from the user command-line. Required keys are
+        {'prefix', 'delim'}.
+
+    Returns
+    -------
+    (prefix, name) : (str, str)
+        Combined, {prefix}{name} gives the full record name in EPICS.
+    '''
     # First check if there is a pytmc pragma
     item_and_config = pragmas.expand_configurations_from_chain([obj])
     delim = user_config['delim']
@@ -122,6 +142,8 @@ def get_name(obj, user_config):
             pv = delim.join(config['pv'])
             if delim in pv:
                 pv_parts = pv.split(delim)
+                # Break the PV parts into a prefix and suffix, using all but
+                # the last section as the prefix.
                 prefix = delim.join(pv_parts[:-1]) + delim
                 suffix = pv_parts[-1]
                 return prefix, suffix
