@@ -190,13 +190,13 @@ def expand_configurations_from_chain(chain, *, pragma='pytmc'):
                                       expand_default=expand_default))
 
     for item in chain:
-        pragmas = get_pragma(item, name=pragma)
+        pragmas = list(get_pragma(item, name=pragma))
         if not pragmas:
             # If any pragma in the chain is unset, escape early
             return []
 
         if item.array_info and (item.data_type.is_complex_type or
-                                item.is_enum):
+                                item.data_type.is_enum):
             dictify_func = dictify_complex_array
         else:
             dictify_func = dictify_scalar
@@ -309,8 +309,7 @@ def chains_from_symbol(symbol, *, pragma='pytmc'):
     'Build all SingularChain instances from a Symbol'
     for full_chain in symbol.walk(condition=has_pragma):
         for item_and_config in expand_configurations_from_chain(full_chain):
-            chain = SingularChain(dict(item_and_config))
-            yield chain
+            yield SingularChain(dict(item_and_config))
 
 
 def record_packages_from_symbol(symbol, *, pragma='pytmc'):

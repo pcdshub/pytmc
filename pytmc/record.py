@@ -99,12 +99,12 @@ class RecordPackage:
     def from_chain(*args, chain, **kwargs):
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         data_type = chain.data_type
-        if data_type.is_array or chain.last.array_info:
+        if data_type.is_enum:
+            spec = EnumRecordPackage
+        elif data_type.is_array or chain.last.array_info:
             spec = WaveformRecordPackage
         elif data_type.is_string:
             spec = StringRecordPackage
-        elif data_type.is_enum:
-            spec = EnumRecordPackage
         else:
             spec = data_types[data_type.name]
         return spec(*args, chain=chain, **kwargs)
