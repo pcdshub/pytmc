@@ -195,7 +195,8 @@ def expand_configurations_from_chain(chain, *, pragma='pytmc'):
             # If any pragma in the chain is unset, escape early
             return []
 
-        if item.array_info and item.data_type.is_complex_type:
+        if item.array_info and (item.data_type.is_complex_type or
+                                item.is_enum):
             dictify_func = dictify_complex_array
         else:
             dictify_func = dictify_scalar
