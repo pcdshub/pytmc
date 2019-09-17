@@ -34,14 +34,10 @@ def test_smoke_ams_id(project):
 
 
 def test_fb_motionstage_linking(project):
-    for inst in project.find(parser.Symbol_FB_MotionStage):
+    for inst in project.find(parser.Symbol_DUT_MotionStage):
         pprint.pprint(inst)
         print('Program name', inst.program_name)
         print('Motor name', inst.motor_name)
-        print('POU', inst.pou)
-        inst.pou.variables  # smoke testing
-        print('Call block', inst.call_block)
-        print('Linked to', inst.linked_to)
         print('NC to PLC link', inst.nc_to_plc_link)
 
         nc_axis = inst.nc_axis
