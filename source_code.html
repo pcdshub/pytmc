@@ -256,7 +256,7 @@ dictionary configurations from parsed pytmc pragmas.</p>
 
 <dl class="function">
 <dt id="pytmc.pragmas.dictify_config">
-<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">dictify_config</code><span class="sig-paren">(</span><em class="sig-param">conf</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.dictify_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">dictify_config</code><span class="sig-paren">(</span><em class="sig-param">conf</em>, <em class="sig-param">array_index=None</em>, <em class="sig-param">expand_default=':%.2d'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.dictify_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a raw config list into an easier-to-use dictionary</p>
 <dl class="simple">
 <dt>Example::</dt><dd><dl class="simple">
@@ -291,6 +291,9 @@ configuration dictionaries config1, config2), this function will return:</p>
 <span class="p">]</span>
 </pre></div>
 </div>
+<p>Special handling for arrays of complex types will unroll the array into
+individual elements.  That is, <cite>arr : ARRAY [1..5] of ST_Structure</cite> will be
+unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
 </dd></dl>
 
 <dl class="function">
@@ -386,6 +389,11 @@ keys: ‘title’ and ‘tag’.</p>
 <dd><p>Take a list of configurations, and squash them into one dictionary</p>
 <p>The key ‘pv’ will be a list of all PV segments found.</p>
 <p>Later configurations override prior ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*configs</strong> (<em>list of dict</em>) – Configurations to squash. Original configs will not be modified.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
