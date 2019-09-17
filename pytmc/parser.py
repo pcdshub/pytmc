@@ -616,6 +616,10 @@ class DataType(_TmcItem):
             return f'{name_attrs["Namespace"]}.{self.name}'
         return self.name
 
+    @property
+    def is_complex_type(self):
+        return True
+
     def walk(self, condition=None):
         extends_types = [
             self.tmc.get_data_type(ext_type.qualified_type)
@@ -750,6 +754,10 @@ class BuiltinDataType:
 
         self.name = typename
         self.length = length
+
+    @property
+    def is_complex_type(self):
+        return False
 
     @property
     def enum_dict(self):
@@ -1118,6 +1126,34 @@ class RemoteConnections(TwincatItem):
         self.by_name = keyed_on('Name')
         self.by_address = keyed_on('Address')
         self.by_ams_id = keyed_on('NetId')
+
+
+class _ArrayItemProxy:
+    '''
+    A TwincatItem proxy that represents a single element of an array value.
+
+    Adjusts 'name' such that access from EPICS will refer to the correct index.
+
+    Parameters
+    ----------
+    item : TwincatItem
+        The item to mirror
+    index : int
+        The array index to use
+    '''
+
+    def __init__(self, item, index):
+        self.__dict__.update(
+            name=f'{item.name}[{index}]',
+            item=item,
+            _index=index,
+        )
+
+    def __getattr__(self, attr):
+        return getattr(self.__dict__['item'], attr)
+
+    def __setattr__(self, attr, value):
+        return setattr(self.__dict__['item'], attr, value)
 
 
 def case_insensitive_path(path):

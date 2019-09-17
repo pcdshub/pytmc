@@ -4,6 +4,7 @@ generating Python-level configuration information.
 """
 import itertools
 import logging
+import math
 import re
 
 from . import parser
@@ -117,7 +118,7 @@ def separate_configs_by_pv(config_lines):
         yield pv, config
 
 
-def dictify_config(conf):
+def dictify_config(conf, array_index=None, expand_default=':%.2d'):
     '''
     Make a raw config list into an easier-to-use dictionary
 
@@ -143,6 +144,10 @@ def dictify_config(conf):
               for item in conf}
     if fields:
         config['field'] = fields
+
+    if array_index is not None:
+        config['pv'] += config.get('expand', expand_default) % array_index
+
     return config
 
 
@@ -161,18 +166,41 @@ def expand_configurations_from_chain(chain, *, pragma='pytmc'):
             [(item1, config1), (item2, config1)],
             [(item1, config1), (item2, config2)],
         ]
+
+    Special handling for arrays of complex types will unroll the array into
+    individual elements.  That is, `arr : ARRAY [1..5] of ST_Structure` will be
+    unrolled into `arr[1]` through `arr[5]`.
     '''
     result = []
+
+    def dictify_scalar(item):
+        for pvname, config in separate_configs_by_pv(
+                split_pytmc_pragma('\n'.join(pragmas))):
+            yield (item, dictify_config(config))
+
+    def dictify_complex_array(item):
+        low, high = item.array_info.bounds
+        expand_digits = math.floor(math.log10(high)) + 2
+        expand_default = f':%.{expand_digits}d'
+        for pvname, config in separate_configs_by_pv(
+                split_pytmc_pragma('\n'.join(pragmas))):
+            for idx in range(low, high):
+                yield (parser._ArrayItemProxy(item, idx),
+                       dictify_config(config, array_index=idx,
+                                      expand_default=expand_default))
+
     for item in chain:
         pragmas = get_pragma(item, name=pragma)
         if not pragmas:
+            # If any pragma in the chain is unset, escape early
             return []
 
-        result.append([
-            (item, dictify_config(config))
-            for pvname, config in separate_configs_by_pv(
-                split_pytmc_pragma('\n'.join(pragmas)))
-        ])
+        if item.array_info and item.data_type.is_complex_type:
+            dictify_func = dictify_complex_array
+        else:
+            dictify_func = dictify_scalar
+
+        result.append(list(dictify_func(item)))
 
     return list(itertools.product(*result))
 
@@ -184,13 +212,25 @@ def squash_configs(*configs):
     The key 'pv' will be a list of all PV segments found.
 
     Later configurations override prior ones.
+
+    Parameters
+    ----------
+    *configs : list of dict
+        Configurations to squash. Original configs will not be modified.
     '''
     squashed = {'pv': [], 'field': {}}
     for config in configs:
+        # Shallow copy so that we don't modify the original
+        config = dict(config)
+
+        # Remove the PV portion - as it should be listified
         squashed['pv'].append(config.pop('pv', None))
+
+        # Update the fields as a dictionary
         fields = config.pop('field', None)
         if fields:
             squashed['field'].update(fields)
+
         squashed.update(config)
 
     return squashed
@@ -268,7 +308,8 @@ def chains_from_symbol(symbol, *, pragma='pytmc'):
     'Build all SingularChain instances from a Symbol'
     for full_chain in symbol.walk(condition=has_pragma):
         for item_and_config in expand_configurations_from_chain(full_chain):
-            yield SingularChain(dict(item_and_config))
+            chain = SingularChain(dict(item_and_config))
+            yield chain
 
 
 def record_packages_from_symbol(symbol, *, pragma='pytmc'):
