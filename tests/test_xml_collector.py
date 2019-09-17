@@ -371,3 +371,29 @@ def test_enum_array():
     assert enum01.field_defaults['ZRST'] == "ONE"
     assert enum01.field_defaults['ONVL'] == 2
     assert enum01.field_defaults['ONST'] == "TWO"
+
+
+def test_unroll_formatting():
+    array = make_mock_twincatitem(
+        name='enum_array',
+        data_type=make_mock_type('MY_ENUM', is_enum=True,
+                                 enum_dict={1: 'ONE', 2: 'TWO'}),
+        pragma='pv: ENUMS\nexpand: _EXPAND%d', array_info=(1, 5)
+    )
+
+    def walk(condition=None):
+        # Just the enum array
+        yield [array]
+
+    array.walk = walk
+    records = {
+        record.pvname: record
+        for record in pragmas.record_packages_from_symbol(array)
+    }
+
+    assert set(records) == {
+        'ENUMS_EXPAND1',
+        'ENUMS_EXPAND2',
+        'ENUMS_EXPAND3',
+        'ENUMS_EXPAND4',
+    }
