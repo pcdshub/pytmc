@@ -15,21 +15,60 @@ from . import conftest
 logger = logging.getLogger(__name__)
 
 
+def make_mock_twincatitem(name, data_type, *, pragma=None, array_info=None,
+                          ads_port=851):
+    '''
+    Create a mock TwincatItem for testing purposes
+
+    May require monkey-patching `walk` to create chains.
+    '''
+
+    class _Property:
+        name = 'pytmc'
+        value = str(pragma)
+
+    class _Properties:
+        Property = [_Property]
+
+    class MockItem:
+        module = types.SimpleNamespace(ads_port=ads_port)
+        walk = data_type.walk
+
+        if pragma is not None:
+            Properties = [_Properties]
+
+    MockItem.name = name
+    MockItem.array_info = array_info
+    MockItem.data_type = data_type
+
+    if array_info is not None:
+        class ArrayInfo:
+            bounds = array_info
+            elements = array_info[1] - array_info[0]
+
+        MockItem.array_info = ArrayInfo
+    return MockItem
+
+
 def make_mock_type(name, is_array=False, is_enum=False, is_string=False,
-                   enum_dict=None, length=1):
+                   is_complex_type=False, enum_dict=None, length=1):
     if name.startswith('STRING'):
         is_string = True
+
+    def walk(condition=None):
+        for a in []:
+            yield 0
 
     return types.SimpleNamespace(
         name=name,
         is_array=is_array,
         is_enum=is_enum,
         is_string=is_string,
-        walk=[],
+        is_complex_type=is_complex_type,
+        walk=walk,
         enum_dict=enum_dict or {},
         length=length
     )
-
 
 
 @pytest.fixture(scope='module')
@@ -242,3 +281,119 @@ def test_BaseRecordPackage_guess_NELM(chain, tc_type, sing_index, is_str,
     record = RecordPackage.from_chain(chain=chain, ads_port=851)
     for rec in record.records:
         assert rec.fields.get('NELM') == final_NELM
+
+
+def test_scalar():
+    item = make_mock_twincatitem(
+        name='tcname', data_type=make_mock_type('DINT'),
+        pragma='pv: PVNAME')
+
+    def walk(condition=None):
+        # Just one chain:
+        yield [item]
+
+    item.walk = walk
+    record, = list(pragmas.record_packages_from_symbol(item))
+    assert record.pvname == 'PVNAME'
+    assert record.tcname == 'tcname'
+    assert isinstance(record, IntegerRecordPackage)
+
+
+def test_complex_array():
+    array = make_mock_twincatitem(
+        name='array_base',
+        data_type=make_mock_type('MY_DUT', is_complex_type=True),
+        pragma='pv: ARRAY', array_info=(1, 5))
+
+    subitem1 = make_mock_twincatitem(
+        name='subitem1', data_type=make_mock_type('INT'),
+        pragma='pv: subitem1')
+
+    subitem2 = make_mock_twincatitem(
+        name='subitem2', data_type=make_mock_type('REAL'),
+        pragma='pv: subitem2\nio: i')
+
+    def walk(condition=None):
+        # Two chains, one for each array + subitem
+        yield [array, subitem1]
+        yield [array, subitem2]
+
+    array.walk = walk
+    records = {
+        record.pvname: record
+        for record in pragmas.record_packages_from_symbol(array)
+    }
+
+    assert set(records) == {
+        'ARRAY:01:subitem1', 'ARRAY:02:subitem1', 'ARRAY:03:subitem1',
+        'ARRAY:04:subitem1',
+
+        'ARRAY:01:subitem2', 'ARRAY:02:subitem2', 'ARRAY:03:subitem2',
+        'ARRAY:04:subitem2',
+    }
+
+    assert isinstance(records['ARRAY:01:subitem1'], IntegerRecordPackage)
+    assert isinstance(records['ARRAY:01:subitem2'], FloatRecordPackage)
+
+    assert records['ARRAY:01:subitem1'].io_direction == 'output'
+    assert records['ARRAY:01:subitem2'].io_direction == 'input'
+
+
+def test_enum_array():
+    array = make_mock_twincatitem(
+        name='enum_array',
+        data_type=make_mock_type('MY_ENUM', is_enum=True,
+                                 enum_dict={1: 'ONE', 2: 'TWO'}),
+        pragma='pv: ENUMS', array_info=(1, 5)
+    )
+
+    def walk(condition=None):
+        # Just the enum array
+        yield [array]
+
+    array.walk = walk
+    records = {
+        record.pvname: record
+        for record in pragmas.record_packages_from_symbol(array)
+    }
+
+    assert set(records) == {
+        'ENUMS:01',
+        'ENUMS:02',
+        'ENUMS:03',
+        'ENUMS:04',
+    }
+
+    print(records)
+    enum01 = records['ENUMS:01']
+    assert isinstance(enum01, EnumRecordPackage)
+    assert enum01.field_defaults['ZRVL'] == 1
+    assert enum01.field_defaults['ZRST'] == "ONE"
+    assert enum01.field_defaults['ONVL'] == 2
+    assert enum01.field_defaults['ONST'] == "TWO"
+
+
+def test_unroll_formatting():
+    array = make_mock_twincatitem(
+        name='enum_array',
+        data_type=make_mock_type('MY_ENUM', is_enum=True,
+                                 enum_dict={1: 'ONE', 2: 'TWO'}),
+        pragma='pv: ENUMS\nexpand: _EXPAND%d', array_info=(1, 5)
+    )
+
+    def walk(condition=None):
+        # Just the enum array
+        yield [array]
+
+    array.walk = walk
+    records = {
+        record.pvname: record
+        for record in pragmas.record_packages_from_symbol(array)
+    }
+
+    assert set(records) == {
+        'ENUMS_EXPAND1',
+        'ENUMS_EXPAND2',
+        'ENUMS_EXPAND3',
+        'ENUMS_EXPAND4',
+    }
