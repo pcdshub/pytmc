@@ -35,9 +35,12 @@ def test_pragmalint(project_filename):
 
 
 def test_stcmd(project_filename):
-    kwargs = (dict(plc_name='plc_kfe_xgmd_vac')
-              if 'plc_kfe_xgmd_vac' in project_filename
-              else {})
+    if 'plc_kfe_xgmd_vac' in project_filename:
+        kwargs = dict(plc_name='plc_kfe_xgmd_vac')
+    elif 'lcls-twincat-motion' in project_filename:
+        kwargs = dict(plc_name='Example', allow_errors=True)
+    else:
+        kwargs = {}
     stcmd_main(project_filename, **kwargs)
 
 
