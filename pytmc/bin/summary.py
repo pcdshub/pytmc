@@ -113,7 +113,7 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
 
     project = parser.parse(proj_path)
 
-    if show_plcs or show_all:
+    if show_plcs or show_all or show_code or show_symbols:
         for i, plc in enumerate(project.plcs, 1):
             util.heading(f'PLC Project ({i}): {plc.project_path.stem}')
             print(f'    Project path: {plc.project_path}')
@@ -159,14 +159,14 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                         )
                     print()
 
-    if show_symbols or show_all:
-        util.sub_heading('Symbols')
-        symbols = list(project.find(parser.Symbol))
-        for symbol in symbols:
-            info = symbol.info
-            print('    {name} : {qualified_type_name} ({bit_offs} {bit_size})'
-                  ''.format(**info))
-        print()
+            if show_symbols or show_all:
+                util.sub_heading('Symbols')
+                symbols = list(plc.find(parser.Symbol))
+                for symbol in sorted(symbols, key=lambda symbol: symbol.name):
+                    info = symbol.info
+                    print('    {name} : {qualified_type_name} ({bit_offs} {bit_size})'
+                          ''.format(**info))
+                print()
 
     if show_boxes or show_all:
         util.sub_heading('Boxes')
