@@ -164,8 +164,8 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                 symbols = list(plc.find(parser.Symbol))
                 for symbol in sorted(symbols, key=lambda symbol: symbol.name):
                     info = symbol.info
-                    print('    {name} : {qualified_type_name} ({bit_offs} {bit_size})'
-                          ''.format(**info))
+                    print('    {name} : {qualified_type_name} ({bit_offs} '
+                          '{bit_size})'.format(**info))
                 print()
 
     if show_boxes or show_all:
