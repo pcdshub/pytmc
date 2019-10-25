@@ -5,6 +5,7 @@ import collections
 import logging
 import os
 import pathlib
+import re
 import types
 
 import lxml
@@ -17,6 +18,10 @@ TWINCAT_TYPES = {}
 USE_FILE_AS_PATH = object()
 
 logger = logging.getLogger(__name__)
+SLN_PROJECT_RE = re.compile(
+    r"^Project.*?=\s*\"(.*?)\",\s*\"(.*?)\"\s*,\s*(.*?)\"\s*$",
+    re.MULTILINE
+)
 
 
 def parse(fn, *, parent=None):
@@ -34,6 +39,33 @@ def parse(fn, *, parent=None):
 
     root = tree.getroot()
     return TwincatItem.parse(root, filename=fn, parent=parent)
+
+
+def projects_from_solution(fn, *, exclude=None):
+    '''
+    Find project filenames from a solution.
+
+    Parameters
+    ----------
+    fn : str, pathlib.Path
+        Solution filename
+    exclude : list or None
+        Exclude certain extensions. Defaults to excluding .tcmproj
+    '''
+    with open(fn, 'rt') as f:
+        solution_text = f.read()
+
+    if exclude is None:
+        exclude = ('.tcmproj', )
+
+    projects = [
+        pathlib.PureWindowsPath(match[1])
+        for match in SLN_PROJECT_RE.findall(solution_text)
+    ]
+
+    return [pathlib.Path(project) for project in projects
+            if project.suffix not in exclude
+            ]
 
 
 def element_to_class_name(element, *, parent=None):

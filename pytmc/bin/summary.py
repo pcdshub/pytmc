@@ -23,8 +23,8 @@ def build_arg_parser(argparser=None):
     argparser.formatter_class = argparse.RawTextHelpFormatter
 
     argparser.add_argument(
-        'tsproj_project', type=str,
-        help='Path to .tsproj project'
+        'filename', type=str,
+        help='Path to project or solution (.tsproj, .sln)'
     )
 
     argparser.add_argument(
@@ -102,10 +102,10 @@ def outline(item, *, depth=0, f=sys.stdout):
         outline(child, depth=depth + 1, f=f)
 
 
-def main(tsproj_project, use_markdown=False, show_all=False,
-         show_outline=False, show_boxes=False, show_code=False,
-         show_plcs=False, show_nc=False, show_symbols=False, show_links=False,
-         log_level=None, debug=False):
+def summary(tsproj_project, use_markdown=False, show_all=False,
+            show_outline=False, show_boxes=False, show_code=False,
+            show_plcs=False, show_nc=False, show_symbols=False,
+            show_links=False, log_level=None, debug=False):
 
     proj_path = pathlib.Path(tsproj_project)
     if proj_path.suffix.lower() not in ('.tsproj', ):
@@ -208,3 +208,33 @@ def main(tsproj_project, use_markdown=False, show_all=False,
         )
 
     return project
+
+
+def main(filename, use_markdown=False, show_all=False,
+         show_outline=False, show_boxes=False, show_code=False,
+         show_plcs=False, show_nc=False, show_symbols=False,
+         show_links=False, log_level=None, debug=False):
+    '''
+    Output a summary of the project or projects provided.
+    '''
+
+    path = pathlib.Path(filename)
+    if path.suffix.lower() in ('.tsproj', ):
+        project_fns = [path]
+    elif path.suffix.lower() in ('.sln', ):
+        project_fns = parser.projects_from_solution(path)
+    else:
+        raise ValueError(f'Expected a tsproj or sln file, got: {path.suffix}')
+
+    projects = []
+    for fn in project_fns:
+        project = summary(
+            fn, use_markdown=use_markdown, show_all=show_all,
+            show_outline=show_outline, show_boxes=show_boxes,
+            show_code=show_code, show_plcs=show_plcs, show_nc=show_nc,
+            show_symbols=show_symbols, show_links=show_links,
+            log_level=log_level, debug=debug
+        )
+        projects.append(project)
+
+    return projects
