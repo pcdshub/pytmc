@@ -1212,6 +1212,20 @@ OSX/Windows, but platform checks are not done here.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="pytmc.parser.projects_from_solution">
+<code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">projects_from_solution</code><span class="sig-paren">(</span><em class="sig-param">fn</em>, <em class="sig-param">*</em>, <em class="sig-param">exclude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.projects_from_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find project filenames from a solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fn</strong> (<em>str</em><em>, </em><em>pathlib.Path</em>) – Solution filename</p></li>
+<li><p><strong>exclude</strong> (<em>list</em><em> or </em><em>None</em>) – Exclude certain extensions. Defaults to excluding .tcmproj</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="pytmc.parser.separate_by_classname">
 <code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">separate_by_classname</code><span class="sig-paren">(</span><em class="sig-param">children</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.separate_by_classname" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take in a list of <cite>TwincatItem</cite>, categorize each by their class name (based
