@@ -15,7 +15,7 @@ import jinja2
 from . import db, util
 from .. import pragmas
 
-from ..parser import parse, Symbol, separate_by_classname
+from ..parser import parse, Symbol, separate_by_classname, NC
 
 
 DESCRIPTION = __doc__
@@ -257,6 +257,11 @@ def main(tsproj_project, *, name=None, prefix=None,
             raise RuntimeError('IP address unset. Try --allow-errors if this '
                                'is not an issue.')
 
+    try:
+        nc, = list(project.find(NC, recurse=False))
+    except Exception:
+        nc = None
+
     template_args = dict(
         hashbang=hashbang,
         binary_name=binary_name,
@@ -273,6 +278,7 @@ def main(tsproj_project, *, name=None, prefix=None,
 
         additional_db_files=additional_db_files,
         symbols=symbols,
+        nc=nc,
     )
 
     stashed_exception = None
