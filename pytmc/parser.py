@@ -572,6 +572,8 @@ class DataTypes(_TmcItem):
             for dtype in self.find(DataType)
         }
 
+        self.types['Tc2_System.T_MaxString'] = T_MaxString()
+
 
 class Type(_TmcItem):
     '[TMC] DataTypes/DataType/SubItem/Type'
@@ -813,6 +815,11 @@ class BuiltinDataType:
 
     def walk(self, condition=None):
         yield []
+
+
+class T_MaxString(BuiltinDataType):
+    def __init__(self):
+        super().__init__(typename='STRING', length=255)
 
 
 class Symbol(_TmcItem):
