@@ -140,7 +140,8 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                     for decl_or_impl in source.find((parser.ST,
                                                      parser.Declaration,
                                                      parser.Implementation)):
-                        if not decl_or_impl.text.strip():
+                        source_text = decl_or_impl.text
+                        if source_text is None or not source_text.strip():
                             continue
 
                         parent = decl_or_impl.parent
@@ -154,7 +155,7 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                             use_markdown=use_markdown
                         )
                         util.text_block(
-                            decl_or_impl.text,
+                            source_text,
                             markdown_language='vhdl' if use_markdown else None
                         )
                     print()
