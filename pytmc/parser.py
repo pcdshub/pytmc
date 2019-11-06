@@ -655,6 +655,13 @@ class DataType(_TmcItem):
         return True
 
     def walk(self, condition=None):
+        if self.is_enum:
+            # Ensure something is yielded for this type - it doesn't
+            # appear possible to have SubItems or use ExtendsType
+            # in this case.
+            yield []
+            return
+
         extends_types = [
             self.tmc.get_data_type(ext_type.qualified_type)
             for ext_type in getattr(self, 'ExtendsType', [])
@@ -867,9 +874,10 @@ class Symbol(_TmcItem):
                     )
 
     def walk(self, condition=None):
-        for item in self.data_type.walk(condition=condition):
-            if condition is None or all(condition(it) for it in item):
-                yield [self] + item
+        if condition is None or condition(self):
+            for item in self.data_type.walk(condition=condition):
+                if condition is None or all(condition(it) for it in item):
+                    yield [self] + item
 
     @property
     def array_info(self):
