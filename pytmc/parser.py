@@ -63,7 +63,9 @@ def projects_from_solution(fn, *, exclude=None):
         for match in SLN_PROJECT_RE.findall(solution_text)
     ]
 
-    return [pathlib.Path(project) for project in projects
+    solution_path = pathlib.Path(fn).parent
+    return [(solution_path / pathlib.Path(project)).absolute()
+            for project in projects
             if project.suffix not in exclude
             ]
 
