@@ -673,11 +673,8 @@ class DataType(_TmcItem):
 
         if hasattr(self, 'SubItem'):
             for subitem in self.SubItem:
-                if condition and not condition(subitem):
-                    continue
-                for item in subitem.walk():
-                    if condition is None or all(condition(it) for it in item):
-                        yield [subitem] + item
+                for item in subitem.walk(condition=condition):
+                    yield [subitem] + item
 
     @property
     def enum_dict(self):
@@ -737,7 +734,8 @@ class SubItem(_TmcItem):
         return f'{namespace}.{type_.text}' if namespace else type_.text
 
     def walk(self, condition=None):
-        yield from self.data_type.walk(condition=condition)
+        if condition is None or condition(self):
+            yield from self.data_type.walk(condition=condition)
 
 
 class Module(_TmcItem):
@@ -878,8 +876,7 @@ class Symbol(_TmcItem):
     def walk(self, condition=None):
         if condition is None or condition(self):
             for item in self.data_type.walk(condition=condition):
-                if condition is None or all(condition(it) for it in item):
-                    yield [self] + item
+                yield [self] + item
 
     @property
     def array_info(self):
