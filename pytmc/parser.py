@@ -34,7 +34,7 @@ def parse(fn, *, parent=None):
     '''
     fn = case_insensitive_path(fn)
 
-    with open(fn, 'rt') as f:
+    with open(fn, 'rb') as f:
         tree = lxml.etree.parse(f)
 
     root = tree.getroot()
@@ -63,7 +63,9 @@ def projects_from_solution(fn, *, exclude=None):
         for match in SLN_PROJECT_RE.findall(solution_text)
     ]
 
-    return [pathlib.Path(project) for project in projects
+    solution_path = pathlib.Path(fn).parent
+    return [(solution_path / pathlib.Path(project)).absolute()
+            for project in projects
             if project.suffix not in exclude
             ]
 
@@ -655,6 +657,13 @@ class DataType(_TmcItem):
         return True
 
     def walk(self, condition=None):
+        if self.is_enum:
+            # Ensure something is yielded for this type - it doesn't
+            # appear possible to have SubItems or use ExtendsType
+            # in this case.
+            yield []
+            return
+
         extends_types = [
             self.tmc.get_data_type(ext_type.qualified_type)
             for ext_type in getattr(self, 'ExtendsType', [])
@@ -664,11 +673,8 @@ class DataType(_TmcItem):
 
         if hasattr(self, 'SubItem'):
             for subitem in self.SubItem:
-                if condition and not condition(subitem):
-                    continue
-                for item in subitem.walk():
-                    if condition is None or all(condition(it) for it in item):
-                        yield [subitem] + item
+                for item in subitem.walk(condition=condition):
+                    yield [subitem] + item
 
     @property
     def enum_dict(self):
@@ -728,7 +734,8 @@ class SubItem(_TmcItem):
         return f'{namespace}.{type_.text}' if namespace else type_.text
 
     def walk(self, condition=None):
-        yield from self.data_type.walk(condition=condition)
+        if condition is None or condition(self):
+            yield from self.data_type.walk(condition=condition)
 
 
 class Module(_TmcItem):
@@ -867,8 +874,8 @@ class Symbol(_TmcItem):
                     )
 
     def walk(self, condition=None):
-        for item in self.data_type.walk(condition=condition):
-            if condition is None or all(condition(it) for it in item):
+        if condition is None or condition(self):
+            for item in self.data_type.walk(condition=condition):
                 yield [self] + item
 
     @property
