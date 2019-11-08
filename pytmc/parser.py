@@ -34,7 +34,7 @@ def parse(fn, *, parent=None):
     '''
     fn = case_insensitive_path(fn)
 
-    with open(fn, 'rt', encoding='utf-8') as f:
+    with open(fn, 'rb') as f:
         tree = lxml.etree.parse(f)
 
     root = tree.getroot()
