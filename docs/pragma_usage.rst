@@ -173,7 +173,7 @@ specified either on a contained datatype or variable.
 
 For example the following code block will assign a ``field:`` of ``SCAN 1
 second`` to all the variables and datatypes that it contains unless they
-specify their own version of the  
+specify their own setting for ``SCAN``.  
 
 .. code-block:: none 
 
