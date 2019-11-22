@@ -107,7 +107,13 @@ class RecordPackage:
         elif data_type.is_string:
             spec = StringRecordPackage
         else:
-            spec = data_types[data_type.name]
+            try:
+                spec = data_types[data_type.name]
+            except KeyError:
+                raise ValueError(
+                    f'Unsupported data type {data_type.name} in chain: '
+                    f'{chain.tcname} record: {chain.pvname}'
+                ) from None
         return spec(*args, chain=chain, **kwargs)
 
 
