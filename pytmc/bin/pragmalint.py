@@ -248,6 +248,11 @@ def main(filename, use_markdown=False, verbose=False):
                 logger.error('Linter error: %s\n%s:line %s: %s',
                              info.exception, info.filename, info.line_number,
                              textwrap.indent(info.pragma, '    '))
+                if hasattr(info.exception, 'original_ex'):
+                    logger.error(
+                        'Unhandled exception (may be a pytmc bug)',
+                        exc_info=info.exception.original_ex
+                    )
 
     logger.info('Total pragmas found: %d Total linter errors: %d',
                 pragma_count, linter_errors)
