@@ -208,6 +208,10 @@ def lint_source(filename, source, verbose=False):
                 lint_pragma(pragma)
             except LinterError as ex:
                 info['exception'] = ex
+            except Exception as ex:
+                wrapped_ex = LinterError(f'Unhandled exception: {ex}')
+                wrapped_ex.original_ex = ex
+                info['exception'] = wrapped_ex
 
             yield types.SimpleNamespace(**info)
 
@@ -230,6 +234,11 @@ def main(filename, use_markdown=False, verbose=False):
                                      info.exception, info.filename,
                                      info.line_number,
                                      textwrap.indent(info.pragma, '    '))
+                        if hasattr(info.exception, 'original_ex'):
+                            logger.error(
+                                'Unhandled exception (may be a pytmc bug)',
+                                exc_info=info.exception.original_ex
+                            )
     else:
         source = project
         for info in lint_source(filename, source, verbose=verbose):
