@@ -22,6 +22,12 @@ _LINE_FINDER = re.compile(r"(?P<line>.+?)(?P<delim>" + _FLEX_TERM_REGEX + ")")
 _LINE_PARSER = re.compile(r"(?P<title>[\S]+):(?:[^\S]*)(?P<tag>.*)")
 _FIELD_FINDER = re.compile(r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)")
 
+# Valid options for 'io' in pragma:
+IO_OUTPUT = ('output', 'io', 'o', 'rw')
+IO_INPUT = ('input', 'i', 'ro')
+KNOWN_BAD_TYPES = ('ALIAS', 'DATE', 'DATE_AND_TIME', 'DT', 'TIME',
+                   'TIME_OF_DAY', 'TOD')
+
 
 def split_pytmc_pragma(pragma_text):
     """
@@ -235,6 +241,31 @@ def squash_configs(*configs):
         squashed.update(config)
 
     return squashed
+
+
+def normalize_io(io):
+    '''
+    Normalize an 'io' specifier in a pragma into either 'input' or 'output'
+
+    Parameters
+    ----------
+    io : string
+        The I/O specifier from the pragma
+
+    Returns
+    -------
+    {'input', 'output'}
+
+    Raises
+    ------
+    ValueError
+        If an invalid specifier is given
+    '''
+    if io in IO_OUTPUT:
+        return 'output'
+    if io in IO_INPUT:
+        return 'input'
+    raise ValueError('Invalid I/O specifier')
 
 
 class SingularChain:

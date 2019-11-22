@@ -11,7 +11,7 @@ import sys
 import types
 import textwrap
 
-from .. import parser
+from .. import parser, pragmas
 from . import util
 from .db import LinterError
 
@@ -118,6 +118,19 @@ def lint_pragma(pragma):
     # There shall be a config line for pv even if it's just "pv:"
     if pv_line_detected <= 0:
         raise LinterError("No pv line(s) detected in a pragma")
+
+    for pvname, config in pragmas.separate_configs_by_pv(
+                pragmas.split_pytmc_pragma(pragma_setting)
+            ):
+        if ' ' in pvname:
+            raise LinterError('Space found in PV name (missing delimiter?)')
+        if 'io' in config:
+            io = config['io']
+            try:
+                pragmas.normalize_io(io)
+            except ValueError:
+                raise LinterError(
+                    f'Invalid i/o direction for {pvname}: {io}') from None
 
     return match
 
