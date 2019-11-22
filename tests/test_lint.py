@@ -72,6 +72,9 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
      # No PV
      make_source_param('io: io', marks=pytest.mark.xfail),
      make_source_param('abc', marks=pytest.mark.xfail),
+
+     # $ character....
+     make_source_param('pv: $(TEST)', marks=pytest.mark.xfail),
      ]
 )
 def test_lint_pragma(source):

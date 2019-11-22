@@ -95,6 +95,10 @@ def lint_pragma(pragma):
         # if no configuration region in the pragma was detected then fail
         raise LinterError()
 
+    if '$' in pragma_setting:
+        # Why, Beckhoff, why? (as of 4022.30, at least)
+        raise LinterError('Pragma cannot contain "$" or TwinCAT will ignore it')
+
     config_lines = PRAGMA_LINE_RE.findall(pragma_setting)
     if len(config_lines) == 0:
         raise LinterError("""It is not acceptable to lack configuration lines.
