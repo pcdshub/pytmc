@@ -7,6 +7,7 @@ from jinja2 import Environment, PackageLoader
 
 from collections import ChainMap, OrderedDict
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -171,10 +172,13 @@ class TwincatTypeRecordPackage(RecordPackage):
         ValueError
             If unable to determine IO direction
         """
+        from .pragmas import normalize_io
         io = self.chain.config.get('io', 'io')
-        if 'o' in io:
-            return 'output'
-        return 'input'
+        try:
+            return normalize_io(io)
+        except ValueError:
+            logger.warning('Invalid i/o direction for %s: %r', self.pvname, io)
+            return 'input'
 
     @property
     def _asyn_port_spec(self):
