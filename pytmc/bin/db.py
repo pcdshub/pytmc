@@ -100,10 +100,21 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
             logger.error('   [db:%d] %s', line_num, line)
         return context
 
-    records = [record
-               for symbol in find_pytmc_symbols(tmc)
-               for record in record_packages_from_symbol(symbol)
-               ]
+    records = [
+        record
+        for symbol in find_pytmc_symbols(tmc)
+        for record in record_packages_from_symbol(symbol,
+                                                  yield_exceptions=True)
+    ]
+
+    exceptions = [ex for ex in records
+                  if isinstance(ex, Exception)]
+    for ex in exceptions:
+        logger.error('Error creating record: %s', ex)
+        records.remove(ex)
+
+    if exceptions and not allow_errors:
+        raise LinterError('Failed to create database')
 
     record_names = [record.pvname for record in records]
     if len(record_names) != len(set(record_names)):

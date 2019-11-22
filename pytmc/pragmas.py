@@ -343,7 +343,14 @@ def chains_from_symbol(symbol, *, pragma='pytmc'):
             yield SingularChain(dict(item_and_config))
 
 
-def record_packages_from_symbol(symbol, *, pragma='pytmc'):
+def record_packages_from_symbol(symbol, *, pragma='pytmc',
+                                yield_exceptions=False):
     'Create all record packages from a given Symbol'
     for chain in chains_from_symbol(symbol, pragma=pragma):
-        yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
+        try:
+            yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
+        except Exception as ex:
+            if yield_exceptions:
+                yield ex
+            else:
+                raise
