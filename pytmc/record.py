@@ -17,10 +17,11 @@ logger = logging.getLogger(__name__)
 class EPICSRecord:
     """Representation of a single EPICS Record"""
 
-    def __init__(self, pvname, record_type, fields=None, template=None,
-                 autosave=None):
+    def __init__(self, pvname, record_type, direction, fields=None,
+                 template=None, autosave=None):
         self.pvname = pvname
         self.record_type = record_type
+        self.direction = direction
         self.fields = OrderedDict(fields) if fields is not None else {}
         self.template = template or 'asyn_standard_record.jinja2'
         self.autosave = dict(autosave) if autosave else {}
@@ -34,6 +35,32 @@ class EPICSRecord:
         self.record_template = self.jinja_env.get_template(
             self.template
         )
+
+    def update_autosave_from_pragma(self, config):
+        """
+        Update autosave settings from a pragma configuration
+
+        To apply to either input or output records, pragma keys
+        `autosave_pass0` or `autosave_pass1` can be used.
+
+        To only apply to input records, pragma keys `autosave_input_pass0`
+        `autosave_input_pass1` can be used.
+
+        To only apply to output records, pragma keys `autosave_output_pass0`
+        `autosave_output_pass1` can be used.
+
+        Parameters
+        ----------
+        config : dict
+            The pragma configuration dictionary
+        """
+        for pass_ in [0, 1]:
+            for config_key in [f'autosave_pass{pass_}',
+                               f'autosave_{self.direction}_pass{pass_}']:
+                if config_key in config:
+                    record_key = f'pass{pass_}'
+                    fields = set(config[config_key].split(' '))
+                    self.autosave[record_key] = fields
 
     def render(self, sort: bool = True):
         """Render the provided template"""
@@ -229,6 +256,7 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         record = EPICSRecord(pvname,
                              self.input_rtyp,
+                             'input',
                              fields=self.field_defaults,
                              autosave=self.autosave_defaults.get('input')
                              )
@@ -240,6 +268,7 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         # Update with given pragmas
         record.fields.update(self.chain.config.get('field', {}))
+        record.update_autosave_from_pragma(self.chain.config)
         return record
 
     def generate_output_record(self):
@@ -256,6 +285,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         # Base record with defaults
         record = EPICSRecord(self.pvname,
                              self.output_rtyp,
+                             'output',
                              fields=self.field_defaults,
                              autosave=self.autosave_defaults.get('output')
                              )
@@ -269,6 +299,7 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         # Update with given pragmas
         record.fields.update(self.chain.config.get('field', {}))
+        record.update_autosave_from_pragma(self.chain.config)
         return record
 
     @property
