@@ -86,6 +86,8 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
     -------
     records : list
         List of RecordPackage
+    exceptions : list
+        List of exceptions raised during parsing
     '''
     def _show_context_from_line(rendered, from_line):
         lines = list(enumerate(rendered.splitlines()[:from_line + 1], 1))
@@ -125,8 +127,11 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
         message = '\n'.join(['Duplicate records encountered:'] +
                             [f'    {dupe} ({count})'
                              for dupe, count in sorted(dupes.items())])
+
+        ex = LinterError(message)
         if not allow_errors:
-            raise LinterError(message)
+            raise ex
+        exceptions.append(ex)
         logger.error(message)
 
     if dbd_file is not None:
@@ -147,7 +152,7 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
         if not results.success and not allow_errors:
             raise LinterError('Failed to create database')
 
-    return records
+    return records, exceptions
 
 
 def build_arg_parser(parser=None):
@@ -200,7 +205,7 @@ def main(tmc_file, record_file=None, *, dbd=None, allow_errors=False,
     tmc = parser.parse(tmc_file)
 
     try:
-        records = process(
+        records, exceptions = process(
             tmc, dbd_file=dbd, allow_errors=allow_errors,
             show_error_context=not no_error_context,
         )

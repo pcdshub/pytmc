@@ -92,7 +92,8 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.chains = {}
         self.records = {}
 
-        for record in process(tmc, allow_errors=True):
+        records, self.exceptions = process(tmc, allow_errors=True)
+        for record in records:
             self.chains[record.tcname] = record
             try:
                 record_text = record.render()
@@ -141,14 +142,27 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.right_layout.addWidget(self.chain_info)
         self.right_layout.addWidget(self.config_info)
 
-        self.splitter = QtWidgets.QSplitter()
-        self.splitter.setOrientation(Qt.Horizontal)
-        self.splitter.addWidget(self.left_frame)
-        self.splitter.addWidget(self.right_frame)
-        self.setCentralWidget(self.splitter)
+        self.frame_splitter = QtWidgets.QSplitter()
+        self.frame_splitter.setOrientation(Qt.Horizontal)
+        self.frame_splitter.addWidget(self.left_frame)
+        self.frame_splitter.addWidget(self.right_frame)
 
-        self.item_list.currentItemChanged.connect(
-            self._item_selected)
+        self.top_splitter = self.frame_splitter
+        if self.exceptions:
+            self.error_list = QtWidgets.QTextEdit()
+            self.error_list.setReadOnly(True)
+
+            for ex in self.exceptions:
+                self.error_list.append(f'{ex}\n')
+
+            self.error_splitter = QtWidgets.QSplitter()
+            self.error_splitter.setOrientation(Qt.Vertical)
+            self.error_splitter.addWidget(self.frame_splitter)
+            self.error_splitter.addWidget(self.error_list)
+            self.top_splitter = self.error_splitter
+
+        self.setCentralWidget(self.top_splitter)
+        self.item_list.currentItemChanged.connect(self._item_selected)
 
         self.item_selected.connect(self._update_config_info)
         self.item_selected.connect(self._update_chain_info)
