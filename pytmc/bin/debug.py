@@ -153,7 +153,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.error_list.setReadOnly(True)
 
             for ex in self.exceptions:
-                self.error_list.append(f'{ex}\n')
+                self.error_list.append(f'({ex.__class__.__name__}) {ex}\n')
 
             self.error_splitter = QtWidgets.QSplitter()
             self.error_splitter.setOrientation(Qt.Vertical)
