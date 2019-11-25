@@ -57,10 +57,15 @@ class RecordPackage:
         """
         All subclasses should use super on their init method.
         """
-        self.pvname = chain.pvname
         self.tcname = chain.tcname
         self.chain = chain
         self.ads_port = ads_port
+
+        # Due to a twincat pragma limitation, EPICS macro prefix '$' cannot be
+        # used or escaped.  Allow the configuration to specify an alternate
+        # character in the pragma, defaulting to '@'.
+        macro_character = self.chain.config.get('macro_character', '@')
+        self.pvname = chain.pvname.replace(macro_character, '$')
 
     @property
     def valid(self):
@@ -205,6 +210,7 @@ class TwincatTypeRecordPackage(RecordPackage):
             pvname = self.pvname + '_RBV'
         else:
             pvname = self.pvname
+
         record = EPICSRecord(pvname,
                              self.input_rtyp,
                              fields=self.field_defaults)
