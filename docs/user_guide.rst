@@ -7,8 +7,8 @@ User Guide
 
    getting_started.rst
    installation.rst
-   terminal_usage.rst
    pragma_usage.rst
+   terminal_usage.rst
 
 
 
