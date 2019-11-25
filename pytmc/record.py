@@ -17,11 +17,13 @@ logger = logging.getLogger(__name__)
 class EPICSRecord:
     """Representation of a single EPICS Record"""
 
-    def __init__(self, pvname, record_type, fields=None, template=None):
+    def __init__(self, pvname, record_type, fields=None, template=None,
+                 autosave=None):
         self.pvname = pvname
         self.record_type = record_type
         self.fields = OrderedDict(fields) if fields is not None else {}
         self.template = template or 'asyn_standard_record.jinja2'
+        self.autosave = dict(autosave) if autosave else {}
 
         # Load jinja templates
         self.jinja_env = Environment(
@@ -157,6 +159,13 @@ class TwincatTypeRecordPackage(RecordPackage):
        not required.
     """
     field_defaults = {'PINI': 1, 'TSE': -2}
+    autosave_defaults = {
+        'input': dict(pass0={},
+                      pass1={}),
+        'output': dict(pass0={'VAL'},
+                       pass1={}),
+    }
+
     dtyp = NotImplemented
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
@@ -173,7 +182,7 @@ class TwincatTypeRecordPackage(RecordPackage):
             if hasattr(parent, 'field_defaults'):
                 cls.field_defaults = dict(ChainMap(cls.field_defaults,
                                                    parent.field_defaults))
-                return
+                break
 
     @property
     def io_direction(self):
@@ -220,7 +229,9 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         record = EPICSRecord(pvname,
                              self.input_rtyp,
-                             fields=self.field_defaults)
+                             fields=self.field_defaults,
+                             autosave=self.autosave_defaults.get('input')
+                             )
 
         # Add our port
         record.fields['INP'] = self._asyn_port_spec + '?'
@@ -245,7 +256,9 @@ class TwincatTypeRecordPackage(RecordPackage):
         # Base record with defaults
         record = EPICSRecord(self.pvname,
                              self.output_rtyp,
-                             fields=self.field_defaults)
+                             fields=self.field_defaults,
+                             autosave=self.autosave_defaults.get('output')
+                             )
         # Add our port
         record.fields['DTYP'] = self.dtyp
         record.fields['OUT'] = self._asyn_port_spec + '='
@@ -288,6 +301,12 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
     output_rtyp = 'ao'
     dtyp = 'asynFloat64'
     field_defaults = {'PREC': '3'}
+    autosave_defaults = {
+        'input': dict(pass0={'PREC'},
+                      pass1={}),
+        'output': dict(pass0={'VAL', 'PREC'},
+                       pass1={}),
+    }
 
 
 class EnumRecordPackage(TwincatTypeRecordPackage):
