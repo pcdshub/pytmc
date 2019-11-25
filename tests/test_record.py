@@ -8,7 +8,9 @@ def test_epics_record_render():
     kwargs = {'pvname': 'Tst:pv',
               'record_type': 'ai',
               'fields': {'ZNAM': 'Out',
-                         'ONAM': 'In'}}
+                         'ONAM': 'In'},
+              'direction': 'input',
+              }
 
     ec = EPICSRecord(**kwargs)
     record = ec.render()
@@ -25,7 +27,9 @@ def test_epics_record_with_linter(dbd_file):
               'record_type': 'bi',
               'fields': {'ZNAM': '"Out"',
                          'ONAM': '"In"',
-                         'DTYP': '"Raw Soft Channel"'}}
+                         'DTYP': '"Raw Soft Channel"'},
+              'direction': 'input',
+              }
     ec = EPICSRecord(**kwargs)
     record = ec.render()
     linted = lint_db(dbd=dbd_file, db=record)
