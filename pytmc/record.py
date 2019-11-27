@@ -7,7 +7,7 @@ from jinja2 import Environment, PackageLoader
 
 from collections import ChainMap, OrderedDict
 
-from default_settings.unified_ordered_field_list import unified_lookup_list
+from .default_settings.unified_ordered_field_list import unified_lookup_list
 
 logger = logging.getLogger(__name__)
 
@@ -443,8 +443,8 @@ data_types = {
 }
 
 
-def sort_fields(unsorted: OrderedDict, sort_scheme: dict, last=True: bool) ->
-        OrderedDict:
+def sort_fields(unsorted: OrderedDict, sort_scheme: dict, 
+        last: bool=True) -> OrderedDict:
     """
     Sort the ordered dict according to the sort_scheme given at instantiation.
     Does NOT sort in place.
