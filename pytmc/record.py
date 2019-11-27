@@ -5,6 +5,8 @@ import logging
 
 from jinja2 import Environment, PackageLoader
 
+from typing import Optional
+
 from collections import ChainMap, OrderedDict
 
 from .default_settings.unified_ordered_field_list import unified_lookup_list
@@ -443,8 +445,8 @@ data_types = {
 }
 
 
-def sort_fields(unsorted: OrderedDict, sort_scheme: dict, 
-        last: bool=True) -> OrderedDict:
+def sort_fields(unsorted: OrderedDict, sort_scheme: Optional[dict]=None, 
+        last: Optional[bool]=True) -> OrderedDict:
     """
     Sort the ordered dict according to the sort_scheme given at instantiation.
     Does NOT sort in place.
@@ -457,14 +459,17 @@ def sort_fields(unsorted: OrderedDict, sort_scheme: dict,
 
     sort_scheme
         Requires a Dictionary, reverse lookup table for identifying sorting
-        order.
+        order. If left as None,
+        :py:obj:`.default_settings.unified_ordered_field_list.unified_list`
+        is used.
 
-    Returns
-    -------
+    last
+        If True, place the alphabetized entries at the end, otherwise, place
+        them at the start.
 
-    OrderedDict
-        A sorted copy of unsorted input argument.
     """
+    
+
     instructed_unsorted = OrderedDict()
     naive_unsorted = OrderedDict()
 
