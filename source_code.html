@@ -315,8 +315,28 @@ unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="pytmc.pragmas.normalize_io">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">normalize_io</code><span class="sig-paren">(</span><em class="sig-param">io</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.normalize_io" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize an ‘io’ specifier in a pragma into either ‘input’ or ‘output’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>io</strong> (<em>string</em>) – The I/O specifier from the pragma</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>{‘input’, ‘output’}</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid specifier is given</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="pytmc.pragmas.record_packages_from_symbol">
-<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">record_packages_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.record_packages_from_symbol" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">record_packages_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">yield_exceptions=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.record_packages_from_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create all record packages from a given Symbol</p>
 </dd></dl>
 
