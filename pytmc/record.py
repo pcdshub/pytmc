@@ -32,10 +32,13 @@ class EPICSRecord:
             self.template
         )
 
-    def render(self):
+    def render(self, sort: bool=True):
         """Render the provided template"""
         for field, value in list(self.fields.items()):
             self.fields[field] = str(value).strip('"')
+
+        if sort:
+            self.fields = sort_fields(self.fields)
 
         return self.record_template.render(record=self)
 
