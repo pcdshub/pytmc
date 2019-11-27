@@ -7,6 +7,7 @@ from jinja2 import Environment, PackageLoader
 
 from collections import ChainMap, OrderedDict
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -56,10 +57,15 @@ class RecordPackage:
         """
         All subclasses should use super on their init method.
         """
-        self.pvname = chain.pvname
         self.tcname = chain.tcname
         self.chain = chain
         self.ads_port = ads_port
+
+        # Due to a twincat pragma limitation, EPICS macro prefix '$' cannot be
+        # used or escaped.  Allow the configuration to specify an alternate
+        # character in the pragma, defaulting to '@'.
+        macro_character = self.chain.config.get('macro_character', '@')
+        self.pvname = chain.pvname.replace(macro_character, '$')
 
     @property
     def valid(self):
@@ -106,7 +112,13 @@ class RecordPackage:
         elif data_type.is_string:
             spec = StringRecordPackage
         else:
-            spec = data_types[data_type.name]
+            try:
+                spec = data_types[data_type.name]
+            except KeyError:
+                raise ValueError(
+                    f'Unsupported data type {data_type.name} in chain: '
+                    f'{chain.tcname} record: {chain.pvname}'
+                ) from None
         return spec(*args, chain=chain, **kwargs)
 
 
@@ -171,10 +183,13 @@ class TwincatTypeRecordPackage(RecordPackage):
         ValueError
             If unable to determine IO direction
         """
+        from .pragmas import normalize_io
         io = self.chain.config.get('io', 'io')
-        if 'o' in io:
-            return 'output'
-        return 'input'
+        try:
+            return normalize_io(io)
+        except ValueError:
+            logger.warning('Invalid i/o direction for %s: %r', self.pvname, io)
+            return 'input'
 
     @property
     def _asyn_port_spec(self):
@@ -195,6 +210,7 @@ class TwincatTypeRecordPackage(RecordPackage):
             pvname = self.pvname + '_RBV'
         else:
             pvname = self.pvname
+
         record = EPICSRecord(pvname,
                              self.input_rtyp,
                              fields=self.field_defaults)

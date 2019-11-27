@@ -11,7 +11,7 @@ import sys
 import types
 import textwrap
 
-from .. import parser
+from .. import parser, pragmas
 from . import util
 from .db import LinterError
 
@@ -95,6 +95,14 @@ def lint_pragma(pragma):
         # if no configuration region in the pragma was detected then fail
         raise LinterError()
 
+    if '$' in pragma_setting:
+        # Why, Beckhoff, why? (as of 4022.30, at least)
+        raise LinterError(
+            'Pragma cannot contain "$" or TwinCAT will ignore it. The '
+            'character "@" can be used as a work-around (or specify '
+            '`macro_character` in your pragma configuration)'
+        )
+
     config_lines = PRAGMA_LINE_RE.findall(pragma_setting)
     if len(config_lines) == 0:
         raise LinterError("""It is not acceptable to lack configuration lines.
@@ -118,6 +126,19 @@ def lint_pragma(pragma):
     # There shall be a config line for pv even if it's just "pv:"
     if pv_line_detected <= 0:
         raise LinterError("No pv line(s) detected in a pragma")
+
+    for pvname, config in pragmas.separate_configs_by_pv(
+                pragmas.split_pytmc_pragma(pragma_setting)
+            ):
+        if ' ' in pvname:
+            raise LinterError('Space found in PV name (missing delimiter?)')
+        if 'io' in config:
+            io = config['io']
+            try:
+                pragmas.normalize_io(io)
+            except ValueError:
+                raise LinterError(
+                    f'Invalid i/o direction for {pvname}: {io}') from None
 
     return match
 
@@ -195,6 +216,10 @@ def lint_source(filename, source, verbose=False):
                 lint_pragma(pragma)
             except LinterError as ex:
                 info['exception'] = ex
+            except Exception as ex:
+                wrapped_ex = LinterError(f'Unhandled exception: {ex}')
+                wrapped_ex.original_ex = ex
+                info['exception'] = wrapped_ex
 
             yield types.SimpleNamespace(**info)
 
@@ -217,6 +242,11 @@ def main(filename, use_markdown=False, verbose=False):
                                      info.exception, info.filename,
                                      info.line_number,
                                      textwrap.indent(info.pragma, '    '))
+                        if hasattr(info.exception, 'original_ex'):
+                            logger.error(
+                                'Unhandled exception (may be a pytmc bug)',
+                                exc_info=info.exception.original_ex
+                            )
     else:
         source = project
         for info in lint_source(filename, source, verbose=verbose):
@@ -226,6 +256,11 @@ def main(filename, use_markdown=False, verbose=False):
                 logger.error('Linter error: %s\n%s:line %s: %s',
                              info.exception, info.filename, info.line_number,
                              textwrap.indent(info.pragma, '    '))
+                if hasattr(info.exception, 'original_ex'):
+                    logger.error(
+                        'Unhandled exception (may be a pytmc bug)',
+                        exc_info=info.exception.original_ex
+                    )
 
     logger.info('Total pragmas found: %d Total linter errors: %d',
                 pragma_count, linter_errors)
