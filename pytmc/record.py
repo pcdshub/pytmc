@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 class EPICSRecord:
     """Representation of a single EPICS Record"""
+
     def __init__(self, pvname, record_type, fields=None, template=None):
         self.pvname = pvname
         self.record_type = record_type
@@ -32,7 +33,7 @@ class EPICSRecord:
             self.template
         )
 
-    def render(self, sort: bool=True):
+    def render(self, sort: bool = True):
         """Render the provided template"""
         for field, value in list(self.fields.items()):
             self.fields[field] = str(value).strip('"')
@@ -41,7 +42,6 @@ class EPICSRecord:
             self.fields = sort_fields(self.fields)
 
         return self.record_template.render(record=self)
-
 
     def __repr__(self):
         return (f"EPICSRecord({self.pvname!r}, "
@@ -448,8 +448,8 @@ data_types = {
 }
 
 
-def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict]=None, 
-        last: Optional[bool]=True) -> OrderedDict:
+def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
+                last: Optional[bool] = True) -> OrderedDict:
     """
     Sort the ordered dict according to the sort_scheme given at instantiation.
     Does NOT sort in place.
@@ -473,7 +473,6 @@ def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict]=None,
     """
     if sort_lookup is None:
         sort_lookup = unified_lookup_list
-
 
     instructed_unsorted = OrderedDict()
     naive_unsorted = OrderedDict()
