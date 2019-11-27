@@ -1,4 +1,6 @@
-from pytmc.record import EPICSRecord
+from collections import OrderedDict
+
+from pytmc.record import EPICSRecord, sort_fields
 from pytmc.linter import lint_db
 
 
@@ -28,3 +30,29 @@ def test_epics_record_with_linter(dbd_file):
     record = ec.render()
     linted = lint_db(dbd=dbd_file, db=record)
     assert not (linted.errors)
+
+def test_sort_fields():
+    unsorted_entry = OrderedDict([
+        ('CALC', None),
+        ('very_fake',None),
+        ('ONVL', None),
+        ('FTVL', None),
+        ('not_real',None),
+        ('NAME', None),
+        ('SVSV', None),
+        ('ONSV', None),
+    ])
+    correct_entry = OrderedDict([
+        ('NAME', None),
+        ('ONVL', None),
+        ('FTVL', None),
+        ('ONSV', None),
+        ('SVSV', None),
+        ('CALC', None),
+        ('not_real',None),
+        ('very_fake',None),
+    ])
+    output = sort_fields(unsorted_entry)
+    for x in output:
+        print(x, '\t', output[x])
+    assert output == correct_entry
