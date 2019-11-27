@@ -445,7 +445,7 @@ data_types = {
 }
 
 
-def sort_fields(unsorted: OrderedDict, sort_scheme: Optional[dict]=None, 
+def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict]=None, 
         last: Optional[bool]=True) -> OrderedDict:
     """
     Sort the ordered dict according to the sort_scheme given at instantiation.
@@ -457,7 +457,7 @@ def sort_fields(unsorted: OrderedDict, sort_scheme: Optional[dict]=None,
     unsorted
         An OrderedDict in need of sorting.
 
-    sort_scheme
+    sort_lookup
         Requires a Dictionary, reverse lookup table for identifying sorting
         order. If left as None,
         :py:obj:`.default_settings.unified_ordered_field_list.unified_list`
@@ -468,22 +468,25 @@ def sort_fields(unsorted: OrderedDict, sort_scheme: Optional[dict]=None,
         them at the start.
 
     """
-    
+    if sort_lookup is None:
+        sort_lookup = unified_lookup_list
+
 
     instructed_unsorted = OrderedDict()
     naive_unsorted = OrderedDict()
 
     # Separate items identified by the sort_sceme into instructed_unsorted
     for x in unsorted:
-        if x in self.sort_lookup:
+        if x in sort_lookup:
             instructed_unsorted[x] = unsorted[x]
         else:
             naive_unsorted[x] = unsorted[x]
 
     # Separately sort instructed and, naively sorted entries
+    print(instructed_unsorted)
     instructed_sorted = sorted(
         instructed_unsorted.items(),
-        key=lambda key: sort_scheme[key[0]])
+        key=lambda key: sort_lookup[key[0]])
     naive_sorted = sorted(
         naive_unsorted.items()
     )

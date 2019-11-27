@@ -601,5 +601,5 @@ unified_list = [
 ]
 
 unified_lookup_list = {
-    field: index for field, index in enumerate(unified_list)
+    field: index for index, field in enumerate(unified_list)
 }
