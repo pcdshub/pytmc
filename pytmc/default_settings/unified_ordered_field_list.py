@@ -599,3 +599,7 @@ unified_list = [
     'NVL',
     'NLST'
 ]
+
+unified_lookup_list = {
+    field: index for field, index in enumerate(unified_list)
+}

@@ -7,6 +7,7 @@ from jinja2 import Environment, PackageLoader
 
 from collections import ChainMap, OrderedDict
 
+from default_settings.unified_ordered_field_list import unified_lookup_list
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ class EPICSRecord:
             self.fields[field] = str(value).strip('"')
 
         return self.record_template.render(record=self)
+
 
     def __repr__(self):
         return (f"EPICSRecord({self.pvname!r}, "
@@ -439,3 +441,54 @@ data_types = {
 
     'STRING': StringRecordPackage,
 }
+
+
+def sort_fields(unsorted: OrderedDict, sort_scheme: dict, last=True: bool) ->
+        OrderedDict:
+    """
+    Sort the ordered dict according to the sort_scheme given at instantiation.
+    Does NOT sort in place.
+
+    Parameters
+    ----------
+
+    unsorted
+        An OrderedDict in need of sorting.
+
+    sort_scheme
+        Requires a Dictionary, reverse lookup table for identifying sorting
+        order.
+
+    Returns
+    -------
+
+    OrderedDict
+        A sorted copy of unsorted input argument.
+    """
+    instructed_unsorted = OrderedDict()
+    naive_unsorted = OrderedDict()
+
+    # Separate items identified by the sort_sceme into instructed_unsorted
+    for x in unsorted:
+        if x in self.sort_lookup:
+            instructed_unsorted[x] = unsorted[x]
+        else:
+            naive_unsorted[x] = unsorted[x]
+
+    # Separately sort instructed and, naively sorted entries
+    instructed_sorted = sorted(
+        instructed_unsorted.items(),
+        key=lambda key: sort_scheme[key[0]])
+    naive_sorted = sorted(
+        naive_unsorted.items()
+    )
+
+    # Merge both Odicts in the order given by 'last'
+    combined_sorted = OrderedDict()
+    if last:
+        combined_sorted.update(instructed_sorted)
+        combined_sorted.update(naive_sorted)
+    else:
+        combined_sorted.update(naive_sorted)
+        combined_sorted.update(instructed_sorted)
+    return combined_sorted
