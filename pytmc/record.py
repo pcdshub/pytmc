@@ -485,7 +485,6 @@ def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
             naive_unsorted[x] = unsorted[x]
 
     # Separately sort instructed and, naively sorted entries
-    print(instructed_unsorted)
     instructed_sorted = sorted(
         instructed_unsorted.items(),
         key=lambda key: sort_lookup[key[0]])

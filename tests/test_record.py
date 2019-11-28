@@ -53,6 +53,4 @@ def test_sort_fields():
         ('very_fake',None),
     ])
     output = sort_fields(unsorted_entry)
-    for x in output:
-        print(x, '\t', output[x])
     assert output == correct_entry
