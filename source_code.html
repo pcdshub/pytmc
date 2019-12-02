@@ -434,7 +434,7 @@ keys: ‘title’ and ‘tag’.</p>
 <p>Representation of a single EPICS Record</p>
 <dl class="method">
 <dt id="pytmc.record.EPICSRecord.render">
-<code class="sig-name descname">render</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord.render" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param">sort=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the provided template</p>
 </dd></dl>
 
@@ -684,6 +684,29 @@ meaningless.”</p>
 <dd><p>Number of elements in record</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.record.sort_fields">
+<code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">sort_fields</code><span class="sig-paren">(</span><em class="sig-param">unsorted</em>, <em class="sig-param">sort_lookup=None</em>, <em class="sig-param">last=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.sort_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort the ordered dict according to the sort_scheme given at instantiation.
+Does NOT sort in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unsorted</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code>) – An OrderedDict in need of sorting.</p></li>
+<li><p><strong>sort_lookup</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – Requires a Dictionary, reverse lookup table for identifying sorting
+order. If left as None,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">default_settings.unified_ordered_field_list.unified_list</span></code>
+is used.</p></li>
+<li><p><strong>last</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – If True, place the alphabetized entries at the end, otherwise, place
+them at the start.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
