@@ -5,14 +5,18 @@ import logging
 
 from jinja2 import Environment, PackageLoader
 
+from typing import Optional
+
 from collections import ChainMap, OrderedDict
 
+from .default_settings.unified_ordered_field_list import unified_lookup_list
 
 logger = logging.getLogger(__name__)
 
 
 class EPICSRecord:
     """Representation of a single EPICS Record"""
+
     def __init__(self, pvname, record_type, fields=None, template=None):
         self.pvname = pvname
         self.record_type = record_type
@@ -29,10 +33,13 @@ class EPICSRecord:
             self.template
         )
 
-    def render(self):
+    def render(self, sort: bool = True):
         """Render the provided template"""
         for field, value in list(self.fields.items()):
             self.fields[field] = str(value).strip('"')
+
+        if sort:
+            self.fields = sort_fields(self.fields)
 
         return self.record_template.render(record=self)
 
@@ -439,3 +446,58 @@ data_types = {
 
     'STRING': StringRecordPackage,
 }
+
+
+def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
+                last: Optional[bool] = True) -> OrderedDict:
+    """
+    Sort the ordered dict according to the sort_scheme given at instantiation.
+    Does NOT sort in place.
+
+    Parameters
+    ----------
+
+    unsorted
+        An OrderedDict in need of sorting.
+
+    sort_lookup
+        Requires a Dictionary, reverse lookup table for identifying sorting
+        order. If left as None,
+        :py:obj:`.default_settings.unified_ordered_field_list.unified_list`
+        is used.
+
+    last
+        If True, place the alphabetized entries at the end, otherwise, place
+        them at the start.
+
+    """
+    if sort_lookup is None:
+        sort_lookup = unified_lookup_list
+
+    instructed_unsorted = OrderedDict()
+    naive_unsorted = OrderedDict()
+
+    # Separate items identified by the sort_sceme into instructed_unsorted
+    for x in unsorted:
+        if x in sort_lookup:
+            instructed_unsorted[x] = unsorted[x]
+        else:
+            naive_unsorted[x] = unsorted[x]
+
+    # Separately sort instructed and, naively sorted entries
+    instructed_sorted = sorted(
+        instructed_unsorted.items(),
+        key=lambda key: sort_lookup[key[0]])
+    naive_sorted = sorted(
+        naive_unsorted.items()
+    )
+
+    # Merge both Odicts in the order given by 'last'
+    combined_sorted = OrderedDict()
+    if last:
+        combined_sorted.update(instructed_sorted)
+        combined_sorted.update(naive_sorted)
+    else:
+        combined_sorted.update(naive_sorted)
+        combined_sorted.update(instructed_sorted)
+    return combined_sorted
