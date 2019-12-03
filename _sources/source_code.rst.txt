@@ -2,7 +2,7 @@ API Documentation
 =================
 
 pytmc.pragmas
-=============
+-------------
 
 .. automodule:: pytmc.pragmas
    :show-inheritance:
@@ -10,7 +10,7 @@ pytmc.pragmas
 
 
 pytmc.record
-=============
+-------------
 
 .. automodule:: pytmc.record
    :show-inheritance:
@@ -18,7 +18,7 @@ pytmc.record
 
 
 pytmc.parser
-=============
+-------------
 
 .. automodule:: pytmc.parser
    :show-inheritance:
@@ -26,7 +26,7 @@ pytmc.parser
 
 
 pytmc.linter
-=============
+-------------
 
 .. automodule:: pytmc.linter
    :show-inheritance:

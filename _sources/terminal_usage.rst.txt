@@ -6,58 +6,77 @@ Using pytmc
 Once pytmc has been installed in a virtual environment the ``pytmc`` command
 can be called from the command line to generate .db files and more.
 
-pytmc-db
+
+pytmc db
 --------
 
 .. argparse::
    :module: pytmc.bin.db
    :func: build_arg_parser
-   :prog: pytmc-db
+   :prog: pytmc db
 
 
-pytmc-stcmd
+pytmc stcmd
 -----------
 
 .. argparse::
    :module: pytmc.bin.stcmd
    :func: build_arg_parser
-   :prog: pytmc-stcmd
+   :prog: pytmc stcmd
 
 
-pytmc-xmltranslate
+pytmc xmltranslate
 ------------------
 
 .. argparse::
    :module: pytmc.bin.xmltranslate
    :func: build_arg_parser
-   :prog: pytmc-xmltranslate
+   :prog: pytmc xmltranslate
 
 
-pytmc-debug
+pytmc debug
 -----------
 
 .. argparse::
    :module: pytmc.bin.debug
    :func: build_arg_parser
-   :prog: pytmc-debug
+   :prog: pytmc debug
 
 
-pytmc-summary
+pytmc pragmalint
+----------------
+
+.. argparse::
+   :module: pytmc.bin.pragmalint
+   :func: build_arg_parser
+   :prog: pytmc pragmalint
+
+
+pytmc stcmd
+-----------
+
+.. argparse::
+   :module: pytmc.bin.stcmd
+   :func: build_arg_parser
+   :prog: pytmc stcmd
+
+
+pytmc summary
 -------------
 
 .. argparse::
    :module: pytmc.bin.summary
    :func: build_arg_parser
-   :prog: pytmc-summary
+   :prog: pytmc summary
 
 
-pytmc-types
+pytmc types
 -----------
 
 .. argparse::
    :module: pytmc.bin.types
    :func: build_arg_parser
-   :prog: pytmc-types
+   :prog: pytmc types
 
 
 Templates

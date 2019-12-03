@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Annotating a TwinCAT3 project" href="pragma_usage.html" /> 
+    <link rel="prev" title="Command-line Usage" href="terminal_usage.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -82,11 +82,13 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#module-pytmc.pragmas">pytmc.pragmas</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#module-pytmc.record">pytmc.record</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#module-pytmc.parser">pytmc.parser</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#module-pytmc.linter">pytmc.linter</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.pragmas">pytmc.pragmas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.record">pytmc.record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.parser">pytmc.parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.linter">pytmc.linter</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -153,9 +155,8 @@
             
   <div class="section" id="api-documentation">
 <h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
-</div>
 <div class="section" id="module-pytmc.pragmas">
-<span id="pytmc-pragmas"></span><h1>pytmc.pragmas<a class="headerlink" href="#module-pytmc.pragmas" title="Permalink to this headline">¶</a></h1>
+<span id="pytmc-pragmas"></span><h2>pytmc.pragmas<a class="headerlink" href="#module-pytmc.pragmas" title="Permalink to this headline">¶</a></h2>
 <p>This file contains the objects for taking in pytmc-parsed TMC files and
 generating Python-level configuration information.</p>
 <dl class="class">
@@ -166,7 +167,7 @@ generating Python-level configuration information.</p>
 of data that should be accessible via EPICS/ADS</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>item_to_config</strong> (<em>dict</em>) – Keys would be <a href="#id1"><span class="problematic" id="id2">`</span></a>TwincatItem`s such as Symbol, and values would be
+<dd class="field-odd"><p><strong>item_to_config</strong> (<em>dict</em>) – Keys would be <code class="docutils literal notranslate"><span class="pre">TwincatItem</span></code> s such as Symbol, and values would be
 dictionary configurations from parsed pytmc pragmas.</p>
 </dd>
 </dl>
@@ -418,7 +419,7 @@ keys: ‘title’ and ‘tag’.</p>
 
 </div>
 <div class="section" id="module-pytmc.record">
-<span id="pytmc-record"></span><h1>pytmc.record<a class="headerlink" href="#module-pytmc.record" title="Permalink to this headline">¶</a></h1>
+<span id="pytmc-record"></span><h2>pytmc.record<a class="headerlink" href="#module-pytmc.record" title="Permalink to this headline">¶</a></h2>
 <p>Record generation and templating</p>
 <dl class="class">
 <dt id="pytmc.record.BinaryRecordPackage">
@@ -711,7 +712,7 @@ them at the start.</p></li>
 
 </div>
 <div class="section" id="module-pytmc.parser">
-<span id="pytmc-parser"></span><h1>pytmc.parser<a class="headerlink" href="#module-pytmc.parser" title="Permalink to this headline">¶</a></h1>
+<span id="pytmc-parser"></span><h2>pytmc.parser<a class="headerlink" href="#module-pytmc.parser" title="Permalink to this headline">¶</a></h2>
 <p>TMC, XTI, tsproj parsing utilities</p>
 <dl class="class">
 <dt id="pytmc.parser.ArrayInfo">
@@ -1310,7 +1311,7 @@ on XML tag), and return a dictionary keyed on that.</p>
 
 </div>
 <div class="section" id="module-pytmc.linter">
-<span id="pytmc-linter"></span><h1>pytmc.linter<a class="headerlink" href="#module-pytmc.linter" title="Permalink to this headline">¶</a></h1>
+<span id="pytmc-linter"></span><h2>pytmc.linter<a class="headerlink" href="#module-pytmc.linter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pytmc.linter.DbdFile">
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.linter.</code><code class="sig-name descname">DbdFile</code><span class="sig-paren">(</span><em class="sig-param">fn</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.linter.DbdFile" title="Permalink to this definition">¶</a></dt>
@@ -1422,6 +1423,7 @@ record instances</p></li>
 </dd></dl>
 
 </div>
+</div>
 
 
            </div>
@@ -1432,7 +1434,7 @@ record instances</p></li>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="pragma_usage.html" class="btn btn-neutral float-left" title="Annotating a TwinCAT3 project" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="terminal_usage.html" class="btn btn-neutral float-left" title="Command-line Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
