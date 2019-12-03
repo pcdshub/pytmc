@@ -31,7 +31,7 @@ def tmc_xtes_sxr_plc():
     """
     generic .tmc file
     """
-    return TMC_Root / "xtes_sxr_plc.tmc"
+    return TMC_ROOT / "xtes_sxr_plc.tmc"
 
 
 @pytest.fixture(scope='module')
@@ -39,7 +39,7 @@ def tmc_ArbiterPlc():
     """
     .tmc file for pinned global variable testing.
     """
-    return TMC_Root / "ArbiterPlc.tmc"
+    return TMC_ROOT / "ArbiterPlc.tmc"
     
 
 
