@@ -26,6 +26,22 @@ def dbd_file():
 def tmc_filename(request):
     return request.param
 
+@pytest.fixture(scope='module')
+def tmc_xtes_sxr_plc():
+    """
+    generic .tmc file
+    """
+    return TMC_Root / "xtes_sxr_plc.tmc"
+
+
+@pytest.fixture(scope='module')
+def tmc_ArbiterPlc():
+    """
+    .tmc file for pinned global variable testing.
+    """
+    return TMC_Root / "ArbiterPlc.tmc"
+    
+
 
 @pytest.fixture(params=list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj')))
 def project_filename(request):
