@@ -44,7 +44,10 @@ for specifics.
 Full IOC Creation
 +++++++++++++++++
 
-(This is incomplete)
+PCDS has recently focused its efforts on `ads-deploy
+<https://github.com/pcdshub/ads-deploy>`_, for seamless development and
+deployment of IOCs directly from the TwinCAT IDE. Behind the scenes, ads-deploy
+takes care of the following steps using a docker container:
 
 .. code-block:: sh
 

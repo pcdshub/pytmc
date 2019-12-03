@@ -276,7 +276,7 @@ class SingularChain:
     Parameters
     ----------
     item_to_config : dict
-        Keys would be `TwincatItem`s such as Symbol, and values would be
+        Keys would be ``TwincatItem`` s such as Symbol, and values would be
         dictionary configurations from parsed pytmc pragmas.
 
     Attributes
