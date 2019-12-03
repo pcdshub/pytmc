@@ -27,6 +27,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
+requirements = open(path.join(here, 'requirements.txt')).read().splitlines()
 
 setup(
     name     = 'pytmc',
@@ -46,4 +47,6 @@ setup(
       'pytmc': ['templates/*'],
     },
     include_package_data=True,
+    python_requires='>=3.6',
+    install_requires=requirements,
 )
