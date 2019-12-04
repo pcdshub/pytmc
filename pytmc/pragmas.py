@@ -6,7 +6,7 @@ import itertools
 import logging
 import math
 import re
-from typing import Generator, Type, Union, List
+from typing import Generator, Type, Union
 
 from . import parser
 from .record import RecordPackage
