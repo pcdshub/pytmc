@@ -6,6 +6,7 @@ import itertools
 import logging
 import math
 import re
+from typing import Generator, Type, Union
 
 from . import parser
 from .record import RecordPackage
@@ -321,8 +322,24 @@ def find_pytmc_symbols(tmc):
                 yield symbol
 
 
-def get_pragma(item, *, name='pytmc'):
-    'Get all pragmas with a certain tag'
+def get_pragma(item: Union[parser.SubItem, Type[parser.Symbol]], *,
+               name: str = 'pytmc') -> Generator[str, None, None]:
+    """
+    Get all pragmas with a certain tag.
+
+    Parameters
+    ----------
+    item
+        Representation of beckhoff variable or data structure  
+
+    name
+        Accept tmc entries where the <Name> field equals the passed string 
+    
+    Yields
+    ------
+    str
+
+    """
     if hasattr(item, 'Properties'):
         properties = item.Properties[0]
         for prop in getattr(properties, 'Property', []):
