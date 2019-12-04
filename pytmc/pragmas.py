@@ -6,7 +6,7 @@ import itertools
 import logging
 import math
 import re
-from typing import Generator, Type, Union
+from typing import Generator, Type, Union, List
 
 from . import parser
 from .record import RecordPackage
@@ -158,7 +158,7 @@ def dictify_config(conf, array_index=None, expand_default=':%.2d'):
     return config
 
 
-def expand_configurations_from_chain(chain, *, pragma='pytmc'):
+def expand_configurations_from_chain(chain, *, pragma : List[str]= None):
     '''
     Generate all possible configuration combinations
 
@@ -178,6 +178,9 @@ def expand_configurations_from_chain(chain, *, pragma='pytmc'):
     individual elements.  That is, `arr : ARRAY [1..5] of ST_Structure` will be
     unrolled into `arr[1]` through `arr[5]`.
     '''
+    if pragma is None:
+        pragma = ['pytmc','plcAttribute_pytmc']
+    
     result = []
 
     def dictify_scalar(item):
@@ -323,7 +326,7 @@ def find_pytmc_symbols(tmc):
 
 
 def get_pragma(item: Union[parser.SubItem, Type[parser.Symbol]], *,
-               name: str = 'pytmc') -> Generator[str, None, None]:
+               name: List[str] = None) -> Generator[str, None, None]:
     """
     Get all pragmas with a certain tag.
 
@@ -340,16 +343,22 @@ def get_pragma(item: Union[parser.SubItem, Type[parser.Symbol]], *,
     str
 
     """
+    if name is None:
+        name = ['pytmc','plcAttribute_pytmc']
+
     if hasattr(item, 'Properties'):
         properties = item.Properties[0]
         for prop in getattr(properties, 'Property', []):
-            if any([prop.name == indiv_name in name]):
-                """RESUME HERE"""
+            # Return true if any of the names searched for are found
+            if any([ indiv_name in prop.name for indiv_name in name]):
                 yield prop.value
 
 
-def has_pragma(item, *, name='pytmc'):
+def has_pragma(item, *, name : List[str] = None):
     'Does `item` have a pragma titled `name`?'
+    if name is None:
+        name = ['pytmc','plcAttribute_pytmc']
+    
     return any(True for pragma in get_pragma(item, name=name)
                if pragma is not None)
 
