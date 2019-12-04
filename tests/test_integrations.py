@@ -9,8 +9,9 @@ import pytest
 from pytmc import linter, parser
 from pytmc.bin.db import process as db_process
 
+
 def test_global_pinned_variables(tmc_ArbiterPlc):
-    
+
     tmc = parser.parse(tmc_ArbiterPlc)
 
     records, exceptions = db_process(
@@ -21,6 +22,6 @@ def test_global_pinned_variables(tmc_ArbiterPlc):
     contains_test_string_list = [
         (test_string in x.pvname) for x in records
     ]
-    
+
     assert any(contains_test_string_list)
     assert exceptions == []
