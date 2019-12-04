@@ -11,7 +11,12 @@ from pytmc.bin.db import process as db_process
 
 
 def test_global_pinned_variables(tmc_ArbiterPlc):
-
+    """
+    Ensure that one of the pinned global variables can be found in the list of
+    records created when parsing this tmc file. This tmc file was specifically
+    created to contain the 'plcAttribute_pytmc' style <Name> fields in place of
+    the normal 'pytmc'.
+    """
     tmc = parser.parse(tmc_ArbiterPlc)
 
     records, exceptions = db_process(
