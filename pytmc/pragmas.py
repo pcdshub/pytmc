@@ -343,7 +343,8 @@ def get_pragma(item: Union[parser.SubItem, Type[parser.Symbol]], *,
     if hasattr(item, 'Properties'):
         properties = item.Properties[0]
         for prop in getattr(properties, 'Property', []):
-            if prop.name == name:
+            if any([prop.name == indiv_name in name]):
+                """RESUME HERE"""
                 yield prop.value
 
 
