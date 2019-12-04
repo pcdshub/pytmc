@@ -363,16 +363,20 @@ def has_pragma(item, *, name : List[str] = None):
                if pragma is not None)
 
 
-def chains_from_symbol(symbol, *, pragma='pytmc'):
+def chains_from_symbol(symbol, *, pragma : List[str]=None):
     'Build all SingularChain instances from a Symbol'
+    if pragma is None:
+        pragma = ['pytmc','plcAttribute_pytmc']
     for full_chain in symbol.walk(condition=has_pragma):
         for item_and_config in expand_configurations_from_chain(full_chain):
             yield SingularChain(dict(item_and_config))
 
 
-def record_packages_from_symbol(symbol, *, pragma='pytmc',
+def record_packages_from_symbol(symbol, *, pragma : List[str]=None,
                                 yield_exceptions=False):
     'Create all record packages from a given Symbol'
+    if pragma is None:
+        pragma = ['pytmc','plcAttribute_pytmc']
     for chain in chains_from_symbol(symbol, pragma=pragma):
         try:
             yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
