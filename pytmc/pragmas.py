@@ -158,7 +158,7 @@ def dictify_config(conf, array_index=None, expand_default=':%.2d'):
     return config
 
 
-def expand_configurations_from_chain(chain, *, pragma: List[str] = None):
+def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc'):
     '''
     Generate all possible configuration combinations
 
@@ -178,9 +178,6 @@ def expand_configurations_from_chain(chain, *, pragma: List[str] = None):
     individual elements.  That is, `arr : ARRAY [1..5] of ST_Structure` will be
     unrolled into `arr[1]` through `arr[5]`.
     '''
-    if pragma is None:
-        pragma = ['pytmc', 'plcAttribute_pytmc']
-    
     result = []
 
     def dictify_scalar(item):
@@ -326,7 +323,7 @@ def find_pytmc_symbols(tmc):
 
 
 def get_pragma(item: Union[parser.SubItem, Type[parser.Symbol]], *,
-               name: List[str] = None) -> Generator[str, None, None]:
+               name: str = 'pytmc') -> Generator[str, None, None]:
     """
     Get all pragmas with a certain tag.
 
@@ -343,40 +340,35 @@ def get_pragma(item: Union[parser.SubItem, Type[parser.Symbol]], *,
     str
 
     """
-    if name is None:
-        name = ['pytmc', 'plcAttribute_pytmc']
-
+    name_list = [
+        name,
+        'plcAttribute_{}'.format(name)
+    ]
     if hasattr(item, 'Properties'):
         properties = item.Properties[0]
         for prop in getattr(properties, 'Property', []):
             # Return true if any of the names searched for are found
-            if any([indiv_name in prop.name for indiv_name in name]):
+            if any(indiv_name == prop.name for indiv_name in name_list):
                 yield prop.value
 
 
-def has_pragma(item, *, name: List[str] = None):
+def has_pragma(item, *, name: str = 'pytmc'):
     'Does `item` have a pragma titled `name`?'
-    if name is None:
-        name = ['pytmc', 'plcAttribute_pytmc']
 
     return any(True for pragma in get_pragma(item, name=name)
                if pragma is not None)
 
 
-def chains_from_symbol(symbol, *, pragma: List[str] = None):
+def chains_from_symbol(symbol, *, pragma: str = 'pytmc'):
     'Build all SingularChain instances from a Symbol'
-    if pragma is None:
-        pragma = ['pytmc', 'plcAttribute_pytmc']
     for full_chain in symbol.walk(condition=has_pragma):
         for item_and_config in expand_configurations_from_chain(full_chain):
             yield SingularChain(dict(item_and_config))
 
 
-def record_packages_from_symbol(symbol, *, pragma: List[str] = None,
+def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
                                 yield_exceptions=False):
     'Create all record packages from a given Symbol'
-    if pragma is None:
-        pragma = ['pytmc', 'plcAttribute_pytmc']
     for chain in chains_from_symbol(symbol, pragma=pragma):
         try:
             yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
