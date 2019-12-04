@@ -296,6 +296,7 @@ class SingularChain:
     config : dict
         The final configuration based on the full chain of configurations
     '''
+
     def __init__(self, item_to_config):
         self.item_to_config = item_to_config
         self.chain = list(self.item_to_config)
@@ -329,10 +330,10 @@ def get_pragma(item: Union[parser.SubItem, Type[parser.Symbol]], *,
 
     Parameters
     ----------
-    item
+    item : parser.SubItem, parser.Symbol, parser.Symbol subclass
         Representation of beckhoff variable or data structure
 
-    name
+    name : str, optional
         Accept tmc entries where the <Name> field equals the passed string
 
     Yields
