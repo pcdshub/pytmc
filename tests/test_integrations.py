@@ -17,5 +17,10 @@ def test_global_pinned_variables(tmc_ArbiterPlc):
         tmc, dbd_file=None, allow_errors=False,
         show_error_context=True
     )
-    print(records)
-    assert False
+    test_string = "BunchEnergy"
+    contains_test_string_list = [
+        (test_string in x.pvname) for x in records
+    ]
+    
+    assert any(contains_test_string_list)
+    assert exceptions == []
