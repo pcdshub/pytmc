@@ -14,6 +14,7 @@ DBD_FILE = TEST_PATH / 'ads.dbd'
 TMC_ROOT = TEST_PATH / 'tmc_files'
 TMC_FILES = list(TMC_ROOT.glob('*.tmc'))
 INVALID_TMC_FILES = list((TMC_ROOT / 'invalid').glob('*.tmc'))
+PROJ_ROOT = TEST_PATH / 'projects'
 
 
 @pytest.fixture(scope='module')
@@ -36,12 +37,12 @@ def tmc_xtes_sxr_plc():
 
 
 @pytest.fixture(scope='module')
-def tmc_ArbiterPlc():
+def tmc_lcls_twincat_pmps_tmc():
     """
-    .tmc file for pinned global variable testing.
+    .tmc file containing pinned global variables
     """
-    return TMC_ROOT / "ArbiterPlc.tmc"
-
+    path = PROJ_ROOT / "lcls-twincat-pmps/lcls-twincat-pmps/Library/Library.tmc"
+    return path
 
 @pytest.fixture(params=list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj')))
 def project_filename(request):

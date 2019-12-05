@@ -5,7 +5,7 @@
 	path = tests/projects/lcls-twincat-motion
 	url = ../../pcdshub/lcls-twincat-motion.git
 [submodule "tests/projects/lcls-twincat-pmps"]
-	path = tests/projects/lcls-twincat-pmps
+	path = tests/projects/lcls-twincat-pmps2/
 	url = https://github.com/pcdshub/lcls-twincat-pmps.git
 [submodule "tests/projects/pmps-dev-arbiter"]
 	path = tests/projects/pmps-dev-arbiter
