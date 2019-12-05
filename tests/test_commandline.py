@@ -37,6 +37,7 @@ def project_filename_linter_success(project_filename):
         return False
     return True
 
+
 def test_pragmalint(project_filename, project_filename_linter_success):
     if not project_filename_linter_success:
         pytest.xfail("Project's current state does not satisfy linter")
