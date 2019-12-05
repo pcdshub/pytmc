@@ -1,12 +1,12 @@
 [submodule "tests/projects/lcls-plc-kfe-xgmd-vac"]
 	path = tests/projects/lcls-plc-kfe-xgmd-vac
-	url = ../../pcdshub/lcls-plc-kfe-xgmd-vac.git
+	url = https://github.com/pcdshub/lcls-plc-kfe-xgmd-vac.git
 [submodule "tests/projects/lcls-twincat-motion"]
 	path = tests/projects/lcls-twincat-motion
-	url = ../../pcdshub/lcls-twincat-motion.git
+	url = https://github.com/pcdshub/lcls-twincat-motion.git
 [submodule "tests/projects/pmps-dev-arbiter"]
 	path = tests/projects/pmps-dev-arbiter
-	url = https://github.com/slacAWallace/pmps-dev-arbiter.git
+	url = https://github.com/pcdshub/pmps-dev-arbiter.git
 [submodule "tests/projects/lcls-twincat-pmps"]
 	path = tests/projects/lcls-twincat-pmps
 	url = https://github.com/pcdshub/lcls-twincat-pmps.git
