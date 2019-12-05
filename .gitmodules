@@ -4,6 +4,3 @@
 [submodule "tests/projects/lcls-twincat-motion"]
 	path = tests/projects/lcls-twincat-motion
 	url = ../../pcdshub/lcls-twincat-motion.git
-[submodule "tests/projects/lcls-twincat-pmps"]
-	path = tests/projects/lcls-twincat-pmps
-	url = ../../pcdshub/lcls-twincat-pmps.git
