@@ -14,6 +14,7 @@ DBD_FILE = TEST_PATH / 'ads.dbd'
 TMC_ROOT = TEST_PATH / 'tmc_files'
 TMC_FILES = list(TMC_ROOT.glob('*.tmc'))
 INVALID_TMC_FILES = list((TMC_ROOT / 'invalid').glob('*.tmc'))
+PROJ_ROOT = TEST_PATH / 'projects'
 
 
 @pytest.fixture(scope='module')
@@ -25,6 +26,31 @@ def dbd_file():
                 ids=[f.name for f in TMC_FILES])
 def tmc_filename(request):
     return request.param
+
+
+@pytest.fixture(scope='module')
+def tmc_xtes_sxr_plc():
+    """
+    generic .tmc file
+    """
+    return TMC_ROOT / "xtes_sxr_plc.tmc"
+
+
+@pytest.fixture(scope='module')
+def tmc_arbiter_plc():
+    """
+    generic .tmc file
+    """
+    return TMC_ROOT / "ArbiterPLC.tmc"
+
+
+@pytest.fixture(scope='module')
+def tmc_pmps_dev_arbiter():
+    """
+    .tmc file containing pinned global variables
+    """
+    path = PROJ_ROOT / "pmps-dev-arbiter/Arbiter/ArbiterPLC/ArbiterPLC.tmc"
+    return path
 
 
 @pytest.fixture(params=list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj')))
