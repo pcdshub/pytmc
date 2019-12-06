@@ -37,11 +37,19 @@ def tmc_xtes_sxr_plc():
 
 
 @pytest.fixture(scope='module')
-def tmc_lcls_twincat_pmps_tmc():
+def tmc_arbiter_plc():
+    """
+    generic .tmc file
+    """
+    return TMC_ROOT / "ArbiterPLC.tmc"
+
+
+@pytest.fixture(scope='module')
+def tmc_pmps_dev_arbiter():
     """
     .tmc file containing pinned global variables
     """
-    path = PROJ_ROOT / "lcls-twincat-pmps/lcls-twincat-pmps/Library/Library.tmc"
+    path = PROJ_ROOT / "pmps-dev-arbiter/Arbiter/ArbiterPLC/ArbiterPLC.tmc"
     return path
 
 @pytest.fixture(params=list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj')))
