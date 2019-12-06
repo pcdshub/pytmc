@@ -277,3 +277,48 @@ Valid options for this field are:
    ".5 second"
    ".2 second"
    ".1 second"
+
+
+Autosave
+''''''''
+
+Autosave fields for individual EPICS records are configured by default with
+pytmc. It is possible to customize this behavior with additional pragmas,
+optionally specifying different fields for input or output records.
+
+Pass 0 indicates restoring information prior to record initialization on IOC
+initialization, whereas pass 1 indicates restoring information after record
+initialization. Pass 0 is generally safe and does not cause record processing,
+whereas pass 1 is just as if one were to ``caput`` to the record after starting
+the IOC. When in doubt, use pass 0 and/or ask an EPICS expert.
+
+To apply to either input or output records, pragma keys ``autosave_pass0`` or
+``autosave_pass1`` can be used.
+
+To only apply to input records, pragma keys ``autosave_input_pass0``
+``autosave_input_pass1`` can be used.
+
+To only apply to output records, pragma keys ``autosave_output_pass0``
+``autosave_output_pass1`` can be used.
+
+For example, a pragma like the following:
+
+.. code-block:: none
+   
+   autosave_pass0: VAL DESC
+
+
+Would result in both input and output records having these fields marked for
+autosaving:
+
+.. code-block:: none
+
+   record(ai, "my:record_RBV") {
+      ...
+      info(autosave_pass0, "VAL DESC")
+   }
+
+   record(ao, "my:record") {
+      ...
+      info(autosave_pass0, "VAL DESC")
+   }
