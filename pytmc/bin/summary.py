@@ -108,6 +108,8 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
             show_links=False, log_level=None, debug=False):
 
     proj_path = pathlib.Path(tsproj_project)
+    proj_root = proj_path.parent.resolve().absolute()
+
     if proj_path.suffix.lower() not in ('.tsproj', ):
         raise ValueError('Expected a .tsproj file')
 
@@ -116,16 +118,21 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
     if show_plcs or show_all or show_code or show_symbols:
         for i, plc in enumerate(project.plcs, 1):
             util.heading(f'PLC Project ({i}): {plc.project_path.stem}')
-            print(f'    Project path: {plc.project_path}')
-            print(f'    TMC path:     {plc.tmc_path}')
+            print(f'    Project root: {proj_root}')
+            print(f'    Project path:',
+                  plc.project_path.resolve().relative_to(proj_root))
+            print(f'    TMC path:    ',
+                  plc.tmc_path.resolve().relative_to(proj_root))
             print(f'    AMS ID:       {plc.ams_id}')
             print(f'    IP Address:   {plc.target_ip} (* based on AMS ID)')
             print(f'    Port:         {plc.port}')
             print(f'')
-            proj_info = [('Source files', plc.source_filenames),
-                         ('POUs', plc.pou_by_name),
-                         ('GVLs', plc.gvl_by_name),
-                         ]
+            proj_info = [
+                ('Source files', [pathlib.Path(fn).relative_to(proj_root)
+                                  for fn in plc.source_filenames]),
+                ('POUs', plc.pou_by_name),
+                ('GVLs', plc.gvl_by_name),
+            ]
 
             for category, items in proj_info:
                 if items:
