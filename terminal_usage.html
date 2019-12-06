@@ -697,10 +697,15 @@ tmc file.</p>
 </div>
 <div class="section" id="asyn-standard-record-jinja2">
 <h2>asyn_standard_record.jinja2<a class="headerlink" href="#asyn-standard-record-jinja2" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">({{</span><span class="n">record</span><span class="o">.</span><span class="n">record_type</span><span class="p">}},</span> <span class="s2">&quot;{{record.pvname}}&quot;</span><span class="p">){</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">({{</span><span class="n">record</span><span class="o">.</span><span class="n">record_type</span><span class="p">}},</span> <span class="s2">&quot;{{record.pvname}}&quot;</span><span class="p">)</span> <span class="p">{</span>
 <span class="p">{</span><span class="o">%</span> <span class="n">block</span> <span class="n">add_fields</span>  <span class="o">%</span><span class="p">}{</span><span class="o">%</span> <span class="n">endblock</span> <span class="o">%</span><span class="p">}</span>
 <span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="o">%</span><span class="p">}</span>
   <span class="n">field</span><span class="p">({{</span><span class="n">f</span><span class="p">}},</span> <span class="s2">&quot;{{record.fields[f]}}&quot;</span><span class="p">)</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">autosave_pass</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;pass0&#39;</span><span class="p">,</span> <span class="s1">&#39;pass1&#39;</span><span class="p">]</span> <span class="o">%</span><span class="p">}</span>
+    <span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">autosave</span><span class="p">[</span><span class="n">autosave_pass</span><span class="p">]</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">info</span><span class="p">(</span><span class="n">autosave_</span><span class="p">{{</span><span class="n">autosave_pass</span><span class="p">}},</span> <span class="s2">&quot;{{ record.autosave[autosave_pass] | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
+    <span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
 <span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>

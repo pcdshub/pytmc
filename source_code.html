@@ -444,13 +444,30 @@ keys: ‘title’ and ‘tag’.</p>
 
 <dl class="class">
 <dt id="pytmc.record.EPICSRecord">
-<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">EPICSRecord</code><span class="sig-paren">(</span><em class="sig-param">pvname</em>, <em class="sig-param">record_type</em>, <em class="sig-param">fields=None</em>, <em class="sig-param">template=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">EPICSRecord</code><span class="sig-paren">(</span><em class="sig-param">pvname</em>, <em class="sig-param">record_type</em>, <em class="sig-param">direction</em>, <em class="sig-param">fields=None</em>, <em class="sig-param">template=None</em>, <em class="sig-param">autosave=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Representation of a single EPICS Record</p>
 <dl class="method">
 <dt id="pytmc.record.EPICSRecord.render">
 <code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param">sort=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord.render" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render the provided template</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.EPICSRecord.update_autosave_from_pragma">
+<code class="sig-name descname">update_autosave_from_pragma</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord.update_autosave_from_pragma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update autosave settings from a pragma configuration</p>
+<p>To apply to either input or output records, pragma keys
+<cite>autosave_pass0</cite> or <cite>autosave_pass1</cite> can be used.</p>
+<p>To only apply to input records, pragma keys <cite>autosave_input_pass0</cite>
+<cite>autosave_input_pass1</cite> can be used.</p>
+<p>To only apply to output records, pragma keys <cite>autosave_output_pass0</cite>
+<cite>autosave_output_pass1</cite> can be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – The pragma configuration dictionary</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

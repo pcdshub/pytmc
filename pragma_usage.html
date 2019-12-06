@@ -99,6 +99,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#scan">SCAN</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#autosave">Autosave</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Command-line Usage</a></li>
@@ -524,6 +525,40 @@ pytmc itself cannot know at what rate a variable will update on the PLC side.</p
 &quot;.1 second&quot;
 </pre></div>
 </div>
+</div>
+</div>
+<div class="section" id="autosave">
+<h2>Autosave<a class="headerlink" href="#autosave" title="Permalink to this headline">¶</a></h2>
+<p>Autosave fields for individual EPICS records are configured by default with
+pytmc. It is possible to customize this behavior with additional pragmas,
+optionally specifying different fields for input or output records.</p>
+<p>Pass 0 indicates restoring information prior to record initialization on IOC
+initialization, whereas pass 1 indicates restoring information after record
+initialization. Pass 0 is generally safe and does not cause record processing,
+whereas pass 1 is just as if one were to <code class="docutils literal notranslate"><span class="pre">caput</span></code> to the record after starting
+the IOC. When in doubt, use pass 0 and/or ask an EPICS expert.</p>
+<p>To apply to either input or output records, pragma keys <code class="docutils literal notranslate"><span class="pre">autosave_pass0</span></code> or
+<code class="docutils literal notranslate"><span class="pre">autosave_pass1</span></code> can be used.</p>
+<p>To only apply to input records, pragma keys <code class="docutils literal notranslate"><span class="pre">autosave_input_pass0</span></code>
+<code class="docutils literal notranslate"><span class="pre">autosave_input_pass1</span></code> can be used.</p>
+<p>To only apply to output records, pragma keys <code class="docutils literal notranslate"><span class="pre">autosave_output_pass0</span></code>
+<code class="docutils literal notranslate"><span class="pre">autosave_output_pass1</span></code> can be used.</p>
+<p>For example, a pragma like the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>autosave_pass0: VAL DESC
+</pre></div>
+</div>
+<p>Would result in both input and output records having these fields marked for
+autosaving:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>record(ai, &quot;my:record_RBV&quot;) {
+   ...
+   info(autosave_pass0, &quot;VAL DESC&quot;)
+}
+
+record(ao, &quot;my:record&quot;) {
+   ...
+   info(autosave_pass0, &quot;VAL DESC&quot;)
+}
+</pre></div>
 </div>
 </div>
 </div>
