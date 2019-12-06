@@ -10,14 +10,15 @@ from pytmc import linter, parser
 from pytmc.bin.db import process as db_process
 from .conftest import TMC_ROOT, PROJ_ROOT
 
+
 @pytest.mark.parametrize(
     'tmc_file_name, target_pv',
     [
         pytest.param(TMC_ROOT / "ArbiterPLC.tmc", "BeamClass"),
         pytest.param(
             PROJ_ROOT / "pmps-dev-arbiter/Arbiter/ArbiterPLC/ArbiterPLC.tmc",
-            "Attenuationsssss", # sic  
-            marks = pytest.mark.xfail
+            "Attenuationsssss",  # sic
+            marks=pytest.mark.xfail
         )
     ]
 )

@@ -52,6 +52,7 @@ def tmc_pmps_dev_arbiter():
     path = PROJ_ROOT / "pmps-dev-arbiter/Arbiter/ArbiterPLC/ArbiterPLC.tmc"
     return path
 
+
 @pytest.fixture(params=list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj')))
 def project_filename(request):
     return request.param
