@@ -49,9 +49,9 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
 @pytest.mark.parametrize(
     'source',
     [make_source_param('pv: test'),
-     make_source_param('pv: test; io: test'),
-     make_source_param('pv: test;; io: test'),
-     make_source_param('pv: test\r\n\r io: test'),
+     make_source_param('pv: test; io: io'),
+     make_source_param('pv: test;; io: io'),
+     make_source_param('pv: test\r\n\r io: io'),
 
      # Valid I/O types
      make_source_param('pv: test; io: i'),
