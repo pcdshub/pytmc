@@ -122,6 +122,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.item_view_type = QtWidgets.QComboBox()
         self.item_view_type.addItem('Chains')
         self.item_view_type.addItem('Records')
+        self.item_view_type.addItem('Chains w/o Records')
         self.item_view_type.currentTextChanged.connect(self._update_view_type)
         self.item_list = QtWidgets.QListWidget()
 
@@ -246,9 +247,10 @@ class TmcSummary(QtWidgets.QMainWindow):
                 (' / '.join(_grep_record_names(db_text)) or 'Unknown', record)
                 for record, db_text in self.records.items()
             ]
+        elif self._mode == "chains w/o records":
+            print("chains w/o records selected")
         else:
             return
-
         for name, record in sorted(items,
                                    key=lambda item: item[0]):
             item = QtWidgets.QListWidgetItem(name)
