@@ -248,7 +248,8 @@ class TmcSummary(QtWidgets.QMainWindow):
                 for record, db_text in self.records.items()
             ]
         elif self._mode == "chains w/o records":
-            print("chains w/o records selected")
+            items = self.chains.items()
+            logger.warning("Not Implemented")
         else:
             return
         for name, record in sorted(items,
