@@ -199,9 +199,12 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
 
     for item in chain:
         pragmas = list(get_pragma(item, name=pragma))
-        if not pragmas and not allow_no_pragma:
-            # If any pragma in the chain is unset, escape early
-            return []
+        if not pragmas:
+            if allow_no_pragma:
+                pragmas = ['pv:']
+            else:
+                # If any pragma in the chain is unset, escape early
+                return []
 
         if item.array_info and (item.data_type.is_complex_type or
                                 item.data_type.is_enum):
