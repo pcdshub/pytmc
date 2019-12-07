@@ -74,7 +74,7 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
 
 
 def process(tmc, *, dbd_file=None, allow_errors=False,
-            show_error_context=True):
+            show_error_context=True, allow_no_pragma=False):
     '''
     Process a TMC
 
@@ -104,9 +104,10 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
 
     records = [
         record
-        for symbol in find_pytmc_symbols(tmc)
+        for symbol in find_pytmc_symbols(tmc, allow_no_pragma=allow_no_pragma)
         for record in record_packages_from_symbol(symbol,
-                                                  yield_exceptions=True)
+                                                  yield_exceptions=True,
+                                                  allow_no_pragma=allow_no_pragma)
     ]
 
     exceptions = [ex for ex in records
