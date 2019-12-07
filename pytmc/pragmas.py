@@ -29,6 +29,16 @@ IO_INPUT = ('input', 'i', 'ro')
 KNOWN_BAD_TYPES = ('ALIAS', 'DATE', 'DATE_AND_TIME', 'DT', 'TIME',
                    'TIME_OF_DAY', 'TOD')
 
+_UPDATE_RE = re.compile(
+    # Rate portion (e.g., 1 s, 1s, 1Hz, 1 Hz)
+    r'^(?P<rate>\d*\.\d+|\d+)\s*(?P<hz_or_sec>hz|s)'
+    # Poll or notify (or default)
+    r'(\s+(?P<method>poll|notify))?$',
+    flags=re.IGNORECASE
+)
+
+UPDATE_RATE_DEFAULT = {'frequency': 1, 'seconds': 1, 'method': 'poll'}
+
 
 def split_pytmc_pragma(pragma_text):
     """
@@ -250,7 +260,7 @@ def normalize_io(io):
 
     Parameters
     ----------
-    io : string
+    io : str
         The I/O specifier from the pragma
 
     Returns
@@ -267,6 +277,58 @@ def normalize_io(io):
     if io in IO_INPUT:
         return 'input'
     raise ValueError('Invalid I/O specifier')
+
+
+def parse_update_rate(update, default=UPDATE_RATE_DEFAULT):
+    '''
+    Parse an 'update' specifier in a pragma
+
+    Parameters
+    ----------
+    update : str
+        The I/O specifier from the pragma
+
+    Returns
+    -------
+    dict
+        With keys {'seconds', 'frequency', 'method'}
+        Where 'method' is one of: {'poll', 'notify'}
+
+    Raises
+    ------
+    ValueError
+        If an invalid pragma is supplied
+    '''
+    update = update.strip()
+    res = dict(default)
+    if update:
+        match = _UPDATE_RE.match(update)
+        if not match:
+            raise ValueError(f'Invalid update specifier: {update}')
+
+        # Method
+        d = match.groupdict()
+        method = d.get('method') or default['method']
+        if method not in {'poll', 'notify'}:
+            raise ValueError(f'Invalid update method: {method}')
+        res['method'] = method
+
+        # Rate + frequency/seconds
+        try:
+            rate = float(d['rate'])
+        except Exception:
+            raise ValueError(f'Invalid update rate: {rate}')
+
+        hz_or_sec = d['hz_or_sec']
+        if hz_or_sec == 'hz':
+            freq, seconds = rate, 1.0 / rate
+        else:
+            freq, seconds = 1.0 / rate, rate
+
+        res['frequency'] = int(freq) if int(freq) == freq else freq
+        res['seconds'] = int(seconds) if int(seconds) == seconds else seconds
+
+    return res
 
 
 class SingularChain:

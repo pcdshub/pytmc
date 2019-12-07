@@ -143,6 +143,14 @@ def lint_pragma(pragma):
                 raise LinterError(
                     f'Invalid i/o direction for {pvname}: {io}') from None
 
+        if 'update' in config:
+            update = config['update']
+            try:
+                pragmas.parse_update_rate(update)
+            except ValueError:
+                raise LinterError(
+                    f'Invalid update rate for {pvname}: {update}') from None
+
     return match
 
 
