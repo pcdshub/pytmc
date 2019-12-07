@@ -38,3 +38,18 @@ def test_global_pinned_variables(tmc_file_name, target_pv):
 
     assert any((target_pv in x.pvname) for x in records)
     assert exceptions == []
+
+def test_allow_no_pragma():
+    tmc_file_name = PROJ_ROOT / ("lcls-plc-kfe-xgmd-vac/plc/plc-kfe-xgmd-vac/" 
+        "plc_kfe_xgmd_vac/plc_kfe_xgmd_vac.tmc")
+    
+    tmc = parser.parse(tmc_file_name)
+
+    records, exceptions = db_process(
+        tmc, dbd_file=None, allow_errors=False,
+        show_error_context=True, allow_no_pragma=True
+    )
+
+    target_variable = "GVL_Devices.VCN_50.i_Req_Pos"
+    assert any((target_variable in x.tcname) for x in records)
+    assert exceptions == []
