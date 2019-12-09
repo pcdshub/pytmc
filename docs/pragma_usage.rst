@@ -87,23 +87,11 @@ A pragma could have multiple fields specified. For example, an ``ai`` record
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
        io: i
-       field: SCAN 1 second
        field: AOFF 1.0
        field: ASLO 2.0
    '}
    scale : LREAL := 0.0;
 
-
-Reducing update rate
-''''''''''''''''''''
-
-By default, all records will have a scan rate of ``I/O Intr``. This means that
-even if the value updates on every PLC cycle, EPICS will see (most) of those
-events.
-
-In the case of values that update quickly, it may be preferable to reduce
-the rate at which EPICS sees updates. This can be done by setting the
-`SCAN` field to poll at a fixed rate.
 
 Declaring top level variables
 ''''''''''''''''''''''''''''''
@@ -124,10 +112,8 @@ optional. We recommend that the user specify the direction of the
 data (``io:`` line) however. 
 
 Pytmc needs no additional information but users have the option to override
-default settings manually. For example a developer can specify the ``SCAN``
-field , which configures how and when the value is updated, even though this is
-not required. For additional information on all the pragma fields, consult the 
-`Pragma fields`_ section.
+default settings manually. For information on all the pragma fields, consult
+the `Pragma fields`_ section.
 
 
 Declaring encapsulated variables
@@ -171,15 +157,15 @@ instantiation if you wish to make generalizations about the variables
 contained inside. These generalizations are overridden if the same field is
 specified either on a contained datatype or variable.
 
-For example the following code block will assign a ``field:`` of ``SCAN 1
-second`` to all the variables and datatypes that it contains unless they
-specify their own setting for ``SCAN``.  
+For example the following code block will assign a ``field:`` of ``DESC test``
+to all the variables and datatypes that it contains unless they
+specify their own setting for ``DESC``.  
 
 .. code-block:: none 
 
    {attribute 'pytmc' := '
        pv: BASE 
-       field: SCAN 1 second
+       field: DESC test
    '}
    counter_b : counter;
 
@@ -188,7 +174,7 @@ specify their own setting for ``SCAN``.
   
    {attribute 'pytmc' := '
        pv: VALUE_F_R
-       field: SCAN 1 second
+       field: DESC test
        io: i
    '}  
    value_d : DINT; 
@@ -213,6 +199,51 @@ In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
 ``TEST:MAIN:ULIMIT_RBV``.
 
 
+Update rate
+'''''''''''
+
+By default, any given PLC variable will be polled at a rate of 1 second, or as
+configured by the IOC startup script.  This poll rate can be customized on a
+a per-record instance (*).
+
+To customize the polling rate, specify the desired rate in either seconds or
+hertz in an ``update`` pragma key. For example:
+
+.. code-block:: none
+
+   update: 1Hz
+   update: 1s
+   update: 0.5s
+   update: 2Hz
+
+
+The keyword ``poll`` can also be used to explicitly mark it for polling:
+
+.. code-block:: none
+
+   update: 1s poll
+
+For faster rates, an ADS concept of `notifications`, can be used. These are
+conceptually similar to callback-on-change in Python or ``camonitor`` in the
+context of EPICS.
+
+Use the ``notify`` keyword in the ``update`` setting to enable this:
+
+.. code-block:: none
+
+   update: 10Hz notify
+   update: 0.1s notify
+
+.. note::
+
+   Adding too many of these notifications can significantly slow down a PLC,
+   even when specified at slow rates. As such, ``notify`` should be used
+   sparingly.
+
+(*) This is on the wishlist for ads-ioc. As of December 2019, all polled
+records will be processed at a rate of 1 Hz/the IOC-configured poll rate.
+
+
 Pragma fields
 '''''''''''''
 Each line of the pragma indicates to pytmc how to generate the corresponding records
@@ -234,6 +265,17 @@ This is a guessed field that defaults to `'io'`.  Specify the whether the IOC
 is reading or writing this value. Values being sent from the PLC to the IOC
 should be marked as input with 'i' and values being sent to the PLC from the
 IOC should be marked 'o'.  Bidirectional PVs can be specified with 'io'.
+
+The following are valid for input-only (read-only) pragmas: ``input``, ``i``,
+and ``ro``.
+
+The following are valid for input-output (read-write) pragmas: ``output``, ``io``,
+``rw``, and ``o``.
+
+update
+......
+
+See `Update rate`_.
 
 fields
 ......
@@ -260,24 +302,10 @@ This would correspond to a field in the record being generated as follows:
 
 SCAN
 ....
-The ``SCAN`` field is special. Pytmc will guess a scan field if not provided
-but like ``io`` and ``pv``, the correct setting is on a case-by-case basis.
-pytmc itself cannot know at what rate a variable will update on the PLC side.
 
-Valid options for this field are:
-
-.. code-block:: none
-
-   "Passive"
-   "I/O Intr"
-   "10 second"
-   "5 second"
-   "2 second"
-   "1 second"
-   ".5 second"
-   ".2 second"
-   ".1 second"
-
+While the ``SCAN`` field is special in EPICS to specify the rate at which
+records should be updated, pytmc requires that such configuration be done
+through the ``update`` pragma key (see `Update rate`_).
 
 Autosave
 ''''''''
