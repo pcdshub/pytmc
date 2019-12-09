@@ -27,10 +27,10 @@ matrix:
 
 install:
   - |
-    if [[ "$LINT_CODE" == "1"]]; then
-        pip install flake8;
-        flake8 pytmc;
-        exit;  # exits with the status of flake8
+    if [[ "$LINT_CODE" == "1" ]]; then
+        pip install flake8
+        flake8 pytmc
+        exit  # exits with the status of flake8
     fi
  
   # Install, configure conda
