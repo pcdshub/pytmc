@@ -5,7 +5,7 @@ record({{record.record_type}}, "{{record.pvname}}") {
 {% endfor %}
 {% for autosave_pass in ['pass0', 'pass1'] %}
     {% if record.autosave[autosave_pass] %}
-  info(autosave_{{autosave_pass}}, "{{ record.autosave[autosave_pass] | join(' ') }}")
+  info(autosave_{{autosave_pass}}, "{{ record.autosave[autosave_pass] | sort | join(' ') }}")
     {% endif %}
 {% endfor %}
 }
