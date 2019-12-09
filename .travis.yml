@@ -29,7 +29,11 @@ install:
   - |
     if [[ "$LINT_CODE" == "1" ]]; then
         pip install flake8
+        echo ""
+        printf '=%.0s' {1..100}
+        echo "Linter results:"
         flake8 pytmc
+        printf '=%.0s' {1..100}
         exit  # exits with the status of flake8
     fi
  
