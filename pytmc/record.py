@@ -259,7 +259,9 @@ class TwincatTypeRecordPackage(RecordPackage):
     @property
     def asyn_input_port_spec(self):
         """Asyn input port specification (for INP field)"""
-        return self._asyn_port_spec.format(options=self.asyn_update_options) + '?'
+        return (
+            self._asyn_port_spec.format(options=self.asyn_update_options) + '?'
+        )
 
     @property
     def asyn_output_port_spec(self):
