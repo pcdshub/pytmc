@@ -17,12 +17,22 @@ env:
 
 matrix:
   include:
+    - name: flake8 linting
+      python: 3.6
+      env: LINT_CODE=1
     - python: 3.6
       env: BUILD_DOCS=1
     - python: 3.7
       dist: xenial
 
 install:
+  - |
+    if [[ "$LINT_CODE" == "1"]]; then
+        pip install flake8;
+        flake8 pytmc;
+        exit;  # exits with the status of flake8
+    fi
+ 
   # Install, configure conda
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
@@ -46,7 +56,6 @@ before_script:
   - sleep 1
 
 script:
-  - flake8 pytmc
   - coverage run run_tests.py
   - coverage report -m 
   - set -e

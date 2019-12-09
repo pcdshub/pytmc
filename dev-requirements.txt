@@ -1,7 +1,6 @@
 codecov
 coverage
 doctr
-flake8
 pytest
 pytest-qt
 qtpy
