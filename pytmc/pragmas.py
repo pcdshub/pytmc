@@ -178,6 +178,12 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
     Special handling for arrays of complex types will unroll the array into
     individual elements.  That is, `arr : ARRAY [1..5] of ST_Structure` will be
     unrolled into `arr[1]` through `arr[5]`.
+
+    Returns
+    -------
+    tuple
+        Tuple of tuples. See description above.
+    
     '''
     result = []
 
@@ -201,18 +207,27 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
         pragmas = list(get_pragma(item, name=pragma))
         if not pragmas:
             if allow_no_pragma:
-                pragmas = ['pv:']
+                pragmas = [None]
             else:
                 # If any pragma in the chain is unset, escape early
                 return []
 
-        if item.array_info and (item.data_type.is_complex_type or
-                                item.data_type.is_enum):
-            dictify_func = dictify_complex_array
+        if allow_no_pragma:
+            result.append((item, None))
         else:
-            dictify_func = dictify_scalar
-
-        result.append(list(dictify_func(item)))
+            if item.array_info and (item.data_type.is_complex_type or
+                                    item.data_type.is_enum):
+                dictify_func = dictify_complex_array
+            else:
+                dictify_func = dictify_scalar
+            
+        
+            result.append(list(dictify_func(item)))
+    
+    print("result:")
+    print(result)
+    for x in result:
+        print(len(x))
 
     return list(itertools.product(*result))
 
@@ -383,6 +398,7 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
     'Create all record packages from a given Symbol'
     for chain in chains_from_symbol(symbol, pragma=pragma, 
                                     allow_no_pragma=allow_no_pragma):
+        print(chain)
         try:
             yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
         except Exception as ex:
