@@ -54,7 +54,7 @@ def test_allow_no_pragma():
         show_error_context=True, allow_no_pragma=True
     )
 
-    target_variable = "GVL_Devices.VCN_50.i_Req_Pos"
+    target_variable = "GVL_Devices.VCN_50.i_ReqPos"
     for x in records:
         print(x.tcname)
     assert any((target_variable in x.tcname) for x in records)

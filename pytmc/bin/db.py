@@ -112,6 +112,8 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
 
     exceptions = [ex for ex in records
                   if isinstance(ex, Exception)]
+    # It looks like exceptions are still getting returned because I'm tripping
+    # the following statement:
     for ex in exceptions:
         logger.error('Error creating record: %s', ex)
         records.remove(ex)

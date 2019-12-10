@@ -92,11 +92,13 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.chains = {}
         self.records = {}
 
-        records, self.exceptions = process(tmc, allow_errors=True,
+        good_records, self.exceptions = process(tmc, allow_errors=True,
+            allow_no_pragma=False)
+        
+        all_records, self.exceptions = process(tmc, allow_errors=True,
             allow_no_pragma=True)
-        print(records)
-
-        for record in records:
+        
+        for record in good_records:
             self.chains[record.tcname] = record
             try:
                 record_text = record.render()
