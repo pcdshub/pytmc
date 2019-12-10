@@ -14,15 +14,38 @@ from .default_settings.unified_ordered_field_list import unified_lookup_list
 logger = logging.getLogger(__name__)
 
 
+def _truncate_middle(string, max_length):
+    '''
+    Truncate a string to a maximum length, replacing the skipped middle section
+    with an ellipsis.
+
+    Parameters
+    ----------
+    string : str
+        The string to optionally truncate
+    max_length : int
+        The maximum length
+    '''
+    # Based on https://www.xormedia.com/string-truncate-middle-with-ellipsis/
+    if len(string) <= max_length:
+        return string
+
+    # half of the size, minus the 3 dots
+    n2 = max_length // 2 - 3
+    n1 = max_length - n2 - 3
+    return '...'.join((string[:n1], string[-n2:]))
+
+
 class EPICSRecord:
     """Representation of a single EPICS Record"""
 
     def __init__(self, pvname, record_type, direction, fields=None,
-                 template=None, autosave=None):
+                 template=None, autosave=None, aliases=None):
         self.pvname = pvname
         self.record_type = record_type
         self.direction = direction
         self.fields = OrderedDict(fields) if fields is not None else {}
+        self.aliases = list(aliases) if aliases is not None else []
         self.template = template or 'asyn_standard_record.jinja2'
         self.autosave = dict(autosave) if autosave else {}
 
@@ -102,6 +125,17 @@ class RecordPackage:
         # character in the pragma, defaulting to '@'.
         macro_character = self.chain.config.get('macro_character', '@')
         self.pvname = chain.pvname.replace(macro_character, '$')
+
+        # The base for the alias does not include the final pvname:
+        alias_base = ':'.join(pv_segment for pv_segment in self.chain.config['pv'][:-1]
+                              if pv_segment)
+
+        # Split user-specified aliases for the record:
+        self.aliases = [':'.join((alias_base, alias))
+                        for alias in self.chain.config.get('alias', '').split(' ')
+                        if alias.strip()
+                        ]
+        self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
 
     @property
     def valid(self):
@@ -249,20 +283,24 @@ class TwincatTypeRecordPackage(RecordPackage):
             Description of input record
         """
         # Base record with defaults
-        if self.pvname and not self.pvname.endswith('RBV'):
-            pvname = self.pvname + '_RBV'
-        else:
-            pvname = self.pvname
+        def add_rbv(pvname):
+            if pvname and not pvname.endswith('RBV'):
+                return pvname + '_RBV'
+            return pvname
+
+        pvname = add_rbv(self.pvname)
+        aliases = [add_rbv(alias) for alias in self.aliases]
 
         record = EPICSRecord(pvname,
                              self.input_rtyp,
                              'input',
                              fields=self.field_defaults,
-                             autosave=self.autosave_defaults.get('input')
+                             autosave=self.autosave_defaults.get('input'),
+                             aliases=aliases,
                              )
 
         # Set a default description to the tcname
-        record.fields.setdefault('DESC', f'ads:{self.chain.tcname}')
+        record.fields.setdefault('DESC', self.default_desc)
 
         # Add our port
         record.fields['INP'] = self._asyn_port_spec + '?'
@@ -290,11 +328,12 @@ class TwincatTypeRecordPackage(RecordPackage):
                              self.output_rtyp,
                              'output',
                              fields=self.field_defaults,
-                             autosave=self.autosave_defaults.get('output')
+                             autosave=self.autosave_defaults.get('output'),
+                             aliases=self.aliases,
                              )
 
         # Set a default description to the tcname
-        record.fields.setdefault('DESC', f'ads:{self.chain.tcname}')
+        record.fields.setdefault('DESC', self.default_desc)
 
         # Add our port
         record.fields['DTYP'] = self.dtyp
