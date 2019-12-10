@@ -127,14 +127,17 @@ class RecordPackage:
         self.pvname = chain.pvname.replace(macro_character, '$')
 
         # The base for the alias does not include the final pvname:
-        alias_base = ':'.join(pv_segment for pv_segment in self.chain.config['pv'][:-1]
-                              if pv_segment)
+        alias_base = ':'.join(
+            pv_segment for pv_segment in self.chain.config['pv'][:-1]
+            if pv_segment
+        )
 
         # Split user-specified aliases for the record:
-        self.aliases = [':'.join((alias_base, alias))
-                        for alias in self.chain.config.get('alias', '').split(' ')
-                        if alias.strip()
-                        ]
+        self.aliases = [
+            ':'.join((alias_base, alias))
+            for alias in self.chain.config.get('alias', '').split(' ')
+            if alias.strip()
+        ]
         self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
 
     @property
