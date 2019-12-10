@@ -261,6 +261,9 @@ class TwincatTypeRecordPackage(RecordPackage):
                              autosave=self.autosave_defaults.get('input')
                              )
 
+        # Set a default description to the tcname
+        record.fields.setdefault('DESC', f'ads:{self.chain.tcname}')
+
         # Add our port
         record.fields['INP'] = self._asyn_port_spec + '?'
         record.fields['DTYP'] = self.dtyp
@@ -289,6 +292,10 @@ class TwincatTypeRecordPackage(RecordPackage):
                              fields=self.field_defaults,
                              autosave=self.autosave_defaults.get('output')
                              )
+
+        # Set a default description to the tcname
+        record.fields.setdefault('DESC', f'ads:{self.chain.tcname}')
+
         # Add our port
         record.fields['DTYP'] = self.dtyp
         record.fields['OUT'] = self._asyn_port_spec + '='
