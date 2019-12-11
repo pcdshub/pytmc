@@ -131,7 +131,8 @@ def lint_pragma(pragma):
                 pragmas.split_pytmc_pragma(pragma_setting)
             ):
         if ' ' in pvname:
-            raise LinterError('Space found in PV name (missing delimiter?)')
+            raise LinterError(
+                f'Space found in PV name: {pvname!r} (missing delimiter?)')
 
         config = pragmas.dictify_config(configs)
 
