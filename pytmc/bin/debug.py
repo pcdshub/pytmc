@@ -97,10 +97,6 @@ class TmcSummary(QtWidgets.QMainWindow):
         
         all_records, self.exceptions = process(tmc, allow_errors=True,
             allow_no_pragma=True)
-        print(any(x.valid for x in records))
-        print(all(x.valid for x in records))
-        print(any(x.valid for x in all_records))
-        print(all(x.valid for x in all_records))
 
         for record in records:
             if record.valid:

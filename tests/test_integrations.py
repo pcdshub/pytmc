@@ -44,18 +44,30 @@ def test_allow_no_pragma():
     Test for the existence of a variable included in the records, despite it
     lacking a proper set of pragmas.
     """
-    tmc_file_name = PROJ_ROOT / ("lcls-plc-kfe-xgmd-vac/plc/plc-kfe-xgmd-vac/" 
-        "plc_kfe_xgmd_vac/plc_kfe_xgmd_vac.tmc")
+    tmc_file_name = TMC_ROOT / ("xtes_sxr_plc.tmc")
     
     tmc = parser.parse(tmc_file_name)
-
+    
     records, exceptions = db_process(
+        tmc, dbd_file=None, allow_errors=True,
+        show_error_context=True, allow_no_pragma=False
+    )
+
+    all_records, exceptions = db_process(
         tmc, dbd_file=None, allow_errors=True,
         show_error_context=True, allow_no_pragma=True
     )
+    good_records=129
+    total_records=976
 
-    target_variable = "GVL_Devices.VCN_50.i_ReqPos"
-    for x in records:
+    assert good_records == len(records)
+    assert good_records == len(list(x.valid for x in records if x.valid))
+    assert total_records == len(all_records)
+    assert good_records == len(list(x.valid for x in all_records if x.valid))
+    
+    # this variable lacks a pragma 
+    target_variable = "GVL_DEVICES.MR2K3_GCC_1.rV"
+    for x in all_records:
         print(x.tcname)
-    assert any((target_variable in x.tcname) for x in records)
+    assert any((target_variable == x.tcname) for x in all_records)
     assert exceptions == []
