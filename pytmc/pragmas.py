@@ -208,21 +208,20 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
         if not pragmas:
             if allow_no_pragma:
                 pragmas = [None]
+                result.append([(item, None)])
+                continue
             else:
                 # If any pragma in the chain is unset, escape early
                 return []
 
-        if allow_no_pragma:
-            result.append([(item, None)])
+        if item.array_info and (item.data_type.is_complex_type or
+                                item.data_type.is_enum):
+            dictify_func = dictify_complex_array
         else:
-            if item.array_info and (item.data_type.is_complex_type or
-                                    item.data_type.is_enum):
-                dictify_func = dictify_complex_array
-            else:
-                dictify_func = dictify_scalar
-            
+            dictify_func = dictify_scalar
         
-            result.append(list(dictify_func(item)))
+        
+        result.append(list(dictify_func(item)))
     
     return list(itertools.product(*result))
 
