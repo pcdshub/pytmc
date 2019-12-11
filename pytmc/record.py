@@ -337,10 +337,13 @@ class TwincatTypeRecordPackage(RecordPackage):
         # Add our port
         record.fields['INP'] = self.asyn_input_port_spec
         record.fields['DTYP'] = self.dtyp
-        record.fields['SCAN'] = 'I/O Intr'
 
         # Update with given pragmas
         record.fields.update(self.chain.config.get('field', {}))
+
+        # Records must always be I/O Intr, regardless of the pragma:
+        record.fields['SCAN'] = 'I/O Intr'
+
         record.update_autosave_from_pragma(self.chain.config)
         return record
 

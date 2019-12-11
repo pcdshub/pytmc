@@ -152,6 +152,11 @@ def lint_pragma(pragma):
                 raise LinterError(
                     f'Invalid update rate for {pvname}: {update}') from None
 
+        fields = config.get('field', {})
+        if fields.get('SCAN', 'I/O Intr') != 'I/O Intr':
+            raise LinterError(f'SCAN field cannot be customized ({pvname}); '
+                              f'use `update` pragma key')
+
     return match
 
 

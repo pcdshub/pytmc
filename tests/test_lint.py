@@ -86,6 +86,8 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
      make_source_param('pv: test; update: 100es', marks=pytest.mark.xfail),
      make_source_param('pv: test; update: 1s test', marks=pytest.mark.xfail),
      make_source_param('pv: test; update: notify 1s', marks=pytest.mark.xfail),
+     make_source_param('pv: test; field: SCAN I/O Intr'),
+     make_source_param('pv: test; field: SCAN 1 second', marks=pytest.mark.xfail),
      ]
 )
 def test_lint_pragma(source):
