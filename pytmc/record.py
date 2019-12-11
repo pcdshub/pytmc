@@ -117,6 +117,8 @@ class RecordPackage:
         bool
             Returns true if this record is fully specified and valid.
         """
+        if self.pvname is None:
+            return False
         has_required_keys = all(self.chain.config.get(key)
                                 for key in self._required_keys)
 
@@ -163,8 +165,6 @@ class RecordPackage:
                     f'Unsupported data type {data_type.name} in chain: '
                     f'{chain.tcname} record: {chain.pvname}'
                 ) from None
-        print(chain)
-        print(chain.valid)
         return spec(*args, chain=chain, **kwargs)
 
 
