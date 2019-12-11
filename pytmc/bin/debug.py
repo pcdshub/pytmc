@@ -90,17 +90,17 @@ class TmcSummary(QtWidgets.QMainWindow):
         super().__init__()
         self.tmc = tmc
         self.chains = {}
+        self.incomplete_chains = {}
         self.records = {}
 
         records, self.exceptions = process(tmc, allow_errors=True,
-            allow_no_pragma=False)
-        
-        all_records, self.exceptions = process(tmc, allow_errors=True,
             allow_no_pragma=True)
 
         for record in records:
-            if record.valid:
-                pass
+            if not record.valid:
+                self.incomplete_chains[record.tcname] = record
+                continue
+
             self.chains[record.tcname] = record
             try:
                 record_text = record.render()
@@ -255,8 +255,7 @@ class TmcSummary(QtWidgets.QMainWindow):
                 for record, db_text in self.records.items()
             ]
         elif self._mode == "chains w/o records":
-            items = self.chains.items()
-            logger.warning("Not Implemented")
+            items = self.incomplete_chains.items()
         else:
             return
         for name, record in sorted(items,
