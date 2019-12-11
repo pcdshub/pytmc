@@ -1,11 +1,14 @@
 record({{record.record_type}}, "{{record.pvname}}") {
+{% for alias in record.aliases %}
+  alias("{{alias}}")
+{% endfor %}
 {% block add_fields  %}{% endblock %}
 {% for f in record.fields%}
   field({{f}}, "{{record.fields[f]}}")
 {% endfor %}
 {% for autosave_pass in ['pass0', 'pass1'] %}
     {% if record.autosave[autosave_pass] %}
-  info(autosave_{{autosave_pass}}, "{{ record.autosave[autosave_pass] | join(' ') }}")
+  info(autosave_{{autosave_pass}}, "{{ record.autosave[autosave_pass] | sort | join(' ') }}")
     {% endif %}
 {% endfor %}
 }
