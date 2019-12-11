@@ -193,6 +193,8 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     def _update_config_info(self, record):
         'Slot - update config information when a new record is selected'
+        if self._mode.lower() == "chains w/o records":
+            return
         chain = record.chain
 
         self.config_info.clear()
@@ -233,7 +235,10 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     def _update_record_text(self, record):
         'Slot - update record text when a new record is selected'
-        self.record_text.setText(self.records[record])
+        if self._mode.lower() == "chains w/o records":
+            self.record_text.setText("NOT GENERATED")
+        else:
+            self.record_text.setText(self.records[record])
 
     def _update_chain_info(self, record):
         'Slot - update chain information when a new record is selected'
