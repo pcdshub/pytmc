@@ -213,7 +213,7 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
                 return []
 
         if allow_no_pragma:
-            result.append((item, None))
+            result.append([(item, None)])
         else:
             if item.array_info and (item.data_type.is_complex_type or
                                     item.data_type.is_enum):
@@ -224,11 +224,6 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
         
             result.append(list(dictify_func(item)))
     
-    print("result:")
-    print(result)
-    for x in result:
-        print(len(x))
-
     return list(itertools.product(*result))
 
 
@@ -323,9 +318,18 @@ class SingularChain:
         self.data_type = self.chain[-1].data_type
         self.array_info = self.chain[-1].array_info
         self.tcname = '.'.join(part.name for part in self.chain)
+        
+        self.valid = True
+        for config in item_to_config:
+            # Detect Nones signifying an incomplete pragma
+            if item_to_config[config] is None:
+                self.valid = False
+                self.config = None
+                self.pvname = None
 
-        self.config = squash_configs(*list(item_to_config.values()))
-        self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv']
+        if self.valid:    
+            self.config = squash_configs(*list(item_to_config.values()))
+            self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv']
                                if pv_segment)
 
     def __repr__(self):
@@ -398,7 +402,6 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
     'Create all record packages from a given Symbol'
     for chain in chains_from_symbol(symbol, pragma=pragma, 
                                     allow_no_pragma=allow_no_pragma):
-        print(chain)
         try:
             yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
         except Exception as ex:
