@@ -169,7 +169,16 @@ def test_dtype(chain, tc_type, io, is_array, final_DTYP):
     # poll rates
     ("BOOL", 2, "1hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("BOOL", 2, "2hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=2/a.b.c?'),
-    ("BOOL", 2, "0.1s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=10/a.b.c?'),
+    ("BOOL", 2, "0.5hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.5/a.b.c?'),
+    ("BOOL", 2, "0.02hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.02/a.b.c?'),
+    ("BOOL", 2, "0.1hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.1/a.b.c?'),
+    ("BOOL", 2, "50s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.02/a.b.c?'),
+    ("BOOL", 2, "10s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.1/a.b.c?'),
+    ("BOOL", 2, "2s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.5/a.b.c?'),
+    ("BOOL", 2, "1s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
+    ("BOOL", 2, "0.5s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=2/a.b.c?'),
+    pytest.param("BOOL", 2, "0.1s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=10/a.b.c?',
+                  marks=pytest.mark.xfail(reason='Invalid poll rate')),
     # notify rates
     ("BOOL", 2, "1hz notify", "INP", '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=1000/a.b.c?'),
     ("BOOL", 2, "2hz notify", "INP", '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=500/a.b.c?'),

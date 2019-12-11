@@ -286,9 +286,9 @@ class TwincatTypeRecordPackage(RecordPackage):
         update = parse_update_rate(self.chain.config.get('update') or '')
         if update['method'] == 'poll':
             freq = update['frequency']
-            freq = (str(int(freq))
-                    if int(freq) == float(freq) else f'{freq:.1f}')
-            return f'POLL_RATE={freq}/'
+            if int(freq) == float(freq):
+                return f'POLL_RATE={int(freq)}/'
+            return f'POLL_RATE={freq:.2f}'.rstrip('0') + '/'
 
         milliseconds = int(1000 * update['seconds'])
         return f'TS_MS={milliseconds}/'

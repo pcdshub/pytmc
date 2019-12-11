@@ -38,6 +38,11 @@ _UPDATE_RE = re.compile(
 )
 
 UPDATE_RATE_DEFAULT = {'frequency': 1, 'seconds': 1, 'method': 'poll'}
+VALID_POLL_RATES_HZ = (1./50,  # 0.02Hz - 1 update every 50 seconds
+                       1./10,  # 0.1 Hz - 1 update every 10 seconds
+                       1./2,   # 0.5 Hz - 1 update every 2 seconds
+                       1,      # 1.0 Hz - 1 update every 1 second (default)
+                       2)      # 2.0 Hz - 2 updates every 1 second
 
 
 def split_pytmc_pragma(pragma_text):
@@ -327,6 +332,12 @@ def parse_update_rate(update, default=UPDATE_RATE_DEFAULT):
 
         res['frequency'] = int(freq) if int(freq) == freq else freq
         res['seconds'] = int(seconds) if int(seconds) == seconds else seconds
+
+        if method == 'poll' and res['frequency'] not in VALID_POLL_RATES_HZ:
+            raise ValueError(
+                f"Invalid poll rate {res['frequency']}.  "
+                f"Valid frequencies in Hz are: {VALID_POLL_RATES_HZ}"
+            )
 
     return res
 
