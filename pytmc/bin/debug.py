@@ -193,8 +193,8 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     def _update_config_info(self, record):
         'Slot - update config information when a new record is selected'
-        if self._mode.lower() == "chains w/o records":
-            return
+        #if self._mode.lower() == "chains w/o records":
+        #    return
         chain = record.chain
 
         self.config_info.clear()
@@ -213,20 +213,25 @@ class TmcSummary(QtWidgets.QMainWindow):
 
         columns = {}
 
-        items = zip(chain.config['pv'], chain.item_to_config.items())
-        for row, (pv, (item, config)) in enumerate(items):
-            info_dict = dict(pv=pv)
-            info_dict.update({k: v for k, v in config.items() if k != 'field'})
-            add_dict_to_table(row, info_dict)
-            fields = config.get('field', {})
-            add_dict_to_table(row, {f'field_{k}': v
-                                    for k, v in fields.items()
-                                    if k != 'field'}
-                              )
+        if self._mode.lower() != "chains w/o records":
+            items = zip(chain.config['pv'], chain.item_to_config.items())
+            for row, (pv, (item, config)) in enumerate(items):
+                info_dict = dict(pv=pv)
+                info_dict.update({k: v for k, v in config.items() if k != 'field'})
+                add_dict_to_table(row, info_dict)
+                fields = config.get('field', {})
+                add_dict_to_table(row, {f'field_{k}': v
+                                        for k, v in fields.items()
+                                        if k != 'field'}
+                                  )
 
-        self.config_info.setHorizontalHeaderLabels(list(columns))
+        # self.config_info.setHorizontalHeaderLabels(list(columns))
         self.config_info.setVerticalHeaderLabels(
             list(item.name for item in chain.item_to_config))
+        
+        for item in chain.item_to_config:
+            print(item.Properties)
+            print(dir(item.Properties))
 
         self.config_info.setColumnCount(
             max(columns.values()) + 1
@@ -236,6 +241,7 @@ class TmcSummary(QtWidgets.QMainWindow):
     def _update_record_text(self, record):
         'Slot - update record text when a new record is selected'
         if self._mode.lower() == "chains w/o records":
+            # TODO: a more helpful message oculd be useful
             self.record_text.setText("NOT GENERATED")
         else:
             self.record_text.setText(self.records[record])
