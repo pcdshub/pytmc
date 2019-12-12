@@ -117,7 +117,7 @@ class RecordPackage:
         bool
             Returns true if this record is fully specified and valid.
         """
-        if self.pvname is None:
+        if self.pvname is None or not self.chain.valid:
             return False
         has_required_keys = all(self.chain.config.get(key)
                                 for key in self._required_keys)

@@ -109,10 +109,16 @@ class TmcSummary(QtWidgets.QMainWindow):
                 record_text = _annotate_record_text(linter_results,
                                                     record_text)
             except Exception as ex:
+                try:
+                    record_text
+                except NameError:
+                    record_text = "Record not rendered" 
+
                 record_text = (
                     f'!! Linter failure: {ex.__class__.__name__} {ex}'
                     f'\n\n{record_text}'
                 )
+
                 logger.exception('Linter failure')
 
             self.records[record] = record_text
@@ -214,8 +220,13 @@ class TmcSummary(QtWidgets.QMainWindow):
         columns = {}
 
         if self._mode.lower() != "chains w/o records":
+            print("chain type", type(chain))
             items = zip(chain.config['pv'], chain.item_to_config.items())
             for row, (pv, (item, config)) in enumerate(items):
+                print("row", row)
+                print("pv", pv)
+                print("item", item)
+                print("config", config)
                 info_dict = dict(pv=pv)
                 info_dict.update({k: v for k, v in config.items() if k != 'field'})
                 add_dict_to_table(row, info_dict)
@@ -230,8 +241,9 @@ class TmcSummary(QtWidgets.QMainWindow):
             list(item.name for item in chain.item_to_config))
         
         for item in chain.item_to_config:
-            print(item.Properties)
-            print(dir(item.Properties))
+            pass
+            # print(item.Properties)
+            # print(dir(item.Properties))
 
         self.config_info.setColumnCount(
             max(columns.values()) + 1
