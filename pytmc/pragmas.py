@@ -242,6 +242,7 @@ def squash_configs(*configs):
     squashed = {'pv': [], 'field': {}}
     for config in configs:
         if config is None:
+            squashed['pv'].append(None)
             continue
         # Shallow copy so that we don't modify the original
         config = dict(config)

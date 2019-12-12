@@ -230,7 +230,13 @@ class TmcSummary(QtWidgets.QMainWindow):
 
         # if self._mode.lower() != "chains w/o records":
         print("chain type", type(chain))
-        items = zip(chain.config['pv'], chain.item_to_config.items())
+        items = list(zip(chain.config['pv'], chain.item_to_config.items()))
+        print("chain.item_to_config.items()")
+        print(chain.item_to_config.items())
+        print("chain.config['pv']")
+        print(chain.config)
+        print("items")
+        print(items)
         for row, (pv, (item, config)) in enumerate(items):
             #print("row", row)
             #print("pv", pv)
@@ -238,13 +244,19 @@ class TmcSummary(QtWidgets.QMainWindow):
             #print("config", config)
             # info_dict is a collection of the non-field pragma lines 
             info_dict = dict(pv=pv)
-            info_dict.update({k: v for k, v in config.items() if k != 'field'})
-            add_dict_to_table(row, info_dict)
+            print("Item")
+            print(item)
+            print("config")
+            print(config)
+            if config is not None:
+                info_dict.update({k: v for k, v in config.items() if k != 'field'})
+                add_dict_to_table(row, info_dict)
             print("info_dict")
             print(info_dict)
             # fields is a dictionary exclusively contining fields
-            fields = config.get('field', {})
-            add_dict_to_table(row, {f'field_{k}': v
+            if config is not None:
+                fields = config.get('field', {})
+                add_dict_to_table(row, {f'field_{k}': v
                                     for k, v in fields.items()
                                     if k != 'field'}
                               )
