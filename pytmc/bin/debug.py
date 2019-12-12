@@ -226,6 +226,8 @@ class TmcSummary(QtWidgets.QMainWindow):
                 print(columns[key])
                 print("value:")
                 print(value)
+                # accumulate a list of entries to print in the chart. These
+                # should only be printed after `setColumnCount` has been run
                 if isinstance(value, dict):
                     yield from (row, value)
                 else:
@@ -262,6 +264,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         # in order to prevent QT from incorrectly drawing/labeling the cols
         self.config_info.setColumnCount(len(columns))
         self.config_info.setHorizontalHeaderLabels(list(columns))
+        # finally print the column's entries 
         print(column_write_entries)
         for line in column_write_entries:
             print(line)
