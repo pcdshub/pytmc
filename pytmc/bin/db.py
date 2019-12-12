@@ -120,7 +120,10 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
     if exceptions and not allow_errors:
         raise LinterError('Failed to create database')
 
-    record_names = [record.pvname for record in records]
+    if allow_no_pragma:
+        record_names = [record.pvname for record in records if record.valid]
+    else:
+        record_names = [record.pvname for record in records]
     if len(record_names) != len(set(record_names)):
         dupes = {name: record_names.count(name)
                  for name in record_names
