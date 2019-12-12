@@ -245,10 +245,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             if config is not None:
                 info_dict.update({k: v for k, v in config.items() if k != 'field'})
                 add_dict_to_table(row, info_dict)
-            print("info_dict")
-            print(info_dict)
-            # fields is a dictionary exclusively contining fields
-            if config is not None:
+                # fields is a dictionary exclusively contining fields
                 fields = config.get('field', {})
                 add_dict_to_table(row, {f'field_{k}': v
                                     for k, v in fields.items()
