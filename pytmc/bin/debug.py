@@ -94,7 +94,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.records = {}
 
         records, self.exceptions = process(tmc, allow_errors=True,
-            allow_no_pragma=True)
+                                           allow_no_pragma=True)
 
         for record in records:
             if not record.valid:
@@ -112,7 +112,7 @@ class TmcSummary(QtWidgets.QMainWindow):
                 try:
                     record_text
                 except NameError:
-                    record_text = "Record not rendered" 
+                    record_text = "Record not rendered"
 
                 record_text = (
                     f'!! Linter failure: {ex.__class__.__name__} {ex}'
@@ -208,7 +208,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             """
             Parameters
             ----------
-            row : int 
+            row : int
                 Identify the row to configure.
 
             d : dict
@@ -228,20 +228,21 @@ class TmcSummary(QtWidgets.QMainWindow):
 
         items = zip(chain.config['pv'], chain.item_to_config.items())
         for row, (pv, (item, config)) in enumerate(items):
-            # info_dict is a collection of the non-field pragma lines 
+            # info_dict is a collection of the non-field pragma lines
             info_dict = dict(pv=pv)
             if config is not None:
-                info_dict.update({k: v for k, v in config.items() if k != 'field'})
+                info_dict.update(
+                    {k: v for k, v in config.items() if k != 'field'})
                 add_dict_to_table(row, info_dict)
                 # fields is a dictionary exclusively contining fields
                 fields = config.get('field', {})
                 add_dict_to_table(row, {f'field_{k}': v
-                                    for k, v in fields.items()
-                                    if k != 'field'}
-                              )
-        
+                                        for k, v in fields.items()
+                                        if k != 'field'}
+                                  )
+
         # setColumnCount seems to need to proceed the setHorizontalHeaderLabels
-        # in order to prevent QT from incorrectly drawing/labeling the cols 
+        # in order to prevent QT from incorrectly drawing/labeling the cols
         self.config_info.setColumnCount(len(columns))
         self.config_info.setHorizontalHeaderLabels(list(columns))
         self.config_info.setVerticalHeaderLabels(

@@ -159,7 +159,7 @@ def dictify_config(conf, array_index=None, expand_default=':%.2d'):
 
 
 def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
-                                      allow_no_pragma=False):
+                                     allow_no_pragma=False):
     '''
     Generate all possible configuration combinations
 
@@ -183,7 +183,7 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
     -------
     tuple
         Tuple of tuples. See description above.
-    
+
     '''
     result = []
 
@@ -219,10 +219,9 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
             dictify_func = dictify_complex_array
         else:
             dictify_func = dictify_scalar
-        
-        
+
         result.append(list(dictify_func(item)))
-    
+
     return list(itertools.product(*result))
 
 
@@ -320,7 +319,7 @@ class SingularChain:
         self.data_type = self.chain[-1].data_type
         self.array_info = self.chain[-1].array_info
         self.tcname = '.'.join(part.name for part in self.chain)
-        
+
         self.valid = True
 
         for config in item_to_config:
@@ -330,7 +329,7 @@ class SingularChain:
                 #self.config = None
                 #self.pvname = None
 
-        #if self.valid:    
+        # if self.valid:
         self.config = squash_configs(*list(item_to_config.values()))
         self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv']
                                if pv_segment)
@@ -386,7 +385,7 @@ def has_pragma(item, *, name: str = 'pytmc'):
                if pragma is not None)
 
 
-def chains_from_symbol(symbol, *, pragma: str = 'pytmc', 
+def chains_from_symbol(symbol, *, pragma: str = 'pytmc',
                        allow_no_pragma=False):
     'Build all SingularChain instances from a Symbol'
     if allow_no_pragma:
@@ -403,7 +402,7 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
                                 yield_exceptions=False,
                                 allow_no_pragma=False):
     'Create all record packages from a given Symbol'
-    for chain in chains_from_symbol(symbol, pragma=pragma, 
+    for chain in chains_from_symbol(symbol, pragma=pragma,
                                     allow_no_pragma=allow_no_pragma):
         try:
             yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)

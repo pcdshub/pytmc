@@ -39,15 +39,16 @@ def test_global_pinned_variables(tmc_file_name, target_pv):
     assert any((target_pv in x.pvname) for x in records)
     assert exceptions == []
 
+
 def test_allow_no_pragma():
     """
     Test for the existence of a variable included in the records, despite it
     lacking a proper set of pragmas.
     """
     tmc_file_name = TMC_ROOT / ("xtes_sxr_plc.tmc")
-    
+
     tmc = parser.parse(tmc_file_name)
-    
+
     records, exceptions = db_process(
         tmc, dbd_file=None, allow_errors=True,
         show_error_context=True, allow_no_pragma=False
@@ -57,15 +58,15 @@ def test_allow_no_pragma():
         tmc, dbd_file=None, allow_errors=True,
         show_error_context=True, allow_no_pragma=True
     )
-    good_records=129
-    total_records=976
+    good_records = 129
+    total_records = 976
 
     assert good_records == len(records)
     assert good_records == len(list(x.valid for x in records if x.valid))
     assert total_records == len(all_records)
     assert good_records == len(list(x.valid for x in all_records if x.valid))
-    
-    # this variable lacks a pragma 
+
+    # this variable lacks a pragma
     target_variable = "GVL_DEVICES.MR2K3_GCC_1.rV"
     for x in all_records:
         print(x.tcname)

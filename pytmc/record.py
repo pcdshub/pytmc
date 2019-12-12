@@ -150,7 +150,7 @@ class RecordPackage:
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         data_type = chain.data_type
         if not chain.valid:
-            spec=RecordPackage
+            spec = RecordPackage
         elif data_type.is_enum:
             spec = EnumRecordPackage
         elif data_type.is_array or chain.last.array_info:
