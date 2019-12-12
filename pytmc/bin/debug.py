@@ -206,7 +206,16 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.config_info.clear()
         self.config_info.setRowCount(len(chain.chain))
 
-        def add_dict_to_table(row, d):
+        def add_dict_to_table(row: int, d: dict):
+            """
+            Parameters
+            ----------
+            row : int 
+                Identify the row to configure.
+
+            d : dict
+                Dictionary of items to enter into the target row.
+            """
             for key, value in d.items():
                 key = str(key)
                 if key not in columns:
@@ -219,24 +228,33 @@ class TmcSummary(QtWidgets.QMainWindow):
 
         columns = {}
 
-        if self._mode.lower() != "chains w/o records":
-            print("chain type", type(chain))
-            items = zip(chain.config['pv'], chain.item_to_config.items())
-            for row, (pv, (item, config)) in enumerate(items):
-                print("row", row)
-                print("pv", pv)
-                print("item", item)
-                print("config", config)
-                info_dict = dict(pv=pv)
-                info_dict.update({k: v for k, v in config.items() if k != 'field'})
-                add_dict_to_table(row, info_dict)
-                fields = config.get('field', {})
-                add_dict_to_table(row, {f'field_{k}': v
-                                        for k, v in fields.items()
-                                        if k != 'field'}
-                                  )
-
-        # self.config_info.setHorizontalHeaderLabels(list(columns))
+        # if self._mode.lower() != "chains w/o records":
+        print("chain type", type(chain))
+        items = zip(chain.config['pv'], chain.item_to_config.items())
+        for row, (pv, (item, config)) in enumerate(items):
+            #print("row", row)
+            #print("pv", pv)
+            #print("item", item)
+            #print("config", config)
+            # info_dict is a collection of the non-field pragma lines 
+            info_dict = dict(pv=pv)
+            info_dict.update({k: v for k, v in config.items() if k != 'field'})
+            add_dict_to_table(row, info_dict)
+            print("info_dict")
+            print(info_dict)
+            # fields is a dictionary exclusively contining fields
+            fields = config.get('field', {})
+            add_dict_to_table(row, {f'field_{k}': v
+                                    for k, v in fields.items()
+                                    if k != 'field'}
+                              )
+            print("fields")
+            print(fields)
+        
+        # setColumnCount seems to need to proceed the setHorizontalHeaderLabels
+        # in order to prevent QT from incorrectly drawing/labeling the cols 
+        self.config_info.setColumnCount(len(columns))
+        self.config_info.setHorizontalHeaderLabels(list(columns))
         self.config_info.setVerticalHeaderLabels(
             list(item.name for item in chain.item_to_config))
         
@@ -245,10 +263,10 @@ class TmcSummary(QtWidgets.QMainWindow):
             # print(item.Properties)
             # print(dir(item.Properties))
 
-        self.config_info.setColumnCount(
-            max(columns.values()) + 1
-            if columns else 0
-        )
+        #self.config_info.setColumnCount(
+        #    max(columns.values()) + 1
+        #    if columns else 0
+        #)
 
     def _update_record_text(self, record):
         'Slot - update record text when a new record is selected'
