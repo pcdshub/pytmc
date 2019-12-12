@@ -382,11 +382,15 @@ def has_pragma(item, *, name: str = 'pytmc'):
                if pragma is not None)
 
 
+def always_true(*a, **kwargs):
+    return True
+
+
 def chains_from_symbol(symbol, *, pragma: str = 'pytmc',
                        allow_no_pragma=False):
     'Build all SingularChain instances from a Symbol'
     if allow_no_pragma:
-        condition = lambda *args, **kwargs: True
+        condition = always_true
     else:
         condition = has_pragma
     for full_chain in symbol.walk(condition=condition):

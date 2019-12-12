@@ -105,9 +105,8 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
     records = [
         record
         for symbol in find_pytmc_symbols(tmc, allow_no_pragma=allow_no_pragma)
-        for record in record_packages_from_symbol(symbol,
-                                                  yield_exceptions=True,
-                                                  allow_no_pragma=allow_no_pragma)
+        for record in record_packages_from_symbol(
+            symbol, yield_exceptions=True, allow_no_pragma=allow_no_pragma)
     ]
 
     exceptions = [ex for ex in records
