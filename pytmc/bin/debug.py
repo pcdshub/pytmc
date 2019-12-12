@@ -218,33 +218,56 @@ class TmcSummary(QtWidgets.QMainWindow):
                 key = str(key)
                 if key not in columns:
                     columns[key] = max(columns.values()) + 1 if columns else 0
-                self.config_info.setItem(
-                    row, columns[key], QtWidgets.QTableWidgetItem(str(value))
-                )
+                print("row:")
+                print(row)
+                print("key:")
+                print(key)
+                print("columns[key]")
+                print(columns[key])
+                print("value:")
+                print(value)
                 if isinstance(value, dict):
-                    add_dict_to_table(row, value)
+                    yield from (row, value)
+                else:
+                    yield (
+                        row, columns[key],
+                        QtWidgets.QTableWidgetItem(str(value))
+                    )
 
         columns = {}
+        column_write_entries = []
 
         items = zip(chain.config['pv'], chain.item_to_config.items())
         for row, (pv, (item, config)) in enumerate(items):
+            print("config:***************")
+            print(config)
             # info_dict is a collection of the non-field pragma lines
             info_dict = dict(pv=pv)
             if config is not None:
                 info_dict.update(
                     {k: v for k, v in config.items() if k != 'field'})
-                add_dict_to_table(row, info_dict)
+                new_entries = add_dict_to_table(row, info_dict)
+                column_write_entries.extend(new_entries)
                 # fields is a dictionary exclusively contining fields
                 fields = config.get('field', {})
-                add_dict_to_table(row, {f'field_{k}': v
+                print("fields:")
+                print(fields)
+                new_entries = add_dict_to_table(row, {f'field_{k}': v
                                         for k, v in fields.items()
                                         if k != 'field'}
                                   )
+                column_write_entries.extend(new_entries)
 
         # setColumnCount seems to need to proceed the setHorizontalHeaderLabels
         # in order to prevent QT from incorrectly drawing/labeling the cols
         self.config_info.setColumnCount(len(columns))
         self.config_info.setHorizontalHeaderLabels(list(columns))
+        print(column_write_entries)
+        for line in column_write_entries:
+            print(line)
+            if line:
+                self.config_info.setItem(*line)
+
         self.config_info.setVerticalHeaderLabels(
             list(item.name for item in chain.item_to_config))
 
