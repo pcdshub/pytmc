@@ -326,10 +326,7 @@ class SingularChain:
             # Detect Nones signifying an incomplete pragma
             if item_to_config[config] is None:
                 self.valid = False
-                #self.config = None
-                #self.pvname = None
 
-        # if self.valid:
         self.config = squash_configs(*list(item_to_config.values()))
         self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv']
                                if pv_segment)
