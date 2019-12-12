@@ -322,9 +322,6 @@ class SingularChain:
         self.tcname = '.'.join(part.name for part in self.chain)
         
         self.valid = True
-        
-        print("item_to_config")
-        print(item_to_config)
 
         for config in item_to_config:
             # Detect Nones signifying an incomplete pragma

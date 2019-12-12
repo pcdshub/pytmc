@@ -199,8 +199,6 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     def _update_config_info(self, record):
         'Slot - update config information when a new record is selected'
-        #if self._mode.lower() == "chains w/o records":
-        #    return
         chain = record.chain
 
         self.config_info.clear()
@@ -228,20 +226,10 @@ class TmcSummary(QtWidgets.QMainWindow):
 
         columns = {}
 
-        # if self._mode.lower() != "chains w/o records":
-        print("chain type", type(chain))
         items = zip(chain.config['pv'], chain.item_to_config.items())
         for row, (pv, (item, config)) in enumerate(items):
-            #print("row", row)
-            #print("pv", pv)
-            #print("item", item)
-            #print("config", config)
             # info_dict is a collection of the non-field pragma lines 
             info_dict = dict(pv=pv)
-            print("Item")
-            print(item)
-            print("config")
-            print(config)
             if config is not None:
                 info_dict.update({k: v for k, v in config.items() if k != 'field'})
                 add_dict_to_table(row, info_dict)
@@ -251,8 +239,6 @@ class TmcSummary(QtWidgets.QMainWindow):
                                     for k, v in fields.items()
                                     if k != 'field'}
                               )
-            print("fields")
-            print(fields)
         
         # setColumnCount seems to need to proceed the setHorizontalHeaderLabels
         # in order to prevent QT from incorrectly drawing/labeling the cols 
@@ -260,16 +246,6 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.config_info.setHorizontalHeaderLabels(list(columns))
         self.config_info.setVerticalHeaderLabels(
             list(item.name for item in chain.item_to_config))
-        
-        for item in chain.item_to_config:
-            pass
-            # print(item.Properties)
-            # print(dir(item.Properties))
-
-        #self.config_info.setColumnCount(
-        #    max(columns.values()) + 1
-        #    if columns else 0
-        #)
 
     def _update_record_text(self, record):
         'Slot - update record text when a new record is selected'
