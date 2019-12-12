@@ -230,13 +230,7 @@ class TmcSummary(QtWidgets.QMainWindow):
 
         # if self._mode.lower() != "chains w/o records":
         print("chain type", type(chain))
-        items = list(zip(chain.config['pv'], chain.item_to_config.items()))
-        print("chain.item_to_config.items()")
-        print(chain.item_to_config.items())
-        print("chain.config['pv']")
-        print(chain.config)
-        print("items")
-        print(items)
+        items = zip(chain.config['pv'], chain.item_to_config.items())
         for row, (pv, (item, config)) in enumerate(items):
             #print("row", row)
             #print("pv", pv)
