@@ -257,8 +257,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.config_info.setHorizontalHeaderLabels(list(columns))
         # finally print the column's entries
         for line in column_write_entries:
-            if line:
-                self.config_info.setItem(*line)
+            self.config_info.setItem(*line)
 
         self.config_info.setVerticalHeaderLabels(
             list(item.name for item in chain.item_to_config))
