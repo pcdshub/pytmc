@@ -202,9 +202,16 @@ In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
 Update rate
 '''''''''''
 
-By default, any given PLC variable will be polled at a rate of T=.5s (2Hz), T=1s (1Hz), T=2s (.5hz), T=10s (.1Hz), and T=50s (.02Hz), or as 
-configured by the IOC startup script.  This poll rate can be customized on a
-a per-record instance (*).
+By default, any given PLC variable will be polled at a rate of T=1s (1Hz).
+Other poll rates planned to be available by default may be selected on a
+per-record (*) basis: T=.5s (2Hz), T=1s (1Hz), T=2s (.5hz), T=10s (.1Hz), and
+T=50s (.02Hz), or as configured by the IOC startup script.
+
+By default, any given PLC variable will be bundled together to be polled at a
+fixed rate. This is the recommend means of using the ADS IOC.  Using one of the
+default polling rates is the only supported method currently, though these
+might be configurable in the future in the IOC startup script.  New poll rates
+cannot be created in the TwinCAT code.
 
 To customize the polling rate, specify the desired rate in either seconds or
 hertz in an ``update`` pragma key. For example:
