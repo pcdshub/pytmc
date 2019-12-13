@@ -148,9 +148,17 @@ def lint_pragma(pragma):
             update = config['update']
             try:
                 pragmas.parse_update_rate(update)
-            except ValueError:
+            except ValueError as ex:
                 raise LinterError(
-                    f'Invalid update rate for {pvname}: {update}') from None
+                    f'Invalid update rate for {pvname}: {ex}') from None
+
+        if 'archive' in config:
+            archive = config['archive']
+            try:
+                pragmas.parse_archive_settings(archive)
+            except ValueError as ex:
+                raise LinterError(
+                    f'Invalid archive settings for {pvname}: {ex}') from None
 
         fields = config.get('field', {})
         if fields.get('SCAN', 'I/O Intr') != 'I/O Intr':

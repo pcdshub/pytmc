@@ -365,7 +365,7 @@ def parse_update_rate(update, default=UPDATE_RATE_DEFAULT):
     ValueError
         If an invalid pragma is supplied
     '''
-    update = update.strip()
+    update = update.lower().strip()
     res = dict(default)
     if update:
         match = _UPDATE_RE.match(update)
@@ -411,8 +411,8 @@ def parse_archive_settings(archive, default=ARCHIVE_DEFAULT):
     ValueError
         If an invalid pragma is supplied
     '''
-    archive = archive.strip()
-    if archive.lower() in ('no', ):
+    archive = archive.lower().strip()
+    if archive in ('no', ):
         return None
 
     res = dict(default)
