@@ -90,10 +90,17 @@ class TmcSummary(QtWidgets.QMainWindow):
         super().__init__()
         self.tmc = tmc
         self.chains = {}
+        self.incomplete_chains = {}
         self.records = {}
 
-        records, self.exceptions = process(tmc, allow_errors=True)
+        records, self.exceptions = process(tmc, allow_errors=True,
+                                           allow_no_pragma=True)
+
         for record in records:
+            if not record.valid:
+                self.incomplete_chains[record.tcname] = record
+                continue
+
             self.chains[record.tcname] = record
             try:
                 record_text = record.render()
@@ -102,10 +109,16 @@ class TmcSummary(QtWidgets.QMainWindow):
                 record_text = _annotate_record_text(linter_results,
                                                     record_text)
             except Exception as ex:
+                try:
+                    record_text
+                except NameError:
+                    record_text = "Record not rendered"
+
                 record_text = (
                     f'!! Linter failure: {ex.__class__.__name__} {ex}'
                     f'\n\n{record_text}'
                 )
+
                 logger.exception('Linter failure')
 
             self.records[record] = record_text
@@ -122,6 +135,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.item_view_type = QtWidgets.QComboBox()
         self.item_view_type.addItem('Chains')
         self.item_view_type.addItem('Records')
+        self.item_view_type.addItem('Chains w/o Records')
         self.item_view_type.currentTextChanged.connect(self._update_view_type)
         self.item_list = QtWidgets.QListWidget()
 
@@ -190,42 +204,71 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.config_info.clear()
         self.config_info.setRowCount(len(chain.chain))
 
-        def add_dict_to_table(row, d):
+        def add_dict_to_table(row: int, d: dict):
+            """
+            Parameters
+            ----------
+            row : int
+                Identify the row to configure.
+
+            d : dict
+                Dictionary of items to enter into the target row.
+            """
             for key, value in d.items():
                 key = str(key)
                 if key not in columns:
                     columns[key] = max(columns.values()) + 1 if columns else 0
-                self.config_info.setItem(
-                    row, columns[key], QtWidgets.QTableWidgetItem(str(value))
-                )
+                # accumulate a list of entries to print in the chart. These
+                # should only be printed after `setColumnCount` has been run
                 if isinstance(value, dict):
-                    add_dict_to_table(row, value)
+                    yield from add_dict_to_table(row, value)
+                else:
+                    yield (
+                        row, columns[key],
+                        QtWidgets.QTableWidgetItem(str(value))
+                    )
 
         columns = {}
+        column_write_entries = []
 
         items = zip(chain.config['pv'], chain.item_to_config.items())
         for row, (pv, (item, config)) in enumerate(items):
+            # info_dict is a collection of the non-field pragma lines
             info_dict = dict(pv=pv)
-            info_dict.update({k: v for k, v in config.items() if k != 'field'})
-            add_dict_to_table(row, info_dict)
-            fields = config.get('field', {})
-            add_dict_to_table(row, {f'field_{k}': v
-                                    for k, v in fields.items()
-                                    if k != 'field'}
-                              )
+            if config is not None:
+                info_dict.update(
+                    {k: v for k, v in config.items() if k != 'field'})
+                new_entries = add_dict_to_table(row, info_dict)
+                column_write_entries.extend(new_entries)
+                # fields is a dictionary exclusively contining fields
+                fields = config.get('field', {})
+                new_entries = add_dict_to_table(
+                    row, {
+                        f'field_{k}': v
+                        for k, v in fields.items()
+                        if k != 'field'
+                    }
+                )
+                column_write_entries.extend(new_entries)
 
+        # setColumnCount seems to need to proceed the setHorizontalHeaderLabels
+        # in order to prevent QT from incorrectly drawing/labeling the cols
+        self.config_info.setColumnCount(len(columns))
         self.config_info.setHorizontalHeaderLabels(list(columns))
+        # finally print the column's entries
+        for line in column_write_entries:
+            self.config_info.setItem(*line)
+
         self.config_info.setVerticalHeaderLabels(
             list(item.name for item in chain.item_to_config))
 
-        self.config_info.setColumnCount(
-            max(columns.values()) + 1
-            if columns else 0
-        )
-
     def _update_record_text(self, record):
         'Slot - update record text when a new record is selected'
-        self.record_text.setText(self.records[record])
+        if self._mode.lower() == "chains w/o records":
+            # TODO: a more helpful message oculd be useful
+            self.record_text.setText("NOT GENERATED")
+        else:
+            self.record_text.setText(self.records[record])
 
     def _update_chain_info(self, record):
         'Slot - update chain information when a new record is selected'
@@ -246,9 +289,10 @@ class TmcSummary(QtWidgets.QMainWindow):
                 (' / '.join(_grep_record_names(db_text)) or 'Unknown', record)
                 for record, db_text in self.records.items()
             ]
+        elif self._mode == "chains w/o records":
+            items = self.incomplete_chains.items()
         else:
             return
-
         for name, record in sorted(items,
                                    key=lambda item: item[0]):
             item = QtWidgets.QListWidgetItem(name)

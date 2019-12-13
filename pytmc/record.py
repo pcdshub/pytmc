@@ -124,8 +124,11 @@ class RecordPackage:
         # Due to a twincat pragma limitation, EPICS macro prefix '$' cannot be
         # used or escaped.  Allow the configuration to specify an alternate
         # character in the pragma, defaulting to '@'.
-        macro_character = self.chain.config.get('macro_character', '@')
-        self.pvname = chain.pvname.replace(macro_character, '$')
+        if self.chain.config is not None:
+            macro_character = self.chain.config.get('macro_character', '@')
+            self.pvname = chain.pvname.replace(macro_character, '$')
+        else:
+            self.pvname = None
 
         # The base for the alias does not include the final pvname:
         alias_base = ':'.join(
@@ -149,6 +152,8 @@ class RecordPackage:
         bool
             Returns true if this record is fully specified and valid.
         """
+        if self.pvname is None or not self.chain.valid:
+            return False
         has_required_keys = all(self.chain.config.get(key)
                                 for key in self._required_keys)
 
@@ -179,7 +184,9 @@ class RecordPackage:
     def from_chain(*args, chain, **kwargs):
         """Select the proper subclass of ``TwincatRecordPackage`` from chain"""
         data_type = chain.data_type
-        if data_type.is_enum:
+        if not chain.valid:
+            spec = RecordPackage
+        elif data_type.is_enum:
             spec = EnumRecordPackage
         elif data_type.is_array or chain.last.array_info:
             spec = WaveformRecordPackage

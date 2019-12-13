@@ -74,7 +74,7 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
 
 
 def process(tmc, *, dbd_file=None, allow_errors=False,
-            show_error_context=True):
+            show_error_context=True, allow_no_pragma=False):
     '''
     Process a TMC
 
@@ -104,13 +104,14 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
 
     records = [
         record
-        for symbol in find_pytmc_symbols(tmc)
-        for record in record_packages_from_symbol(symbol,
-                                                  yield_exceptions=True)
+        for symbol in find_pytmc_symbols(tmc, allow_no_pragma=allow_no_pragma)
+        for record in record_packages_from_symbol(
+            symbol, yield_exceptions=True, allow_no_pragma=allow_no_pragma)
     ]
 
     exceptions = [ex for ex in records
                   if isinstance(ex, Exception)]
+
     for ex in exceptions:
         logger.error('Error creating record: %s', ex)
         records.remove(ex)
@@ -118,7 +119,10 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
     if exceptions and not allow_errors:
         raise LinterError('Failed to create database')
 
-    record_names = [record.pvname for record in records]
+    if allow_no_pragma:
+        record_names = [record.pvname for record in records if record.valid]
+    else:
+        record_names = [record.pvname for record in records]
     if len(record_names) != len(set(record_names)):
         dupes = {name: record_names.count(name)
                  for name in record_names

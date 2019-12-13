@@ -173,7 +173,8 @@ def dictify_config(conf, array_index=None, expand_default=':%.2d'):
     return config
 
 
-def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc'):
+def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
+                                     allow_no_pragma=False):
     '''
     Generate all possible configuration combinations
 
@@ -192,6 +193,12 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc'):
     Special handling for arrays of complex types will unroll the array into
     individual elements.  That is, `arr : ARRAY [1..5] of ST_Structure` will be
     unrolled into `arr[1]` through `arr[5]`.
+
+    Returns
+    -------
+    tuple
+        Tuple of tuples. See description above.
+
     '''
     result = []
 
@@ -214,8 +221,13 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc'):
     for item in chain:
         pragmas = list(get_pragma(item, name=pragma))
         if not pragmas:
-            # If any pragma in the chain is unset, escape early
-            return []
+            if allow_no_pragma:
+                pragmas = [None]
+                result.append([(item, None)])
+                continue
+            else:
+                # If any pragma in the chain is unset, escape early
+                return []
 
         if item.array_info and (item.data_type.is_complex_type or
                                 item.data_type.is_enum):
@@ -243,6 +255,9 @@ def squash_configs(*configs):
     '''
     squashed = {'pv': [], 'field': {}}
     for config in configs:
+        if config is None:
+            squashed['pv'].append(None)
+            continue
         # Shallow copy so that we don't modify the original
         config = dict(config)
 
@@ -378,6 +393,13 @@ class SingularChain:
         self.array_info = self.chain[-1].array_info
         self.tcname = '.'.join(part.name for part in self.chain)
 
+        self.valid = True
+
+        for config in item_to_config:
+            # Detect Nones signifying an incomplete pragma
+            if item_to_config[config] is None:
+                self.valid = False
+
         self.config = squash_configs(*list(item_to_config.values()))
         self.pvname = ':'.join(pv_segment for pv_segment in self.config['pv']
                                if pv_segment)
@@ -388,10 +410,10 @@ class SingularChain:
                 f'data_type={self.data_type!r})')
 
 
-def find_pytmc_symbols(tmc):
+def find_pytmc_symbols(tmc, allow_no_pragma=False):
     'Find all symbols in a tmc file that contain pragmas'
     for symbol in tmc.find(parser.Symbol):
-        if has_pragma(symbol):
+        if has_pragma(symbol) or allow_no_pragma:
             if symbol.name.count('.') == 1:
                 yield symbol
 
@@ -433,17 +455,29 @@ def has_pragma(item, *, name: str = 'pytmc'):
                if pragma is not None)
 
 
-def chains_from_symbol(symbol, *, pragma: str = 'pytmc'):
+def always_true(*a, **kwargs):
+    return True
+
+
+def chains_from_symbol(symbol, *, pragma: str = 'pytmc',
+                       allow_no_pragma=False):
     'Build all SingularChain instances from a Symbol'
-    for full_chain in symbol.walk(condition=has_pragma):
-        for item_and_config in expand_configurations_from_chain(full_chain):
+    if allow_no_pragma:
+        condition = always_true
+    else:
+        condition = has_pragma
+    for full_chain in symbol.walk(condition=condition):
+        for item_and_config in expand_configurations_from_chain(
+                full_chain, allow_no_pragma=allow_no_pragma):
             yield SingularChain(dict(item_and_config))
 
 
 def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
-                                yield_exceptions=False):
+                                yield_exceptions=False,
+                                allow_no_pragma=False):
     'Create all record packages from a given Symbol'
-    for chain in chains_from_symbol(symbol, pragma=pragma):
+    for chain in chains_from_symbol(symbol, pragma=pragma,
+                                    allow_no_pragma=allow_no_pragma):
         try:
             yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
         except Exception as ex:
