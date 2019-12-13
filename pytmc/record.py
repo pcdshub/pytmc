@@ -100,14 +100,11 @@ class RecordPackage:
         # Due to a twincat pragma limitation, EPICS macro prefix '$' cannot be
         # used or escaped.  Allow the configuration to specify an alternate
         # character in the pragma, defaulting to '@'.
-        try:
+        if self.chain.config is not None:
             macro_character = self.chain.config.get('macro_character', '@')
             self.pvname = chain.pvname.replace(macro_character, '$')
-        except AttributeError:
-            if self.chain.config is None:
-                self.pvname = None
-            else:
-                raise
+        else:
+            self.pvname = None
 
     @property
     def valid(self):
