@@ -127,11 +127,15 @@ def lint_pragma(pragma):
     if pv_line_detected <= 0:
         raise LinterError("No pv line(s) detected in a pragma")
 
-    for pvname, config in pragmas.separate_configs_by_pv(
+    for pvname, configs in pragmas.separate_configs_by_pv(
                 pragmas.split_pytmc_pragma(pragma_setting)
             ):
         if ' ' in pvname:
-            raise LinterError('Space found in PV name (missing delimiter?)')
+            raise LinterError(
+                f'Space found in PV name: {pvname!r} (missing delimiter?)')
+
+        config = pragmas.dictify_config(configs)
+
         if 'io' in config:
             io = config['io']
             try:
@@ -139,6 +143,19 @@ def lint_pragma(pragma):
             except ValueError:
                 raise LinterError(
                     f'Invalid i/o direction for {pvname}: {io}') from None
+
+        if 'update' in config:
+            update = config['update']
+            try:
+                pragmas.parse_update_rate(update)
+            except ValueError:
+                raise LinterError(
+                    f'Invalid update rate for {pvname}: {update}') from None
+
+        fields = config.get('field', {})
+        if fields.get('SCAN', 'I/O Intr') != 'I/O Intr':
+            raise LinterError(f'SCAN field cannot be customized ({pvname}); '
+                              f'use `update` pragma key')
 
     return match
 

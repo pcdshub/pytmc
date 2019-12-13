@@ -11,6 +11,7 @@ from collections import ChainMap, OrderedDict
 
 from .default_settings.unified_ordered_field_list import unified_lookup_list
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -273,8 +274,36 @@ class TwincatTypeRecordPackage(RecordPackage):
 
     @property
     def _asyn_port_spec(self):
-        """Asyn port specification without io direction"""
-        return f'@asyn($(PORT),0,1)ADSPORT={self.ads_port}/{self.tcname}'
+        'Asyn port specification without io direction, with room for options'
+        return (f'@asyn($(PORT),0,1)'
+                f'ADSPORT={self.ads_port}/{{options}}{self.tcname}'
+                )
+
+    @property
+    def asyn_update_options(self):
+        'Input record update options (TS_MS or POLL_RATE)'
+        from .pragmas import parse_update_rate
+        update = parse_update_rate(self.chain.config.get('update') or '')
+        if update['method'] == 'poll':
+            freq = update['frequency']
+            if int(freq) == float(freq):
+                return f'POLL_RATE={int(freq)}/'
+            return f'POLL_RATE={freq:.2f}'.rstrip('0') + '/'
+
+        milliseconds = int(1000 * update['seconds'])
+        return f'TS_MS={milliseconds}/'
+
+    @property
+    def asyn_input_port_spec(self):
+        """Asyn input port specification (for INP field)"""
+        return (
+            self._asyn_port_spec.format(options=self.asyn_update_options) + '?'
+        )
+
+    @property
+    def asyn_output_port_spec(self):
+        """Asyn output port specification (for OUT field)"""
+        return self._asyn_port_spec.format(options='') + '='
 
     def generate_input_record(self):
         """
@@ -306,12 +335,15 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.setdefault('DESC', self.default_desc)
 
         # Add our port
-        record.fields['INP'] = self._asyn_port_spec + '?'
+        record.fields['INP'] = self.asyn_input_port_spec
         record.fields['DTYP'] = self.dtyp
-        record.fields['SCAN'] = 'I/O Intr'
 
         # Update with given pragmas
         record.fields.update(self.chain.config.get('field', {}))
+
+        # Records must always be I/O Intr, regardless of the pragma:
+        record.fields['SCAN'] = 'I/O Intr'
+
         record.update_autosave_from_pragma(self.chain.config)
         return record
 
@@ -340,7 +372,7 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         # Add our port
         record.fields['DTYP'] = self.dtyp
-        record.fields['OUT'] = self._asyn_port_spec + '='
+        record.fields['OUT'] = self.asyn_output_port_spec
 
         # Remove timestamp source and process-on-init for output records:
         record.fields.pop('TSE', None)

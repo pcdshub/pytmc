@@ -49,9 +49,9 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
 @pytest.mark.parametrize(
     'source',
     [make_source_param('pv: test'),
-     make_source_param('pv: test; io: test'),
-     make_source_param('pv: test;; io: test'),
-     make_source_param('pv: test\r\n\r io: test'),
+     make_source_param('pv: test; io: io'),
+     make_source_param('pv: test;; io: io'),
+     make_source_param('pv: test\r\n\r io: io'),
 
      # Valid I/O types
      make_source_param('pv: test; io: i'),
@@ -75,6 +75,19 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
 
      # $ character....
      make_source_param('pv: $(TEST)', marks=pytest.mark.xfail),
+
+     # Update rates
+     make_source_param('pv: test; update: 1HZ poll'),
+     make_source_param('pv: test; update: 1s poll'),
+     make_source_param('pv: test; update: 1HZ    notify'),
+     make_source_param('pv: test; update:  1s  notify'),
+     make_source_param('pv: test; update:  1HZ'),
+     make_source_param('pv: test; update: 1s'),
+     make_source_param('pv: test; update: 100es', marks=pytest.mark.xfail),
+     make_source_param('pv: test; update: 1s test', marks=pytest.mark.xfail),
+     make_source_param('pv: test; update: notify 1s', marks=pytest.mark.xfail),
+     make_source_param('pv: test; field: SCAN I/O Intr'),
+     make_source_param('pv: test; field: SCAN 1 second', marks=pytest.mark.xfail),
      ]
 )
 def test_lint_pragma(source):
