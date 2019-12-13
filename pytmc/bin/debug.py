@@ -221,7 +221,7 @@ class TmcSummary(QtWidgets.QMainWindow):
                 # accumulate a list of entries to print in the chart. These
                 # should only be printed after `setColumnCount` has been run
                 if isinstance(value, dict):
-                    yield from (row, value)
+                    yield from _update_config_info(row, value)
                 else:
                     yield (
                         row, columns[key],
