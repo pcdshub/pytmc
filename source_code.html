@@ -335,7 +335,7 @@ unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
 <dd><p>Normalize an ‘io’ specifier in a pragma into either ‘input’ or ‘output’</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>io</strong> (<em>string</em>) – The I/O specifier from the pragma</p>
+<dd class="field-odd"><p><strong>io</strong> (<em>str</em>) – The I/O specifier from the pragma</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
@@ -345,6 +345,27 @@ unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>ValueError</strong> – If an invalid specifier is given</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.parse_update_rate">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">parse_update_rate</code><span class="sig-paren">(</span><em class="sig-param">update</em>, <em class="sig-param">default={'frequency': 1</em>, <em class="sig-param">'method': 'poll'</em>, <em class="sig-param">'seconds': 1}</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.parse_update_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an ‘update’ specifier in a pragma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>update</strong> (<em>str</em>) – The I/O specifier from the pragma</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>With keys {‘seconds’, ‘frequency’, ‘method’}
+Where ‘method’ is one of: {‘poll’, ‘notify’}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid pragma is supplied</p>
 </dd>
 </dl>
 </dd></dl>
@@ -605,6 +626,24 @@ type.</p></li>
 functions can be subclasses if further customisation is needed. This is
 not required.</p></li>
 </ol>
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.asyn_input_port_spec">
+<em class="property">property </em><code class="sig-name descname">asyn_input_port_spec</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.asyn_input_port_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asyn input port specification (for INP field)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.asyn_output_port_spec">
+<em class="property">property </em><code class="sig-name descname">asyn_output_port_spec</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.asyn_output_port_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asyn output port specification (for OUT field)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.asyn_update_options">
+<em class="property">property </em><code class="sig-name descname">asyn_update_options</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.asyn_update_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input record update options (TS_MS or POLL_RATE)</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="pytmc.record.TwincatTypeRecordPackage.generate_input_record">
 <code class="sig-name descname">generate_input_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.generate_input_record" title="Permalink to this definition">¶</a></dt>

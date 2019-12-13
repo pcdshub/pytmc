@@ -88,13 +88,14 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Annotating a TwinCAT3 project</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#data-and-record-types">Data and Record Types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pragma-syntax">Pragma syntax</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reducing-update-rate">Reducing update rate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-top-level-variables">Declaring top level variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-bidirectional-pvs">Declaring bidirectional PVs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update-rate">Update rate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pragma-fields">Pragma fields</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pv">pv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#io">io</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update">update</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#fields">fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#scan">SCAN</a></li>
 </ul>
@@ -368,22 +369,12 @@ single PV.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
     pv: TEST:MAIN:SCALE
     io: i
-    field: SCAN 1 second
     field: AOFF 1.0
     field: ASLO 2.0
 &#39;}
 scale : LREAL := 0.0;
 </pre></div>
 </div>
-</div>
-<div class="section" id="reducing-update-rate">
-<h2>Reducing update rate<a class="headerlink" href="#reducing-update-rate" title="Permalink to this headline">¶</a></h2>
-<p>By default, all records will have a scan rate of <code class="docutils literal notranslate"><span class="pre">I/O</span> <span class="pre">Intr</span></code>. This means that
-even if the value updates on every PLC cycle, EPICS will see (most) of those
-events.</p>
-<p>In the case of values that update quickly, it may be preferable to reduce
-the rate at which EPICS sees updates. This can be done by setting the
-<cite>SCAN</cite> field to poll at a fixed rate.</p>
 </div>
 <div class="section" id="declaring-top-level-variables">
 <h2>Declaring top level variables<a class="headerlink" href="#declaring-top-level-variables" title="Permalink to this headline">¶</a></h2>
@@ -400,10 +391,8 @@ scale : LREAL := 0.0;
 optional. We recommend that the user specify the direction of the
 data (<code class="docutils literal notranslate"><span class="pre">io:</span></code> line) however.</p>
 <p>Pytmc needs no additional information but users have the option to override
-default settings manually. For example a developer can specify the <code class="docutils literal notranslate"><span class="pre">SCAN</span></code>
-field , which configures how and when the value is updated, even though this is
-not required. For additional information on all the pragma fields, consult the
-<a class="reference internal" href="#pragma-fields">Pragma fields</a> section.</p>
+default settings manually. For information on all the pragma fields, consult
+the <a class="reference internal" href="#pragma-fields">Pragma fields</a> section.</p>
 </div>
 <div class="section" id="declaring-encapsulated-variables">
 <h2>Declaring encapsulated variables<a class="headerlink" href="#declaring-encapsulated-variables" title="Permalink to this headline">¶</a></h2>
@@ -437,19 +426,19 @@ to the PV. In the example above the final PV will be
 instantiation if you wish to make generalizations about the variables
 contained inside. These generalizations are overridden if the same field is
 specified either on a contained datatype or variable.</p>
-<p>For example the following code block will assign a <code class="docutils literal notranslate"><span class="pre">field:</span></code> of <code class="docutils literal notranslate"><span class="pre">SCAN</span> <span class="pre">1</span>
-<span class="pre">second</span></code> to all the variables and datatypes that it contains unless they
-specify their own setting for <code class="docutils literal notranslate"><span class="pre">SCAN</span></code>.</p>
+<p>For example the following code block will assign a <code class="docutils literal notranslate"><span class="pre">field:</span></code> of <code class="docutils literal notranslate"><span class="pre">DESC</span> <span class="pre">test</span></code>
+to all the variables and datatypes that it contains unless they
+specify their own setting for <code class="docutils literal notranslate"><span class="pre">DESC</span></code>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
     pv: BASE
-    field: SCAN 1 second
+    field: DESC test
 &#39;}
 counter_b : counter;
 </pre></div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
     pv: VALUE_F_R
-    field: SCAN 1 second
+    field: DESC test
     io: i
 &#39;}
 value_d : DINT;
@@ -471,6 +460,46 @@ upper_limit : DINT := 5000;
 <p>In this case, two records will be generated: <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT</span></code> and
 <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT_RBV</span></code>.</p>
 </div>
+<div class="section" id="update-rate">
+<h2>Update rate<a class="headerlink" href="#update-rate" title="Permalink to this headline">¶</a></h2>
+<p>By default, any given PLC variable will be polled at a rate of T=1s (1Hz).
+Other poll rates planned to be available by default may be selected on a
+per-record (*) basis: T=.5s (2Hz), T=1s (1Hz), T=2s (.5hz), T=10s (.1Hz), and
+T=50s (.02Hz), or as configured by the IOC startup script.</p>
+<p>By default, any given PLC variable will be bundled together to be polled at a
+fixed rate. This is the recommend means of using the ADS IOC.  Using one of the
+default polling rates is the only supported method currently, though these
+might be configurable in the future in the IOC startup script.  New poll rates
+cannot be created in the TwinCAT code.</p>
+<p>To customize the polling rate, specify the desired rate in either seconds or
+hertz in an <code class="docutils literal notranslate"><span class="pre">update</span></code> pragma key. For example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>update: 1Hz
+update: 1s
+update: 0.5s
+update: 2Hz
+</pre></div>
+</div>
+<p>The keyword <code class="docutils literal notranslate"><span class="pre">poll</span></code> can also be used to explicitly mark it for polling:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>update: 1s poll
+</pre></div>
+</div>
+<p>For faster rates, an ADS concept of <cite>notifications</cite>, can be used. These are
+conceptually similar to callback-on-change in Python or <code class="docutils literal notranslate"><span class="pre">camonitor</span></code> in the
+context of EPICS.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">notify</span></code> keyword in the <code class="docutils literal notranslate"><span class="pre">update</span></code> setting to enable this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>update: 10Hz notify
+update: 0.1s notify
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Adding too many of these notifications can significantly slow down a PLC,
+even when specified at slow rates. As such, <code class="docutils literal notranslate"><span class="pre">notify</span></code> should be used
+sparingly.</p>
+</div>
+<p>(*) This is on the wishlist for ads-ioc. As of December 2019, all polled
+records will be processed at a rate of 1 Hz/the IOC-configured poll rate.</p>
+</div>
 <div class="section" id="pragma-fields">
 <h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Permalink to this headline">¶</a></h2>
 <p>Each line of the pragma indicates to pytmc how to generate the corresponding records
@@ -490,6 +519,14 @@ appended to the front of any PVs that are declared within the data type.</p>
 is reading or writing this value. Values being sent from the PLC to the IOC
 should be marked as input with ‘i’ and values being sent to the PLC from the
 IOC should be marked ‘o’.  Bidirectional PVs can be specified with ‘io’.</p>
+<p>The following are valid for input-only (read-only) pragmas: <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">i</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">ro</span></code>.</p>
+<p>The following are valid for input-output (read-write) pragmas: <code class="docutils literal notranslate"><span class="pre">output</span></code>, <code class="docutils literal notranslate"><span class="pre">io</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rw</span></code>, and <code class="docutils literal notranslate"><span class="pre">o</span></code>.</p>
+</div>
+<div class="section" id="update">
+<h3>update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
+<p>See <a class="reference internal" href="#update-rate">Update rate</a>.</p>
 </div>
 <div class="section" id="fields">
 <h3>fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h3>
@@ -510,21 +547,9 @@ as alarm limits and scanning frequency.</p>
 </div>
 <div class="section" id="scan">
 <h3>SCAN<a class="headerlink" href="#scan" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">SCAN</span></code> field is special. Pytmc will guess a scan field if not provided
-but like <code class="docutils literal notranslate"><span class="pre">io</span></code> and <code class="docutils literal notranslate"><span class="pre">pv</span></code>, the correct setting is on a case-by-case basis.
-pytmc itself cannot know at what rate a variable will update on the PLC side.</p>
-<p>Valid options for this field are:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;Passive&quot;
-&quot;I/O Intr&quot;
-&quot;10 second&quot;
-&quot;5 second&quot;
-&quot;2 second&quot;
-&quot;1 second&quot;
-&quot;.5 second&quot;
-&quot;.2 second&quot;
-&quot;.1 second&quot;
-</pre></div>
-</div>
+<p>While the <code class="docutils literal notranslate"><span class="pre">SCAN</span></code> field is special in EPICS to specify the rate at which
+records should be updated, pytmc requires that such configuration be done
+through the <code class="docutils literal notranslate"><span class="pre">update</span></code> pragma key (see <a class="reference internal" href="#update-rate">Update rate</a>).</p>
 </div>
 </div>
 <div class="section" id="autosave">
