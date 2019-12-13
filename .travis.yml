@@ -27,7 +27,7 @@ matrix:
 
 install:
   - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
-  - source pcds-ci-helpers/init.sh
+  - source pcds-ci-helpers/travis/init.sh
  
   # Install, configure conda
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
