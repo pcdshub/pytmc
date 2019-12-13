@@ -127,6 +127,14 @@ class RecordPackage:
         if self.chain.config is not None:
             macro_character = self.chain.config.get('macro_character', '@')
             self.pvname = chain.pvname.replace(macro_character, '$')
+            from .pragmas import parse_archive_settings
+            self.archive_settings = parse_archive_settings(
+                self.chain.config.get('archive', ''))
+            if self.archive_settings:
+                fields = self.chain.config.get('archive_fields', '')
+                self.archive_settings['fields'] = (
+                    fields.split(' ') if fields else []
+                )
         else:
             self.pvname = None
 
@@ -241,6 +249,7 @@ class TwincatTypeRecordPackage(RecordPackage):
     dtyp = NotImplemented
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
+    archive_fields = ['VAL']
 
     def __init_subclass__(cls, **kwargs):
         """Magic to have field_defaults be the combination of hierarchy"""
@@ -639,3 +648,31 @@ def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
         combined_sorted.update(naive_sorted)
         combined_sorted.update(instructed_sorted)
     return combined_sorted
+
+
+def generate_archive_settings(packages):
+    '''
+    Generate an archive settings given a list of record packages
+
+    Parameters
+    ----------
+    packages : list of record packages
+
+    Yields
+    ------
+    str
+        One line from the archiver settings file
+    '''
+    for package in packages:
+        archive_settings = package.archive_settings
+        if archive_settings:
+            # for record in package.records:
+            for record in package.records:
+                # Fields are those from the pragma (key: archive_fields) plus
+                # those set by default on the RecordPackage class
+                fields = sorted(set(archive_settings['fields'] +
+                                    package.archive_fields))
+                for field in fields:
+                    period = archive_settings['seconds']
+                    method = archive_settings['method']
+                    yield f'{record.pvname}.{field}\t{period}\t{method}'

@@ -45,6 +45,16 @@ VALID_POLL_RATES_HZ = (1./50,  # 0.02Hz - 1 update every 50 seconds
                        2)      # 2.0 Hz - 2 updates every 1 second
 
 
+_ARCHIVE_RE = re.compile(
+    # Rate portion (e.g., 1 s, 1s, 1Hz, 1 Hz)
+    r'^(?P<rate>\d*\.\d+|\d+)\s*(?P<hz_or_sec>hz|s)'
+    # Poll or notify (or default)
+    r'(\s+(?P<method>scan|monitor))?$',
+    flags=re.IGNORECASE
+)
+ARCHIVE_DEFAULT = {'frequency': 1, 'seconds': 1, 'method': 'scan'}
+
+
 def split_pytmc_pragma(pragma_text):
     """
     Return dictionaries for each line.
@@ -299,6 +309,42 @@ def normalize_io(io):
     raise ValueError('Invalid I/O specifier')
 
 
+def _parse_rate(rate, hz_or_sec):
+    '''
+    Parse rate into frequency and seconds
+
+    Parameters
+    ----------
+    rate : str
+        The pragma-specified rate
+
+    hz_or_sec : str
+        {'hz', 's'}
+
+    Returns
+    -------
+    dict
+        With keys {'seconds', 'frequency'}
+    '''
+
+    try:
+        rate = float(rate)
+    except Exception:
+        raise ValueError(f'Invalid rate: {rate}')
+
+    if hz_or_sec == 'hz':
+        freq, seconds = rate, 1.0 / rate
+    elif hz_or_sec == 's':
+        freq, seconds = 1.0 / rate, rate
+    else:
+        raise ValueError(f'Invalid hz_or_sec: {hz_or_sec}')
+
+    return dict(
+        frequency=int(freq) if int(freq) == freq else freq,
+        seconds=int(seconds) if int(seconds) == seconds else seconds,
+    )
+
+
 def parse_update_rate(update, default=UPDATE_RATE_DEFAULT):
     '''
     Parse an 'update' specifier in a pragma
@@ -334,25 +380,56 @@ def parse_update_rate(update, default=UPDATE_RATE_DEFAULT):
         res['method'] = method
 
         # Rate + frequency/seconds
-        try:
-            rate = float(d['rate'])
-        except Exception:
-            raise ValueError(f'Invalid update rate: {rate}')
-
-        hz_or_sec = d['hz_or_sec']
-        if hz_or_sec == 'hz':
-            freq, seconds = rate, 1.0 / rate
-        else:
-            freq, seconds = 1.0 / rate, rate
-
-        res['frequency'] = int(freq) if int(freq) == freq else freq
-        res['seconds'] = int(seconds) if int(seconds) == seconds else seconds
+        res.update(_parse_rate(d['rate'], d['hz_or_sec']))
 
         if method == 'poll' and res['frequency'] not in VALID_POLL_RATES_HZ:
             raise ValueError(
                 f"Invalid poll rate {res['frequency']}.  "
                 f"Valid frequencies in Hz are: {VALID_POLL_RATES_HZ}"
             )
+
+    return res
+
+
+def parse_archive_settings(archive, default=ARCHIVE_DEFAULT):
+    '''
+    Parse an 'archive' specifier in a pragma
+
+    Parameters
+    ----------
+    archive : str
+        The I/O specifier from the pragma
+
+    Returns
+    -------
+    dict
+        With keys {'seconds', 'frequency', 'method'}
+        Where 'method' is one of: {'scan', 'monitor'}
+
+    Raises
+    ------
+    ValueError
+        If an invalid pragma is supplied
+    '''
+    archive = archive.strip()
+    if archive.lower() in ('no', ):
+        return None
+
+    res = dict(default)
+    if archive:
+        match = _ARCHIVE_RE.match(archive)
+        if not match:
+            raise ValueError(f'Invalid archive specifier: {archive}')
+
+        # Method
+        d = match.groupdict()
+        method = d.get('method') or default['method']
+        if method not in {'scan', 'monitor'}:
+            raise ValueError(f'Invalid archive method: {method}')
+
+        res['method'] = method
+        # Rate + frequency/seconds
+        res.update(_parse_rate(d['rate'], d['hz_or_sec']))
 
     return res
 
