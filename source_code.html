@@ -251,7 +251,7 @@ dictionary configurations from parsed pytmc pragmas.</p>
 
 <dl class="function">
 <dt id="pytmc.pragmas.chains_from_symbol">
-<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">chains_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.chains_from_symbol" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">chains_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.chains_from_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build all SingularChain instances from a Symbol</p>
 </dd></dl>
 
@@ -278,7 +278,7 @@ dictionary configurations from parsed pytmc pragmas.</p>
 
 <dl class="function">
 <dt id="pytmc.pragmas.expand_configurations_from_chain">
-<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">expand_configurations_from_chain</code><span class="sig-paren">(</span><em class="sig-param">chain</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.expand_configurations_from_chain" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">expand_configurations_from_chain</code><span class="sig-paren">(</span><em class="sig-param">chain</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.expand_configurations_from_chain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate all possible configuration combinations</p>
 <p>For example, from a chain with two items:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">]</span>
@@ -295,11 +295,19 @@ configuration dictionaries config1, config2), this function will return:</p>
 <p>Special handling for arrays of complex types will unroll the array into
 individual elements.  That is, <cite>arr : ARRAY [1..5] of ST_Structure</cite> will be
 unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Tuple of tuples. See description above.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pytmc.pragmas.find_pytmc_symbols">
-<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">find_pytmc_symbols</code><span class="sig-paren">(</span><em class="sig-param">tmc</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.find_pytmc_symbols" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">find_pytmc_symbols</code><span class="sig-paren">(</span><em class="sig-param">tmc</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.find_pytmc_symbols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find all symbols in a tmc file that contain pragmas</p>
 </dd></dl>
 
@@ -372,7 +380,7 @@ Where ‘method’ is one of: {‘poll’, ‘notify’}</p>
 
 <dl class="function">
 <dt id="pytmc.pragmas.record_packages_from_symbol">
-<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">record_packages_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">yield_exceptions=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.record_packages_from_symbol" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">record_packages_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">yield_exceptions=False</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.record_packages_from_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create all record packages from a given Symbol</p>
 </dd></dl>
 
