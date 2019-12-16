@@ -202,7 +202,7 @@ In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
 Pragma fields
 '''''''''''''
 
-Example: ``field: value``
+Format: ``{field}: [value]``
 
 A pragma key or field (before the ``:``) and the value after the ``:`` are used
 to generate records in EPICS.
@@ -240,7 +240,8 @@ being sent to the PLC from the IOC should be marked ``output`` (or equivalently
 Update rate
 ...........
 
-Format: ``{rate}{s|Hz} [{poll|notify}]``
+
+Format: ``update: {rate}{s|Hz} [{poll|notify}]``
 
 Example: ``1s``, ``1s poll``, ``2Hz notify``
 
@@ -296,9 +297,10 @@ records will be processed at a rate of 1 Hz/the IOC-configured poll rate.
 Archiver settings
 .................
 
-Format: ``{rate}{s|Hz} [{scan|monitor}]``
+Format: ``archive: {rate}{s|Hz} [{scan|monitor}]``
 
 Example: ``1s``, ``1s scan``, ``2Hz monitor``
+
 
 Using the database-generating tool ``pytmc db`` along with the pragma key
 ``archive`` will automatically generate archiver appliance cron-job compatible
@@ -310,6 +312,9 @@ Without an ``archive`` pragma key, the default setting is ``1s scan``. This
 means that your PVs will be archived at a rate of once per second, using the
 ``scan`` method.
 
+For more information on the two methods, see the `EPICS Archiver Appliance
+documentation <https://slacmshankar.github.io/epicsarchiver_docs/faq.html>`_.
+
 .. note::
 
    If the update frequency is slower than the specified archive frequency, the
@@ -320,14 +325,13 @@ means that your PVs will be archived at a rate of once per second, using the
    Large arrays will not be archived, regardless of pragma settings.
 
 
-For more information on the two methods, see the `EPICS Archiver Appliance
-documentation <https://slacmshankar.github.io/epicsarchiver_docs/faq.html>`_.
+.. note::
 
+   Additional fields can be specified for archiving through the ``archive_fields``
+   key, which is a space-delimited list of field names. 
 
-update
-......
+   Example: ``archive_fields: DESC PREC``
 
-See `Update rate`_.
 
 Record fields
 .............
