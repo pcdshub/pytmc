@@ -320,8 +320,8 @@ means that your PVs will be archived at a rate of once per second, using the
    Large arrays will not be archived, regardless of pragma settings.
 
 
-For more information on the two methods, see the `<EPICS Archiver Appliance
-documentation> https://slacmshankar.github.io/epicsarchiver_docs/faq.html`_.
+For more information on the two methods, see the `EPICS Archiver Appliance
+documentation <https://slacmshankar.github.io/epicsarchiver_docs/faq.html>`_.
 
 
 update
