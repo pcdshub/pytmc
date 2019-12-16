@@ -434,6 +434,32 @@ def parse_archive_settings(archive, default=ARCHIVE_DEFAULT):
     return res
 
 
+def normalize_config(config):
+    '''
+    Parse and normalize pragma values into Python representations
+
+    The following keys will be interpreted: ``io``, ``archive``, ``update``
+
+    Parameters
+    ----------
+    config : dict
+        The configuration
+
+    Returns
+    -------
+    dict
+        A shallow-copy of ``config`` with parsed and normalized values
+    '''
+    key_to_parser = {'io': (normalize_io, 'io'),
+                     'update': (parse_update_rate, '1s poll'),
+                     'archive': (parse_archive_settings, '1s scan'),
+                     }
+    ret = dict(config)
+    for key, (parser_func, default) in key_to_parser.items():
+        ret[key] = parser_func(ret.get(key, default))
+    return ret
+
+
 class SingularChain:
     '''
     A chain of data types, all with pytmc pragmas, representing a single piece

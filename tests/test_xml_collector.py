@@ -293,9 +293,9 @@ def test_BaseRecordPackage_guess_FTVL(chain, tc_type, io, is_str, is_arr,
 
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM", [
     ("INT", 0, False, False, None),
-    ("INT", 0, False, True, '3'),
-    ("LREAL", 0, False, True, '9'),
-    ("STRING", 0, True, False, '81'),
+    ("INT", 0, False, True, 3),
+    ("LREAL", 0, False, True, 9),
+    ("STRING", 0, True, False, 81),
 ])
 def test_BaseRecordPackage_guess_NELM(chain, tc_type, sing_index, is_str,
                                       is_arr, final_NELM):
