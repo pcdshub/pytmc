@@ -199,8 +199,50 @@ In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
 ``TEST:MAIN:ULIMIT_RBV``.
 
 
+Pragma fields
+'''''''''''''
+
+Example: ``field: value``
+
+A pragma key or field (before the ``:``) and the value after the ``:`` are used
+to generate records in EPICS.
+
+pv
+..
+This constructs the PV name that will represent this variable in EPICS. It is
+the only mandatory configuration line. This line can be used on specific
+variables as well as the instantiations of data types. 
+
+.. note::
+
+   ``$`` may not be used in pragmas due to some TwinCAT limitations as of
+   version 4024.  An alternative character ``@`` may be used in its place for
+   pv names.  This can also be customized using the ``macro_character`` pragma
+   key.
+
+io
+..
+This is a field that defaults to `'io'`.  Specify the whether the IOC can only
+read or also write the value. Values being sent from the PLC to the IOC should
+be marked as input with ``input`` (or equivalently ``i``, ``ro``) and values
+being sent to the PLC from the IOC should be marked ``output`` (or equivalently
+``o``, ``rw``).
+
+.. note::
+
+   The following are valid for input-only (read-only) pragmas: ``input``, ``i``,
+   and ``ro``.
+
+   The following are valid for input-output (read-write) pragmas: ``output``, ``io``,
+   ``rw``, and ``o``.
+
+
 Update rate
-'''''''''''
+...........
+
+Format: ``{rate}{s|Hz} [{poll|notify}]``
+
+Example: ``1s``, ``1s poll``, ``2Hz notify``
 
 By default, any given PLC variable will be polled at a rate of T=1s (1Hz).
 Other poll rates planned to be available by default may be selected on a
@@ -251,41 +293,44 @@ Use the ``notify`` keyword in the ``update`` setting to enable this:
 records will be processed at a rate of 1 Hz/the IOC-configured poll rate.
 
 
-Pragma fields
-'''''''''''''
-Each line of the pragma indicates to pytmc how to generate the corresponding records
-in the database file output.
+Archiver settings
+.................
 
-pv
-..
-This constructs the PV name that will represent this variable in EPICS. It is
-the only mandatory configuration line. This line can be used on specific
-variables as well as the instantiations of data types. 
+Format: ``{rate}{s|Hz} [{scan|monitor}]``
 
-When used on variables declared in the main scope, the PV for the variable will
-be generated verbatim.  When used on instantiations, this string will be
-appended to the front of any PVs that are declared within the data type. 
+Example: ``1s``, ``1s scan``, ``2Hz monitor``
 
-io
-..
-This is a guessed field that defaults to `'io'`.  Specify the whether the IOC
-is reading or writing this value. Values being sent from the PLC to the IOC
-should be marked as input with 'i' and values being sent to the PLC from the
-IOC should be marked 'o'.  Bidirectional PVs can be specified with 'io'.
+Using the database-generating tool ``pytmc db`` along with the pragma key
+``archive`` will automatically generate archiver appliance cron-job compatible
+``.archive`` files (i.e., those in ``$IOC_DATA/$IOC/archive/*.archive``).
+The cron job will read these files and automatically configure the archiver
+to archive the listed PVs.
 
-The following are valid for input-only (read-only) pragmas: ``input``, ``i``,
-and ``ro``.
+Without an ``archive`` pragma key, the default setting is ``1s scan``. This
+means that your PVs will be archived at a rate of once per second, using the
+``scan`` method.
 
-The following are valid for input-output (read-write) pragmas: ``output``, ``io``,
-``rw``, and ``o``.
+.. note::
+
+   If the update frequency is slower than the specified archive frequency, the
+   archive frequency will be reduced.
+
+.. note::
+
+   Large arrays will not be archived, regardless of pragma settings.
+
+
+For more information on the two methods, see the `<EPICS Archiver Appliance
+documentation> https://slacmshankar.github.io/epicsarchiver_docs/faq.html`_.
+
 
 update
 ......
 
 See `Update rate`_.
 
-fields
-......
+Record fields
+.............
 This specifies additional field(s) to be set on the generated EPICS record(s).
 Multiple field lines are allowed. These lines determine the PV's behaviors such
 as alarm limits and scanning frequency.  
@@ -315,7 +360,7 @@ records should be updated, pytmc requires that such configuration be done
 through the ``update`` pragma key (see `Update rate`_).
 
 Autosave
-''''''''
+........
 
 Autosave fields for individual EPICS records are configured by default with
 pytmc. It is possible to customize this behavior with additional pragmas,
