@@ -674,5 +674,8 @@ def generate_archive_settings(packages):
                                     package.archive_fields))
                 for field in fields:
                     period = archive_settings['seconds']
+                    update_rate = package.config['update']['seconds']
+                    if period < update_rate:
+                        period = update_rate
                     method = archive_settings['method']
                     yield f'{record.pvname}.{field}\t{period}\t{method}'
