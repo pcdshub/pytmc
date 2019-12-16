@@ -38,10 +38,21 @@ def get_record_package(data_type, io, pragma):
                   id='1s_i_scan'),
      pytest.param(make_mock_type('INT'), 'i', dict(archive='1s test'), [],
                   id='bad_pragma', marks=pytest.mark.xfail),
+     pytest.param(make_mock_type('INT', length=100, is_array=True), 'i',
+                  dict(archive='1s scan'),
+                  ['\t'.join(('PVNAME_RBV.VAL', '1', 'scan')),
+                   ],
+                  id='small_array_100'),
+     pytest.param(make_mock_type('INT',
+                                 length=pytmc.record.MAX_ARCHIVE_ELEMENTS + 1,
+                                 is_array=True),
+                  'i', dict(archive='1s scan'), [],
+                  id='large_array_1025'),
      ]
 )
 def test_archive(data_type, io, pragma, expected):
     record_package = get_record_package(data_type, io, pragma)
+    print(record_package)
     archive_settings = list(pytmc.record.generate_archive_settings([record_package]))
     assert archive_settings == expected
     # pkg = pytmc.record.StringRecordPackage(851, )

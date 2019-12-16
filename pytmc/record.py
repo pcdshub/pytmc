@@ -13,6 +13,7 @@ from .default_settings.unified_ordered_field_list import unified_lookup_list
 
 
 logger = logging.getLogger(__name__)
+MAX_ARCHIVE_ELEMENTS = 1024
 
 
 def _truncate_middle(string, max_length):
@@ -202,7 +203,7 @@ class RecordPackage:
             spec = StringRecordPackage
         else:
             try:
-                spec = data_types[data_type.name]
+                spec = DATA_TYPES[data_type.name]
             except KeyError:
                 raise ValueError(
                     f'Unsupported data type {data_type.name} in chain: '
@@ -479,6 +480,11 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.nelm > MAX_ARCHIVE_ELEMENTS:
+            self.archive_settings = None
+
     @property
     def ftvl(self):
         """Field type of value"""
@@ -573,7 +579,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         return record
 
 
-data_types = {
+DATA_TYPES = {
     'BOOL': BinaryRecordPackage,
     'BYTE': IntegerRecordPackage,
     'SINT': IntegerRecordPackage,
