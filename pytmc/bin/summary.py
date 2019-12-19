@@ -179,7 +179,7 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
     if show_boxes or show_all:
         util.sub_heading('Boxes')
         boxes = list(project.find(parser.Box))
-        for box in boxes:
+        for box in sorted(boxes, key=lambda box: int(box.attributes['Id'])):
             print(f'    {box.attributes["Id"]}.) {box.name}')
 
     if show_nc or show_all:
