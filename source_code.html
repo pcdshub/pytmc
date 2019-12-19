@@ -338,6 +338,24 @@ unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="pytmc.pragmas.normalize_config">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">normalize_config</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.normalize_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and normalize pragma values into Python representations</p>
+<p>The following keys will be interpreted: <code class="docutils literal notranslate"><span class="pre">io</span></code>, <code class="docutils literal notranslate"><span class="pre">archive</span></code>, <code class="docutils literal notranslate"><span class="pre">update</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – The configuration</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A shallow-copy of <code class="docutils literal notranslate"><span class="pre">config</span></code> with parsed and normalized values</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="pytmc.pragmas.normalize_io">
 <code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">normalize_io</code><span class="sig-paren">(</span><em class="sig-param">io</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.normalize_io" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize an ‘io’ specifier in a pragma into either ‘input’ or ‘output’</p>
@@ -353,6 +371,27 @@ unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>ValueError</strong> – If an invalid specifier is given</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.parse_archive_settings">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">parse_archive_settings</code><span class="sig-paren">(</span><em class="sig-param">archive</em>, <em class="sig-param">default={'frequency': 1</em>, <em class="sig-param">'method': 'scan'</em>, <em class="sig-param">'seconds': 1}</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.parse_archive_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an ‘archive’ specifier in a pragma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>archive</strong> (<em>str</em>) – The I/O specifier from the pragma</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>With keys {‘seconds’, ‘frequency’, ‘method’}
+Where ‘method’ is one of: {‘scan’, ‘monitor’}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid pragma is supplied</p>
 </dd>
 </dl>
 </dd></dl>
@@ -692,9 +731,6 @@ not required.</p></li>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>str</p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If unable to determine IO direction</p>
-</dd>
 </dl>
 </dd></dl>
 
@@ -708,7 +744,7 @@ not required.</p></li>
 
 <dl class="class">
 <dt id="pytmc.record.WaveformRecordPackage">
-<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">WaveformRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.WaveformRecordPackage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">WaveformRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.WaveformRecordPackage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage" title="pytmc.record.TwincatTypeRecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.TwincatTypeRecordPackage</span></code></a></p>
 <p>Create a set of records for a Twincat Array</p>
 <dl class="method">
@@ -763,6 +799,20 @@ meaningless.”</p>
 <dd><p>Number of elements in record</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.record.generate_archive_settings">
+<code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">generate_archive_settings</code><span class="sig-paren">(</span><em class="sig-param">packages</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.generate_archive_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an archive settings given a list of record packages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>packages</strong> (<em>list of record packages</em>) – </p>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>str</em> – One line from the archiver settings file</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">

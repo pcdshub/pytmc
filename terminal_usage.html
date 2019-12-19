@@ -218,6 +218,7 @@ TwinCAT3 .tmc files. This program is designed to work in conjunction with ESS’
 m-epics-twincat-ads driver.</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">db</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">error</span><span class="o">-</span><span class="n">context</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span> <span class="n">ARCHIVE_FILE</span> <span class="o">|</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span><span class="p">]</span>
                 <span class="n">INPUT</span> <span class="p">[</span><span class="n">OUTPUT</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -229,6 +230,7 @@ m-epics-twincat-ads driver.</p>
 </dd>
 <dt><kbd>OUTPUT</kbd></dt>
 <dd><p>Path to output .db file</p>
+<p>Default: &lt;_io.TextIOWrapper name=’&lt;stdout&gt;’ mode=’w’ encoding=’UTF-8’&gt;</p>
 </dd>
 </dl>
 </div>
@@ -244,6 +246,13 @@ m-epics-twincat-ads driver.</p>
 </dd>
 <dt><kbd>--no-error-context</kbd></dt>
 <dd><p>Do not show db file context around errors</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--archive-file</kbd></dt>
+<dd><p>Save an archive configuration file. Defaults to OUTPUT.archive if specified</p>
+</dd>
+<dt><kbd>--no-archive-file</kbd></dt>
+<dd><p>Do not write the archive file, regardless of OUTPUT filename settings.</p>
 <p>Default: False</p>
 </dd>
 </dl>

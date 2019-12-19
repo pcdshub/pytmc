@@ -91,16 +91,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#declaring-top-level-variables">Declaring top level variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#declaring-bidirectional-pvs">Declaring bidirectional PVs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#update-rate">Update rate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pragma-fields">Pragma fields</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pv">pv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#io">io</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#update">update</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#fields">fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update-rate">Update rate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#archiver-settings">Archiver settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#record-fields">Record fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#scan">SCAN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autosave">Autosave</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#autosave">Autosave</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Command-line Usage</a></li>
@@ -460,8 +460,43 @@ upper_limit : DINT := 5000;
 <p>In this case, two records will be generated: <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT</span></code> and
 <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT_RBV</span></code>.</p>
 </div>
+<div class="section" id="pragma-fields">
+<h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Permalink to this headline">¶</a></h2>
+<p>Format: <code class="docutils literal notranslate"><span class="pre">{field}:</span> <span class="pre">[value]</span></code></p>
+<p>A pragma key or field (before the <code class="docutils literal notranslate"><span class="pre">:</span></code>) and the value after the <code class="docutils literal notranslate"><span class="pre">:</span></code> are used
+to generate records in EPICS.</p>
+<div class="section" id="pv">
+<h3>pv<a class="headerlink" href="#pv" title="Permalink to this headline">¶</a></h3>
+<p>This constructs the PV name that will represent this variable in EPICS. It is
+the only mandatory configuration line. This line can be used on specific
+variables as well as the instantiations of data types.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">$</span></code> may not be used in pragmas due to some TwinCAT limitations as of
+version 4024.  An alternative character <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> may be used in its place for
+pv names.  This can also be customized using the <code class="docutils literal notranslate"><span class="pre">macro_character</span></code> pragma
+key.</p>
+</div>
+</div>
+<div class="section" id="io">
+<h3>io<a class="headerlink" href="#io" title="Permalink to this headline">¶</a></h3>
+<p>This is a field that defaults to <cite>‘io’</cite>.  Specify the whether the IOC can only
+read or also write the value. Values being sent from the PLC to the IOC should
+be marked as input with <code class="docutils literal notranslate"><span class="pre">input</span></code> (or equivalently <code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">ro</span></code>) and values
+being sent to the PLC from the IOC should be marked <code class="docutils literal notranslate"><span class="pre">output</span></code> (or equivalently
+<code class="docutils literal notranslate"><span class="pre">o</span></code>, <code class="docutils literal notranslate"><span class="pre">rw</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following are valid for input-only (read-only) pragmas: <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">i</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">ro</span></code>.</p>
+<p>The following are valid for input-output (read-write) pragmas: <code class="docutils literal notranslate"><span class="pre">output</span></code>, <code class="docutils literal notranslate"><span class="pre">io</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rw</span></code>, and <code class="docutils literal notranslate"><span class="pre">o</span></code>.</p>
+</div>
+</div>
 <div class="section" id="update-rate">
-<h2>Update rate<a class="headerlink" href="#update-rate" title="Permalink to this headline">¶</a></h2>
+<h3>Update rate<a class="headerlink" href="#update-rate" title="Permalink to this headline">¶</a></h3>
+<p>Format: <code class="docutils literal notranslate"><span class="pre">update:</span> <span class="pre">{rate}{s|Hz}</span> <span class="pre">[{poll|notify}]</span></code></p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">1s</span></code>, <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">poll</span></code>, <code class="docutils literal notranslate"><span class="pre">2Hz</span> <span class="pre">notify</span></code></p>
 <p>By default, any given PLC variable will be polled at a rate of T=1s (1Hz).
 Other poll rates planned to be available by default may be selected on a
 per-record (*) basis: T=.5s (2Hz), T=1s (1Hz), T=2s (.5hz), T=10s (.1Hz), and
@@ -500,36 +535,38 @@ sparingly.</p>
 <p>(*) This is on the wishlist for ads-ioc. As of December 2019, all polled
 records will be processed at a rate of 1 Hz/the IOC-configured poll rate.</p>
 </div>
-<div class="section" id="pragma-fields">
-<h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Permalink to this headline">¶</a></h2>
-<p>Each line of the pragma indicates to pytmc how to generate the corresponding records
-in the database file output.</p>
-<div class="section" id="pv">
-<h3>pv<a class="headerlink" href="#pv" title="Permalink to this headline">¶</a></h3>
-<p>This constructs the PV name that will represent this variable in EPICS. It is
-the only mandatory configuration line. This line can be used on specific
-variables as well as the instantiations of data types.</p>
-<p>When used on variables declared in the main scope, the PV for the variable will
-be generated verbatim.  When used on instantiations, this string will be
-appended to the front of any PVs that are declared within the data type.</p>
+<div class="section" id="archiver-settings">
+<h3>Archiver settings<a class="headerlink" href="#archiver-settings" title="Permalink to this headline">¶</a></h3>
+<p>Format: <code class="docutils literal notranslate"><span class="pre">archive:</span> <span class="pre">{rate}{s|Hz}</span> <span class="pre">[{scan|monitor}]</span></code></p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">1s</span></code>, <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">scan</span></code>, <code class="docutils literal notranslate"><span class="pre">2Hz</span> <span class="pre">monitor</span></code></p>
+<p>Using the database-generating tool <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">db</span></code> along with the pragma key
+<code class="docutils literal notranslate"><span class="pre">archive</span></code> will automatically generate archiver appliance cron-job compatible
+<code class="docutils literal notranslate"><span class="pre">.archive</span></code> files (i.e., those in <code class="docutils literal notranslate"><span class="pre">$IOC_DATA/$IOC/archive/*.archive</span></code>).
+The cron job will read these files and automatically configure the archiver
+to archive the listed PVs.</p>
+<p>Without an <code class="docutils literal notranslate"><span class="pre">archive</span></code> pragma key, the default setting is <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">scan</span></code>. This
+means that your PVs will be archived at a rate of once per second, using the
+<code class="docutils literal notranslate"><span class="pre">scan</span></code> method.</p>
+<p>For more information on the two methods, see the <a class="reference external" href="https://slacmshankar.github.io/epicsarchiver_docs/faq.html">EPICS Archiver Appliance
+documentation</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the update frequency is slower than the specified archive frequency, the
+archive frequency will be reduced.</p>
 </div>
-<div class="section" id="io">
-<h3>io<a class="headerlink" href="#io" title="Permalink to this headline">¶</a></h3>
-<p>This is a guessed field that defaults to <cite>‘io’</cite>.  Specify the whether the IOC
-is reading or writing this value. Values being sent from the PLC to the IOC
-should be marked as input with ‘i’ and values being sent to the PLC from the
-IOC should be marked ‘o’.  Bidirectional PVs can be specified with ‘io’.</p>
-<p>The following are valid for input-only (read-only) pragmas: <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">i</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">ro</span></code>.</p>
-<p>The following are valid for input-output (read-write) pragmas: <code class="docutils literal notranslate"><span class="pre">output</span></code>, <code class="docutils literal notranslate"><span class="pre">io</span></code>,
-<code class="docutils literal notranslate"><span class="pre">rw</span></code>, and <code class="docutils literal notranslate"><span class="pre">o</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Large arrays will not be archived, regardless of pragma settings.</p>
 </div>
-<div class="section" id="update">
-<h3>update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
-<p>See <a class="reference internal" href="#update-rate">Update rate</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Additional fields can be specified for archiving through the <code class="docutils literal notranslate"><span class="pre">archive_fields</span></code>
+key, which is a space-delimited list of field names.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">archive_fields:</span> <span class="pre">DESC</span> <span class="pre">PREC</span></code></p>
 </div>
-<div class="section" id="fields">
-<h3>fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="record-fields">
+<h3>Record fields<a class="headerlink" href="#record-fields" title="Permalink to this headline">¶</a></h3>
 <p>This specifies additional field(s) to be set on the generated EPICS record(s).
 Multiple field lines are allowed. These lines determine the PV’s behaviors such
 as alarm limits and scanning frequency.</p>
@@ -551,9 +588,8 @@ as alarm limits and scanning frequency.</p>
 records should be updated, pytmc requires that such configuration be done
 through the <code class="docutils literal notranslate"><span class="pre">update</span></code> pragma key (see <a class="reference internal" href="#update-rate">Update rate</a>).</p>
 </div>
-</div>
 <div class="section" id="autosave">
-<h2>Autosave<a class="headerlink" href="#autosave" title="Permalink to this headline">¶</a></h2>
+<h3>Autosave<a class="headerlink" href="#autosave" title="Permalink to this headline">¶</a></h3>
 <p>Autosave fields for individual EPICS records are configured by default with
 pytmc. It is possible to customize this behavior with additional pragmas,
 optionally specifying different fields for input or output records.</p>
@@ -584,6 +620,7 @@ record(ao, &quot;my:record&quot;) {
    info(autosave_pass0, &quot;VAL DESC&quot;)
 }
 </pre></div>
+</div>
 </div>
 </div>
 </div>
