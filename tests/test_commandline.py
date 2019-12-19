@@ -59,7 +59,12 @@ def test_xmltranslate(project_filename):
 
 
 def test_db(tmc_filename):
-    db_main(tmc_filename)
+    db_main(tmc_filename, archive_file=sys.stderr)
+
+
+@pytest.mark.xfail
+def test_db_archive_bad_args(tmc_filename):
+    db_main(tmc_filename, archive_file=sys.stderr, no_archive_file=True)
 
 
 def test_types(qtbot, tmc_filename):

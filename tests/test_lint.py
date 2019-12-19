@@ -88,6 +88,19 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
      make_source_param('pv: test; update: notify 1s', marks=pytest.mark.xfail),
      make_source_param('pv: test; field: SCAN I/O Intr'),
      make_source_param('pv: test; field: SCAN 1 second', marks=pytest.mark.xfail),
+
+     # Archiver settings
+     make_source_param('pv: test; archive: no'),
+     make_source_param('pv: test; archive: 1s'),
+     make_source_param('pv: test; archive: 1s'),
+     make_source_param('pv: test; archive: 1s scan'),
+     make_source_param('pv: test; archive: 1s monitor'),
+     make_source_param('pv: test; archive: 1Hz scan'),
+     make_source_param('pv: test; archive: 1Hz monitor'),
+     make_source_param('pv: test; archive: 1Hz test', marks=pytest.mark.xfail),
+     make_source_param('pv: test; archive: 1s test', marks=pytest.mark.xfail),
+     make_source_param('pv: test; archive: 1Hz test', marks=pytest.mark.xfail),
+     make_source_param('pv: test; archive: 1es', marks=pytest.mark.xfail),
      ]
 )
 def test_lint_pragma(source):

@@ -32,7 +32,6 @@ def make_mock_twincatitem(name, data_type, *, pragma=None, array_info=None,
 
     class MockItem:
         module = types.SimpleNamespace(ads_port=ads_port)
-        walk = data_type.walk
 
         if pragma is not None:
             Properties = [_Properties]
@@ -40,6 +39,12 @@ def make_mock_twincatitem(name, data_type, *, pragma=None, array_info=None,
     MockItem.name = name
     MockItem.array_info = array_info
     MockItem.data_type = data_type
+
+    def walk(condition=None):
+        # By default, just the item itself:
+        yield [MockItem]
+
+    MockItem.walk = walk
 
     if array_info is not None:
         class ArrayInfo:
@@ -288,9 +293,9 @@ def test_BaseRecordPackage_guess_FTVL(chain, tc_type, io, is_str, is_arr,
 
 @pytest.mark.parametrize("tc_type, sing_index, is_str, is_arr, final_NELM", [
     ("INT", 0, False, False, None),
-    ("INT", 0, False, True, '3'),
-    ("LREAL", 0, False, True, '9'),
-    ("STRING", 0, True, False, '81'),
+    ("INT", 0, False, True, 3),
+    ("LREAL", 0, False, True, 9),
+    ("STRING", 0, True, False, 81),
 ])
 def test_BaseRecordPackage_guess_NELM(chain, tc_type, sing_index, is_str,
                                       is_arr, final_NELM):
@@ -307,11 +312,6 @@ def test_scalar():
         name='tcname', data_type=make_mock_type('DINT'),
         pragma='pv: PVNAME')
 
-    def walk(condition=None):
-        # Just one chain:
-        yield [item]
-
-    item.walk = walk
     record, = list(pragmas.record_packages_from_symbol(item))
     assert record.pvname == 'PVNAME'
     assert record.tcname == 'tcname'
@@ -366,11 +366,6 @@ def test_enum_array():
         pragma='pv: ENUMS', array_info=(1, 5)
     )
 
-    def walk(condition=None):
-        # Just the enum array
-        yield [array]
-
-    array.walk = walk
     records = {
         record.pvname: record
         for record in pragmas.record_packages_from_symbol(array)
@@ -400,11 +395,6 @@ def test_unroll_formatting():
         pragma='pv: ENUMS\nexpand: _EXPAND%d', array_info=(1, 5)
     )
 
-    def walk(condition=None):
-        # Just the enum array
-        yield [array]
-
-    array.walk = walk
     records = {
         record.pvname: record
         for record in pragmas.record_packages_from_symbol(array)

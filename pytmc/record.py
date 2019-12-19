@@ -2,6 +2,7 @@
 Record generation and templating
 """
 import logging
+import pytmc
 
 from jinja2 import Environment, PackageLoader
 
@@ -13,6 +14,7 @@ from .default_settings.unified_ordered_field_list import unified_lookup_list
 
 
 logger = logging.getLogger(__name__)
+MAX_ARCHIVE_ELEMENTS = 1024
 
 
 def _truncate_middle(string, max_length):
@@ -117,32 +119,45 @@ class RecordPackage:
         """
         All subclasses should use super on their init method.
         """
-        self.tcname = chain.tcname
-        self.chain = chain
         self.ads_port = ads_port
+        self.aliases = []
+        self.archive_settings = None
+        self.chain = chain
+        self.pvname = None
+        self.tcname = chain.tcname
+        self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
+
+        self.config = self.chain.config
 
         # Due to a twincat pragma limitation, EPICS macro prefix '$' cannot be
         # used or escaped.  Allow the configuration to specify an alternate
         # character in the pragma, defaulting to '@'.
-        if self.chain.config is not None:
-            macro_character = self.chain.config.get('macro_character', '@')
-            self.pvname = chain.pvname.replace(macro_character, '$')
-        else:
-            self.pvname = None
+        if self.config is None:
+            return
+
+        self.config = pytmc.pragmas.normalize_config(self.config)
+
+        macro_character = self.config.get('macro_character', '@')
+        self.pvname = chain.pvname.replace(macro_character, '$')
+        self.archive_settings = self.config['archive']
+        if self.archive_settings:
+            fields = self.config.get('archive_fields', '')
+            self.archive_settings['fields'] = (
+                fields.split(' ') if fields else []
+            )
 
         # The base for the alias does not include the final pvname:
         alias_base = ':'.join(
-            pv_segment for pv_segment in self.chain.config['pv'][:-1]
+            pv_segment for pv_segment in self.config['pv'][:-1]
             if pv_segment
         )
 
         # Split user-specified aliases for the record:
         self.aliases = [
-            ':'.join((alias_base, alias))
-            for alias in self.chain.config.get('alias', '').split(' ')
+            ':'.join((alias_base, alias)).replace(macro_character, '$')
+            for alias in self.config.get('alias', '').split(' ')
             if alias.strip()
         ]
-        self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
 
     @property
     def valid(self):
@@ -154,10 +169,10 @@ class RecordPackage:
         """
         if self.pvname is None or not self.chain.valid:
             return False
-        has_required_keys = all(self.chain.config.get(key)
+        has_required_keys = all(self.config.get(key)
                                 for key in self._required_keys)
 
-        fields = self.chain.config.get('field', {})
+        fields = self.config.get('field', {})
         has_required_fields = all(fields.get(key)
                                   for key in self._required_fields)
         return has_required_keys and has_required_fields
@@ -194,7 +209,7 @@ class RecordPackage:
             spec = StringRecordPackage
         else:
             try:
-                spec = data_types[data_type.name]
+                spec = DATA_TYPES[data_type.name]
             except KeyError:
                 raise ValueError(
                     f'Unsupported data type {data_type.name} in chain: '
@@ -241,6 +256,7 @@ class TwincatTypeRecordPackage(RecordPackage):
     dtyp = NotImplemented
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
+    archive_fields = ['VAL']
 
     def __init_subclass__(cls, **kwargs):
         """Magic to have field_defaults be the combination of hierarchy"""
@@ -265,19 +281,8 @@ class TwincatTypeRecordPackage(RecordPackage):
         -------
         direction : str
             {'input', 'output'}
-
-        Raises
-        ------
-        ValueError
-            If unable to determine IO direction
         """
-        from .pragmas import normalize_io
-        io = self.chain.config.get('io', 'io')
-        try:
-            return normalize_io(io)
-        except ValueError:
-            logger.warning('Invalid i/o direction for %s: %r', self.pvname, io)
-            return 'input'
+        return self.config['io']
 
     @property
     def _asyn_port_spec(self):
@@ -289,8 +294,7 @@ class TwincatTypeRecordPackage(RecordPackage):
     @property
     def asyn_update_options(self):
         'Input record update options (TS_MS or POLL_RATE)'
-        from .pragmas import parse_update_rate
-        update = parse_update_rate(self.chain.config.get('update') or '')
+        update = self.config['update']
         if update['method'] == 'poll':
             freq = update['frequency']
             if int(freq) == float(freq):
@@ -346,12 +350,12 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['DTYP'] = self.dtyp
 
         # Update with given pragmas
-        record.fields.update(self.chain.config.get('field', {}))
+        record.fields.update(self.config.get('field', {}))
 
         # Records must always be I/O Intr, regardless of the pragma:
         record.fields['SCAN'] = 'I/O Intr'
 
-        record.update_autosave_from_pragma(self.chain.config)
+        record.update_autosave_from_pragma(self.config)
         return record
 
     def generate_output_record(self):
@@ -386,8 +390,8 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.pop('PINI', None)
 
         # Update with given pragmas
-        record.fields.update(self.chain.config.get('field', {}))
-        record.update_autosave_from_pragma(self.chain.config)
+        record.fields.update(self.config.get('field', {}))
+        record.update_autosave_from_pragma(self.config)
         return record
 
     @property
@@ -469,6 +473,11 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a Twincat Array"""
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.nelm > MAX_ARCHIVE_ELEMENTS:
+            self.archive_settings = None
 
     @property
     def ftvl(self):
@@ -564,7 +573,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         return record
 
 
-data_types = {
+DATA_TYPES = {
     'BOOL': BinaryRecordPackage,
     'BYTE': IntegerRecordPackage,
     'SINT': IntegerRecordPackage,
@@ -639,3 +648,34 @@ def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
         combined_sorted.update(naive_sorted)
         combined_sorted.update(instructed_sorted)
     return combined_sorted
+
+
+def generate_archive_settings(packages):
+    '''
+    Generate an archive settings given a list of record packages
+
+    Parameters
+    ----------
+    packages : list of record packages
+
+    Yields
+    ------
+    str
+        One line from the archiver settings file
+    '''
+    for package in packages:
+        archive_settings = package.archive_settings
+        if archive_settings:
+            # for record in package.records:
+            for record in package.records:
+                # Fields are those from the pragma (key: archive_fields) plus
+                # those set by default on the RecordPackage class
+                fields = sorted(set(archive_settings['fields'] +
+                                    package.archive_fields))
+                for field in fields:
+                    period = archive_settings['seconds']
+                    update_rate = package.config['update']['seconds']
+                    if period < update_rate:
+                        period = update_rate
+                    method = archive_settings['method']
+                    yield f'{record.pvname}.{field}\t{period}\t{method}'

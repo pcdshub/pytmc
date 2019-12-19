@@ -6,12 +6,14 @@ m-epics-twincat-ads driver.
 
 import argparse
 import logging
+import os
 import sys
 
 from collections import defaultdict
 
 from .. import linter, parser
 from ..pragmas import find_pytmc_symbols, record_packages_from_symbol
+from ..record import generate_archive_settings
 
 
 logger = logging.getLogger(__name__)
@@ -119,10 +121,11 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
     if exceptions and not allow_errors:
         raise LinterError('Failed to create database')
 
-    if allow_no_pragma:
-        record_names = [record.pvname for record in records if record.valid]
-    else:
-        record_names = [record.pvname for record in records]
+    record_names = [single_record.pvname
+                    for record_package in records if record_package.valid
+                    for single_record in record_package.records
+                    ]
+
     if len(record_names) != len(set(record_names)):
         dupes = {name: record_names.count(name)
                  for name in record_names
@@ -167,17 +170,6 @@ def build_arg_parser(parser=None):
     parser.formatter_class = argparse.RawTextHelpFormatter
 
     parser.add_argument(
-        'tmc_file', metavar="INPUT", type=str,
-        help='Path to interpreted .tmc file'
-    )
-
-    parser.add_argument(
-        'record_file', metavar="OUTPUT", type=str,
-        nargs='?',
-        help='Path to output .db file'
-    )
-
-    parser.add_argument(
         '--dbd',
         '-d',
         default=None,
@@ -201,11 +193,52 @@ def build_arg_parser(parser=None):
         help='Do not show db file context around errors'
     )
 
+    archive_group = parser.add_mutually_exclusive_group()
+    archive_group.add_argument(
+        '--archive-file',
+        type=argparse.FileType('wt', encoding='ascii'),
+        help=('Save an archive configuration file. Defaults to '
+              'OUTPUT.archive if specified')
+    )
+
+    archive_group.add_argument(
+        '--no-archive-file',
+        action='store_true', default=False,
+        help=('Do not write the archive file, regardless of OUTPUT '
+              'filename settings.')
+    )
+
+    parser.add_argument(
+        'tmc_file', metavar="INPUT", type=str,
+        help='Path to interpreted .tmc file'
+    )
+
+    class OutputFileAction(argparse.Action):
+        def __call__(self, parser, namespace, value, option_string=None):
+            if namespace.no_archive_file or not os.path.exists(value.name):
+                namespace.archive_file = None
+            else:
+                namespace.archive_file = open(value.name + '.archive', 'wt')
+            namespace.record_file = value
+
+    parser.add_argument(
+        'record_file',
+        metavar="OUTPUT",
+        action=OutputFileAction,
+        type=argparse.FileType('wt', encoding='ascii'),
+        default=sys.stdout,
+        nargs='?',
+        help='Path to output .db file'
+    )
+
     return parser
 
 
-def main(tmc_file, record_file=None, *, dbd=None, allow_errors=False,
-         no_error_context=False):
+def main(tmc_file, record_file=sys.stdout, *, dbd=None, allow_errors=False,
+         no_error_context=False, archive_file=None, no_archive_file=False):
+    if archive_file and no_archive_file:
+        raise ValueError('Invalid options specified (specify zero or one of '
+                         'archive_file or no_archive_file)')
     tmc = parser.parse(tmc_file)
 
     try:
@@ -220,9 +253,7 @@ def main(tmc_file, record_file=None, *, dbd=None, allow_errors=False,
         sys.exit(1)
 
     db_string = '\n\n'.join(record.render() for record in records)
+    record_file.write(db_string)
 
-    if not record_file:
-        print(db_string)
-    else:
-        with open(record_file, 'wt') as record_file:
-            record_file.write(db_string)
+    if archive_file:
+        archive_file.write('\n'.join(generate_archive_settings(records)))

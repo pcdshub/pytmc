@@ -9,6 +9,8 @@ import argparse
 import importlib
 import logging
 
+import pytmc
+
 
 DESCRIPTION = __doc__
 
@@ -54,6 +56,13 @@ def main():
         prog='pytmc',
         description=DESCRIPTION,
         formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    top_parser.add_argument(
+        '--version', '-V',
+        action='version',
+        version=pytmc.__version__,
+        help="Show the pytmc version number and exit."
     )
 
     top_parser.add_argument(
