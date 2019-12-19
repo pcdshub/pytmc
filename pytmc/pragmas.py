@@ -229,7 +229,8 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
                                       expand_default=expand_default))
 
     for item in chain:
-        pragmas = list(get_pragma(item, name=pragma))
+        pragmas = list(pragma for pragma in get_pragma(item, name=pragma)
+                       if pragma is not None)
         if not pragmas:
             if allow_no_pragma:
                 pragmas = [None]
