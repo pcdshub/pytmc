@@ -125,6 +125,7 @@ class RecordPackage:
         self.chain = chain
         self.pvname = None
         self.tcname = chain.tcname
+        self.linked_to_pv = None
         self.macro_character = '@'
         self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
         self.config = pytmc.pragmas.normalize_config(self.chain.config)
@@ -139,6 +140,7 @@ class RecordPackage:
         self.macro_character = config.get('macro_character', '@')
 
         self._configure_pvname()
+        self._configure_link()
         self._configure_archive_settings(
             archive_settings=config['archive'],
             archive_fields=config.get('archive_fields', '')
@@ -148,6 +150,10 @@ class RecordPackage:
                                 alias_setting=config.get('alias', ''))
 
         return config
+
+    def _configure_link(self):
+        'Link this record to a pre-existing EPICS record via a CA (CPP) link'
+        self.linked_to_pv = self.config.get('link') or None
 
     def _configure_pvname(self):
         'Configure the pvname, based on the given macro character'
@@ -408,6 +414,10 @@ class TwincatTypeRecordPackage(RecordPackage):
         # Remove timestamp source and process-on-init for output records:
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
+
+        if self.linked_to_pv:
+            record.fields['OMSL'] = 'closed_loop'
+            record.fields['DOL'] = f'{self.linked_to_pv} CPP'
 
         # Update with given pragmas
         record.fields.update(self.config.get('field', {}))
