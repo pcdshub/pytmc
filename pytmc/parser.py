@@ -623,7 +623,7 @@ class ArrayInfo(_TmcItem):
 
         ubound = (int(self.UBound[0].text)
                   if hasattr(self, 'UBound')
-                  else lbound + elements)
+                  else lbound + elements - 1)
 
         self.bounds = (lbound, ubound)
         self.elements = elements
