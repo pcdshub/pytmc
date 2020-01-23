@@ -24,11 +24,11 @@ epicsEnvSet("IPPORT",        "{{plc_ads_port}}")
 
 adsAsynPortDriverConfigure("$(ASYN_PORT)","$(IPADDR)","$(AMSID)","$(IPPORT)", 1000, 0, 0, 50, 100, 1000, 0)
 
-{% if symbols.Symbol_DUT_MotionStage %}
+{% if motors %}
 epicsEnvSet("MOTOR_PORT",    "{{motor_port}}")
 epicsEnvSet("PREFIX",        "{{prefix}}{{delim}}")
-epicsEnvSet("ECM_NUMAXES",   "{{symbols.Symbol_DUT_MotionStage|length}}")
-epicsEnvSet("NUMAXES",       "{{symbols.Symbol_DUT_MotionStage|length}}")
+epicsEnvSet("ECM_NUMAXES",   "{{motors|length}}")
+epicsEnvSet("NUMAXES",       "{{motors|length}}")
 
 EthercatMCCreateController("$(MOTOR_PORT)", "$(ASYN_PORT)", "$(NUMAXES)", "200", "1000")
 
@@ -57,7 +57,7 @@ asynSetTraceInfoMask("$(ASYN_PORT)", -1, 5)
 #define AMPLIFIER_ON_FLAG_WHEN_HOMING  2
 #define AMPLIFIER_ON_FLAG_USING_CNEN   4
 
-{% for motor in symbols.Symbol_DUT_MotionStage | sort(attribute='nc_axis.axis_number') %}
+{% for motor in motors | sort(attribute='nc_axis.axis_number') %}
 epicsEnvSet("AXIS_NO",         "{{motor.nc_axis.axis_number}}")
 epicsEnvSet("MOTOR_PREFIX",    "{{motor|epics_prefix}}")
 epicsEnvSet("MOTOR_NAME",      "{{motor|epics_suffix}}")

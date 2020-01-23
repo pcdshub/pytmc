@@ -623,7 +623,7 @@ class ArrayInfo(_TmcItem):
 
         ubound = (int(self.UBound[0].text)
                   if hasattr(self, 'UBound')
-                  else lbound + elements)
+                  else lbound + elements - 1)
 
         self.bounds = (lbound, ubound)
         self.elements = elements
@@ -871,6 +871,9 @@ class Symbol(_TmcItem):
                     qualified_type_name=self.qualified_type_name,
                     bit_offs=self.BitOffs[0].text,
                     module=self.module.name,
+                    is_pointer=self.is_pointer,
+                    array_bounds=self.array_bounds,
+                    summary_type_name=self.summary_type_name,
                     )
 
     def walk(self, condition=None):
@@ -885,6 +888,13 @@ class Symbol(_TmcItem):
         except (AttributeError, IndexError):
             return None
 
+    @property
+    def array_bounds(self):
+        try:
+            return self.array_info.bounds
+        except (AttributeError, IndexError):
+            return None
+
     def get_links(self, *, strict=False):
         sym_name = '^' + self.name.lower()
         dotted_name = sym_name + '.'
@@ -896,6 +906,22 @@ class Symbol(_TmcItem):
                     not strict and dotted_name in var.lower())
                    for owner, var in link.link):
                 yield link
+
+    @property
+    def is_pointer(self):
+        type_ = self.BaseType[0]
+        pointer_info = type_.attributes.get("PointerTo", None)
+        return bool(pointer_info)
+
+    @property
+    def summary_type_name(self):
+        summary = self.qualified_type_name
+        if self.is_pointer:
+            summary = 'POINTER TO ' + summary
+        array_bounds = self.array_bounds
+        if array_bounds:
+            summary = 'ARRAY[{}..{}] OF '.format(*array_bounds) + summary
+        return summary
 
 
 class Symbol_DUT_MotionStage(Symbol):
