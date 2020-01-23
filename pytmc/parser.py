@@ -897,6 +897,12 @@ class Symbol(_TmcItem):
                    for owner, var in link.link):
                 yield link
 
+    @property
+    def is_pointer(self):
+        type_ = self.BaseType[0]
+        pointer_info = type_.attributes.get("PointerTo", None)
+        return bool(pointer_info)
+
 
 class Symbol_DUT_MotionStage(Symbol):
     '[TMC] A customized Symbol, representing only DUT_MotionStage'
