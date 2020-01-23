@@ -890,13 +890,9 @@ class Symbol(_TmcItem):
 
     @property
     def array_bounds(self):
-        array_info = self.array_info
-        if array_info:
-            lower_bound = int(array_info.children.LBound[0].text)
-            n_elems = int(array_info.children.Elements[0].text)
-            upper_bound = lower_bound + n_elems - 1
-            return (lower_bound, upper_bound)
-        else:
+        try:
+            return self.array_info.bounds
+        except (AttributeError, IndexError):
             return None
 
     def get_links(self, *, strict=False):
