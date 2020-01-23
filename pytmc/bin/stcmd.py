@@ -230,6 +230,8 @@ def main(tsproj_project, *, name=None, prefix=None,
                                f'Projects: {list(by_name)}')
 
     symbols = separate_by_classname(plc.find(Symbol))
+    motors = [mot for mot in symbols['Symbol_DUT_MotionStage']
+              if not mot.is_pointer]
 
     if not only_motor:
         other_records, _ = db.process(plc.tmc, dbd_file=dbd)
@@ -277,6 +279,7 @@ def main(tsproj_project, *, name=None, prefix=None,
 
         additional_db_files=additional_db_files,
         symbols=symbols,
+        motors=motors,
         nc=nc,
     )
 
