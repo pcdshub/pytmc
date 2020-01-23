@@ -615,11 +615,11 @@ tmc file.</p>
 
 <span class="n">adsAsynPortDriverConfigure</span><span class="p">(</span><span class="s2">&quot;$(ASYN_PORT)&quot;</span><span class="p">,</span><span class="s2">&quot;$(IPADDR)&quot;</span><span class="p">,</span><span class="s2">&quot;$(AMSID)&quot;</span><span class="p">,</span><span class="s2">&quot;$(IPPORT)&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">symbols</span><span class="o">.</span><span class="n">Symbol_DUT_MotionStage</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">motors</span> <span class="o">%</span><span class="p">}</span>
 <span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;MOTOR_PORT&quot;</span><span class="p">,</span>    <span class="s2">&quot;{{motor_port}}&quot;</span><span class="p">)</span>
 <span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;PREFIX&quot;</span><span class="p">,</span>        <span class="s2">&quot;{{prefix}}{{delim}}&quot;</span><span class="p">)</span>
-<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;ECM_NUMAXES&quot;</span><span class="p">,</span>   <span class="s2">&quot;{{symbols.Symbol_DUT_MotionStage|length}}&quot;</span><span class="p">)</span>
-<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;NUMAXES&quot;</span><span class="p">,</span>       <span class="s2">&quot;{{symbols.Symbol_DUT_MotionStage|length}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;ECM_NUMAXES&quot;</span><span class="p">,</span>   <span class="s2">&quot;{{motors|length}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;NUMAXES&quot;</span><span class="p">,</span>       <span class="s2">&quot;{{motors|length}}&quot;</span><span class="p">)</span>
 
 <span class="n">EthercatMCCreateController</span><span class="p">(</span><span class="s2">&quot;$(MOTOR_PORT)&quot;</span><span class="p">,</span> <span class="s2">&quot;$(ASYN_PORT)&quot;</span><span class="p">,</span> <span class="s2">&quot;$(NUMAXES)&quot;</span><span class="p">,</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span> <span class="s2">&quot;1000&quot;</span><span class="p">)</span>
 
@@ -648,7 +648,7 @@ tmc file.</p>
 <span class="c1">#define AMPLIFIER_ON_FLAG_WHEN_HOMING  2</span>
 <span class="c1">#define AMPLIFIER_ON_FLAG_USING_CNEN   4</span>
 
-<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">motor</span> <span class="ow">in</span> <span class="n">symbols</span><span class="o">.</span><span class="n">Symbol_DUT_MotionStage</span> <span class="o">|</span> <span class="n">sort</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="s1">&#39;nc_axis.axis_number&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">motor</span> <span class="ow">in</span> <span class="n">motors</span> <span class="o">|</span> <span class="n">sort</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="s1">&#39;nc_axis.axis_number&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
 <span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;AXIS_NO&quot;</span><span class="p">,</span>         <span class="s2">&quot;{{motor.nc_axis.axis_number}}&quot;</span><span class="p">)</span>
 <span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;MOTOR_PREFIX&quot;</span><span class="p">,</span>    <span class="s2">&quot;{{motor|epics_prefix}}&quot;</span><span class="p">)</span>
 <span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;MOTOR_NAME&quot;</span><span class="p">,</span>      <span class="s2">&quot;{{motor|epics_suffix}}&quot;</span><span class="p">)</span>
