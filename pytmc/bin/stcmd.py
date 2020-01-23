@@ -213,7 +213,6 @@ def main(tsproj_project, *, name=None, prefix=None,
     template = jinja_env.get_template(template_filename)
 
     project = parse(tsproj_project)
-    symbols = separate_by_classname(project.find(Symbol))
 
     additional_db_files = []
     try:
