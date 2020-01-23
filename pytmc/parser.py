@@ -872,7 +872,7 @@ class Symbol(_TmcItem):
                     bit_offs=self.BitOffs[0].text,
                     module=self.module.name,
                     is_pointer=self.is_pointer,
-                    array_bounds = self.array_bounds,
+                    array_bounds=self.array_bounds,
                     summary_type_name=self.summary_type_name,
                     )
 
@@ -898,7 +898,6 @@ class Symbol(_TmcItem):
             return (lower_bound, upper_bound)
         else:
             return None
-
 
     def get_links(self, *, strict=False):
         sym_name = '^' + self.name.lower()
