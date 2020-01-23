@@ -871,6 +871,9 @@ class Symbol(_TmcItem):
                     qualified_type_name=self.qualified_type_name,
                     bit_offs=self.BitOffs[0].text,
                     module=self.module.name,
+                    is_pointer=self.is_pointer,
+                    array_bounds = self.array_bounds,
+                    summary_type_name=self.summary_type_name,
                     )
 
     def walk(self, condition=None):
@@ -884,6 +887,18 @@ class Symbol(_TmcItem):
             return self.ArrayInfo[0]
         except (AttributeError, IndexError):
             return None
+
+    @property
+    def array_bounds(self):
+        array_info = self.array_info
+        if array_info:
+            lower_bound = int(array_info.children.LBound[0].text)
+            n_elems = int(array_info.children.Elements[0].text)
+            upper_bound = lower_bound + n_elems - 1
+            return (lower_bound, upper_bound)
+        else:
+            return None
+
 
     def get_links(self, *, strict=False):
         sym_name = '^' + self.name.lower()
@@ -902,6 +917,16 @@ class Symbol(_TmcItem):
         type_ = self.BaseType[0]
         pointer_info = type_.attributes.get("PointerTo", None)
         return bool(pointer_info)
+
+    @property
+    def summary_type_name(self):
+        summary = self.qualified_type_name
+        if self.is_pointer:
+            summary = 'POINTER TO ' + summary
+        array_bounds = self.array_bounds
+        if array_bounds:
+            summary = 'ARRAY[{}..{}] OF '.format(*array_bounds) + summary
+        return summary
 
 
 class Symbol_DUT_MotionStage(Symbol):
