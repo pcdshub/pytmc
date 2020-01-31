@@ -322,7 +322,7 @@ def test_complex_array():
     array = make_mock_twincatitem(
         name='array_base',
         data_type=make_mock_type('MY_DUT', is_complex_type=True),
-        pragma='pv: ARRAY', array_info=(1, 5))
+        pragma='pv: ARRAY', array_info=(1, 4))
 
     subitem1 = make_mock_twincatitem(
         name='subitem1', data_type=make_mock_type('INT'),
@@ -363,7 +363,7 @@ def test_enum_array():
         name='enum_array',
         data_type=make_mock_type('MY_ENUM', is_enum=True,
                                  enum_dict={1: 'ONE', 2: 'TWO'}),
-        pragma='pv: ENUMS', array_info=(1, 5)
+        pragma='pv: ENUMS', array_info=(1, 4)
     )
 
     records = {
@@ -392,7 +392,7 @@ def test_unroll_formatting():
         name='enum_array',
         data_type=make_mock_type('MY_ENUM', is_enum=True,
                                  enum_dict={1: 'ONE', 2: 'TWO'}),
-        pragma='pv: ENUMS\nexpand: _EXPAND%d', array_info=(1, 5)
+        pragma='pv: ENUMS\nexpand: _EXPAND%d', array_info=(1, 4)
     )
 
     records = {

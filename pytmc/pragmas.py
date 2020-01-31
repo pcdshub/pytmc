@@ -223,7 +223,7 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
         expand_default = f':%.{expand_digits}d'
         for pvname, config in separate_configs_by_pv(
                 split_pytmc_pragma('\n'.join(pragmas))):
-            for idx in range(low, high):
+            for idx in range(low, high + 1):
                 yield (parser._ArrayItemProxy(item, idx),
                        dictify_config(config, array_index=idx,
                                       expand_default=expand_default))
