@@ -999,6 +999,24 @@ class Declaration(_TwincatProjectSubItem):
     '[XTI] Code declaration'
 
 
+class Action(_TwincatProjectSubItem):
+    '[XTI] Code declaration for actions'
+    @property
+    def source_code(self):
+        return f'''\
+ACTION {self.name}:
+{self.implementation or ''}
+END_ACTION'''
+
+    @property
+    def implementation(self):
+        'The implementation code; i.e., the bottom portion in visual studio'
+        impl = self.Implementation[0]
+        if hasattr(impl, 'ST'):
+            # NOTE: only ST for now
+            return impl.ST[0].text
+
+
 class POU(_TwincatProjectSubItem):
     '[XTI] A Program Organization Unit'
 
@@ -1025,6 +1043,34 @@ class POU(_TwincatProjectSubItem):
         impl = self.Implementation[0]
         if hasattr(impl, 'ST'):
             return impl.ST[0].text
+
+    @property
+    def actions(self):
+        'The action implementations (zero or more)'
+        return list(getattr(self, 'Action', []))
+
+    def get_source_code(self, *, close_block=True):
+        'The full source code - declaration, implementation, and actions'
+        source_code = [self.declaration or '',
+                       self.implementation or '',
+                       ]
+
+        if close_block:
+            source_code.append('')
+            # TODO: compile
+            if re.search(r'^FUNCTION_BLOCK\s', self.declaration, re.MULTILINE):
+                source_code.append('END_FUNCTION_BLOCK')
+            elif re.search(r'^PROGRAM\s', self.declaration, re.MULTILINE):
+                source_code.append('END_PROGRAM')
+            elif re.search(r'^FUNCTION\s', self.declaration, re.MULTILINE):
+                source_code.append('END_FUNCTION')
+            # TODO: others?
+
+        # TODO: actions defined outside of the block?
+        for action in self.actions:
+            source_code.append(action.source_code)
+
+        return '\n'.join(source_code)
 
     @property
     def call_blocks(self):
