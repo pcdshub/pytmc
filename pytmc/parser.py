@@ -504,6 +504,13 @@ class Plc(TwincatItem):
             and plc_obj.GVL[0].name
         }
 
+        self.dut_by_name = {
+            plc_obj.DUT[0].name: plc_obj.DUT[0]
+            for plc_obj in self.source.values()
+            if hasattr(plc_obj, 'DUT')
+            and plc_obj.DUT[0].name
+        }
+
         self.namespaces.update(self.pou_by_name)
         self.namespaces.update(self.gvl_by_name)
 
@@ -986,6 +993,11 @@ class Symbol_DUT_MotionStage(Symbol):
 class GVL(_TwincatProjectSubItem):
     '[TcGVL] A Global Variable List'
 
+    @property
+    def declaration(self):
+        'The declaration code; i.e., the top portion in visual studio'
+        return self.Declaration[0].text
+
 
 class ST(_TwincatProjectSubItem):
     '[TcDUT/TcPOU] Structured text'
@@ -1001,6 +1013,11 @@ class Declaration(_TwincatProjectSubItem):
 
 class DUT(_TwincatProjectSubItem):
     '[TcDUT] Data unit type (DUT)'
+
+    @property
+    def declaration(self):
+        'The declaration code; i.e., the top portion in visual studio'
+        return self.Declaration[0].text
 
 
 class Action(_TwincatProjectSubItem):
