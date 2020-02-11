@@ -998,6 +998,10 @@ class GVL(_TwincatProjectSubItem):
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
+    def get_source_code(self, *, close_block=True):
+        'The full source code - declaration only in the case of a GVL'
+        return self.declaration
+
 
 class ST(_TwincatProjectSubItem):
     '[TcDUT/TcPOU] Structured text'
@@ -1018,6 +1022,10 @@ class DUT(_TwincatProjectSubItem):
     def declaration(self):
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
+
+    def get_source_code(self, *, close_block=True):
+        'The full source code - declaration only in the case of a DUT'
+        return self.declaration
 
 
 class Action(_TwincatProjectSubItem):
