@@ -984,23 +984,28 @@ class Symbol_DUT_MotionStage(Symbol):
 
 
 class GVL(_TwincatProjectSubItem):
-    '[XTI] A Global Variable List'
+    '[TcGVL] A Global Variable List'
 
 
 class ST(_TwincatProjectSubItem):
-    '[XTI] Structured text'
+    '[TcDUT/TcPOU] Structured text'
 
 
 class Implementation(_TwincatProjectSubItem):
-    '[XTI] Code implementation'
+    '[TcDUT/TcPOU] Code implementation'
 
 
 class Declaration(_TwincatProjectSubItem):
-    '[XTI] Code declaration'
+    '[TcDUT/TcPOU/TcGVL] Code declaration'
+
+
+class DUT(_TwincatProjectSubItem):
+    '[TcDUT] Data unit type (DUT)'
 
 
 class Action(_TwincatProjectSubItem):
-    '[XTI] Code declaration for actions'
+    '[TcPOU] Code declaration for actions'
+
     @property
     def source_code(self):
         return f'''\
