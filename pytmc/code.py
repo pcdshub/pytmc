@@ -9,6 +9,12 @@ import re
 logger = logging.getLogger(__name__)
 
 
+RE_FUNCTION_BLOCK = re.compile(r'^FUNCTION_BLOCK\s', re.MULTILINE)
+RE_PROGRAM = re.compile(r'^PROGRAM\s', re.MULTILINE)
+RE_FUNCTION = re.compile(r'^FUNCTION\s', re.MULTILINE)
+RE_ACTION = re.compile(r'^ACTION\s', re.MULTILINE)
+
+
 def program_name_from_declaration(declaration):
     '''
     Determine a program name from a given declaration
@@ -21,6 +27,25 @@ def program_name_from_declaration(declaration):
         line = line.strip()
         if line.lower().startswith('program '):
             return line.split(' ')[1]
+
+
+def determine_block_type(code):
+    '''
+    Determine the code block type, looking for e.g., PROGRAM or FUNCTION_BLOCk
+
+    Returns
+    -------
+    {'function_block', 'program', 'function', 'action'} or None
+    '''
+    checks = [(RE_FUNCTION_BLOCK, 'function_block'),
+              (RE_FUNCTION, 'function'),
+              (RE_PROGRAM, 'program'),
+              (RE_ACTION, 'action'),
+              # TODO: others?
+              ]
+    for regex, block_type in checks:
+        if regex.search(code):
+            return block_type
 
 
 def lines_between(text, start_marker, end_marker, *, include_blank=False):

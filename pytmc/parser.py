@@ -12,7 +12,9 @@ import lxml
 import lxml.etree
 
 from .code import (get_pou_call_blocks, program_name_from_declaration,
-                   variables_from_declaration)
+                   variables_from_declaration, determine_block_type)
+
+
 # Registry of all TwincatItem-based classes
 TWINCAT_TYPES = {}
 USE_FILE_AS_PATH = object()
@@ -1095,14 +1097,16 @@ class POU(_TwincatProjectSubItem):
 
         if close_block:
             source_code.append('')
-            # TODO: compile
-            if re.search(r'^FUNCTION_BLOCK\s', self.declaration, re.MULTILINE):
-                source_code.append('END_FUNCTION_BLOCK')
-            elif re.search(r'^PROGRAM\s', self.declaration, re.MULTILINE):
-                source_code.append('END_PROGRAM')
-            elif re.search(r'^FUNCTION\s', self.declaration, re.MULTILINE):
-                source_code.append('END_FUNCTION')
-            # TODO: others?
+            closing = {
+                'function_block': 'END_FUNCTION_BLOCK',
+                'program': 'END_PROGRAM',
+                'function': 'END_FUNCTION',
+                'action': 'END_ACTION',
+            }
+            source_code.append(
+                closing.get(determine_block_type(self.declaration),
+                            '# pytmc: unknown block type')
+            )
 
         # TODO: actions defined outside of the block?
         for action in self.actions:
