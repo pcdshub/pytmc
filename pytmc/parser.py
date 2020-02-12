@@ -490,29 +490,23 @@ class Plc(TwincatItem):
             for fn in self.source_filenames
         }
 
-        self.pou_by_name = {
-            plc_obj.POU[0].program_name: plc_obj.POU[0]
-            for plc_obj in self.source.values()
-            if hasattr(plc_obj, 'POU')
-            and plc_obj.POU[0].program_name
-        }
+        def get_source_items(attr):
+            for plc_obj in self.source.values():
+                try:
+                    source_obj = getattr(plc_obj, attr, [None])[0]
+                except IndexError:
+                    continue
 
-        self.gvl_by_name = {
-            plc_obj.GVL[0].name: plc_obj.GVL[0]
-            for plc_obj in self.source.values()
-            if hasattr(plc_obj, 'GVL')
-            and plc_obj.GVL[0].name
-        }
+                if source_obj and source_obj.name:
+                    yield (source_obj.name, source_obj)
 
-        self.dut_by_name = {
-            plc_obj.DUT[0].name: plc_obj.DUT[0]
-            for plc_obj in self.source.values()
-            if hasattr(plc_obj, 'DUT')
-            and plc_obj.DUT[0].name
-        }
+        self.pou_by_name = dict(sorted(get_source_items('POU')))
+        self.gvl_by_name = dict(sorted(get_source_items('GVL')))
+        self.dut_by_name = dict(sorted(get_source_items('DUT')))
 
         self.namespaces.update(self.pou_by_name)
         self.namespaces.update(self.gvl_by_name)
+        self.namespaces.update(self.dut_by_name)
 
     @property
     def links(self):
@@ -554,6 +548,20 @@ class Plc(TwincatItem):
 
         if self.tmc is not None:
             yield from self.tmc.find(cls, recurse=recurse)
+
+    def get_source_code(self):
+        'Get the full source code, DUTs, GVLs, and then POUs'
+        source_items = (
+            list(self.dut_by_name.items()) +
+            list(self.gvl_by_name.items()) +
+            list(self.pou_by_name.items())
+        )
+
+        return '\n'.join(
+            item.get_source_code()
+            for item in source_items
+            if hasattr(item, 'get_source_code')
+        )
 
 
 class Compile(TwincatItem):

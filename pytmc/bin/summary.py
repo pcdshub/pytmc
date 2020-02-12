@@ -142,30 +142,28 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                     print()
 
             if show_code:
-                for fn, source in plc.source.items():
-                    util.sub_heading(f'{fn} ({source.tag})')
-                    for decl_or_impl in source.find((parser.ST,
-                                                     parser.Declaration,
-                                                     parser.Implementation)):
-                        source_text = decl_or_impl.text
-                        if source_text is None or not source_text.strip():
-                            continue
+                source_items = (
+                    list(plc.dut_by_name.items()) +
+                    list(plc.gvl_by_name.items()) +
+                    list(plc.pou_by_name.items())
+                )
+                for name, source in source_items:
+                    util.sub_heading(f'{source.tag}: {name}')
 
-                        parent = decl_or_impl.parent
-                        path_to_source = []
-                        while parent is not source:
-                            if parent.name is not None:
-                                path_to_source.insert(0, parent.name)
-                            parent = parent.parent
-                        util.sub_sub_heading(
-                            f'{".".join(path_to_source)}: {decl_or_impl.tag}',
-                            use_markdown=use_markdown
-                        )
+                    fn = source.filename.resolve().relative_to(proj_root)
+                    print(f'File: {fn}')
+                    print()
+
+                    if not hasattr(source, 'get_source_code'):
+                        continue
+
+                    source_text = source.get_source_code() or ''
+                    if source_text.strip():
                         util.text_block(
                             source_text,
                             markdown_language='vhdl' if use_markdown else None
                         )
-                    print()
+                        print()
 
             if show_symbols or show_all:
                 util.sub_heading('Symbols')
