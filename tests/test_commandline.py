@@ -9,6 +9,7 @@ from pytmc.bin.stcmd import main as stcmd_main
 from pytmc.bin.summary import main as summary_main
 from pytmc.bin.types import create_types_gui
 from pytmc.bin.xmltranslate import main as xmltranslate_main
+from pytmc.bin.code import main as code_main
 
 
 def test_help_main(monkeypatch):
@@ -75,3 +76,7 @@ def test_types(qtbot, tmc_filename):
 def test_debug(qtbot, tmc_filename):
     widget = create_debug_gui(tmc_filename)
     qtbot.addWidget(widget)
+
+
+def test_code(project_filename):
+    code_main(project_filename)

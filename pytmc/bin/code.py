@@ -66,10 +66,10 @@ def main(filename):
     else:
         raise ValueError(f'Expected a tsproj, but got: {path.suffix}')
 
-    projects = []
+    projects = {}
     for fn in project_fns:
         project, source_code = dump_source_code(fn)
         print(source_code)
-        projects.append(project)
+        projects[project] = source_code
 
     return projects
