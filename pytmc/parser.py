@@ -12,7 +12,9 @@ import lxml
 import lxml.etree
 
 from .code import (get_pou_call_blocks, program_name_from_declaration,
-                   variables_from_declaration)
+                   variables_from_declaration, determine_block_type)
+
+
 # Registry of all TwincatItem-based classes
 TWINCAT_TYPES = {}
 USE_FILE_AS_PATH = object()
@@ -490,22 +492,23 @@ class Plc(TwincatItem):
             for fn in self.source_filenames
         }
 
-        self.pou_by_name = {
-            plc_obj.POU[0].program_name: plc_obj.POU[0]
-            for plc_obj in self.source.values()
-            if hasattr(plc_obj, 'POU')
-            and plc_obj.POU[0].program_name
-        }
+        def get_source_items(attr):
+            for plc_obj in self.source.values():
+                try:
+                    source_obj = getattr(plc_obj, attr, [None])[0]
+                except IndexError:
+                    continue
 
-        self.gvl_by_name = {
-            plc_obj.GVL[0].name: plc_obj.GVL[0]
-            for plc_obj in self.source.values()
-            if hasattr(plc_obj, 'GVL')
-            and plc_obj.GVL[0].name
-        }
+                if source_obj and source_obj.name:
+                    yield (source_obj.name, source_obj)
+
+        self.pou_by_name = dict(sorted(get_source_items('POU')))
+        self.gvl_by_name = dict(sorted(get_source_items('GVL')))
+        self.dut_by_name = dict(sorted(get_source_items('DUT')))
 
         self.namespaces.update(self.pou_by_name)
         self.namespaces.update(self.gvl_by_name)
+        self.namespaces.update(self.dut_by_name)
 
     @property
     def links(self):
@@ -547,6 +550,20 @@ class Plc(TwincatItem):
 
         if self.tmc is not None:
             yield from self.tmc.find(cls, recurse=recurse)
+
+    def get_source_code(self):
+        'Get the full source code, DUTs, GVLs, and then POUs'
+        source_items = (
+            list(self.dut_by_name.items()) +
+            list(self.gvl_by_name.items()) +
+            list(self.pou_by_name.items())
+        )
+
+        return '\n'.join(
+            item.get_source_code()
+            for item in source_items
+            if hasattr(item, 'get_source_code')
+        )
 
 
 class Compile(TwincatItem):
@@ -984,19 +1001,60 @@ class Symbol_DUT_MotionStage(Symbol):
 
 
 class GVL(_TwincatProjectSubItem):
-    '[XTI] A Global Variable List'
+    '[TcGVL] A Global Variable List'
+
+    @property
+    def declaration(self):
+        'The declaration code; i.e., the top portion in visual studio'
+        return self.Declaration[0].text
+
+    def get_source_code(self, *, close_block=True):
+        'The full source code - declaration only in the case of a GVL'
+        return self.declaration
 
 
 class ST(_TwincatProjectSubItem):
-    '[XTI] Structured text'
+    '[TcDUT/TcPOU] Structured text'
 
 
 class Implementation(_TwincatProjectSubItem):
-    '[XTI] Code implementation'
+    '[TcDUT/TcPOU] Code implementation'
 
 
 class Declaration(_TwincatProjectSubItem):
-    '[XTI] Code declaration'
+    '[TcDUT/TcPOU/TcGVL] Code declaration'
+
+
+class DUT(_TwincatProjectSubItem):
+    '[TcDUT] Data unit type (DUT)'
+
+    @property
+    def declaration(self):
+        'The declaration code; i.e., the top portion in visual studio'
+        return self.Declaration[0].text
+
+    def get_source_code(self, *, close_block=True):
+        'The full source code - declaration only in the case of a DUT'
+        return self.declaration
+
+
+class Action(_TwincatProjectSubItem):
+    '[TcPOU] Code declaration for actions'
+
+    @property
+    def source_code(self):
+        return f'''\
+ACTION {self.name}:
+{self.implementation or ''}
+END_ACTION'''
+
+    @property
+    def implementation(self):
+        'The implementation code; i.e., the bottom portion in visual studio'
+        impl = self.Implementation[0]
+        if hasattr(impl, 'ST'):
+            # NOTE: only ST for now
+            return impl.ST[0].text
 
 
 class POU(_TwincatProjectSubItem):
@@ -1025,6 +1083,36 @@ class POU(_TwincatProjectSubItem):
         impl = self.Implementation[0]
         if hasattr(impl, 'ST'):
             return impl.ST[0].text
+
+    @property
+    def actions(self):
+        'The action implementations (zero or more)'
+        return list(getattr(self, 'Action', []))
+
+    def get_source_code(self, *, close_block=True):
+        'The full source code - declaration, implementation, and actions'
+        source_code = [self.declaration or '',
+                       self.implementation or '',
+                       ]
+
+        if close_block:
+            source_code.append('')
+            closing = {
+                'function_block': 'END_FUNCTION_BLOCK',
+                'program': 'END_PROGRAM',
+                'function': 'END_FUNCTION',
+                'action': 'END_ACTION',
+            }
+            source_code.append(
+                closing.get(determine_block_type(self.declaration),
+                            '# pytmc: unknown block type')
+            )
+
+        # TODO: actions defined outside of the block?
+        for action in self.actions:
+            source_code.append(action.source_code)
+
+        return '\n'.join(source_code)
 
     @property
     def call_blocks(self):
