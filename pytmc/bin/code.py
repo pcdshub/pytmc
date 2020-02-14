@@ -4,12 +4,9 @@ TwinCAT3 .tsproj projects.
 """
 
 import argparse
-import ast
 import pathlib
-import sys
 
 from .. import parser
-from . import util
 
 
 DESCRIPTION = __doc__
