@@ -21,10 +21,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -566,7 +566,7 @@ keys: ‘title’ and ‘tag’.</p>
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">RecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.RecordPackage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base class to be inherited by all other RecordPackages</p>
-<p>The subclass must implement the <code class="xref py py-attr docutils literal notranslate"><span class="pre">records</span></code> property which returns the
+<p>The subclass must implement the <a class="reference internal" href="#pytmc.record.RecordPackage.records" title="pytmc.record.RecordPackage.records"><code class="xref py py-attr docutils literal notranslate"><span class="pre">records</span></code></a> property which returns the
 <a class="reference internal" href="#pytmc.record.EPICSRecord" title="pytmc.record.EPICSRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">EPICSRecord</span></code></a> objects which will be rendered from the package.
 Optionally, <code class="docutils literal notranslate"><span class="pre">RecordPackage</span></code> can have a <code class="docutils literal notranslate"><span class="pre">configure</span></code> method which does
 the necessary setup before the record can be configured.</p>
@@ -667,7 +667,7 @@ fields in parent classes that are redundant. In other words,
 <code class="docutils literal notranslate"><span class="pre">default_fields</span></code> are inherited if not explicitly overwritten. Also
 note that these defaults are applied to both the input and output
 records.</p></li>
-<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtyp</span></code> needs to be set to the appropriate value for the Twincat
+<li><p><a class="reference internal" href="#pytmc.record.WaveformRecordPackage.dtyp" title="pytmc.record.WaveformRecordPackage.dtyp"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtyp</span></code></a> needs to be set to the appropriate value for the Twincat
 type.</p></li>
 <li><p>The <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage.generate_input_record" title="pytmc.record.TwincatTypeRecordPackage.generate_input_record"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_input_record()</span></code></a> and <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage.generate_output_record" title="pytmc.record.TwincatTypeRecordPackage.generate_output_record"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_output_record()</span></code></a>
 functions can be subclasses if further customisation is needed. This is
@@ -843,6 +843,19 @@ them at the start.</p></li>
 <span id="pytmc-parser"></span><h2>pytmc.parser<a class="headerlink" href="#module-pytmc.parser" title="Permalink to this headline">¶</a></h2>
 <p>TMC, XTI, tsproj parsing utilities</p>
 <dl class="class">
+<dt id="pytmc.parser.Action">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Action</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[TcPOU] Code declaration for actions</p>
+<dl class="method">
+<dt id="pytmc.parser.Action.implementation">
+<em class="property">property </em><code class="sig-name descname">implementation</code><a class="headerlink" href="#pytmc.parser.Action.implementation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The implementation code; i.e., the bottom portion in visual studio</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="pytmc.parser.ArrayInfo">
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">ArrayInfo</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.ArrayInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
@@ -894,6 +907,25 @@ May be TcTTO, TcPOU, TcDUT, GVL, etc.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="pytmc.parser.DUT">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">DUT</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.DUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[TcDUT] Data unit type (DUT)</p>
+<dl class="method">
+<dt id="pytmc.parser.DUT.declaration">
+<em class="property">property </em><code class="sig-name descname">declaration</code><a class="headerlink" href="#pytmc.parser.DUT.declaration" title="Permalink to this definition">¶</a></dt>
+<dd><p>The declaration code; i.e., the top portion in visual studio</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.DUT.get_source_code">
+<code class="sig-name descname">get_source_code</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">close_block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.DUT.get_source_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full source code - declaration only in the case of a DUT</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="pytmc.parser.DataType">
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">DataType</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.DataType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
@@ -917,7 +949,7 @@ May be TcTTO, TcPOU, TcDUT, GVL, etc.</p>
 <dt id="pytmc.parser.Declaration">
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Declaration</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Declaration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
-<p>[XTI] Code declaration</p>
+<p>[TcDUT/TcPOU/TcGVL] Code declaration</p>
 </dd></dl>
 
 <dl class="class">
@@ -962,14 +994,26 @@ and so on.</p>
 <dt id="pytmc.parser.GVL">
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">GVL</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.GVL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
-<p>[XTI] A Global Variable List</p>
+<p>[TcGVL] A Global Variable List</p>
+<dl class="method">
+<dt id="pytmc.parser.GVL.declaration">
+<em class="property">property </em><code class="sig-name descname">declaration</code><a class="headerlink" href="#pytmc.parser.GVL.declaration" title="Permalink to this definition">¶</a></dt>
+<dd><p>The declaration code; i.e., the top portion in visual studio</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.GVL.get_source_code">
+<code class="sig-name descname">get_source_code</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">close_block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.GVL.get_source_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full source code - declaration only in the case of a GVL</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="pytmc.parser.Implementation">
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Implementation</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Implementation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
-<p>[XTI] Code implementation</p>
+<p>[TcDUT/TcPOU] Code implementation</p>
 </dd></dl>
 
 <dl class="class">
@@ -1032,6 +1076,12 @@ and so on.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
 <p>[XTI] A Program Organization Unit</p>
 <dl class="method">
+<dt id="pytmc.parser.POU.actions">
+<em class="property">property </em><code class="sig-name descname">actions</code><a class="headerlink" href="#pytmc.parser.POU.actions" title="Permalink to this definition">¶</a></dt>
+<dd><p>The action implementations (zero or more)</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pytmc.parser.POU.call_blocks">
 <em class="property">property </em><code class="sig-name descname">call_blocks</code><a class="headerlink" href="#pytmc.parser.POU.call_blocks" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary of all implementation call blocks</p>
@@ -1041,6 +1091,12 @@ and so on.</p>
 <dt id="pytmc.parser.POU.declaration">
 <em class="property">property </em><code class="sig-name descname">declaration</code><a class="headerlink" href="#pytmc.parser.POU.declaration" title="Permalink to this definition">¶</a></dt>
 <dd><p>The declaration code; i.e., the top portion in visual studio</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.POU.get_source_code">
+<code class="sig-name descname">get_source_code</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">close_block=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.POU.get_source_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full source code - declaration, implementation, and actions</p>
 </dd></dl>
 
 <dl class="method">
@@ -1083,6 +1139,12 @@ and so on.</p>
 <dd class="field-odd"><p><strong>cls</strong> (<em>TwincatItem</em>) – </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Plc.get_source_code">
+<code class="sig-name descname">get_source_code</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Plc.get_source_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the full source code, DUTs, GVLs, and then POUs</p>
 </dd></dl>
 
 <dl class="method">
@@ -1148,7 +1210,7 @@ and so on.</p>
 <dt id="pytmc.parser.ST">
 <em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">ST</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.ST" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
-<p>[XTI] Structured text</p>
+<p>[TcDUT/TcPOU] Structured text</p>
 </dd></dl>
 
 <dl class="class">
