@@ -7,6 +7,7 @@ m-epics-twincat-ads driver.
 import argparse
 import logging
 import os
+import pathlib
 import sys
 
 from collections import defaultdict
@@ -248,8 +249,8 @@ def main(tmc_file, record_file=sys.stdout, *, dbd=None, allow_errors=False,
         raise ValueError('Invalid options specified (specify zero or one of '
                          'archive_file or no_archive_file)')
 
-    if tmc_file.lower().endswith('.tsproj'):
-        proj_path = tmc_file
+    proj_path = pathlib.Path(tmc_file)
+    if proj_path.suffix.lower() == '.tsproj':
         project = parser.parse(proj_path)
         if plc is None:
             try:
