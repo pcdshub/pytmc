@@ -193,6 +193,13 @@ def build_arg_parser(parser=None):
         help='Do not show db file context around errors'
     )
 
+    parser.add_argument(
+        '--plc',
+        default=None,
+        type=str,
+        help='The PLC name, if specifying a .tsproj file'
+    )
+
     archive_group = parser.add_mutually_exclusive_group()
     archive_group.add_argument(
         '--archive-file',
@@ -210,7 +217,7 @@ def build_arg_parser(parser=None):
 
     parser.add_argument(
         'tmc_file', metavar="INPUT", type=str,
-        help='Path to interpreted .tmc file'
+        help='Path to interpreted .tmc file, or a .tsproj project'
     )
 
     class OutputFileAction(argparse.Action):
@@ -235,10 +242,26 @@ def build_arg_parser(parser=None):
 
 
 def main(tmc_file, record_file=sys.stdout, *, dbd=None, allow_errors=False,
-         no_error_context=False, archive_file=None, no_archive_file=False):
+         no_error_context=False, archive_file=None, no_archive_file=False,
+         plc=None):
     if archive_file and no_archive_file:
         raise ValueError('Invalid options specified (specify zero or one of '
                          'archive_file or no_archive_file)')
+
+    if tmc_file.lower().endswith('.tsproj'):
+        proj_path = tmc_file
+        project = parser.parse(proj_path)
+        if plc is None:
+            try:
+                plc_inst, = project.plcs
+            except TypeError:
+                raise RuntimeError(
+                    'A .tsproj file was specified without --plc. Available '
+                    'PLCs: ' + ', '.join(plc.name for plc in project.plcs)
+                )
+            plc = plc_inst.name
+        tmc_file = project.plcs_by_name[plc].tmc_path
+
     tmc = parser.parse(tmc_file)
 
     try:
