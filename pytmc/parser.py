@@ -17,7 +17,7 @@ from .code import (get_pou_call_blocks, program_name_from_declaration,
 
 # Registry of all TwincatItem-based classes
 TWINCAT_TYPES = {}
-USE_FILE_AS_PATH = object()
+USE_NAME_AS_PATH = object()
 
 logger = logging.getLogger(__name__)
 SLN_PROJECT_RE = re.compile(
@@ -113,8 +113,38 @@ def element_to_class_name(element, *, parent=None):
     return tag, TwincatItem
 
 
+def _determine_path(base_path, name, class_hint):
+    '''
+    Determine the path to load child XTI items from, given a base path and the
+    class load path hint.
+
+    Parameters
+    ----------
+    base_path : pathlib.Path
+        The path from which to start, e.g., the child_load_path of the parent
+        object
+
+    name : str
+        The name of the parent object, to be used when USE_NAME_AS_PATH is
+        specified
+
+    class_hint : pathlib.Path or USE_NAME_AS_PATH
+        A hint path as to where to load child objects from
+    '''
+    if not class_hint:
+        return base_path
+
+    path = base_path / (name
+                        if class_hint is USE_NAME_AS_PATH
+                        else class_hint)
+
+    if path.exists() and path.is_dir():
+        return path
+    return base_path  # the fallback
+
+
 class TwincatItem:
-    _load_path = ''
+    _load_path_hint = ''
 
     def __init__(self, element, *, parent=None, name=None, filename=None):
         '''
@@ -128,6 +158,9 @@ class TwincatItem:
         name : str, optional
         filename : pathlib.Path, optional
         '''
+        self.child_load_path = _determine_path(
+            filename.parent, name, self._load_path_hint)
+
         self.attributes = dict(element.attrib)
         self._children = []
         self.children = None  # populated later
@@ -308,15 +341,12 @@ class TwincatItem:
 
     @classmethod
     def from_file(cls, filename, parent):
-        if cls._load_path is USE_FILE_AS_PATH:
-            parent_root = pathlib.Path(parent.filename).parent
-            full_path = (parent_root / pathlib.Path(parent.filename).stem /
-                         filename)
-        else:
-            project = parent.find_ancestor(TopLevelProject)
-            project_root = pathlib.Path(project.filename).parent
-            full_path = project_root / cls._load_path / filename
-        return parse(full_path, parent=parent)
+        base_path = _determine_path(
+            base_path=parent.child_load_path,
+            name=parent.name,
+            class_hint=cls._load_path_hint
+        )
+        return parse(base_path / filename, parent=parent)
 
 
 class _TwincatProjectSubItem(TwincatItem):
@@ -461,7 +491,7 @@ class TopLevelPlc(TwincatItem):
 
 class Plc(TwincatItem):
     '[tsproj] A project which contains Plc, Io, Mappings, etc.'
-    _load_path = pathlib.Path('_Config') / 'PLC'
+    _load_path_hint = pathlib.Path('_Config') / 'PLC'
 
     def post_init(self):
         self.link_name = (self.Instance[0].name
@@ -1140,7 +1170,7 @@ class AxisPara(TwincatItem):
 
 class NC(TwincatItem):
     '[tsproj or XTI] Top-level NC'
-    _load_path = pathlib.Path('_Config') / 'NC'
+    _load_path_hint = pathlib.Path('_Config') / 'NC'
 
     def post_init(self):
         # Axes can be stored directly in the tsproj:
@@ -1159,7 +1189,7 @@ class NC(TwincatItem):
 
 class Axis(TwincatItem):
     '[XTI] A single NC axis'
-    _load_path = pathlib.Path('_Config') / 'NC' / 'Axes'
+    _load_path_hint = pathlib.Path('Axes')
 
     @property
     def axis_number(self):
@@ -1218,12 +1248,15 @@ class Encoder(TwincatItem):
 
 class Device(TwincatItem):
     '[XTI] Top-level IO device container'
-    _load_path = pathlib.Path('_Config') / 'IO'
+    _load_path_hint = pathlib.Path('_Config') / 'IO'
+
+    def __init__(self, element, *, parent=None, name=None, filename=None):
+        super().__init__(element, parent=parent, name=name, filename=filename)
 
 
 class Box(TwincatItem):
     '[XTI] A box / module'
-    _load_path = USE_FILE_AS_PATH
+    _load_path_hint = USE_NAME_AS_PATH
 
 
 class RemoteConnections(TwincatItem):
