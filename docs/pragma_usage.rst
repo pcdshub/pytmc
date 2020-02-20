@@ -399,10 +399,10 @@ autosaving:
 
    record(ai, "my:record_RBV") {
       ...
-      info(autosave_pass0, "VAL DESC")
+      info(autosaveFields_pass0, "VAL DESC")
    }
 
    record(ao, "my:record") {
       ...
-      info(autosave_pass0, "VAL DESC")
+      info(autosaveFields_pass0, "VAL DESC")
    }
