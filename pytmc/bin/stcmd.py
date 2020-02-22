@@ -234,7 +234,8 @@ def main(tsproj_project, *, name=None, prefix=None,
               if not mot.is_pointer]
 
     if not only_motor:
-        other_records, _ = db.process(plc.tmc, dbd_file=dbd)
+        other_records, _ = db.process(plc.tmc, dbd_file=dbd,
+            allow_errors=allow_errors)
         if not other_records:
             logger.info('No additional records from pytmc found in %s',
                         plc.tmc.filename)
