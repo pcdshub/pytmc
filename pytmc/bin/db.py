@@ -112,8 +112,6 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
             symbol, yield_exceptions=True, allow_no_pragma=allow_no_pragma)
     ]
 
-    #exceptions = [ex for ex in records
-    #              if isinstance(ex['ex'], Exception)]
     exceptions = [ex for ex in records
                   if isinstance(ex, dict)]
 
