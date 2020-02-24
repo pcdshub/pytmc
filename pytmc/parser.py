@@ -623,8 +623,8 @@ class EnumInfo(_TmcItem):
 
         logger.warning(
             'Encountered a known issue with the TwinCAT-generated TMC file: '
-            '%s is missing an Enum value in section %s; this may database '
-            'generation failures.', self.parent.name, self.path
+            '%s is missing an Enum value in section %s; this may cause '
+            'database generation errors.', self.parent.name, self.path
         )
         return ''
 
