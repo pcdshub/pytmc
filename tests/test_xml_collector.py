@@ -421,3 +421,23 @@ def test_pv_linking():
     assert rec.fields['OMSL'] == 'closed_loop'
     assert rec.fields['DOL'] == 'OTHER:RECORD CPP MS'
     assert rec.fields['SCAN'] == '.5 second'
+
+
+def test_pv_linking_special():
+    struct = make_mock_twincatitem(
+        name='array_base',
+        data_type=make_mock_type('MY_DUT', is_complex_type=True),
+        pragma='pv: PREFIX')
+
+    subitem1 = make_mock_twincatitem(
+        name='subitem1', data_type=make_mock_type('INT'),
+        pragma='pv: ABCD; link: **ABCD.STAT')
+
+    def walk(condition=None):
+        yield [struct, subitem1]
+
+    struct.walk = walk
+
+    pkg, = list(pragmas.record_packages_from_symbol(struct))
+    rec = pkg.generate_output_record()
+    assert rec.fields['DOL'] == 'PREFIX:ABCD.STAT CPP MS'
