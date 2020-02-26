@@ -125,39 +125,67 @@ class RecordPackage:
         self.chain = chain
         self.pvname = None
         self.tcname = chain.tcname
+        self.linked_to_pv = None
+        self.macro_character = '@'
+        self.delimiter = ':'
         self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
+        self.config = pytmc.pragmas.normalize_config(self.chain.config)
 
-        self.config = self.chain.config
+        self._parse_config(self.config)
 
+    def _parse_config(self, config):
+        'Parse the chain configuration'
+        if config is None:
+            return
+
+        self.macro_character = config.get('macro_character', '@')
+
+        self._configure_pvname()
+        self._configure_link()
+        self._configure_archive_settings(
+            archive_settings=config['archive'],
+            archive_fields=config.get('archive_fields', '')
+        )
+        self._configure_aliases(pv=config['pv'],
+                                macro_character=self.macro_character,
+                                alias_setting=config.get('alias', ''))
+
+        return config
+
+    def _configure_link(self):
+        'Link this record to a pre-existing EPICS record via a CA (CPP) link'
+        self.linked_to_pv = self.config.get('link') or None
+
+    def _configure_pvname(self):
+        'Configure the pvname, based on the given macro character'
         # Due to a twincat pragma limitation, EPICS macro prefix '$' cannot be
         # used or escaped.  Allow the configuration to specify an alternate
         # character in the pragma, defaulting to '@'.
-        if self.config is None:
-            return
+        self.pvname = self.chain.pvname.replace(self.macro_character, '$')
 
-        self.config = pytmc.pragmas.normalize_config(self.config)
-
-        macro_character = self.config.get('macro_character', '@')
-        self.pvname = chain.pvname.replace(macro_character, '$')
-        self.archive_settings = self.config['archive']
-        if self.archive_settings:
-            fields = self.config.get('archive_fields', '')
-            self.archive_settings['fields'] = (
-                fields.split(' ') if fields else []
-            )
-
+    def _configure_aliases(self, pv, macro_character, alias_setting):
+        'Configure aliases from the configuration (aliases attribute)'
         # The base for the alias does not include the final pvname:
-        alias_base = ':'.join(
-            pv_segment for pv_segment in self.config['pv'][:-1]
+        alias_base = self.delimiter.join(
+            pv_segment for pv_segment in pv[:-1]
             if pv_segment
         )
 
         # Split user-specified aliases for the record:
         self.aliases = [
-            ':'.join((alias_base, alias)).replace(macro_character, '$')
-            for alias in self.config.get('alias', '').split(' ')
+            self.delimiter.join(
+                (alias_base, alias)).replace(self.macro_character, '$')
+            for alias in alias_setting.split(' ')
             if alias.strip()
         ]
+
+    def _configure_archive_settings(self, archive_settings, archive_fields):
+        'Parse archive settings pragma key (archive_settings attribute)'
+        self.archive_settings = archive_settings
+        if archive_settings:
+            archive_settings['fields'] = (
+                archive_fields.split(' ') if archive_fields else []
+            )
 
     @property
     def valid(self):
@@ -388,6 +416,13 @@ class TwincatTypeRecordPackage(RecordPackage):
         # Remove timestamp source and process-on-init for output records:
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
+
+        if self.linked_to_pv and self.linked_to_pv[-1] is not None:
+            record.fields['OMSL'] = 'closed_loop'
+            linked_to_pv = ''.join([part for part in self.linked_to_pv
+                                    if part is not None])
+            record.fields['DOL'] = linked_to_pv + ' CPP MS'
+            record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
 
         # Update with given pragmas
         record.fields.update(self.config.get('field', {}))

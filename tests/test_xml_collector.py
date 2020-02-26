@@ -406,3 +406,18 @@ def test_unroll_formatting():
         'ENUMS_EXPAND3',
         'ENUMS_EXPAND4',
     }
+
+
+def test_pv_linking():
+    item = make_mock_twincatitem(
+        name='tcname', data_type=make_mock_type('DINT'),
+        pragma='pv: PVNAME; link: OTHER:RECORD')
+
+    pkg, = list(pragmas.record_packages_from_symbol(item))
+    assert pkg.pvname == 'PVNAME'
+    assert pkg.tcname == 'tcname'
+    assert isinstance(pkg, IntegerRecordPackage)
+    rec = pkg.generate_output_record()
+    assert rec.fields['OMSL'] == 'closed_loop'
+    assert rec.fields['DOL'] == 'OTHER:RECORD CPP MS'
+    assert rec.fields['SCAN'] == '.5 second'

@@ -160,6 +160,17 @@ def lint_pragma(pragma):
                 raise LinterError(
                     f'Invalid archive settings for {pvname}: {ex}') from None
 
+        if 'link' in config:
+            link = config['link']
+            if ' ' in link:
+                raise LinterError(
+                    f'Invalid link settings for {pvname}: spaces in pvname')
+            if pragmas.normalize_io(config.get('io', 'io')) != 'output':
+                raise LinterError(
+                    f'Invalid link settings for {pvname}: '
+                    f'read-write I/O required'
+                )
+
         fields = config.get('field', {})
         if fields.get('SCAN', 'I/O Intr') != 'I/O Intr':
             raise LinterError(f'SCAN field cannot be customized ({pvname}); '

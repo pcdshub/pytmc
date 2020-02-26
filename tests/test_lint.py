@@ -101,6 +101,11 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
      make_source_param('pv: test; archive: 1s test', marks=pytest.mark.xfail),
      make_source_param('pv: test; archive: 1Hz test', marks=pytest.mark.xfail),
      make_source_param('pv: test; archive: 1es', marks=pytest.mark.xfail),
+
+     # Link settings
+     make_source_param('pv: test; link: OTHER:PV'),
+     make_source_param('pv: test; io: ro; link: OTHER:PV', marks=pytest.mark.xfail),
+     make_source_param('pv: test; link: SPACES IN PV', marks=pytest.mark.xfail),
      ]
 )
 def test_lint_pragma(source):
