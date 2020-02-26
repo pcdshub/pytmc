@@ -265,6 +265,11 @@ def squash_configs(*configs):
         Configurations to squash. Original configs will not be modified.
     '''
     squashed = {'pv': [], 'field': {}}
+
+    has_link = any('link' in config for config in configs)
+    if has_link:
+        squashed['link'] = []
+
     for config in configs:
         if config is None:
             squashed['pv'].append(None)
@@ -274,6 +279,9 @@ def squash_configs(*configs):
 
         # Remove the PV portion - as it should be listified
         squashed['pv'].append(config.pop('pv', None))
+
+        if has_link:
+            squashed['link'].append(config.pop('link', None))
 
         # Update the fields as a dictionary
         fields = config.pop('field', None)

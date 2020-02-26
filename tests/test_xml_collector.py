@@ -419,4 +419,4 @@ def test_pv_linking():
     assert isinstance(pkg, IntegerRecordPackage)
     rec = pkg.generate_output_record()
     assert rec.fields['OMSL'] == 'closed_loop'
-    assert rec.fields['DOL'] == 'OTHER:RECORD CPP'
+    assert rec.fields['DOL'] == 'OTHER:RECORD CPP MS'

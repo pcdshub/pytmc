@@ -127,6 +127,7 @@ class RecordPackage:
         self.tcname = chain.tcname
         self.linked_to_pv = None
         self.macro_character = '@'
+        self.delimiter = ':'
         self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
         self.config = pytmc.pragmas.normalize_config(self.chain.config)
 
@@ -165,14 +166,15 @@ class RecordPackage:
     def _configure_aliases(self, pv, macro_character, alias_setting):
         'Configure aliases from the configuration (aliases attribute)'
         # The base for the alias does not include the final pvname:
-        alias_base = ':'.join(
+        alias_base = self.delimiter.join(
             pv_segment for pv_segment in pv[:-1]
             if pv_segment
         )
 
         # Split user-specified aliases for the record:
         self.aliases = [
-            ':'.join((alias_base, alias)).replace(self.macro_character, '$')
+            self.delimiter.join(
+                (alias_base, alias)).replace(self.macro_character, '$')
             for alias in alias_setting.split(' ')
             if alias.strip()
         ]
@@ -417,7 +419,10 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         if self.linked_to_pv:
             record.fields['OMSL'] = 'closed_loop'
-            record.fields['DOL'] = f'{self.linked_to_pv} CPP'
+            linked_to_pv = ''.join([part for part in self.linked_to_pv
+                                    if part is not None])
+            record.fields['DOL'] = linked_to_pv + ' CPP MS'
+            record.fields['SCAN'] = self.config.get('link_scan', '.5 seconds')
 
         # Update with given pragmas
         record.fields.update(self.config.get('field', {}))
