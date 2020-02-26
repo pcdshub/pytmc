@@ -418,9 +418,23 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.pop('PINI', None)
 
         if self.linked_to_pv and self.linked_to_pv[-1] is not None:
+
             record.fields['OMSL'] = 'closed_loop'
-            linked_to_pv = ''.join([part for part in self.linked_to_pv
-                                    if part is not None])
+
+            last_link = self.linked_to_pv[-1]
+            if last_link.startswith('*'):
+                # NOTE: A special, undocumented syntax for a lack of a better
+                # idea/more time:  need to allow pytmc to get access to a PV
+                # name it generates
+                # Consider this temporary API, only to be used in
+                # lcls-twincat-general for now.
+                pv_parts = list(self.config['pv'])
+                linked_to_pv = ':'.join(pv_parts[:-1] +
+                                        [last_link.lstrip('*')])
+            else:
+                linked_to_pv = ''.join([part for part in self.linked_to_pv
+                                        if part is not None])
+
             record.fields['DOL'] = linked_to_pv + ' CPP MS'
             record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
 
