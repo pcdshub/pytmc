@@ -417,7 +417,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
 
-        if self.linked_to_pv:
+        if self.linked_to_pv and self.linked_to_pv[-1] is not None:
             record.fields['OMSL'] = 'closed_loop'
             linked_to_pv = ''.join([part for part in self.linked_to_pv
                                     if part is not None])

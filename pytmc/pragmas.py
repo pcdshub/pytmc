@@ -266,7 +266,8 @@ def squash_configs(*configs):
     '''
     squashed = {'pv': [], 'field': {}}
 
-    has_link = any('link' in config for config in configs)
+    has_link = any('link' in config for config in configs
+                   if config is not None)
     if has_link:
         squashed['link'] = []
 
