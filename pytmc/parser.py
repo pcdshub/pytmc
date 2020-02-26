@@ -646,7 +646,17 @@ class EnumInfo(_TmcItem):
 
     @property
     def enum_value(self):
-        return self.Enum[0].text
+        try:
+            return self.Enum[0].text
+        except AttributeError:
+            ...
+
+        logger.warning(
+            'Encountered a known issue with the TwinCAT-generated TMC file: '
+            '%s is missing an Enum value in section %s; this may cause '
+            'database generation errors.', self.parent.name, self.path
+        )
+        return ''
 
     @property
     def enum_comment(self):
