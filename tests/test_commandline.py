@@ -45,14 +45,13 @@ def test_pragmalint(project_filename, project_filename_linter_success):
     pragmalint_main(project_filename, verbose=True, use_markdown=True)
 
 
-def test_stcmd(project_filename):
-    if 'plc_kfe_xgmd_vac' in project_filename:
-        kwargs = dict(plc_name='plc_kfe_xgmd_vac')
-    elif 'lcls-twincat-motion' in project_filename:
-        kwargs = dict(plc_name='Example', allow_errors=True)
-    else:
-        kwargs = {}
-    stcmd_main(project_filename, **kwargs)
+def test_stcmd(project_and_plc):
+    project_filename = project_and_plc.project
+    plc_name = project_and_plc.plc_name
+    allow_errors = any(name in project_filename
+                       for name in ('lcls-twincat-motion', 'XtesSxrPlc',
+                                    'plc-kfe-gmd-vac'))
+    stcmd_main(project_filename, plc_name=plc_name, allow_errors=allow_errors)
 
 
 def test_xmltranslate(project_filename):

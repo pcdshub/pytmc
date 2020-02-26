@@ -10,3 +10,6 @@
 [submodule "tests/projects/lcls-twincat-pmps"]
 	path = tests/projects/lcls-twincat-pmps
 	url = https://github.com/pcdshub/lcls-twincat-pmps.git
+[submodule "tests/projects/lcls-plc-kfe-gmd-vac-ext-io"]
+	path = tests/projects/lcls-plc-kfe-gmd-vac-ext-io
+	url = git://github.com/n-wbrown/lcls-plc-kfe-gmd-vac.git

@@ -15,6 +15,7 @@ TMC_ROOT = TEST_PATH / 'tmc_files'
 TMC_FILES = list(TMC_ROOT.glob('*.tmc'))
 INVALID_TMC_FILES = list((TMC_ROOT / 'invalid').glob('*.tmc'))
 PROJ_ROOT = TEST_PATH / 'projects'
+TSPROJ_PROJECTS = list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj'))
 
 
 @pytest.fixture(scope='module')
@@ -53,9 +54,29 @@ def tmc_pmps_dev_arbiter():
     return path
 
 
-@pytest.fixture(params=list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj')))
+@pytest.fixture(params=TSPROJ_PROJECTS)
 def project_filename(request):
     return request.param
+
+
+def _generate_project_and_plcs():
+    for project_filename in TSPROJ_PROJECTS:
+        project = parser.parse(project_filename)
+        for plc_name in project.plcs_by_name:
+            yield project_filename, plc_name
+
+
+@pytest.fixture(
+    params=[
+        pytest.param((project_filename, plc_name), id=f'{project_filename} {plc_name}')
+        for project_filename, plc_name in _generate_project_and_plcs()
+    ]
+)
+def project_and_plc(request):
+    class Item:
+        project = request.param[0]
+        plc_name = request.param[1]
+    return Item
 
 
 @pytest.fixture(scope='function')

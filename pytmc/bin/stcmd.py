@@ -233,7 +233,9 @@ def main(tsproj_project, *, name=None, prefix=None,
     motors = [mot for mot in symbols['Symbol_DUT_MotionStage']
               if not mot.is_pointer]
 
-    if not only_motor:
+    if plc.tmc is None:
+        logger.warning('No TMC file found; no records to be generated')
+    elif not only_motor:
         other_records, _ = db.process(plc.tmc,
                                       dbd_file=dbd,
                                       allow_errors=allow_errors)
