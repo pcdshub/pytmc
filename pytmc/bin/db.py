@@ -116,7 +116,7 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
                   if isinstance(ex, Exception)]
 
     for ex in exceptions:
-        logger.error('Error creating record: %s ', ex)
+        logger.error('Error creating record: %s', ex)
         records.remove(ex)
 
     if exceptions and not allow_errors:
