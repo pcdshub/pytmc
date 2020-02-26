@@ -422,7 +422,7 @@ class TwincatTypeRecordPackage(RecordPackage):
             linked_to_pv = ''.join([part for part in self.linked_to_pv
                                     if part is not None])
             record.fields['DOL'] = linked_to_pv + ' CPP MS'
-            record.fields['SCAN'] = self.config.get('link_scan', '.5 seconds')
+            record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
 
         # Update with given pragmas
         record.fields.update(self.config.get('field', {}))

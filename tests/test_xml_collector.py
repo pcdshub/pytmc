@@ -420,3 +420,4 @@ def test_pv_linking():
     rec = pkg.generate_output_record()
     assert rec.fields['OMSL'] == 'closed_loop'
     assert rec.fields['DOL'] == 'OTHER:RECORD CPP MS'
+    assert rec.fields['SCAN'] == '.5 second'
