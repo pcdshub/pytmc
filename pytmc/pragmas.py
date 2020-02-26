@@ -595,6 +595,6 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
             yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
         except Exception as ex:
             if yield_exceptions:
-                yield ex
+                yield type(ex)(f"{chain.tcname} {ex.args[0]}")
             else:
                 raise
