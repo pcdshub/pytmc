@@ -120,6 +120,7 @@ class RecordPackage:
     """
     _required_keys = {}
     _required_fields = {}
+    archive_fields = []
 
     def __init__(self, ads_port, chain=None, origin=None):
         """
