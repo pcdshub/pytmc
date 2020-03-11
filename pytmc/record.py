@@ -43,7 +43,8 @@ class EPICSRecord:
     """Representation of a single EPICS Record"""
 
     def __init__(self, pvname, record_type, direction, fields=None,
-                 template=None, autosave=None, aliases=None):
+                 template=None, autosave=None, aliases=None,
+                 archive_settings=None):
         self.pvname = pvname
         self.record_type = record_type
         self.direction = direction
@@ -51,6 +52,11 @@ class EPICSRecord:
         self.aliases = list(aliases) if aliases is not None else []
         self.template = template or 'asyn_standard_record.jinja2'
         self.autosave = dict(autosave) if autosave else {}
+        self.archive_settings = (dict(archive_settings)
+                                 if archive_settings else {})
+
+        if 'fields' not in self.archive_settings:
+            self.archive_settings = {}
 
         # Load jinja templates
         self.jinja_env = Environment(
@@ -114,6 +120,7 @@ class RecordPackage:
     """
     _required_keys = {}
     _required_fields = {}
+    archive_fields = []
 
     def __init__(self, ads_port, chain=None, origin=None):
         """
@@ -183,9 +190,11 @@ class RecordPackage:
         'Parse archive settings pragma key (archive_settings attribute)'
         self.archive_settings = archive_settings
         if archive_settings:
-            archive_settings['fields'] = (
-                archive_fields.split(' ') if archive_fields else []
-            )
+            # Fields are those from the pragma (key: archive_fields) plus
+            # those set by default on the RecordPackage class
+            fields = set(archive_fields.split(' ')
+                         if archive_fields else [])
+            archive_settings['fields'] = fields.union(set(self.archive_fields))
 
     @property
     def valid(self):
@@ -368,6 +377,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                              fields=self.field_defaults,
                              autosave=self.autosave_defaults.get('input'),
                              aliases=aliases,
+                             archive_settings=self.archive_settings,
                              )
 
         # Set a default description to the tcname
@@ -404,6 +414,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                              fields=self.field_defaults,
                              autosave=self.autosave_defaults.get('output'),
                              aliases=self.aliases,
+                             archive_settings=self.archive_settings,
                              )
 
         # Set a default description to the tcname
@@ -717,11 +728,7 @@ def generate_archive_settings(packages):
         if archive_settings:
             # for record in package.records:
             for record in package.records:
-                # Fields are those from the pragma (key: archive_fields) plus
-                # those set by default on the RecordPackage class
-                fields = sorted(set(archive_settings['fields'] +
-                                    package.archive_fields))
-                for field in fields:
+                for field in sorted(archive_settings['fields']):
                     period = archive_settings['seconds']
                     update_rate = package.config['update']['seconds']
                     if period < update_rate:

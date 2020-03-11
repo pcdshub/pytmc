@@ -12,4 +12,11 @@ record({{record.record_type}}, "{{record.pvname}}") {
 {% if record.autosave['pass0'] %}
   info(autosaveFields_pass0, "{{ record.autosave['pass0'] | sort | join(' ') }}")
 {% endif %}
+{% if record.archive_settings %}
+  {% if record.archive_settings['method'] == 'scan' and record.archive_settings['seconds'] == 1 %}
+  info(archive, "{{ record.archive_settings['fields'] | join(' ') }}")
+  {% else %}
+  info(archive, "{{ record.archive_settings['method'] }} {{ record.archive_settings['seconds'] }}: {{ record.archive_settings['fields'] | join(' ') }}")
+  {% endif %}
+{% endif %}
 }
