@@ -723,6 +723,13 @@ tmc file.</p>
 <span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">autosave</span><span class="p">[</span><span class="s1">&#39;pass0&#39;</span><span class="p">]</span> <span class="o">%</span><span class="p">}</span>
   <span class="n">info</span><span class="p">(</span><span class="n">autosaveFields_pass0</span><span class="p">,</span> <span class="s2">&quot;{{ record.autosave[&#39;pass0&#39;] | sort | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
 <span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">archive_settings</span> <span class="o">%</span><span class="p">}</span>
+  <span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">archive_settings</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;scan&#39;</span> <span class="ow">and</span> <span class="n">record</span><span class="o">.</span><span class="n">archive_settings</span><span class="p">[</span><span class="s1">&#39;seconds&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">info</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="s2">&quot;{{ record.archive_settings[&#39;fields&#39;] | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
+  <span class="p">{</span><span class="o">%</span> <span class="k">else</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">info</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="s2">&quot;{{ record.archive_settings[&#39;method&#39;] }} {{ record.archive_settings[&#39;seconds&#39;] }}: {{ record.archive_settings[&#39;fields&#39;] | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
+  <span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
