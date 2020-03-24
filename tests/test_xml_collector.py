@@ -220,7 +220,7 @@ def test_input_output_scan(chain, dbd_file, tc_type, sing_index, update,
 
 
 @pytest.mark.parametrize("tc_type, sing_index, final_ZNAM, final_ONAM, ret", [
-    ("BOOL", 0, 'Zero', 'One', True),
+    ("BOOL", 0, 'FALSE', 'TRUE', True),
     ("STRING", 0, None, None, False),
 ])
 def test_bool_naming(chain, tc_type, sing_index, final_ZNAM, final_ONAM, ret):
