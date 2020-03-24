@@ -119,7 +119,7 @@ class RecordPackage:
     the necessary setup before the record can be configured.
     """
     _required_keys = {}
-    _required_fields = {}
+    _required_fields = []
     archive_fields = []
 
     def __init__(self, ads_port, chain=None, origin=None):
@@ -468,7 +468,7 @@ class BinaryRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'bi'
     output_rtyp = 'bo'
     dtyp = 'asynInt32'
-    field_defaults = {'ZNAM': 'Zero', 'ONAM': 'One'}
+    _required_fields = ['ZNAM', 'ONAM']
 
 
 class IntegerRecordPackage(TwincatTypeRecordPackage):
