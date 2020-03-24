@@ -468,7 +468,7 @@ class BinaryRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'bi'
     output_rtyp = 'bo'
     dtyp = 'asynInt32'
-    field_defaults = {'ZNAM': 'Zero', 'ONAM': 'One'}
+    field_defaults = {'ZNAM': 'FALSE', 'ONAM': 'TRUE'}
 
 
 class IntegerRecordPackage(TwincatTypeRecordPackage):
