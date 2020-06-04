@@ -72,25 +72,37 @@ def split_pytmc_pragma(pragma_text):
         This list contains a dictionary for each line broken up into two
         keys: 'title' and 'tag'.
     """
-    conf_lines = [m.groupdict() for m in _LINE_FINDER.finditer(pragma_text)]
+    conf_lines = [m.groupdict()['line']
+                  for m in _LINE_FINDER.finditer(pragma_text)]
 
     # create list of lines information only. Strip out delimiters, empty lines
-    result_no_delims = [r["line"]
-                        for r in conf_lines
-                        if r["line"].strip()]
+    result_no_delims = [_LINE_PARSER.search(line)
+                        for line in conf_lines
+                        if line.strip()]
 
     # Break lines into list of dictionaries w/ title/tag structure
-    result = [_LINE_PARSER.search(m).groupdict() for m in result_no_delims]
+    if None in result_no_delims:
+        invalid_lines = '\n'.join(
+            f'--> | {line}' if _LINE_PARSER.search(line) is None
+            else f'    | {line}'
+            for line in conf_lines
+        )
+        raise ValueError(f'Found invalid pragma line(s):\n{invalid_lines}')
 
-    for line in result:
-        # Strip out extra whitespace in the tag and/or
-        # split out fields into {'f_name': '...', 'f_set': '...'}
-        tag = line['tag']
-        line['tag'] = (split_field(tag.strip())
-                       if line['title'] == 'field'
-                       else tag.strip())
+    def line_to_dict(match):
+        """
+        Strip out extra whitespace in the tag and/or split out fields into
+        {'f_name': '...', 'f_set': '...'}
+        """
+        groupdict = match.groupdict()
+        tag = groupdict['tag']
+        groupdict['tag'] = (
+            split_field(tag.strip())
+            if groupdict['title'] == 'field' else tag.strip()
+        )
+        return groupdict
 
-    return result
+    return [line_to_dict(m) for m in result_no_delims]
 
 
 def split_field(string):
@@ -589,12 +601,19 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
                                 yield_exceptions=False,
                                 allow_no_pragma=False):
     'Create all record packages from a given Symbol'
-    for chain in chains_from_symbol(symbol, pragma=pragma,
-                                    allow_no_pragma=allow_no_pragma):
-        try:
-            yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
-        except Exception as ex:
-            if yield_exceptions:
-                yield type(ex)(f"{chain.tcname} {ex.args[0]}")
-            else:
-                raise
+    try:
+        for chain in chains_from_symbol(symbol, pragma=pragma,
+                                        allow_no_pragma=allow_no_pragma):
+            try:
+                yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
+            except Exception as ex:
+                if yield_exceptions:
+                    yield type(ex)(f"Symbol {symbol.name} "
+                                   f"chain: {chain.tcname}: {ex.args[0]}")
+                else:
+                    raise
+    except Exception as ex:
+        if yield_exceptions:
+            yield type(ex)(f"Symbol {symbol.name} failure: {ex.args[0]}")
+        else:
+            raise
