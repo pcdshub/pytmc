@@ -1,76 +1,26 @@
-language: python
-sudo: false
-
-services:
-    - xvfb
-
-addons:
-    apt:
-      packages:
-        - herbstluftwm
-        - libxkbcommon-x11-0
+version: ~> 1.0
 
 env:
   global:
-    - OFFICIAL_REPO="slaclab/pytmc"
     - secure: "eW+HXTrfHs6UN5WqJUg23J6gNIxntYUY6eeEDpS5ShCLaPBjrVOzDBhBKXGHLYCSP+iorvDZA1jQhH4eiyeZgQE4wfsJHf9o6T2klN8sKD9rwgfaWd1/ramnLDPGh+Ccz12WlzoOIAEKlQJ1PhmpXPcH8sT+dC8bUl04Qf2Feg+LxHCtuXgrwoYlqjebaMWBvDbk/ngGCY1wMSYqkv1Nzn/J2K+syZFLpY7k61HiCKUQZlIm8KPz924ICZ5oKYMPAF7POC6BORXhgH9qKbxZ0Q86+D+LX7HGhFU/MFb3kbLmUmZtE6Q3Wc9BHvKiIyHXhBLBDVGHH4JXdWzMNulYapS9iuctjfmhuHySVXAv9E22FXlnKBJicCjlBKzcl2Re2Yn6F5oN34y0K6uQb2ip/Cfe0K4jO2R2lD74eHktLuCTVfXejnRZHkGY2C3TjpEOTKmN7Qfwuze1iJcGLLTO4SZFurdpyOwNipyK83KbNNecmNAgenwH9J2sv6ZQ+pDO5DobtxI9jPIX0X1XDbtSbwIb0Cg718qVA50KfC6XLLNcQW+61b4POFiGlSUfA+PJMqvX9OGkm3rj7zsG7IrfkGVAT6IJxU5wiMhwsal5IvAAG2t0Un9EDGdSzIr0s3P9fh5fl1afU9IL7FnVmKGOIwtdWILtDxGd6kbV7jEGn50="
+    - DOCTR_VERSIONS_MENU="1"
+    - DOCS_REQUIREMENTS="dev-requirements.txt requirements.txt"
+    - PYTHON_LINT_OPTIONS="pytmc"
 
-matrix:
-  include:
-    - name: flake8 linting
-      python: 3.6
-      env: LINT_PYTHON=pytmc
-    - python: 3.6
-      env: BUILD_DOCS=1
-    - python: 3.7
-      dist: xenial
+    - CONDA_PACKAGE="pytmc"
+    - CONDA_RECIPE_FOLDER="conda-recipe"
+    - CONDA_EXTRAS="pip pyqt=5"
+    - CONDA_REQUIREMENTS="dev-requirements.txt"
 
-install:
-  - git clone --depth 1 git://github.com/pcdshub/pcds-ci-helpers.git
-  - source pcds-ci-helpers/travis/init.sh
- 
-  # Install, configure conda
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda config --set always_yes yes --set changeps1 no
-  - conda install conda-build anaconda-client
-  - conda update -q conda conda-build
-  - conda config --add channels pcds-tag
-  - conda config --append channels conda-forge
-  # Useful for debugging
-  - conda info -a
-  - conda build  -q conda-recipe --python $TRAVIS_PYTHON_VERSION --output-folder bld-dir
-  - conda config --add channels "file://`pwd`/bld-dir"
-  # Manage conda environment
-  - conda create -n pytmc-env python=$TRAVIS_PYTHON_VERSION pytmc pip pyqt --file dev-requirements.txt
-  - source activate pytmc-env
+    - PIP_EXTRAS="PyQt5"
 
-before_script:
-  # Run windows manager
-  - "herbstluftwm &"
-  - sleep 1
+jobs:
+  allow_failures:
+    - name: "Python 3.6 - PIP"
 
-script:
-  - coverage run run_tests.py
-  - coverage report -m 
-  - set -e
-  - |
-    if [[ $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $BUILD_DOCS ]]; then
-      pushd docs
-      make html
-      popd
-      doctr deploy . --built-docs docs/_build/html --deploy-branch-name gh-pages --command "touch .nojekyll; git add .nojekyll"
-    fi
-after_success:
-  - codecov
-  - |
-    if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $TRAVIS_BRANCH == $TRAVIS_TAG  && $TRAVIS_TAG != '' ]]; then
-      export ANACONDA_API_TOKEN=$CONDA_UPLOAD_TOKEN_TAG
-      anaconda upload bld-dir/linux-64/*.tar.bz2
-    fi
-  - |
-    if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $TRAVIS_BRANCH == 'master' ]]; then
-      export ANACONDA_API_TOKEN=$CONDA_UPLOAD_TOKEN_DEV
-      anaconda upload bld-dir/linux-64/*.tar.bz2
-    fi
+after_failure:
+  - cat logs/run_tests_log.txt
+
+import:
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/setup-env-ui.yml
+  - pcdshub/pcds-ci-helpers:travis/shared_configs/standard-python-conda.yml
