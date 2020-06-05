@@ -605,7 +605,8 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
         for chain in chains_from_symbol(symbol, pragma=pragma,
                                         allow_no_pragma=allow_no_pragma):
             try:
-                yield RecordPackage.from_chain(symbol.module.ads_port, chain=chain)
+                yield RecordPackage.from_chain(symbol.module.ads_port,
+                                               chain=chain)
             except Exception as ex:
                 if yield_exceptions:
                     yield type(ex)(f"Symbol {symbol.name} "

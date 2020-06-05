@@ -50,7 +50,7 @@ def text_block(text, indent=4, markdown_language=None, *, file=sys.stdout):
     if markdown_language is not None:
         print(f'```{markdown_language}', file=file)
         print(text, file=file)
-        print(f'```', file=file)
+        print('```', file=file)
     else:
         for line in text.splitlines():
             print(' ' * indent, line, file=file)
