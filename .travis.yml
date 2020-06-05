@@ -14,6 +14,10 @@ env:
 
     - PIP_EXTRAS="PyQt5"
 
+jobs:
+  allow_failures:
+    - name: "Python 3.6 - PIP"
+
 after_failure:
   - cat logs/run_tests_log.txt
 
