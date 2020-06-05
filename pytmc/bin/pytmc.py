@@ -39,7 +39,7 @@ def _build_commands():
             DESCRIPTION += f'\n    $ pytmc {module} --help'
 
     if unavailable:
-        DESCRIPTION += f'\n\n'
+        DESCRIPTION += '\n\n'
 
         for module, ex in unavailable:
             DESCRIPTION += (f'WARNING: pytmc {module!r} is unavailable due to:'

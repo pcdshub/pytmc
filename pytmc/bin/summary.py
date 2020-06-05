@@ -119,14 +119,14 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
         for i, plc in enumerate(project.plcs, 1):
             util.heading(f'PLC Project ({i}): {plc.project_path.stem}')
             print(f'    Project root: {proj_root}')
-            print(f'    Project path:',
+            print('    Project path:',
                   plc.project_path.resolve().relative_to(proj_root))
-            print(f'    TMC path:    ',
+            print('    TMC path:    ',
                   plc.tmc_path.resolve().relative_to(proj_root))
             print(f'    AMS ID:       {plc.ams_id}')
             print(f'    IP Address:   {plc.target_ip} (* based on AMS ID)')
             print(f'    Port:         {plc.port}')
-            print(f'')
+            print()
             proj_info = [
                 ('Source files', [pathlib.Path(fn).relative_to(proj_root)
                                   for fn in plc.source_filenames]),
