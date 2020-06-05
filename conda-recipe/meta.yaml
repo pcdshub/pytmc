@@ -8,24 +8,40 @@ source:
   path: ..
 
 build:
-  number: 1
+  noarch: python
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
-  build:
-    - python {{PY_VER}}*,>=3
-    - setuptools
-
+  host:
+    - python >=3.6
+    - pip
   run:
-    - python {{PY_VER}}*,>=3
+    - python >=3.6
     - jinja2
-    - epics-pypdb
     - lxml
+    - epics-pypdb >=0.1.5
 
 test:
   imports:
     - pytmc
+  requires:
+    - pytest
+    - pytest-qt
+    - qtpy
+    - pyqt >=5
 
 about:
   home: https://github.com/slaclab/pytmc
-  license: SLAC Open License
-  summary: Generate Epics DB records from TwinCAT .tmc files
+  doc_url: https://slaclab.github.io/pytmc/
+  license: SLAC Open
+  license_family: Other
+  license_file: LICENSE
+  summary: 'Generate EPICS IOCs and records from Beckhoff TwinCAT projects'
+
+extra:
+  recipe-maintainers:
+    - klauer
+    - hhslepicka 
+    - zllentz
+    - n-wbrown
