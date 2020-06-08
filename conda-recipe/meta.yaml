@@ -26,10 +26,12 @@ test:
   imports:
     - pytmc
   requires:
+    - codecov
+    - coverage
     - pytest
     - pytest-qt
     - qtpy
-    - pyqt >=5
+    - pyqt
 
 about:
   home: https://github.com/slaclab/pytmc
