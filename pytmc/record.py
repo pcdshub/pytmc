@@ -1,10 +1,9 @@
 """
 Record generation and templating
 """
+import jinja2
 import logging
 import pytmc
-
-from jinja2 import Environment, PackageLoader
 
 from typing import Optional
 
@@ -15,6 +14,12 @@ from .default_settings.unified_ordered_field_list import unified_lookup_list
 
 logger = logging.getLogger(__name__)
 MAX_ARCHIVE_ELEMENTS = 1024
+
+_default_jinja_env = jinja2.Environment(
+    loader=jinja2.PackageLoader("pytmc", "templates"),
+    trim_blocks=True,
+    lstrip_blocks=True,
+)
 
 
 def _truncate_middle(string, max_length):
@@ -58,15 +63,7 @@ class EPICSRecord:
         if 'fields' not in self.archive_settings:
             self.archive_settings = {}
 
-        # Load jinja templates
-        self.jinja_env = Environment(
-            loader=PackageLoader("pytmc", "templates"),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.record_template = self.jinja_env.get_template(
-            self.template
-        )
+        self.record_template = _default_jinja_env.get_template(self.template)
 
     def update_autosave_from_pragma(self, config):
         """
