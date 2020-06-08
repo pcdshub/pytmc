@@ -293,8 +293,8 @@ class TwincatTypeRecordPackage(RecordPackage):
     dtyp = NotImplemented
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
-    output_only_fields = set()
-    input_only_fields = set()
+    input_only_fields = {'SVAL'}
+    output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL'}
     archive_fields = ['VAL']
 
     def __init_subclass__(cls, **kwargs):
@@ -483,13 +483,17 @@ class BinaryRecordPackage(TwincatTypeRecordPackage):
     output_rtyp = 'bo'
     dtyp = 'asynInt32'
     field_defaults = {'ZNAM': 'FALSE', 'ONAM': 'TRUE'}
+    output_only_fields = {'DOL', 'HIGH', 'IVOA', 'IVOV', 'OMSL', 'ORBV',
+                          'OUT', 'RBV', 'RPVT', 'WDPT'}
+    input_only_fields = {'SVAL'}
 
 
 class IntegerRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for an integer Twincat Variable"""
     input_rtyp = 'longin'
     output_rtyp = 'longout'
-    output_only_fields = {'DRVL', 'DRVH'}
+    output_only_fields = {'DOL', 'DRVH', 'DRVL', 'IVOA', 'IVOV', 'OMSL'}
+    input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
     dtyp = 'asynInt32'
 
 
@@ -499,7 +503,11 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
     output_rtyp = 'ao'
     dtyp = 'asynFloat64'
     field_defaults = {'PREC': '3'}
-    output_only_fields = {'DRVL', 'DRVH'}
+    output_only_fields = {'DOL', 'DRVH', 'DRVL', 'IVOA', 'IVOV', 'OIF',
+                          'OMOD', 'OMSL', 'ORBV', 'OROC', 'OVAL', 'PVAL',
+                          'RBV'}
+    input_only_fields = {'AFTC', 'AFVL', 'SMOO', 'SVAL'}
+
     autosave_defaults = {
         'input': dict(pass0={'PREC'},
                       pass1={}),
@@ -513,6 +521,8 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'mbbi'
     output_rtyp = 'mbbo'
     dtyp = 'asynInt32'
+    output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL', 'ORBV', 'RBV'}
+    input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
 
     mbb_fields = [
         ('ZRVL', 'ZRST'),
