@@ -293,6 +293,8 @@ class TwincatTypeRecordPackage(RecordPackage):
     dtyp = NotImplemented
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
+    output_only_fields = set()
+    input_only_fields = set()
     archive_fields = ['VAL']
 
     def __init_subclass__(cls, **kwargs):
@@ -387,13 +389,19 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['INP'] = self.asyn_input_port_spec
         record.fields['DTYP'] = self.dtyp
 
-        # Update with given pragmas
-        record.fields.update(self.config.get('field', {}))
+        # Update with given pragma fields - ignoring output-only fields:
+        user_fields = self.config.get('field', {})
+        record.fields.update(
+            {field: value for field, value in user_fields.items()
+             if field not in self.output_only_fields
+             }
+        )
 
         # Records must always be I/O Intr, regardless of the pragma:
         record.fields['SCAN'] = 'I/O Intr'
 
         record.update_autosave_from_pragma(self.config)
+
         return record
 
     def generate_output_record(self):
@@ -449,8 +457,14 @@ class TwincatTypeRecordPackage(RecordPackage):
             record.fields['DOL'] = linked_to_pv + ' CPP MS'
             record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
 
-        # Update with given pragmas
-        record.fields.update(self.config.get('field', {}))
+        # Update with given pragma fields - ignoring input-only fields:
+        user_fields = self.config.get('field', {})
+        record.fields.update(
+            {field: value for field, value in user_fields.items()
+             if field not in self.input_only_fields
+             }
+        )
+
         record.update_autosave_from_pragma(self.config)
         return record
 
@@ -475,6 +489,7 @@ class IntegerRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for an integer Twincat Variable"""
     input_rtyp = 'longin'
     output_rtyp = 'longout'
+    output_only_fields = {'DRVL', 'DRVH'}
     dtyp = 'asynInt32'
 
 
@@ -484,6 +499,7 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
     output_rtyp = 'ao'
     dtyp = 'asynFloat64'
     field_defaults = {'PREC': '3'}
+    output_only_fields = {'DRVL', 'DRVH'}
     autosave_defaults = {
         'input': dict(pass0={'PREC'},
                       pass1={}),
