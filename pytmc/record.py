@@ -1,10 +1,9 @@
 """
 Record generation and templating
 """
+import jinja2
 import logging
 import pytmc
-
-from jinja2 import Environment, PackageLoader
 
 from typing import Optional
 
@@ -15,6 +14,13 @@ from .default_settings.unified_ordered_field_list import unified_lookup_list
 
 logger = logging.getLogger(__name__)
 MAX_ARCHIVE_ELEMENTS = 1024
+MAX_DESC_FIELD_LENGTH = 40
+
+_default_jinja_env = jinja2.Environment(
+    loader=jinja2.PackageLoader("pytmc", "templates"),
+    trim_blocks=True,
+    lstrip_blocks=True,
+)
 
 
 def _truncate_middle(string, max_length):
@@ -39,6 +45,33 @@ def _truncate_middle(string, max_length):
     return '...'.join((string[:n1], string[-n2:]))
 
 
+def _update_description(record, default):
+    """
+    Update the description field for the given record.
+
+    * If not provided, fall back to the given `default`.
+    * Ensure the description fits, given the maximum length restrictions.
+
+    Parameters
+    ----------
+    record : EPICSRecord
+        The record to update.
+
+    default : str
+        The default description.
+    """
+    fields = record.fields
+    desc = fields.setdefault('DESC', default)
+    if len(desc) <= MAX_DESC_FIELD_LENGTH:
+        return
+
+    # Stash the full description:
+    record.long_description = desc
+
+    # And truncate the one available to EPICS:
+    fields['DESC'] = _truncate_middle(desc, MAX_DESC_FIELD_LENGTH)
+
+
 class EPICSRecord:
     """Representation of a single EPICS Record"""
 
@@ -58,15 +91,7 @@ class EPICSRecord:
         if 'fields' not in self.archive_settings:
             self.archive_settings = {}
 
-        # Load jinja templates
-        self.jinja_env = Environment(
-            loader=PackageLoader("pytmc", "templates"),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.record_template = self.jinja_env.get_template(
-            self.template
-        )
+        self.record_template = _default_jinja_env.get_template(self.template)
 
     def update_autosave_from_pragma(self, config):
         """
@@ -135,8 +160,8 @@ class RecordPackage:
         self.linked_to_pv = None
         self.macro_character = '@'
         self.delimiter = ':'
-        self.default_desc = _truncate_middle(f'ads:{self.chain.tcname}', 40)
         self.config = pytmc.pragmas.normalize_config(self.chain.config)
+        self.long_description = None
 
         self._parse_config(self.config)
 
@@ -381,7 +406,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                              )
 
         # Set a default description to the tcname
-        record.fields.setdefault('DESC', self.default_desc)
+        _update_description(record, self.chain.tcname)
 
         # Add our port
         record.fields['INP'] = self.asyn_input_port_spec
@@ -418,7 +443,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                              )
 
         # Set a default description to the tcname
-        record.fields.setdefault('DESC', self.default_desc)
+        _update_description(record, self.chain.tcname)
 
         # Add our port
         record.fields['DTYP'] = self.dtyp
