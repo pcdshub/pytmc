@@ -1,4 +1,7 @@
 record({{record.record_type}}, "{{record.pvname}}") {
+{% if record.long_description %}
+  # {{ record.long_description }}
+{% endif %}
 {% for alias in record.aliases %}
   alias("{{alias}}")
 {% endfor %}
