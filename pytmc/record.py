@@ -318,6 +318,8 @@ class TwincatTypeRecordPackage(RecordPackage):
     dtyp = NotImplemented
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
+    input_only_fields = {'SVAL'}
+    output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL'}
     archive_fields = ['VAL']
 
     def __init_subclass__(cls, **kwargs):
@@ -412,13 +414,19 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['INP'] = self.asyn_input_port_spec
         record.fields['DTYP'] = self.dtyp
 
-        # Update with given pragmas
-        record.fields.update(self.config.get('field', {}))
+        # Update with given pragma fields - ignoring output-only fields:
+        user_fields = self.config.get('field', {})
+        record.fields.update(
+            {field: value for field, value in user_fields.items()
+             if field not in self.output_only_fields
+             }
+        )
 
         # Records must always be I/O Intr, regardless of the pragma:
         record.fields['SCAN'] = 'I/O Intr'
 
         record.update_autosave_from_pragma(self.config)
+
         return record
 
     def generate_output_record(self):
@@ -474,8 +482,14 @@ class TwincatTypeRecordPackage(RecordPackage):
             record.fields['DOL'] = linked_to_pv + ' CPP MS'
             record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
 
-        # Update with given pragmas
-        record.fields.update(self.config.get('field', {}))
+        # Update with given pragma fields - ignoring input-only fields:
+        user_fields = self.config.get('field', {})
+        record.fields.update(
+            {field: value for field, value in user_fields.items()
+             if field not in self.input_only_fields
+             }
+        )
+
         record.update_autosave_from_pragma(self.config)
         return record
 
@@ -494,12 +508,17 @@ class BinaryRecordPackage(TwincatTypeRecordPackage):
     output_rtyp = 'bo'
     dtyp = 'asynInt32'
     field_defaults = {'ZNAM': 'FALSE', 'ONAM': 'TRUE'}
+    output_only_fields = {'DOL', 'HIGH', 'IVOA', 'IVOV', 'OMSL', 'ORBV',
+                          'OUT', 'RBV', 'RPVT', 'WDPT'}
+    input_only_fields = {'SVAL'}
 
 
 class IntegerRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for an integer Twincat Variable"""
     input_rtyp = 'longin'
     output_rtyp = 'longout'
+    output_only_fields = {'DOL', 'DRVH', 'DRVL', 'IVOA', 'IVOV', 'OMSL'}
+    input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
     dtyp = 'asynInt32'
 
 
@@ -509,6 +528,11 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
     output_rtyp = 'ao'
     dtyp = 'asynFloat64'
     field_defaults = {'PREC': '3'}
+    output_only_fields = {'DOL', 'DRVH', 'DRVL', 'IVOA', 'IVOV', 'OIF',
+                          'OMOD', 'OMSL', 'ORBV', 'OROC', 'OVAL', 'PVAL',
+                          'RBV'}
+    input_only_fields = {'AFTC', 'AFVL', 'SMOO', 'SVAL'}
+
     autosave_defaults = {
         'input': dict(pass0={'PREC'},
                       pass1={}),
@@ -522,6 +546,8 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'mbbi'
     output_rtyp = 'mbbo'
     dtyp = 'asynInt32'
+    output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL', 'ORBV', 'RBV'}
+    input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
 
     mbb_fields = [
         ('ZRVL', 'ZRST'),
