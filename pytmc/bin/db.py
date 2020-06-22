@@ -72,7 +72,7 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
             for record in getattr(pack, 'records', []):
                 for field in invalid_fields_by_record.get(
                         record.record_type, []):
-                    pack.cfg.remove_config_field(field)
+                    pack.config['field'].pop(field, None)
     return results, db_text
 
 
