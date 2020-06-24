@@ -843,6 +843,10 @@ class Property(_TmcItem):
         return f'<Property {self.key}={self.value!r}>'
 
 
+class DataArea(_TmcItem):
+    '[TMC] Container that holds symbols'
+
+
 class BuiltinDataType:
     '[TMC] A built-in data type such as STRING, INT, REAL, etc.'
     def __init__(self, typename, *, length=1):
@@ -1316,6 +1320,26 @@ class _ArrayItemProxy:
 
     def __setattr__(self, attr, value):
         return setattr(self.__dict__['item'], attr, value)
+
+
+def _make_fake_item(name, parent=None, item_name=None, *, text=None,
+                    attrib=None):
+    """Make a fake TwincatItem, for debugging/testing purposes."""
+    cls = TWINCAT_TYPES[name]
+    filename = (parent.filename
+                if parent is not None
+                else pathlib.Path(__file__))
+
+    attrib = attrib or {}
+    if 'name' not in attrib:
+        attrib['name'] = item_name or name
+
+    elem = lxml.etree.Element(cls.__name__, attrib=attrib)
+    elem.text = text or ''
+    item = cls(element=elem,
+               name=attrib['name'],
+               parent=parent, filename=filename)
+    return item
 
 
 def case_insensitive_path(path):
