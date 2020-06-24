@@ -122,7 +122,8 @@ def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
         print('* TMC unavailable to show types', file=file)
         return
 
-    for data_type in sorted(tmc.find(parser.DataType), key=lambda dt: dt.name):
+    for data_type in sorted(tmc.find(parser.DataType),
+                            key=lambda dt: dt.qualified_type):
         if filter_types:
             if not any(fnmatch.fnmatch(data_type.name, filter_type)
                        for filter_type in filter_types):
@@ -130,26 +131,37 @@ def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
 
         symbol = pragmas.make_fake_symbol_from_data_type(
             data_type, pragma)
-        try:
-            packages = list(pragmas.record_packages_from_symbol(symbol))
-        except Exception as ex:
-            print(f'Failed: {ex}', file=file)
+
+        output_block = []
+        records = []
+
+        for item in pragmas.record_packages_from_symbol(symbol,
+                                                        yield_exceptions=True):
+            if isinstance(item, Exception):
+                output_block.append(f'{data_type.name} failed: {item}')
+                continue
+
+            try:
+                records.extend(item.records)
+            except Exception as ex:
+                output_block.append(
+                    f'Package failed: {item.tcname} {ex.__class__.__name__} '
+                    f'{ex}'
+                )
+
+        if not records and filter_types:
+            output_block.append('** Matched user filter (but no records)')
+
+        output_block.extend(
+            [record.pvname
+             for record in sorted(records, key=lambda r: r.pvname)]
+        )
+
+        if output_block:
+            util.sub_heading(f'Data type {data_type.qualified_type}',
+                             file=file)
+            util.text_block('\n'.join(output_block), file=file)
             print(file=file)
-            continue
-
-        if not packages:
-            continue
-
-        util.sub_heading(f'Data type {data_type.name}', file=file)
-        block = [
-            record.pvname
-            for record in sorted((record for pkg in packages
-                                  for record in pkg.records),
-                                 key=lambda r: r.pvname)
-        ]
-        util.text_block('\n'.join(block))
-
-        print(file=file)
 
 
 def summary(tsproj_project, use_markdown=False, show_all=False,
