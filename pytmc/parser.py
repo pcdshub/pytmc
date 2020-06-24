@@ -11,9 +11,8 @@ import types
 import lxml
 import lxml.etree
 
-from .code import (get_pou_call_blocks, program_name_from_declaration,
-                   variables_from_declaration, determine_block_type)
-
+from .code import (determine_block_type, get_pou_call_blocks,
+                   program_name_from_declaration, variables_from_declaration)
 
 # Registry of all TwincatItem-based classes
 TWINCAT_TYPES = {}
@@ -710,6 +709,13 @@ class DataType(_TmcItem):
         return self.name
 
     @property
+    def base_type(self):
+        base_type = getattr(self, 'BaseType', [None])[0]
+        if base_type is None:
+            return None
+        return self.tmc.get_data_type(base_type.text)
+
+    @property
     def is_complex_type(self):
         return True
 
@@ -841,6 +847,10 @@ class Property(_TmcItem):
 
     def __repr__(self):
         return f'<Property {self.key}={self.value!r}>'
+
+
+class DataArea(_TmcItem):
+    '[TMC] Container that holds symbols'
 
 
 class BuiltinDataType:
@@ -1316,6 +1326,26 @@ class _ArrayItemProxy:
 
     def __setattr__(self, attr, value):
         return setattr(self.__dict__['item'], attr, value)
+
+
+def _make_fake_item(name, parent=None, item_name=None, *, text=None,
+                    attrib=None):
+    """Make a fake TwincatItem, for debugging/testing purposes."""
+    cls = TWINCAT_TYPES[name]
+    filename = (parent.filename
+                if parent is not None
+                else pathlib.Path(__file__))
+
+    attrib = attrib or {}
+    if 'name' not in attrib:
+        attrib['name'] = item_name or name
+
+    elem = lxml.etree.Element(cls.__name__, attrib=attrib)
+    elem.text = text or ''
+    item = cls(element=elem,
+               name=attrib['name'],
+               parent=parent, filename=filename)
+    return item
 
 
 def case_insensitive_path(path):

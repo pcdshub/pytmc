@@ -5,12 +5,12 @@
 
 import argparse
 import ast
+import fnmatch
 import pathlib
 import sys
 
-from .. import parser
+from .. import parser, pragmas
 from . import util
-
 
 DESCRIPTION = __doc__
 
@@ -70,6 +70,19 @@ def build_arg_parser(argparser=None):
     )
 
     argparser.add_argument(
+        '--types', dest='show_types',
+        action='store_true',
+        help='Show TMC types and record suffixes, if available'
+    )
+
+    argparser.add_argument(
+        '--filter-types',
+        action='append',
+        type=str,
+        help='Filter the types shown by name'
+    )
+
+    argparser.add_argument(
         '--links', '-l', dest='show_links',
         action='store_true',
         help='Show links'
@@ -102,10 +115,125 @@ def outline(item, *, depth=0, f=sys.stdout):
         outline(child, depth=depth + 1, f=f)
 
 
+def data_type_to_record_info(data_type, pragma):
+    """
+    Get record information from a given TMC DataType.
+
+    Parameters
+    ----------
+    data_type : pytmc.parser.DataType
+        The data type.
+
+    pragma : str, optional
+        The pragma to use for a "fake" symbol, in order to generate a full
+        pytmc chain.  This can be used to customize the PV prefix, for example.
+
+    Returns
+    -------
+    info : dict
+        With keys {'data_type', 'qualified_type_name', 'packages', 'records',
+        'errors'}.
+    """
+    symbol = pragmas.make_fake_symbol_from_data_type(data_type, pragma)
+    packages = []
+    records = []
+    errors = []
+
+    for item in pragmas.record_packages_from_symbol(
+            symbol, yield_exceptions=True):
+        if isinstance(item, Exception):
+            errors.append(f'{data_type.name} failed: {item}')
+            continue
+
+        packages.append(item)
+        try:
+            records.extend(item.records)
+        except Exception as ex:
+            errors.append(
+                f'Package failed: {item.tcname} {ex.__class__.__name__} {ex}'
+            )
+
+    return {
+        'data_type': data_type,
+        'qualified_type_name': data_type.qualified_type,
+        'packages': packages,
+        'records': records,
+        'errors': errors,
+    }
+
+
+def enumerate_types(tmc, pragma='pv: @(PREFIX)', filter_types=None):
+    """
+    Enumerate data types from a parsed TMC file.
+
+    Parameters
+    ----------
+    tmc : pytmc.parser.TcModuleClass
+        The TMC instance.
+
+    pragma : str, optional
+        The pragma to use for a "fake" symbol, in order to generate a full
+        pytmc chain.  This can be used to customize the PV prefix, for example.
+
+    filter_types : list, optional
+        List of glob-style patterns to match against the types.
+
+    Yields
+    ------
+    info : dict
+        With keys {'data_type', 'qualified_type_name', 'packages', 'records',
+        'errors'}.
+    """
+    for data_type in sorted(tmc.find(parser.DataType),
+                            key=lambda dt: dt.qualified_type):
+        base_type = data_type.base_type
+        if base_type and not base_type.is_complex_type:
+            continue
+
+        if filter_types:
+            if not any(fnmatch.fnmatch(data_type.name, filter_type)
+                       for filter_type in filter_types):
+                continue
+
+        yield data_type_to_record_info(data_type, pragma)
+
+
+def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
+               file=sys.stdout):
+    tmc = plc.tmc
+    if not tmc:
+        print('* TMC unavailable to show types', file=file)
+        return
+
+    for item in enumerate_types(plc.tmc, pragma=pragma,
+                                filter_types=filter_types):
+        output_block = [
+            record.pvname
+            for record in sorted(item['records'],
+                                 key=lambda record: record.pvname)
+        ]
+        if not item['records'] and filter_types:
+            output_block.append('** Matched user filter (but no records)')
+
+        output_block.extend([f'!! {error}' for error in item['errors']])
+
+        if output_block:
+            util.sub_heading(f'Data type {item["qualified_type_name"]}',
+                             file=file)
+            util.text_block('\n'.join(output_block), file=file)
+            print(file=file)
+
+
 def summary(tsproj_project, use_markdown=False, show_all=False,
             show_outline=False, show_boxes=False, show_code=False,
             show_plcs=False, show_nc=False, show_symbols=False,
-            show_links=False, log_level=None, debug=False):
+            show_links=False, show_types=False, filter_types=None,
+            log_level=None, debug=False):
+
+    if not any((show_all, show_outline, show_boxes, show_code, show_plcs,
+                show_nc, show_symbols, show_links, show_types, debug)):
+        # Show _something_
+        show_plcs = True
 
     proj_path = pathlib.Path(tsproj_project)
     proj_root = proj_path.parent.resolve().absolute()
@@ -115,7 +243,7 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
 
     project = parser.parse(proj_path)
 
-    if show_plcs or show_all or show_code or show_symbols:
+    if show_plcs or show_all or show_code or show_symbols or show_types:
         for i, plc in enumerate(project.plcs, 1):
             util.heading(f'PLC Project ({i}): {plc.project_path.stem}')
             print(f'    Project root: {proj_root}')
@@ -174,6 +302,9 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                           '{bit_size})'.format(**info))
                 print()
 
+            if show_types:
+                list_types(plc, filter_types=filter_types)
+
     if show_boxes or show_all:
         util.sub_heading('Boxes')
         boxes = list(project.find(parser.Box))
@@ -219,7 +350,8 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
 def main(filename, use_markdown=False, show_all=False,
          show_outline=False, show_boxes=False, show_code=False,
          show_plcs=False, show_nc=False, show_symbols=False,
-         show_links=False, log_level=None, debug=False):
+         show_links=False, show_types=False, filter_types=None, log_level=None,
+         debug=False):
     '''
     Output a summary of the project or projects provided.
     '''
@@ -239,6 +371,7 @@ def main(filename, use_markdown=False, show_all=False,
             show_outline=show_outline, show_boxes=show_boxes,
             show_code=show_code, show_plcs=show_plcs, show_nc=show_nc,
             show_symbols=show_symbols, show_links=show_links,
+            show_types=show_types, filter_types=filter_types,
             log_level=log_level, debug=debug
         )
         projects.append(project)

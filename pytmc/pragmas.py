@@ -618,3 +618,70 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
             yield type(ex)(f"Symbol {symbol.name} failure: {ex.args[0]}")
         else:
             raise
+
+
+def _attach_pragma(item, name, value):
+    """Attach a pragma to a TwincatItem using `_make_fake_item`."""
+    if not hasattr(item, 'Properties'):
+        properties = parser._make_fake_item('Properties', parent=item)
+        properties.Property = []
+        item.Properties = [properties]
+
+    properties = item.Properties[0]
+    prop = parser._make_fake_item('Property', parent=properties, text=value,
+                                  item_name=name)
+    properties.Property.append(prop)
+    return prop
+
+
+class _FakeSymbol(parser.Symbol):
+    @property
+    def data_type(self):
+        return self._data_type
+
+    @property
+    def qualified_type_name(self):
+        return self._data_type.qualified_type
+
+    @property
+    def type_name(self):
+        return self._data_type.name
+
+    @property
+    def BitSize(self):
+        return self._data_type.BitSize
+
+
+def make_fake_symbol_from_data_type(
+        data_type, symbol_pragma_text, *, name='$(SYMBOL)',
+        pragma_name: str = 'pytmc',
+        data_area_index=0):
+    """
+    Create a :class:`_FakeSymbol` from the given data type.
+
+    Parameters
+    ----------
+    data_type : pytmc.parser.DataType
+        The TMC data type.
+
+    symbol_pragma_text : str
+        The pragma text to attach.
+
+    name : str, optional
+        The symbol name.
+
+    pragma_name : str, optional
+        The pragma name to use (defaults to "pytmc").
+
+    data_area_index : int, optional
+        The data area to pretend the symbol exists in.
+    """
+    tmc = data_type.tmc
+    # TODO: does data area make a difference?
+    data_area = list(tmc.find(parser.DataArea))[data_area_index]
+    sym = parser._make_fake_item('_FakeSymbol', parent=data_area,
+                                 item_name=name)
+    sym._data_type = data_type
+    sym.BitOffs = parser._make_fake_item('BitOffs', parent=sym, text='0')
+    _attach_pragma(sym, pragma_name, symbol_pragma_text)
+    return sym
