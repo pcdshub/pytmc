@@ -115,13 +115,75 @@ def outline(item, *, depth=0, f=sys.stdout):
         outline(child, depth=depth + 1, f=f)
 
 
-def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
-               file=sys.stdout):
-    tmc = plc.tmc
-    if not tmc:
-        print('* TMC unavailable to show types', file=file)
-        return
+def data_type_to_record_info(data_type, pragma):
+    """
+    Get record information from a given TMC DataType.
 
+    Parameters
+    ----------
+    data_type : pytmc.parser.DataType
+        The data type.
+
+    pragma : str, optional
+        The pragma to use for a "fake" symbol, in order to generate a full
+        pytmc chain.  This can be used to customize the PV prefix, for example.
+
+    Returns
+    -------
+    info : dict
+        With keys {'data_type', 'qualified_type_name', 'packages', 'records',
+        'errors'}.
+    """
+    symbol = pragmas.make_fake_symbol_from_data_type(data_type, pragma)
+    packages = []
+    records = []
+    errors = []
+
+    for item in pragmas.record_packages_from_symbol(
+            symbol, yield_exceptions=True):
+        if isinstance(item, Exception):
+            errors.append(f'{data_type.name} failed: {item}')
+            continue
+
+        packages.append(item)
+        try:
+            records.extend(item.records)
+        except Exception as ex:
+            errors.append(
+                f'Package failed: {item.tcname} {ex.__class__.__name__} {ex}'
+            )
+
+    return {
+        'data_type': data_type,
+        'qualified_type_name': data_type.qualified_type,
+        'packages': packages,
+        'records': records,
+        'errors': errors,
+    }
+
+
+def enumerate_types(tmc, pragma='pv: @(PREFIX)', filter_types=None):
+    """
+    Enumerate data types from a parsed TMC file.
+
+    Parameters
+    ----------
+    tmc : pytmc.parser.TcModuleClass
+        The TMC instance.
+
+    pragma : str, optional
+        The pragma to use for a "fake" symbol, in order to generate a full
+        pytmc chain.  This can be used to customize the PV prefix, for example.
+
+    filter_types : list, optional
+        List of glob-style patterns to match against the types.
+
+    Yields
+    ------
+    info : dict
+        With keys {'data_type', 'qualified_type_name', 'packages', 'records',
+        'errors'}.
+    """
     for data_type in sorted(tmc.find(parser.DataType),
                             key=lambda dt: dt.qualified_type):
         if filter_types:
@@ -129,36 +191,30 @@ def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
                        for filter_type in filter_types):
                 continue
 
-        symbol = pragmas.make_fake_symbol_from_data_type(
-            data_type, pragma)
+        yield data_type_to_record_info(data_type, pragma)
 
-        output_block = []
-        records = []
 
-        for item in pragmas.record_packages_from_symbol(symbol,
-                                                        yield_exceptions=True):
-            if isinstance(item, Exception):
-                output_block.append(f'{data_type.name} failed: {item}')
-                continue
+def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
+               file=sys.stdout):
+    tmc = plc.tmc
+    if not tmc:
+        print('* TMC unavailable to show types', file=file)
+        return
 
-            try:
-                records.extend(item.records)
-            except Exception as ex:
-                output_block.append(
-                    f'Package failed: {item.tcname} {ex.__class__.__name__} '
-                    f'{ex}'
-                )
-
-        if not records and filter_types:
+    for item in enumerate_types(plc.tmc, pragma=pragma,
+                                filter_types=filter_types):
+        output_block = [
+            record.pvname
+            for record in sorted(item['records'],
+                                 key=lambda record: record.pvname)
+        ]
+        if not item['records'] and filter_types:
             output_block.append('** Matched user filter (but no records)')
 
-        output_block.extend(
-            [record.pvname
-             for record in sorted(records, key=lambda r: r.pvname)]
-        )
+        output_block.extend([f'!! {error}' for error in item['errors']])
 
         if output_block:
-            util.sub_heading(f'Data type {data_type.qualified_type}',
+            util.sub_heading(f'Data type {item["qualified_type_name"]}',
                              file=file)
             util.text_block('\n'.join(output_block), file=file)
             print(file=file)
