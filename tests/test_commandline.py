@@ -28,7 +28,7 @@ def test_help_module(monkeypatch, subcommand):
 
 def test_summary(project_filename):
     summary_main(project_filename, show_all=True, show_code=True,
-                 use_markdown=True)
+                 use_markdown=True, show_types=True, filter_types=['*'])
 
 
 @pytest.fixture()

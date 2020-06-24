@@ -5,10 +5,11 @@
 
 import argparse
 import ast
+import fnmatch
 import pathlib
 import sys
 
-from .. import parser
+from .. import parser, pragmas
 from . import util
 
 
@@ -70,6 +71,19 @@ def build_arg_parser(argparser=None):
     )
 
     argparser.add_argument(
+        '--types', dest='show_types',
+        action='store_true',
+        help='Show TMC types and record suffixes, if available'
+    )
+
+    argparser.add_argument(
+        '--filter-types',
+        action='append',
+        type=str,
+        help='Filter the types shown by name'
+    )
+
+    argparser.add_argument(
         '--links', '-l', dest='show_links',
         action='store_true',
         help='Show links'
@@ -102,10 +116,53 @@ def outline(item, *, depth=0, f=sys.stdout):
         outline(child, depth=depth + 1, f=f)
 
 
+def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
+               file=sys.stdout):
+    tmc = plc.tmc
+    if not tmc:
+        print('* TMC unavailable to show types', file=file)
+        return
+
+    for data_type in tmc.find(parser.DataType):
+        if filter_types:
+            if not any(fnmatch.fnmatch(data_type.name, filter_type)
+                   for filter_type in filter_types):
+                continue
+
+        symbol = pragmas.make_fake_symbol_from_data_type(
+            data_type, pragma)
+        try:
+            packages = list(pragmas.record_packages_from_symbol(symbol))
+        except Exception as ex:
+            print(f'Failed: {ex}', file=file)
+            print(file=file)
+            continue
+
+        if not packages:
+            continue
+
+        util.sub_heading(f'Data type {data_type.name}', file=file)
+        block = [
+            record.pvname
+            for record in sorted((record for pkg in packages
+                                  for record in pkg.records),
+                key=lambda r: r.pvname)
+        ]
+        util.text_block('\n'.join(block))
+
+        print(file=file)
+
+
 def summary(tsproj_project, use_markdown=False, show_all=False,
             show_outline=False, show_boxes=False, show_code=False,
             show_plcs=False, show_nc=False, show_symbols=False,
-            show_links=False, log_level=None, debug=False):
+            show_links=False, show_types=False, filter_types=None,
+            log_level=None, debug=False):
+
+    if not any((show_all, show_outline, show_boxes, show_code, show_plcs,
+                show_nc, show_symbols, show_links, show_types, debug)):
+        # Show _something_
+        show_plcs = True
 
     proj_path = pathlib.Path(tsproj_project)
     proj_root = proj_path.parent.resolve().absolute()
@@ -115,7 +172,7 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
 
     project = parser.parse(proj_path)
 
-    if show_plcs or show_all or show_code or show_symbols:
+    if show_plcs or show_all or show_code or show_symbols or show_types:
         for i, plc in enumerate(project.plcs, 1):
             util.heading(f'PLC Project ({i}): {plc.project_path.stem}')
             print(f'    Project root: {proj_root}')
@@ -174,6 +231,9 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                           '{bit_size})'.format(**info))
                 print()
 
+            if show_types:
+                list_types(plc, filter_types=filter_types)
+
     if show_boxes or show_all:
         util.sub_heading('Boxes')
         boxes = list(project.find(parser.Box))
@@ -219,7 +279,8 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
 def main(filename, use_markdown=False, show_all=False,
          show_outline=False, show_boxes=False, show_code=False,
          show_plcs=False, show_nc=False, show_symbols=False,
-         show_links=False, log_level=None, debug=False):
+         show_links=False, show_types=False, filter_types=None, log_level=None,
+         debug=False):
     '''
     Output a summary of the project or projects provided.
     '''
@@ -239,6 +300,7 @@ def main(filename, use_markdown=False, show_all=False,
             show_outline=show_outline, show_boxes=show_boxes,
             show_code=show_code, show_plcs=show_plcs, show_nc=show_nc,
             show_symbols=show_symbols, show_links=show_links,
+            show_types=show_types, filter_types=filter_types,
             log_level=log_level, debug=debug
         )
         projects.append(project)
