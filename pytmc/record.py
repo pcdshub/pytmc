@@ -1,16 +1,15 @@
 """
 Record generation and templating
 """
-import jinja2
 import logging
-import pytmc
-
+from collections import ChainMap, OrderedDict
 from typing import Optional
 
-from collections import ChainMap, OrderedDict
+import jinja2
+
+import pytmc
 
 from .default_settings.unified_ordered_field_list import unified_lookup_list
-
 
 logger = logging.getLogger(__name__)
 MAX_ARCHIVE_ELEMENTS = 1024
@@ -77,7 +76,7 @@ class EPICSRecord:
 
     def __init__(self, pvname, record_type, direction, fields=None,
                  template=None, autosave=None, aliases=None,
-                 archive_settings=None):
+                 archive_settings=None, package=None):
         self.pvname = pvname
         self.record_type = record_type
         self.direction = direction
@@ -85,6 +84,7 @@ class EPICSRecord:
         self.aliases = list(aliases) if aliases is not None else []
         self.template = template or 'asyn_standard_record.jinja2'
         self.autosave = dict(autosave) if autosave else {}
+        self.package = package
         self.archive_settings = (dict(archive_settings)
                                  if archive_settings else {})
 
@@ -405,6 +405,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                              autosave=self.autosave_defaults.get('input'),
                              aliases=aliases,
                              archive_settings=self.archive_settings,
+                             package=self,
                              )
 
         # Set a default description to the tcname
@@ -448,6 +449,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                              autosave=self.autosave_defaults.get('output'),
                              aliases=self.aliases,
                              archive_settings=self.archive_settings,
+                             package=self,
                              )
 
         # Set a default description to the tcname
