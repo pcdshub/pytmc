@@ -123,7 +123,7 @@ def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
         print('* TMC unavailable to show types', file=file)
         return
 
-    for data_type in tmc.find(parser.DataType):
+    for data_type in sorted(tmc.find(parser.DataType), key=lambda dt: dt.name):
         if filter_types:
             if not any(fnmatch.fnmatch(data_type.name, filter_type)
                    for filter_type in filter_types):
