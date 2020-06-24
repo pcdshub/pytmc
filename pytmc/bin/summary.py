@@ -186,6 +186,10 @@ def enumerate_types(tmc, pragma='pv: @(PREFIX)', filter_types=None):
     """
     for data_type in sorted(tmc.find(parser.DataType),
                             key=lambda dt: dt.qualified_type):
+        base_type = data_type.base_type
+        if base_type and not base_type.is_complex_type:
+            continue
+
         if filter_types:
             if not any(fnmatch.fnmatch(data_type.name, filter_type)
                        for filter_type in filter_types):

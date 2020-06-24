@@ -11,9 +11,8 @@ import types
 import lxml
 import lxml.etree
 
-from .code import (get_pou_call_blocks, program_name_from_declaration,
-                   variables_from_declaration, determine_block_type)
-
+from .code import (determine_block_type, get_pou_call_blocks,
+                   program_name_from_declaration, variables_from_declaration)
 
 # Registry of all TwincatItem-based classes
 TWINCAT_TYPES = {}
@@ -708,6 +707,13 @@ class DataType(_TmcItem):
         if 'Namespace' in name_attrs:
             return f'{name_attrs["Namespace"]}.{self.name}'
         return self.name
+
+    @property
+    def base_type(self):
+        base_type = getattr(self, 'BaseType', [None])[0]
+        if base_type is None:
+            return None
+        return self.tmc.get_data_type(base_type.text)
 
     @property
     def is_complex_type(self):
