@@ -12,7 +12,6 @@ import sys
 from .. import parser, pragmas
 from . import util
 
-
 DESCRIPTION = __doc__
 
 
@@ -126,7 +125,7 @@ def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
     for data_type in sorted(tmc.find(parser.DataType), key=lambda dt: dt.name):
         if filter_types:
             if not any(fnmatch.fnmatch(data_type.name, filter_type)
-                   for filter_type in filter_types):
+                       for filter_type in filter_types):
                 continue
 
         symbol = pragmas.make_fake_symbol_from_data_type(
@@ -146,7 +145,7 @@ def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
             record.pvname
             for record in sorted((record for pkg in packages
                                   for record in pkg.records),
-                key=lambda r: r.pvname)
+                                 key=lambda r: r.pvname)
         ]
         util.text_block('\n'.join(block))
 
