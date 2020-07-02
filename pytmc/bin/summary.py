@@ -162,14 +162,14 @@ def data_type_to_record_info(data_type, pragma):
     }
 
 
-def enumerate_types(tmc, pragma='pv: @(PREFIX)', filter_types=None):
+def enumerate_types(container, pragma='pv: @(PREFIX)', filter_types=None):
     """
-    Enumerate data types from a parsed TMC file.
+    Enumerate data types from a parsed TMC file or tsproj.
 
     Parameters
     ----------
-    tmc : pytmc.parser.TcModuleClass
-        The TMC instance.
+    container : pytmc.parser.TcModuleClass
+        The TMC instance or tsproj instance.
 
     pragma : str, optional
         The pragma to use for a "fake" symbol, in order to generate a full
@@ -184,7 +184,7 @@ def enumerate_types(tmc, pragma='pv: @(PREFIX)', filter_types=None):
         With keys {'data_type', 'qualified_type_name', 'packages', 'records',
         'errors'}.
     """
-    for data_type in sorted(tmc.find(parser.DataType),
+    for data_type in sorted(container.find(parser.DataType),
                             key=lambda dt: dt.qualified_type):
         base_type = data_type.base_type
         if base_type and not base_type.is_complex_type:
@@ -198,14 +198,9 @@ def enumerate_types(tmc, pragma='pv: @(PREFIX)', filter_types=None):
         yield data_type_to_record_info(data_type, pragma)
 
 
-def list_types(plc, pragma='pv: @(PREFIX)', filter_types=None,
+def list_types(container, pragma='pv: @(PREFIX)', filter_types=None,
                file=sys.stdout):
-    tmc = plc.tmc
-    if not tmc:
-        print('* TMC unavailable to show types', file=file)
-        return
-
-    for item in enumerate_types(plc.tmc, pragma=pragma,
+    for item in enumerate_types(container, pragma=pragma,
                                 filter_types=filter_types):
         output_block = [
             record.pvname
@@ -303,7 +298,15 @@ def summary(tsproj_project, use_markdown=False, show_all=False,
                 print()
 
             if show_types:
-                list_types(plc, filter_types=filter_types)
+                if plc.tmc is not None:
+                    util.sub_heading('TMC-defined data types')
+                    list_types(plc.tmc, filter_types=filter_types)
+
+    if show_types:
+        data_types = getattr(project, 'DataTypes', [None])[0]
+        if data_types is not None:
+            util.sub_heading('Project-defined data types')
+            list_types(data_types, filter_types=filter_types)
 
     if show_boxes or show_all:
         util.sub_heading('Boxes')
