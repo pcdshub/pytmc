@@ -368,6 +368,26 @@ class TcModuleClass(_TwincatProjectSubItem):
         except KeyError:
             return BuiltinDataType(type_name)
 
+    def create_data_area(self, module_index=0):
+        """
+        Create a fake DataArea in a given parsed TcModuleClass (tmc).
+
+        Some .tmc files (specifically for libraries) may not have a DataArea.
+
+        These areas are required to enumerate data types for summaries and
+        documentation, due to how pytmc operates internally.
+        """
+        # NOTE: _make_fake_item normally does not truly insert the item into
+        # the hierarchy, but pretends that the child has a parent. Here, we
+        # actually link both child and parent.
+        module = list(self.find(Module))[module_index]
+        if not hasattr(module, 'DataAreas'):
+            _make_fake_item('DataAreas', parent=module, add_as_child=True)
+
+        data_areas = module.DataAreas[0]
+        return _make_fake_item('DataArea', parent=data_areas,
+                               add_as_child=True)
+
 
 class OwnerA(TwincatItem):
     '[XTI] For a Link between VarA and VarB, this is the parent of VarA'
@@ -432,6 +452,13 @@ class TcSmProject(TwincatItem):
     def plcs_by_link_name(self):
         'The virtual PLC projects in a dictionary keyed by link name'
         return {plc.link_name: plc for plc in self.plcs}
+
+    def get_data_type(self, type_name):
+        """Project-level data types exist alongside tmc-defined data types."""
+        try:
+            return self.DataTypes[0].types[type_name]
+        except Exception:
+            return BuiltinDataType(type_name)
 
 
 class TcSmItem(TwincatItem):
@@ -613,7 +640,7 @@ class _TmcItem(_TwincatProjectSubItem):
 
 
 class DataTypes(_TmcItem):
-    '[TMC] Container of DataType'
+    '[TMC or TSPROJ] Container of DataType'
     def post_init(self):
         self.types = {
             dtype.qualified_type: dtype
@@ -696,7 +723,7 @@ class ExtendsType(_TmcItem):
 
 
 class DataType(_TmcItem):
-    '[TMC] A DataType with SubItems, likely representing a structure'
+    '[TMC or TSPROJ] A DataType with SubItems, likely representing a structure'
     Name: list
     EnumInfo: list
     SubItem: list
@@ -708,12 +735,21 @@ class DataType(_TmcItem):
             return f'{name_attrs["Namespace"]}.{self.name}'
         return self.name
 
+    def _get_data_type(self, name):
+        if self.tmc is not None:
+            return self.tmc.get_data_type(name)
+
+        project = self.find_ancestor(TcSmProject)
+        if project is not None:
+            return project.get_data_type(name)
+
     @property
     def base_type(self):
         base_type = getattr(self, 'BaseType', [None])[0]
         if base_type is None:
             return None
-        return self.tmc.get_data_type(base_type.text)
+
+        return self._get_data_type(base_type.text)
 
     @property
     def is_complex_type(self):
@@ -728,7 +764,7 @@ class DataType(_TmcItem):
             return
 
         extends_types = [
-            self.tmc.get_data_type(ext_type.qualified_type)
+            self._get_data_type(ext_type.qualified_type)
             for ext_type in getattr(self, 'ExtendsType', [])
         ]
         for extend_type in extends_types:
@@ -775,7 +811,12 @@ class SubItem(_TmcItem):
 
     @property
     def data_type(self):
-        return self.tmc.get_data_type(self.qualified_type_name)
+        if self.tmc is not None:
+            return self.tmc.get_data_type(self.qualified_type_name)
+
+        project = self.find_ancestor(TcSmProject)
+        if project is not None:
+            return project.get_data_type(self.qualified_type_name)
 
     @property
     def array_info(self):
@@ -1329,7 +1370,7 @@ class _ArrayItemProxy:
 
 
 def _make_fake_item(name, parent=None, item_name=None, *, text=None,
-                    attrib=None):
+                    attrib=None, add_as_child=False):
     """Make a fake TwincatItem, for debugging/testing purposes."""
     cls = TWINCAT_TYPES[name]
     filename = (parent.filename
@@ -1345,6 +1386,16 @@ def _make_fake_item(name, parent=None, item_name=None, *, text=None,
     item = cls(element=elem,
                name=attrib['name'],
                parent=parent, filename=filename)
+
+    if add_as_child and parent is not None:
+        # The main list
+        parent._children.append(item)
+
+        # The class-name based list, for easy tab completion
+        child_list = getattr(parent, cls.__name__, [])
+        child_list.append(item)
+        setattr(parent, cls.__name__, child_list)
+
     return item
 
 

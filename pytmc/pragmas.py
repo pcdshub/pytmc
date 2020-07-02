@@ -655,7 +655,8 @@ class _FakeSymbol(parser.Symbol):
 def make_fake_symbol_from_data_type(
         data_type, symbol_pragma_text, *, name='$(SYMBOL)',
         pragma_name: str = 'pytmc',
-        data_area_index=0):
+        data_area_index=0, tmc=None,
+        create_data_area_if_needed=True):
     """
     Create a :class:`_FakeSymbol` from the given data type.
 
@@ -676,9 +677,31 @@ def make_fake_symbol_from_data_type(
     data_area_index : int, optional
         The data area to pretend the symbol exists in.
     """
-    tmc = data_type.tmc
+    if tmc is None:
+        # If defined in a .tmc file, this is the obvious choice.
+        tmc = data_type.tmc
+        if tmc is None:
+            # Fallback to the first .tmc we find.  This really should be an
+            # error condition, but given that we're making fake symbols anyway
+            # it _probably_ doesn't matter.
+            project = data_type.find_ancestor(parser.TcSmProject)
+            for plc in project.plcs:
+                tmc = plc.tmc
+                if tmc is not None:
+                    break
+
+    if tmc is None:
+        raise ValueError('Unable to find a tmc to insert the symbol')
+
     # TODO: does data area make a difference?
-    data_area = list(tmc.find(parser.DataArea))[data_area_index]
+    data_areas = list(tmc.find(parser.DataArea))
+    if not data_areas:
+        if not create_data_area_if_needed:
+            raise ValueError('No data area found to create symbol')
+        data_area = tmc.create_data_area()
+    else:
+        data_area = data_areas[data_area_index]
+
     sym = parser._make_fake_item('_FakeSymbol', parent=data_area,
                                  item_name=name)
     sym._data_type = data_type
