@@ -32,7 +32,7 @@ def _build_commands():
     for module in sorted(MODULES):
         try:
             mod = _try_import(module)
-        except ImportError as ex:
+        except Exception as ex:
             unavailable.append((module, ex))
         else:
             result[module] = (mod.build_arg_parser, mod.main)
