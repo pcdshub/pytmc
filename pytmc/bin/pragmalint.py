@@ -8,13 +8,12 @@ import logging
 import pathlib
 import re
 import sys
-import types
 import textwrap
+import types
 
 from .. import parser, pragmas
 from . import util
 from .db import LinterError
-
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
@@ -213,7 +212,7 @@ def lint_source(filename, source, verbose=False):
     '''
     heading_shown = False
     for decl in source.find(parser.Declaration):
-        if not decl.text.strip():
+        if not (decl.text or '').strip():
             continue
 
         offset_to_line_number = _build_map_of_offset_to_line_number(decl.text)
