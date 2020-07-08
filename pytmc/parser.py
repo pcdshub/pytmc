@@ -1307,15 +1307,100 @@ class Encoder(TwincatItem):
                     yield f'{child.tag}:{key}', value
 
 
-class Device(TwincatItem):
-    '[XTI] Top-level IO device container'
+def _enumerate_subdirectories(parent):
+    yield parent
+    for root, dirs, files in os.walk(parent, followlinks=False):
+        for name in dirs:
+            yield pathlib.Path(root) / name
+
+
+class Io(TwincatItem):
+    '[XTI] Top-level IO container, which has devices'
     _load_path_hint = pathlib.Path('_Config') / 'IO'
 
-    def __init__(self, element, *, parent=None, name=None, filename=None):
-        super().__init__(element, parent=parent, name=name, filename=filename)
+    def _add_children(self, element):
+        io_dir = self.child_load_path
+        self._child_load_paths = list(
+            sorted(_enumerate_subdirectories(io_dir),
+                   key=lambda path: len(path.parts),
+                   reverse=True)
+        )
+        return super()._add_children(element)
+
+    def find_file(self, parent, filename):
+        # Boxes seem to be easily relocatable and one of the biggest problem-
+        # causers for loading; so make an attempt here to search multiple
+        # locations
+        candidates = []
+        for path in self._child_load_paths:
+            candidate = path / filename
+            if candidate.exists() and candidate.is_file():
+                candidates.append(candidate)
+
+        count = len(candidates)
+        if count == 0:
+            raise FileNotFoundError(f'{filename} not found in IO tree.')
+        if count == 1:
+            return candidates[0]
+
+        log_candidates = '\n    '.join(str(candidate)
+                                       for candidate in candidates)
+
+        logger.debug('Multiple candidates for file %s found. Parent: %s:'
+                     'Candidates:\n    %s',
+                     filename, parent.filename, log_candidates)
+        # Find one that has the most in common with the parent?
+        parent_root = parent.filename.parent
+        parent_name = parent.filename.name
+
+        match_preference = [
+            # _Config/IO/Device/Box/Box.xti
+            parent_root / parent_name / pathlib.Path(filename).stem,
+            # _Config/IO/Device/Box.xti
+            parent_root / parent_name,
+            # _Config/IO/Box/Box.xti
+            parent_root / pathlib.Path(filename).stem,
+            # _Config/IO/Box.xti
+            parent_root,
+        ]
+
+        for match in match_preference:
+            match_parts = [part.lower() for part in match.parts]
+            for candidate in candidates:
+                candidate_parts = [
+                    part.lower() for part in candidate.parts[:len(match.parts)]
+                ]
+                if candidate_parts == match_parts:
+                    logger.debug(
+                        'Choosing candidate\n\t%s due to matching\n\t%s',
+                        str(candidate), match)
+                    return candidate
+
+        match_preference = ' or '.join(str(path) for path in match_preference)
+        raise FileNotFoundError(
+            'Multiple matches were found for an IO tree file, but pytmc was '
+            f'unable to disambiguate between the options.  File: {filename} '
+            f'(Preference for files in {match_preference})'
+            f'Candidates:\n    {log_candidates}')
 
 
-class Box(TwincatItem):
+class _IoTreeItem(TwincatItem):
+    '[XTI] Base class for items contained in an IO Tree'
+
+    @classmethod
+    def from_file(cls, filename, parent):
+        if isinstance(parent, Io):
+            io = parent
+        else:
+            io = parent.find_ancestor(Io)
+        return parse(io.find_file(parent, filename), parent=parent)
+
+
+class Device(_IoTreeItem):
+    '[XTI] Top-level IO device container'
+
+
+class Box(_IoTreeItem):
     '[XTI] A box / module'
     _load_path_hint = USE_NAME_AS_PATH
 
