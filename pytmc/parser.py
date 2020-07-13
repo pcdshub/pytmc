@@ -413,12 +413,10 @@ class TcModuleClass(_TwincatProjectSubItem):
     '[TMC] The top-level TMC file'
     DataTypes: list
 
-    def get_data_type(self, type_name):
-        data_types = self.DataTypes[0].types
-        try:
-            return data_types[type_name]
-        except KeyError:
-            return BuiltinDataType(type_name)
+    def get_data_type(self, type_name, *, include_project=True):
+        """Get a data type by name (or GUID)."""
+        proj = self.find_ancestor(TcSmProject) if include_project else None
+        return get_data_type_by_reference(self.base_type, (self.tmc, proj))
 
     def create_data_area(self, module_index=0):
         """
@@ -511,6 +509,52 @@ class TcSmProject(TwincatItem):
             return self.DataTypes[0].types[type_name]
         except Exception:
             return BuiltinDataType(type_name)
+
+
+def get_data_type_by_reference(ref, data_type_holders, *,
+                               fallback_to_builtin=True):
+    """Get a data type from the project, falling back to the tmc file."""
+    if isinstance(ref, str):
+        search_key = ref
+    else:
+        guid = getattr(ref, 'guid', None)
+        qualified_type = getattr(ref, 'qualified_type_name', None)
+        type_name = getattr(ref, 'text', None)
+        search_key = guid or qualified_type or type_name
+        if search_key is None:
+            raise ValueError(f'No GUID or type name was available from: {ref}')
+
+    namespaces = []
+
+    for parent in data_type_holders:
+        if hasattr(parent, 'DataTypes'):
+            namespaces.append(parent.DataTypes[0].types)
+
+    for namespace in namespaces:
+        try:
+            return namespace[search_key]
+        except KeyError:
+            ...
+
+    if search_key.startswith('{'):
+        type_name = getattr(ref, 'type_name', None)
+        if type_name is None:
+            raise ValueError(
+                f'Type with GUID {search_key} not in TMC') from None
+        logger.debug('Reference to implicitly-defined GUID %s = %s',
+                     search_key, type_name)
+        # Known items:
+        #   - GUID type itself
+        #   - OTCID
+
+    if fallback_to_builtin:
+        # Likely a built-in data type :shrug:
+        if isinstance(ref, str):
+            type_name = ref
+        else:
+            type_name = ref.type_name
+
+        return BuiltinDataType(type_name)
 
 
 class TcSmItem(TwincatItem):
@@ -638,7 +682,6 @@ class Plc(TwincatItem):
         The AMS ID of the configured target
         '''
         return self.find_ancestor(TopLevelProject).ams_id
-        return self.attributes.get('TargetNetId', '')
 
     @property
     def target_ip(self):
@@ -695,9 +738,16 @@ class DataTypes(_TmcItem):
     '[TMC or TSPROJ] Container of DataType'
     def post_init(self):
         self.types = {
-            dtype.qualified_type: dtype
+            dtype.qualified_type_name: dtype
             for dtype in self.find(DataType)
         }
+
+        # Also allow access by GUID:
+        self.types.update({
+            dtype.guid: dtype
+            for dtype in self.types.values()
+            if hasattr(dtype, 'guid')
+        })
 
         self.types['Tc2_System.T_MaxString'] = T_MaxString()
 
@@ -706,10 +756,13 @@ class Type(_TmcItem):
     '[TMC] DataTypes/DataType/SubItem/Type'
 
     @property
-    def qualified_type(self):
+    def qualified_type_name(self):
         'The base type, including the namespace'
         namespace = self.attributes.get("Namespace", None)
         return f'{namespace}.{self.text}' if namespace else self.text
+
+    # Back-compat
+    qualified_type = qualified_type_name
 
 
 class EnumInfo(_TmcItem):
@@ -768,10 +821,31 @@ class ExtendsType(_TmcItem):
     '[TMC] A marker of inheritance / extension, found on DataType'
 
     @property
-    def qualified_type(self):
-        if 'Namespace' in self.attributes:
-            return f'{self.attributes["Namespace"]}.{self.text}'
+    def qualified_type_name(self):
+        namespace = self.attributes.get("Namespace", None)
+        return f'{namespace}.{self.text}' if namespace else self.text
+
+
+class BaseType(_TmcItem):
+    '[TMC] A reference to the data type of a symbol'
+
+    @property
+    def type_name(self) -> str:
+        """The referenced type name."""
         return self.text
+
+    @property
+    def qualified_type_name(self):
+        namespace = self.attributes.get("Namespace", None)
+        return f'{namespace}.{self.text}' if namespace else self.text
+
+    @property
+    def guid(self):
+        """Globally unique identifier for the referenced data type."""
+        try:
+            return self.attributes['GUID']
+        except KeyError:
+            raise AttributeError('No GUID') from None
 
 
 class DataType(_TmcItem):
@@ -781,19 +855,32 @@ class DataType(_TmcItem):
     SubItem: list
 
     @property
-    def qualified_type(self):
+    def guid(self):
+        """
+        Globally unique identifier for the data type.
+
+        Note
+        ----
+        This is not available for all data types.
+        """
+        try:
+            return self.Name[0].attributes['GUID']
+        except KeyError:
+            raise AttributeError('GUID unavailable')
+
+    @property
+    def qualified_type_name(self):
         name_attrs = self.Name[0].attributes
         if 'Namespace' in name_attrs:
             return f'{name_attrs["Namespace"]}.{self.name}'
         return self.name
 
-    def _get_data_type(self, name):
-        if self.tmc is not None:
-            return self.tmc.get_data_type(name)
+    # Back-compat
+    qualified_type = qualified_type_name
 
-        project = self.find_ancestor(TcSmProject)
-        if project is not None:
-            return project.get_data_type(name)
+    def _get_data_type(self, data_type):
+        return get_data_type_by_reference(
+            data_type, (self.tmc, self.find_ancestor(TcSmProject)))
 
     @property
     def base_type(self):
@@ -801,7 +888,7 @@ class DataType(_TmcItem):
         if base_type is None:
             return None
 
-        return self._get_data_type(base_type.text)
+        return self._get_data_type(base_type)
 
     @property
     def is_complex_type(self):
@@ -816,7 +903,7 @@ class DataType(_TmcItem):
             return
 
         extends_types = [
-            self._get_data_type(ext_type.qualified_type)
+            self._get_data_type(ext_type)
             for ext_type in getattr(self, 'ExtendsType', [])
         ]
         for extend_type in extends_types:
@@ -1003,23 +1090,30 @@ class Symbol(_TmcItem):
     BaseType: list
 
     @property
-    def type_name(self):
-        'The base type'
-        return self.BaseType[0].text
+    def base_type(self) -> BaseType:
+        'The reference used to determine the data type (BaseType)'
+        return self.BaseType[0]
 
     @property
-    def qualified_type_name(self):
-        'The base type, including the namespace'
-        type_ = self.BaseType[0]
+    def type_name(self) -> str:
+        'The base type name.'
+        return self.base_type.text
+
+    @property
+    def qualified_type_name(self) -> str:
+        'The base type name, including the namespace'
+        type_ = self.base_type
         namespace = type_.attributes.get("Namespace", None)
         return f'{namespace}.{type_.text}' if namespace else type_.text
 
     @property
-    def data_type(self):
-        return self.tmc.get_data_type(self.qualified_type_name)
+    def data_type(self) -> DataType:
+        return get_data_type_by_reference(
+            self.base_type, (self.tmc, self.find_ancestor(TcSmProject))
+        )
 
     @property
-    def module(self):
+    def module(self) -> Module:
         'The TMC Module containing the Symbol'
         return self.find_ancestor(Module)
 
