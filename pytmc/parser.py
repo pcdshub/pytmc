@@ -413,10 +413,10 @@ class TcModuleClass(_TwincatProjectSubItem):
     '[TMC] The top-level TMC file'
     DataTypes: list
 
-    def get_data_type(self, type_name, *, include_project=True):
-        """Get a data type by name (or GUID)."""
+    def get_data_type(self, ref, *, include_project=True):
+        """Get a data type by name, GUID, or BaseType."""
         proj = self.find_ancestor(TcSmProject) if include_project else None
-        return get_data_type_by_reference(self.base_type, (self.tmc, proj))
+        return get_data_type_by_reference(ref, (self, proj))
 
     def create_data_area(self, module_index=0):
         """
