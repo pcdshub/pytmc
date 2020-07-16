@@ -188,7 +188,9 @@ class RecordPackage:
         'Link this record to a pre-existing EPICS record via a CA (CPP) link'
         link = self.config.get('link') or None
         if link is not None:
-            link = [part.replace(self.macro_character, '$') for part in link]
+            link = [part.replace(self.macro_character, '$')
+                    if part is not None else None
+                    for part in link]
 
         self.linked_to_pv = link
 
