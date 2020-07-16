@@ -186,7 +186,11 @@ class RecordPackage:
 
     def _configure_link(self):
         'Link this record to a pre-existing EPICS record via a CA (CPP) link'
-        self.linked_to_pv = self.config.get('link') or None
+        link = self.config.get('link') or None
+        if link is not None:
+            link = link.replace(self.macro_character, '$')
+
+        self.linked_to_pv = link
 
     def _configure_pvname(self):
         'Configure the pvname, based on the given macro character'
