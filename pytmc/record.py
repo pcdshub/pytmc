@@ -186,13 +186,7 @@ class RecordPackage:
 
     def _configure_link(self):
         'Link this record to a pre-existing EPICS record via a CA (CPP) link'
-        link = self.config.get('link') or None
-        if link is not None:
-            link = [part.replace(self.macro_character, '$')
-                    if part is not None else None
-                    for part in link]
-
-        self.linked_to_pv = link
+        self.linked_to_pv = self.config.get('link') or None
 
     def _configure_pvname(self):
         'Configure the pvname, based on the given macro character'
@@ -414,9 +408,6 @@ class TwincatTypeRecordPackage(RecordPackage):
                              package=self,
                              )
 
-        # Set a default description to the tcname
-        _update_description(record, self.chain.tcname)
-
         # Add our port
         record.fields['INP'] = self.asyn_input_port_spec
         record.fields['DTYP'] = self.dtyp
@@ -428,6 +419,9 @@ class TwincatTypeRecordPackage(RecordPackage):
              if field not in self.output_only_fields
              }
         )
+
+        # Set a default description to the tcname
+        _update_description(record, self.chain.tcname)
 
         # Records must always be I/O Intr, regardless of the pragma:
         record.fields['SCAN'] = 'I/O Intr'
@@ -458,9 +452,6 @@ class TwincatTypeRecordPackage(RecordPackage):
                              package=self,
                              )
 
-        # Set a default description to the tcname
-        _update_description(record, self.chain.tcname)
-
         # Add our port
         record.fields['DTYP'] = self.dtyp
         record.fields['OUT'] = self.asyn_output_port_spec
@@ -470,7 +461,6 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.pop('PINI', None)
 
         if self.linked_to_pv and self.linked_to_pv[-1] is not None:
-
             record.fields['OMSL'] = 'closed_loop'
 
             last_link = self.linked_to_pv[-1]
@@ -487,6 +477,7 @@ class TwincatTypeRecordPackage(RecordPackage):
                 linked_to_pv = ''.join([part for part in self.linked_to_pv
                                         if part is not None])
 
+            linked_to_pv = linked_to_pv.replace(self.macro_character, '$')
             record.fields['DOL'] = linked_to_pv + ' CPP MS'
             record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
 
@@ -497,6 +488,9 @@ class TwincatTypeRecordPackage(RecordPackage):
              if field not in self.input_only_fields
              }
         )
+
+        # Set a default description to the tcname
+        _update_description(record, self.chain.tcname)
 
         record.update_autosave_from_pragma(self.config)
         return record
