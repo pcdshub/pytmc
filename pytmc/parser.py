@@ -145,8 +145,18 @@ def _determine_path(base_path, name, class_hint):
 
 
 class TwincatItem:
-    _load_path_hint = ''
-    _lazy_load = False
+    _load_path_hint: str = ''
+    _lazy_load: bool = False
+    _children: typing.List['TwincatItem']
+    attributes: typing.Dict[str, str]
+    children: types.SimpleNamespace
+    comments: typing.List[str]
+    element: lxml.etree.Element
+    filename: pathlib.Path
+    name: str
+    parent: 'TwincatItem'
+    tag: str
+    text: typing.Optional[str]
 
     def __init__(self, element, *, parent=None, name=None, filename=None):
         '''
@@ -956,7 +966,7 @@ class DataType(_TmcItem):
         return getattr(self.array_info, 'array_bounds', None)
 
     @property
-    def friendly_name(self):
+    def summary_type_name(self):
         summary = self.name
         array_bounds = self.array_bounds
         if array_bounds:
@@ -1064,7 +1074,7 @@ class BoundDataType:
         )
 
     @property
-    def friendly_name(self):
+    def summary_type_name(self):
         summary = self.name
         if self.is_pointer:
             summary = 'POINTER TO ' + summary
@@ -1223,7 +1233,7 @@ class BuiltinDataType:
         return self.name
 
     @property
-    def friendly_name(self):
+    def summary_type_name(self):
         if self.length > 1:
             return f'{self.name}({self.length})'
         return self.name
@@ -1361,7 +1371,7 @@ class Symbol(_TmcItem):
 
     @property
     def summary_type_name(self):
-        return self.data_type.friendly_name
+        return self.data_type.summary_type_name
 
 
 class Symbol_DUT_MotionStage(Symbol):
