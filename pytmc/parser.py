@@ -584,7 +584,7 @@ def get_data_type_by_reference(
         if isinstance(ref, str):
             type_name = ref
         else:
-            type_name = ref.type_name
+            type_name = ref.qualified_type_name
 
         return BoundDataType(
             BuiltinDataType(type_name), array_info=array_info, pointer=pointer,
@@ -796,7 +796,7 @@ class Type(_TmcItem):
             type_name=self.type_name,
             namespace=self.namespace,
             qualified_type_name=self.qualified_type_name,
-            pointer_to=self.pointer_to,
+            pointer_depth=self.pointer_depth,
             is_reference=self.is_reference,
             is_pointer=self.is_pointer,
         )
@@ -816,18 +816,18 @@ class Type(_TmcItem):
         return self.attributes.get("Namespace", None)
 
     @property
-    def pointer_to(self) -> int:
-        pointer_info = self.attributes.get("PointerTo", None)
-        return int(getattr(pointer_info, 'text', 0))
+    def pointer_depth(self) -> int:
+        pointerto_value = self.attributes.get("PointerTo", None)
+        return int(pointerto_value or '0')
 
     @property
     def is_pointer(self) -> bool:
-        return self.pointer_to > 0
+        return self.pointer_depth > 0
 
     @property
     def is_reference(self) -> bool:
-        ref_info = self.attributes.get("ReferenceTo", None)
-        return getattr(ref_info, 'text', 'false').lower() in _TRUE_VALUES
+        ref_value = self.attributes.get("ReferenceTo", None)
+        return (ref_value or '').lower() in _TRUE_VALUES
 
     @property
     def qualified_type_name(self):
@@ -892,21 +892,21 @@ class ArrayInfo(_TmcItem):
 
     @property
     def is_reference(self):
-        ref_info = self.attributes.get("ReferenceTo", None)
-        return getattr(ref_info, 'text', 'false').lower() in _TRUE_VALUES
+        ref_value = self.attributes.get("ReferenceTo", None)
+        return (ref_value or '').lower() in _TRUE_VALUES
 
     @property
-    def pointer_to(self) -> int:
+    def pointer_depth(self) -> int:
         # 0 = Non-pointer
         # 1 = POINTER TO
         # 2 = POINTER TO POINTER TO
         # 3 = ...
-        pointer_info = self.attributes.get("PointerTo", None)
-        return int(getattr(pointer_info, 'text', 0))
+        pointerto_value = self.attributes.get("PointerTo", None)
+        return int(pointerto_value or '0')
 
     @property
     def is_pointer(self) -> bool:
-        return self.pointer_to > 0
+        return self.pointer_depth > 0
 
     @property
     def level(self):
@@ -918,8 +918,29 @@ class ExtendsType(_TmcItem):
     '[TMC] A marker of inheritance / extension, found on DataType'
 
     @property
+    def namespace(self):
+        """
+        Namespace of the data type.
+        """
+        return self.attributes.get('namespace', None)
+
+    @property
+    def guid(self):
+        """
+        Globally unique identifier for the data type.
+
+        Note
+        ----
+        This is not available for all data types.
+        """
+        try:
+            return self.attributes['GUID']
+        except KeyError:
+            raise AttributeError('GUID unavailable') from None
+
+    @property
     def qualified_type_name(self):
-        namespace = self.attributes.get("Namespace", None)
+        namespace = self.namespace
         return f'{namespace}.{self.text}' if namespace else self.text
 
 
@@ -999,7 +1020,11 @@ class DataType(_TmcItem):
 
     @property
     def is_complex_type(self):
-        return True
+        base_type = self.base_type
+        if base_type is None:
+            return True
+
+        return base_type.is_complex_type
 
     def walk(self, condition=None):
         if self.is_enum:
