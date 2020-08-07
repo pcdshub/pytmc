@@ -1069,8 +1069,19 @@ class Symbol_DUT_MotionStage(Symbol):
                  ]
 
         if not links:
-            raise RuntimeError(f'No NC link to DUT_MotionStage found for '
-                               f'{self.name!r}')
+            # NOTE: fallback to project links, if the PLC project was saved
+            # incorrectly (and apparently unrecoverably?)
+            proj = self.find_ancestor(TcSmProject)
+            if proj is not None:
+                links = [link
+                         for link in proj.find(Link, recurse=False)
+                         if expected in link.a[1].lower()
+                         ]
+
+            if not links:
+                raise RuntimeError(
+                    f'No NC link to DUT_MotionStage found for {self.name!r}')
+
         link, = links
         return link
 
