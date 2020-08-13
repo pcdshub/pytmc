@@ -1,7 +1,8 @@
 import pytest
-from .conftest import TEST_PATH
 
-from pytmc.parser import get_pou_call_blocks, variables_from_declaration, parse
+from pytmc.parser import get_pou_call_blocks, parse, variables_from_declaration
+
+from .conftest import TEST_PATH
 
 
 @pytest.mark.parametrize(
@@ -79,7 +80,9 @@ from pytmc.parser import get_pou_call_blocks, variables_from_declaration, parse
                 arr1 at %I*: ARRAY [1..5] OF INT := 1,2,3,4,5;
             END_VAR
             ''',
-            {'arr1': {'spec': '%I*', 'type': 'ARRAY [1..5] OF INT', 'value': '1,2,3,4,5'},
+            {'arr1': {'spec': '%I*',
+                      'type': 'ARRAY [1..5] OF INT',
+                      'value': '1,2,3,4,5'},
              },
             id='int_array'
         ),
@@ -96,10 +99,12 @@ from pytmc.parser import get_pou_call_blocks, variables_from_declaration, parse
                 END_TYPE
                 arr1 : ARRAY[1..3] OF STRUCT1:= [(p1:=1,p2:=10,p3:=4723), (p1:=2,p2:=0,p3:=299), (p1:=14,p2:=5,p3:=112)];
             END_VAR
-            ''',
-            {'arr1': {'spec': '',
-                      'type': 'ARRAY[1..3] OF STRUCT1',
-                      'value': '[(p1:=1,p2:=10,p3:=4723), (p1:=2,p2:=0,p3:=299), (p1:=14,p2:=5,p3:=112)]'},
+            ''',  # noqa
+            {'arr1': {
+                'spec': '',
+                'type': 'ARRAY[1..3] OF STRUCT1',
+                'value': '[(p1:=1,p2:=10,p3:=4723), (p1:=2,p2:=0,p3:=299), (p1:=14,p2:=5,p3:=112)]',  # noqa
+            },
              },
             id='structs',
         ),
@@ -119,14 +124,15 @@ from pytmc.parser import get_pou_call_blocks, variables_from_declaration, parse
                 (p1:=14,p2:=5,p3:=112)];
             END_VAR
             ''',
-            {'arr1': {'spec': '',
-                      'type': 'ARRAY[1..3] OF STRUCT1',
-                      'value': '[(p1:=1,p2:=10,p3:=4723), (p1:=2,p2:=0,p3:=299), (p1:=14,p2:=5,p3:=112)]'},
+            {'arr1': {
+                'spec': '',
+                'type': 'ARRAY[1..3] OF STRUCT1',
+                'value': '[(p1:=1,p2:=10,p3:=4723), (p1:=2,p2:=0,p3:=299), (p1:=14,p2:=5,p3:=112)]'},  # noqa
              },
             id='multiline_structs',
             marks=pytest.mark.xfail,
         ),
-     ]
+    ]
 )
 def test_variables_from_declaration(decl, expected):
     assert variables_from_declaration(decl) == expected
@@ -193,7 +199,7 @@ def test_route_parsing():
                           'Name': 'LAMP-VACUUM',
                           'NetId': '5.21.50.18.1.1',
                           'Type': 'TCP_IP'}
-        }
+    }
 
     assert remote_connections.by_ams_id == {
         '5.17.65.196.1.1': {

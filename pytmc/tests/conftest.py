@@ -6,7 +6,6 @@ import pytest
 import pytmc
 from pytmc import linter, parser
 
-
 logger = logging.getLogger(__name__)
 TEST_PATH = pathlib.Path(__file__).parent
 DBD_FILE = TEST_PATH / 'ads.dbd'
@@ -68,7 +67,8 @@ def _generate_project_and_plcs():
 
 @pytest.fixture(
     params=[
-        pytest.param((project_filename, plc_name), id=f'{project_filename} {plc_name}')
+        pytest.param((project_filename, plc_name),
+                     id=f'{project_filename} {plc_name}')
         for project_filename, plc_name in _generate_project_and_plcs()
     ]
 )

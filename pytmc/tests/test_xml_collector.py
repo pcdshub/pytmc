@@ -4,11 +4,10 @@ import types
 import pytest
 
 from pytmc import parser, pragmas
-
-from pytmc.record import (RecordPackage,
-                          BinaryRecordPackage, IntegerRecordPackage,
-                          EnumRecordPackage, FloatRecordPackage,
-                          WaveformRecordPackage, StringRecordPackage)
+from pytmc.record import (BinaryRecordPackage, EnumRecordPackage,
+                          FloatRecordPackage, IntegerRecordPackage,
+                          RecordPackage, StringRecordPackage,
+                          WaveformRecordPackage)
 
 from . import conftest
 
@@ -145,16 +144,17 @@ def test_dtype(chain, tc_type, io, is_array, final_DTYP):
         assert record.records[1].fields['DTYP'] == final_DTYP
 
 
-@pytest.mark.parametrize("tc_type, sing_index, update, field_type, final_INP_OUT", [
-    # default update rates:
+scan_test_params = [   # default update rates:
     ("BOOL", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
     ("BOOL", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("BYTE", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
     ("BYTE", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("SINT", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c=',),
-    ("SINT", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
+    ("SINT", 2, "", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
     ("USINT", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-    ("USINT", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
+    ("USINT", 2, "", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("WORD", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
     ("WORD", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("INT", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c=',),
@@ -162,33 +162,58 @@ def test_dtype(chain, tc_type, io, is_array, final_DTYP):
     ("UINT", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
     ("UINT", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("DWORD", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-    ("DWORD", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
+    ("DWORD", 2, "", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("DINT", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c=',),
-    ("DINT", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
+    ("DINT", 2, "", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
     ("UDINT", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c='),
-    ("UDINT", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
+    ("UDINT", 2, "", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
     ("LREAL", 0, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c=',),
-    ("LREAL", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
-    ("STRING", 2, "", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
+    ("LREAL", 2, "", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
+    ("STRING", 2, "", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?',),
     ("STRING", 6, "", "OUT", '@asyn($(PORT),0,1)ADSPORT=851/a.b.c=',),
     # poll rates
-    ("BOOL", 2, "1hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
-    ("BOOL", 2, "2hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=2/a.b.c?'),
-    ("BOOL", 2, "0.5hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.5/a.b.c?'),
-    ("BOOL", 2, "0.02hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.02/a.b.c?'),
-    ("BOOL", 2, "0.1hz poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.1/a.b.c?'),
-    ("BOOL", 2, "50s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.02/a.b.c?'),
-    ("BOOL", 2, "10s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.1/a.b.c?'),
-    ("BOOL", 2, "2s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.5/a.b.c?'),
-    ("BOOL", 2, "1s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
-    ("BOOL", 2, "0.5s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=2/a.b.c?'),
-    pytest.param("BOOL", 2, "0.1s poll", "INP", '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=10/a.b.c?',
-                  marks=pytest.mark.xfail(reason='Invalid poll rate')),
+    ("BOOL", 2, "1hz poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
+    ("BOOL", 2, "2hz poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=2/a.b.c?'),
+    ("BOOL", 2, "0.5hz poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.5/a.b.c?'),
+    ("BOOL", 2, "0.02hz poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.02/a.b.c?'),
+    ("BOOL", 2, "0.1hz poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.1/a.b.c?'),
+    ("BOOL", 2, "50s poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.02/a.b.c?'),
+    ("BOOL", 2, "10s poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.1/a.b.c?'),
+    ("BOOL", 2, "2s poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=0.5/a.b.c?'),
+    ("BOOL", 2, "1s poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=1/a.b.c?'),
+    ("BOOL", 2, "0.5s poll", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=2/a.b.c?'),
+    pytest.param("BOOL", 2, "0.1s poll", "INP",
+                 '@asyn($(PORT),0,1)ADSPORT=851/POLL_RATE=10/a.b.c?',
+                 marks=pytest.mark.xfail(reason='Invalid poll rate')),
     # notify rates
-    ("BOOL", 2, "1hz notify", "INP", '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=1000/a.b.c?'),
-    ("BOOL", 2, "2hz notify", "INP", '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=500/a.b.c?'),
-    ("BOOL", 2, "0.1s notify", "INP", '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=100/a.b.c?'),
-])
+    ("BOOL", 2, "1hz notify", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=1000/a.b.c?'),
+    ("BOOL", 2, "2hz notify", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=500/a.b.c?'),
+    ("BOOL", 2, "0.1s notify", "INP",
+     '@asyn($(PORT),0,1)ADSPORT=851/TS_MS=100/a.b.c?'),
+]
+
+
+@pytest.mark.parametrize(
+    "tc_type, sing_index, update, field_type, final_INP_OUT",
+    scan_test_params
+    )
 def test_input_output_scan(chain, dbd_file, tc_type, sing_index, update,
                            field_type, final_INP_OUT):
     chain.data_type = make_mock_type(tc_type, is_array=False)
