@@ -1,8 +1,8 @@
 # Custom
 *.swp
 *.swo
-tests/tmc_files/*.db
-tests/tmc_files/invalid/*.db
+pytmc/tests/tmc_files/*.db
+pytmc/tests/tmc_files/invalid/*.db
 
 
 .DS_store

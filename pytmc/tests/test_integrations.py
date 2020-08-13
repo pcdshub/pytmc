@@ -2,13 +2,12 @@
 Collections of higher level tests that don't fit cleanly into unit or module
 test files.
 """
-import logging
-
 import pytest
 
-from pytmc import linter, parser
+from pytmc import parser
 from pytmc.bin.db import process as db_process
-from .conftest import TMC_ROOT, PROJ_ROOT
+
+from .conftest import PROJ_ROOT, TMC_ROOT
 
 
 @pytest.mark.parametrize(

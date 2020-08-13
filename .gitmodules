@@ -1,15 +1,15 @@
 [submodule "tests/projects/lcls-plc-kfe-xgmd-vac"]
-	path = tests/projects/lcls-plc-kfe-xgmd-vac
+	path = pytmc/tests/projects/lcls-plc-kfe-xgmd-vac
 	url = https://github.com/pcdshub/lcls-plc-kfe-xgmd-vac.git
 [submodule "tests/projects/lcls-twincat-motion"]
-	path = tests/projects/lcls-twincat-motion
+	path = pytmc/tests/projects/lcls-twincat-motion
 	url = https://github.com/pcdshub/lcls-twincat-motion.git
 [submodule "tests/projects/pmps-dev-arbiter"]
-	path = tests/projects/pmps-dev-arbiter
+	path = pytmc/tests/projects/pmps-dev-arbiter
 	url = https://github.com/pcdshub/pmps-dev-arbiter.git
 [submodule "tests/projects/lcls-twincat-pmps"]
-	path = tests/projects/lcls-twincat-pmps
+	path = pytmc/tests/projects/lcls-twincat-pmps
 	url = https://github.com/pcdshub/lcls-twincat-pmps.git
 [submodule "tests/projects/lcls-plc-kfe-gmd-vac-ext-io"]
-	path = tests/projects/lcls-plc-kfe-gmd-vac-ext-io
+	path = pytmc/tests/projects/lcls-plc-kfe-gmd-vac-ext-io
 	url = git://github.com/n-wbrown/lcls-plc-kfe-gmd-vac.git

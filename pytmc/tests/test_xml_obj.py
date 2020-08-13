@@ -1,7 +1,8 @@
-import pytest
 import logging
 
-from pytmc.pragmas import split_pytmc_pragma, separate_configs_by_pv
+import pytest
+
+from pytmc.pragmas import separate_configs_by_pv, split_pytmc_pragma
 
 logger = logging.getLogger(__name__)
 
@@ -214,11 +215,11 @@ def test_get_config_lines(leaf_bool_pragma_string):
     ]
 
     assert configs['TEST:MAIN:NEW_VAR_IN'] == [
-         {'tag': 'TEST:MAIN:NEW_VAR_IN', 'title': 'pv'},
-         {'tag': 'bi', 'title': 'type'},
-         {'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}, 'title': 'field'},
-         {'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}, 'title': 'field'},
-         {'tag': {'f_name': 'SCAN', 'f_set': '1 second'}, 'title': 'field'},
-         {'tag': '%d', 'title': 'str'},
-         {'tag': 'i', 'title': 'io'},
+        {'tag': 'TEST:MAIN:NEW_VAR_IN', 'title': 'pv'},
+        {'tag': 'bi', 'title': 'type'},
+        {'tag': {'f_name': 'ZNAM', 'f_set': 'SINGLE'}, 'title': 'field'},
+        {'tag': {'f_name': 'ONAM', 'f_set': 'MULTI'}, 'title': 'field'},
+        {'tag': {'f_name': 'SCAN', 'f_set': '1 second'}, 'title': 'field'},
+        {'tag': '%d', 'title': 'str'},
+        {'tag': 'i', 'title': 'io'},
     ]

@@ -1,7 +1,7 @@
 import pytest
 
-from pytmc.bin.pragmalint import lint_source, LinterError
 from pytmc import parser
+from pytmc.bin.pragmalint import lint_source
 
 
 def make_pragma(text):
@@ -87,7 +87,8 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
      make_source_param('pv: test; update: 1s test', marks=pytest.mark.xfail),
      make_source_param('pv: test; update: notify 1s', marks=pytest.mark.xfail),
      make_source_param('pv: test; field: SCAN I/O Intr'),
-     make_source_param('pv: test; field: SCAN 1 second', marks=pytest.mark.xfail),
+     make_source_param('pv: test; field: SCAN 1 second',
+                       marks=pytest.mark.xfail),
 
      # Archiver settings
      make_source_param('pv: test; archive: no'),
@@ -104,8 +105,10 @@ def make_source_param(pragma, variable='VAR', type='INT', **param_kw):
 
      # Link settings
      make_source_param('pv: test; link: OTHER:PV'),
-     make_source_param('pv: test; io: ro; link: OTHER:PV', marks=pytest.mark.xfail),
-     make_source_param('pv: test; link: SPACES IN PV', marks=pytest.mark.xfail),
+     make_source_param('pv: test; io: ro; link: OTHER:PV',
+                       marks=pytest.mark.xfail),
+     make_source_param('pv: test; link: SPACES IN PV',
+                       marks=pytest.mark.xfail),
      ]
 )
 def test_lint_pragma(source):

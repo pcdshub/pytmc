@@ -1,2 +1,2 @@
 [flake8]
-exclude = .git,__pycache__,build,dist,versioneer.py,pytmc/_version.py
+exclude = .git,__pycache__,build,dist,versioneer.py,pytmc/_version.py,pytmc/tests/projects

@@ -1,8 +1,8 @@
 import pytest
 
 import pytmc
-import pytmc.record
 import pytmc.pragmas
+import pytmc.record
 
 from .test_xml_collector import make_mock_twincatitem, make_mock_type
 
@@ -58,5 +58,6 @@ def get_record_package(data_type, io, pragma):
 def test_archive(data_type, io, pragma, expected):
     record_package = get_record_package(data_type, io, pragma)
     print(record_package)
-    archive_settings = list(pytmc.record.generate_archive_settings([record_package]))
+    archive_settings = list(
+        pytmc.record.generate_archive_settings([record_package]))
     assert archive_settings == expected
