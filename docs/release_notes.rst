@@ -2,12 +2,27 @@
  Release History
 =================
 
+v2.7.1 (2020-08-18)
+===================
+
+Fixes
+-----
+
+* Working fix for macro expansion character replacement for linked PVs
+  (``DOL`` field).  This means ``link: @(MACRO)PV`` now works.
+* Tests will no longer be installed erroneously as a package on the system.
+
+Development
+-----------
+
+* Tests have been moved into the pytmc package, and with it flake8 compliance.
+
 
 v2.7.0 (2020-07-16)
 ===================
 
-*  Fixes macro expansion character replacement for linked PVs (``DOL``
-   field)
+* Included an incomplete fix for macro expansion character replacement for
+  linked PVs (``DOL`` field)
 
 
 v2.6.9 (2020-07-06)
