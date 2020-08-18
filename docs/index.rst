@@ -23,7 +23,7 @@ Issues and requests can be posted on the `github issue tracker
 <https://github.com/slaclab/pytmc/issues>`_. Use the ``bug`` tag for issues
 with intended features and the ``enhancement`` tag can be used for feature
 requests. The ``question`` tag will be treated like an 'enhancements' tag for
-the documentation but regular questions can be posted there as well. 
+the documentation but regular questions can be posted there as well.
 
 .. toctree::
    :maxdepth: 3
@@ -31,4 +31,4 @@ the documentation but regular questions can be posted there as well.
 
    user_guide.rst
    source_code.rst
-
+   release_notes.rst
