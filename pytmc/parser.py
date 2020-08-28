@@ -1390,7 +1390,17 @@ class Io(TwincatItem):
         xti_files = {}
 
         for xti_filename in io_dir.glob('**/*.xti'):
-            xti = parse(xti_filename)
+            try:
+                xti = parse(xti_filename)
+            except Exception as ex:
+                logger.warning(
+                    '(Pre-loading XTI file) Failed: %s (%s). If this file is '
+                    'referenced in the project, this may cause the project to '
+                    'fail loading.  If not, this can be ignored.',
+                    xti_filename.name, ex
+                )
+                continue
+
             try:
                 key = get_key(xti_filename, xti)
             except Exception as ex:
