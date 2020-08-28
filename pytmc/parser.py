@@ -144,6 +144,7 @@ def _determine_path(base_path, name, class_hint):
 
 class TwincatItem:
     _load_path_hint = ''
+    _lazy_load = False
 
     def __init__(self, element, *, parent=None, name=None, filename=None):
         '''
@@ -273,6 +274,29 @@ class TwincatItem:
                 grandchild.parent = self
                 child._children.remove(grandchild)
 
+    def _finish_lazy_loading(self, file_map):
+        """
+        Now that all XTI files are loaded, circle back and instantiate
+        lazily-loaded children.
+
+        It's been found that directory locations for .XTI files can be
+        inconsistent, necessitating this functionality.
+
+        The preloading mechanism works as follows:
+            1. Load the project, skipping any external file entries marked as
+               ``_lazy_load = True``.
+            2. Load all .XTI files in ``_Config/IO`` at once.
+            3. Key the XTI files based on:
+                ``(class, identifier, base filename)``
+            4. Go back through the IO tree, dereferencing any lazy-loaded
+               files by the above key.
+        """
+        for idx, child in list(enumerate(self._children)):
+            if isinstance(child, _LazyLoadPlaceholder):
+                self._children[idx] = child.load(file_map)
+            else:
+                child._finish_lazy_loading(file_map)
+
     @staticmethod
     def parse(element, parent=None, filename=None):
         '''
@@ -300,6 +324,9 @@ class TwincatItem:
             cls = type(classname, (base, ), {})
 
         if 'File' in element.attrib:
+            if cls._lazy_load:
+                return _LazyLoadPlaceholder(cls, element, parent)
+
             # This is defined directly in the file. Instantiate it as-is:
             filename = element.attrib['File']
             return cls.from_file(filename, parent=parent)
@@ -346,6 +373,31 @@ class TwincatItem:
             class_hint=cls._load_path_hint
         )
         return parse(base_path / filename, parent=parent)
+
+
+class _LazyLoadPlaceholder:
+    def __init__(self, cls, element, parent):
+        self.cls = cls
+        self.element = element
+        self.parent = parent
+
+    def __repr__(self):
+        return f'<LazyLoadPlaceholder {self.key}>'
+
+    def find(self, cls, *, recurse=True):
+        yield from ()
+
+    @property
+    def key(self):
+        filename = self.element.attrib['File'].lower()
+        identifier = self.element.attrib['Id']
+        return (self.cls, identifier, filename)
+
+    def load(self, file_map):
+        info = file_map[self.key]
+        obj = info['obj']
+        obj._finish_lazy_loading(file_map)
+        return obj
 
 
 class _TwincatProjectSubItem(TwincatItem):
@@ -1307,15 +1359,78 @@ class Encoder(TwincatItem):
                     yield f'{child.tag}:{key}', value
 
 
-class Device(TwincatItem):
-    '[XTI] Top-level IO device container'
+class Io(TwincatItem):
+    '[XTI] Top-level IO container, which has devices'
     _load_path_hint = pathlib.Path('_Config') / 'IO'
 
-    def __init__(self, element, *, parent=None, name=None, filename=None):
-        super().__init__(element, parent=parent, name=name, filename=filename)
+    @classmethod
+    def _pre_load_xti_files(cls, io_dir):
+        """
+        Pre-load all XTI files from the IO directory.
+
+        Used in the lazy loading mechanism.
+        """
+        def get_key(xti_filename, xti):
+            candidates = []
+            for item in xti.find(TwincatItem):
+                if item.attributes.get('Id') is not None:
+                    class_id = (type(item),
+                                item.attributes.get('Id'),
+                                xti_filename.name.lower(),
+                                )
+                    candidates.append(class_id)
+                    if item._lazy_load:
+                        return class_id
+
+            if len(candidates) == 1:
+                return candidates[0]
+
+            raise ValueError(f'Hmm: {candidates}')
+
+        xti_files = {}
+
+        for xti_filename in io_dir.glob('**/*.xti'):
+            xti = parse(xti_filename)
+            try:
+                key = get_key(xti_filename, xti)
+            except Exception as ex:
+                logger.warning(
+                    'Pytmc failed to figure out what to do with: %s',
+                    xti_filename, exc_info=ex,
+                )
+                continue
+
+            if key in xti_files:
+                logger.warning(
+                    'Found multiple potential matches with the same key: '
+                    '%s => %s (choosing %s)', key, xti_filename,
+                    xti_files[key]['file']
+                )
+            else:
+                xti_files[key] = {
+                    'file': xti_filename,
+                    'obj': xti,
+                }
+
+        return xti_files
+
+    def _add_children(self, element):
+        ret = super()._add_children(element)
+        self._xti_files = self._pre_load_xti_files(self.child_load_path)
+        self._finish_lazy_loading(self._xti_files)
+        return ret
 
 
-class Box(TwincatItem):
+class _IoTreeItem(TwincatItem):
+    '[XTI] Base class for items contained in an IO Tree'
+    _lazy_load = True
+
+
+class Device(_IoTreeItem):
+    '[XTI] Top-level IO device container'
+
+
+class Box(_IoTreeItem):
     '[XTI] A box / module'
     _load_path_hint = USE_NAME_AS_PATH
 
@@ -1435,7 +1550,9 @@ def case_insensitive_path(path):
                 part = all_files[part.lower()]
             except KeyError:
                 raise FileNotFoundError(
-                    f'{path} does not exist ({part!r} not in {new_path!r})'
+                    f'Path does not exist:\n'
+                    f'{path}\n'
+                    f'{new_path}/{part} missing'
                 ) from None
         new_path = new_path / part
 
