@@ -425,15 +425,6 @@ class TcModuleClass(_TwincatProjectSubItem):
     '[TMC] The top-level TMC file'
     DataTypes: typing.List['DataTypes']
 
-    def get_data_type(self, ref, *, include_project=True, array_info=None,
-                      reference=None, pointer=None):
-        """Get a data type by name, GUID, or BaseType."""
-        proj = self.find_ancestor(TcSmProject) if include_project else None
-        return get_data_type_by_reference(
-            ref, (self, proj), array_info=array_info,
-            reference=reference, pointer=pointer
-        )
-
     def create_data_area(self, module_index=0):
         """
         Create a fake DataArea in a given parsed TcModuleClass (tmc).
@@ -518,12 +509,6 @@ class TcSmProject(TwincatItem):
     def plcs_by_link_name(self):
         'The virtual PLC projects in a dictionary keyed by link name'
         return {plc.link_name: plc for plc in self.plcs}
-
-    def get_data_type(self, type_name, *, array_info=None, reference=False,
-                      pointer=False):
-        """Project-level data types exist alongside tmc-defined data types."""
-        return get_data_type_by_reference(type_name, array_info=array_info,
-                                          reference=reference, pointer=pointer)
 
 
 def get_data_type_by_reference(
