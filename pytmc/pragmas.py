@@ -535,10 +535,13 @@ class SingularChain:
                 f'data_type={self.data_type!r})')
 
 
-def find_pytmc_symbols(tmc, allow_no_pragma=False):
+def find_pytmc_symbols(tmc, allow_no_pragma=False, include_structs=False):
     'Find all symbols in a tmc file that contain pragmas'
     for symbol in tmc.find(parser.Symbol):
         if has_pragma(symbol) or allow_no_pragma:
+            if not include_structs and symbol.data_type.is_complex_type:
+                continue
+
             if symbol.name.count('.') == 1:
                 yield symbol
 

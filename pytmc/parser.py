@@ -1013,9 +1013,8 @@ class DataType(_TmcItem):
 
     def walk(self, condition=None):
         if self.is_enum:
-            # Ensure something is yielded for this type - it doesn't
-            # appear possible to have SubItems or use ExtendsType
-            # in this case.
+            # Ensure something is yielded for this type - it doesn't appear
+            # possible to have SubItems or use ExtendsType in this case.
             yield []
             return
 
