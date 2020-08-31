@@ -907,7 +907,7 @@ class ExtendsType(_TmcItem):
         """
         Namespace of the data type.
         """
-        return self.attributes.get('namespace', None)
+        return self.attributes.get('Namespace', None)
 
     @property
     def guid(self):
@@ -1096,6 +1096,9 @@ class BoundDataType:
 
     def __getattr__(self, attr):
         return getattr(self.data_type, attr)
+
+    def walk(self, condition=None):
+        yield from self.data_type.walk(condition=condition)
 
 
 class Name(_TmcItem):
