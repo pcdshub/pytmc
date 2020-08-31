@@ -14,12 +14,8 @@ from .record import RecordPackage
 logger = logging.getLogger(__name__)
 
 
-# Select special delimiter sequences and prepare them for re injection
-_FLEX_TERM_END = [r";", r";;", r"[\n\r]", r"$"]
-_FLEX_TERM_REGEX = "|".join(_FLEX_TERM_END)
-
 # Break configuration str into list of lines paired w/ their delimiters
-_LINE_FINDER = re.compile(r"(?P<line>.+?)(?P<delim>" + _FLEX_TERM_REGEX + ")")
+_LINE_FINDER = re.compile(r"(?P<line>.+?)(?P<delim>(?:[;\n\r]+|$))")
 _LINE_PARSER = re.compile(r"(?P<title>[\S]+):(?:[^\S]*)(?P<tag>.*)")
 _FIELD_FINDER = re.compile(r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)")
 
@@ -535,13 +531,10 @@ class SingularChain:
                 f'data_type={self.data_type!r})')
 
 
-def find_pytmc_symbols(tmc, allow_no_pragma=False, include_structs=False):
+def find_pytmc_symbols(tmc, allow_no_pragma=False):
     'Find all symbols in a tmc file that contain pragmas'
     for symbol in tmc.find(parser.Symbol):
         if has_pragma(symbol) or allow_no_pragma:
-            if not include_structs and symbol.data_type.is_complex_type:
-                continue
-
             if symbol.name.count('.') == 1:
                 yield symbol
 
@@ -605,11 +598,11 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
                                 allow_no_pragma=False):
     'Create all record packages from a given Symbol'
     try:
+        ads_port = symbol.module.ads_port
         for chain in chains_from_symbol(symbol, pragma=pragma,
                                         allow_no_pragma=allow_no_pragma):
             try:
-                yield RecordPackage.from_chain(symbol.module.ads_port,
-                                               chain=chain)
+                yield RecordPackage.from_chain(ads_port, chain=chain)
             except Exception as ex:
                 if yield_exceptions:
                     yield type(ex)(f"Symbol {symbol.name} "
