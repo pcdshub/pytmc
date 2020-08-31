@@ -14,12 +14,8 @@ from .record import RecordPackage
 logger = logging.getLogger(__name__)
 
 
-# Select special delimiter sequences and prepare them for re injection
-_FLEX_TERM_END = [r";", r";;", r"[\n\r]", r"$"]
-_FLEX_TERM_REGEX = "|".join(_FLEX_TERM_END)
-
 # Break configuration str into list of lines paired w/ their delimiters
-_LINE_FINDER = re.compile(r"(?P<line>.+?)(?P<delim>" + _FLEX_TERM_REGEX + ")")
+_LINE_FINDER = re.compile(r"(?P<line>.+?)(?P<delim>(?:[;\n\r]+|$))")
 _LINE_PARSER = re.compile(r"(?P<title>[\S]+):(?:[^\S]*)(?P<tag>.*)")
 _FIELD_FINDER = re.compile(r"(?P<f_name>[\S]+)(?:[^\S]*)(?P<f_set>.*)")
 
@@ -602,11 +598,11 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
                                 allow_no_pragma=False):
     'Create all record packages from a given Symbol'
     try:
+        ads_port = symbol.module.ads_port
         for chain in chains_from_symbol(symbol, pragma=pragma,
                                         allow_no_pragma=allow_no_pragma):
             try:
-                yield RecordPackage.from_chain(symbol.module.ads_port,
-                                               chain=chain)
+                yield RecordPackage.from_chain(ads_port, chain=chain)
             except Exception as ex:
                 if yield_exceptions:
                     yield type(ex)(f"Symbol {symbol.name} "

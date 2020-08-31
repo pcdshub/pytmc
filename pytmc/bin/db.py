@@ -9,13 +9,11 @@ import logging
 import os
 import pathlib
 import sys
-
 from collections import defaultdict
 
 from .. import linter, parser
 from ..pragmas import find_pytmc_symbols, record_packages_from_symbol
 from ..record import generate_archive_settings
-
 
 logger = logging.getLogger(__name__)
 DESCRIPTION = __doc__
@@ -76,8 +74,8 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
     return results, db_text
 
 
-def process(tmc, *, dbd_file=None, allow_errors=False,
-            show_error_context=True, allow_no_pragma=False):
+def process(tmc, *, dbd_file=None, allow_errors=False, show_error_context=True,
+            allow_no_pragma=False, debug=False):
     '''
     Process a TMC
 
@@ -109,7 +107,8 @@ def process(tmc, *, dbd_file=None, allow_errors=False,
         record
         for symbol in find_pytmc_symbols(tmc, allow_no_pragma=allow_no_pragma)
         for record in record_packages_from_symbol(
-            symbol, yield_exceptions=True, allow_no_pragma=allow_no_pragma)
+            symbol, yield_exceptions=not debug,
+            allow_no_pragma=allow_no_pragma)
     ]
 
     exceptions = [ex for ex in records
@@ -201,6 +200,13 @@ def build_arg_parser(parser=None):
         help='The PLC name, if specifying a .tsproj file'
     )
 
+    parser.add_argument(
+        '--debug',
+        action='store_true',
+        help=('Raise exceptions immediately, such that the IPython debugger '
+              'may be used')
+    )
+
     archive_group = parser.add_mutually_exclusive_group()
     archive_group.add_argument(
         '--archive-file',
@@ -244,7 +250,7 @@ def build_arg_parser(parser=None):
 
 def main(tmc_file, record_file=sys.stdout, *, dbd=None, allow_errors=False,
          no_error_context=False, archive_file=None, no_archive_file=False,
-         plc=None):
+         plc=None, debug=False):
     if archive_file and no_archive_file:
         raise ValueError('Invalid options specified (specify zero or one of '
                          'archive_file or no_archive_file)')
@@ -269,6 +275,7 @@ def main(tmc_file, record_file=sys.stdout, *, dbd=None, allow_errors=False,
         records, exceptions = process(
             tmc, dbd_file=dbd, allow_errors=allow_errors,
             show_error_context=not no_error_context,
+            debug=debug,
         )
     except LinterError:
         logger.exception(

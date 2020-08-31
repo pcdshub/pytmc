@@ -2,6 +2,7 @@
 Collections of higher level tests that don't fit cleanly into unit or module
 test files.
 """
+
 import pytest
 
 from pytmc import parser
@@ -58,7 +59,7 @@ def test_allow_no_pragma():
         show_error_context=True, allow_no_pragma=True
     )
     good_records = 129
-    total_records = 976
+    total_records = 1002
 
     assert good_records == len(records)
     assert good_records == len(list(x.valid for x in records if x.valid))

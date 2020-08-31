@@ -7,6 +7,7 @@ import os
 import pathlib
 import re
 import types
+import typing
 
 import lxml
 import lxml.etree
@@ -23,6 +24,7 @@ SLN_PROJECT_RE = re.compile(
     r"^Project.*?=\s*\"(.*?)\",\s*\"(.*?)\"\s*,\s*(.*?)\"\s*$",
     re.MULTILINE
 )
+_TRUE_VALUES = {'true', '1'}
 
 
 def parse(fn, *, parent=None):
@@ -143,8 +145,18 @@ def _determine_path(base_path, name, class_hint):
 
 
 class TwincatItem:
-    _load_path_hint = ''
-    _lazy_load = False
+    _load_path_hint: str = ''
+    _lazy_load: bool = False
+    _children: typing.List['TwincatItem']
+    attributes: typing.Dict[str, str]
+    children: types.SimpleNamespace
+    comments: typing.List[str]
+    element: lxml.etree.Element
+    filename: pathlib.Path
+    name: str
+    parent: 'TwincatItem'
+    tag: str
+    text: typing.Optional[str]
 
     def __init__(self, element, *, parent=None, name=None, filename=None):
         '''
@@ -411,14 +423,7 @@ class _TwincatProjectSubItem(TwincatItem):
 
 class TcModuleClass(_TwincatProjectSubItem):
     '[TMC] The top-level TMC file'
-    DataTypes: list
-
-    def get_data_type(self, type_name):
-        data_types = self.DataTypes[0].types
-        try:
-            return data_types[type_name]
-        except KeyError:
-            return BuiltinDataType(type_name)
+    DataTypes: typing.List['DataTypes']
 
     def create_data_area(self, module_index=0):
         """
@@ -505,12 +510,70 @@ class TcSmProject(TwincatItem):
         'The virtual PLC projects in a dictionary keyed by link name'
         return {plc.link_name: plc for plc in self.plcs}
 
-    def get_data_type(self, type_name):
-        """Project-level data types exist alongside tmc-defined data types."""
+
+def get_data_type_by_reference(
+        ref, data_type_holders, *,
+        fallback_to_builtin=True,
+        array_info=None, reference=None, pointer=None,
+        ):
+    """Get a data type from the project, falling back to the tmc file."""
+    if isinstance(ref, str):
+        search_key = ref
+    else:
+        guid = getattr(ref, 'guid', None)
+        qualified_type = getattr(ref, 'qualified_type_name', None)
+        type_name = getattr(ref, 'text', None)
+        search_key = guid or qualified_type or type_name
+        if search_key is None:
+            raise ValueError(f'No GUID or type name was available from: {ref}')
+
+        if array_info is None:
+            array_info = getattr(ref, 'array_info', None)
+
+        if reference is None:
+            reference = getattr(ref, 'is_reference', False)
+
+        if pointer is None:
+            pointer = getattr(ref, 'is_pointer', False)
+
+    namespaces = []
+
+    for parent in data_type_holders:
+        if hasattr(parent, 'DataTypes'):
+            namespaces.append(parent.DataTypes[0].types)
+
+    for namespace in namespaces:
         try:
-            return self.DataTypes[0].types[type_name]
-        except Exception:
-            return BuiltinDataType(type_name)
+            data_type = namespace[search_key]
+        except KeyError:
+            ...
+        else:
+            return BoundDataType(
+                data_type, array_info=array_info, pointer=pointer,
+                reference=reference
+            )
+
+    if search_key.startswith('{'):
+        type_name = getattr(ref, 'type_name', None)
+        if type_name is None:
+            raise ValueError(
+                f'Type with GUID {search_key} not in TMC') from None
+        logger.debug('Reference to implicitly-defined GUID %s = %s',
+                     search_key, type_name)
+        # Known items:
+        #   - GUID type itself
+        #   - OTCID
+
+    if fallback_to_builtin:
+        # Likely a built-in data type :shrug:
+        if isinstance(ref, str):
+            type_name = ref
+        else:
+            type_name = ref.qualified_type_name
+
+        return BoundDataType(
+            BuiltinDataType(type_name), array_info=array_info, pointer=pointer,
+            reference=reference)
 
 
 class TcSmItem(TwincatItem):
@@ -638,7 +701,6 @@ class Plc(TwincatItem):
         The AMS ID of the configured target
         '''
         return self.find_ancestor(TopLevelProject).ams_id
-        return self.attributes.get('TargetNetId', '')
 
     @property
     def target_ip(self):
@@ -695,9 +757,16 @@ class DataTypes(_TmcItem):
     '[TMC or TSPROJ] Container of DataType'
     def post_init(self):
         self.types = {
-            dtype.qualified_type: dtype
+            dtype.qualified_type_name: dtype
             for dtype in self.find(DataType)
         }
+
+        # Also allow access by GUID:
+        self.types.update({
+            dtype.guid: dtype
+            for dtype in self.types.values()
+            if hasattr(dtype, 'guid')
+        })
 
         self.types['Tc2_System.T_MaxString'] = T_MaxString()
 
@@ -706,10 +775,53 @@ class Type(_TmcItem):
     '[TMC] DataTypes/DataType/SubItem/Type'
 
     @property
-    def qualified_type(self):
+    def info(self):
+        return dict(
+            guid=self.attributes.get("GUID", None),
+            type_name=self.type_name,
+            namespace=self.namespace,
+            qualified_type_name=self.qualified_type_name,
+            pointer_depth=self.pointer_depth,
+            is_reference=self.is_reference,
+            is_pointer=self.is_pointer,
+        )
+
+    @property
+    def guid(self) -> str:
+        """The referenced type name."""
+        return self.attributes.get("GUID", None)
+
+    @property
+    def type_name(self) -> str:
+        """The referenced type name."""
+        return self.text
+
+    @property
+    def namespace(self):
+        return self.attributes.get("Namespace", None)
+
+    @property
+    def pointer_depth(self) -> int:
+        pointerto_value = self.attributes.get("PointerTo", None)
+        return int(pointerto_value or '0')
+
+    @property
+    def is_pointer(self) -> bool:
+        return self.pointer_depth > 0
+
+    @property
+    def is_reference(self) -> bool:
+        ref_value = self.attributes.get("ReferenceTo", None)
+        return (ref_value or '').lower() in _TRUE_VALUES
+
+    @property
+    def qualified_type_name(self):
         'The base type, including the namespace'
-        namespace = self.attributes.get("Namespace", None)
+        namespace = self.namespace
         return f'{namespace}.{self.text}' if namespace else self.text
+
+    # Back-compat
+    qualified_type = qualified_type_name
 
 
 class EnumInfo(_TmcItem):
@@ -743,9 +855,9 @@ class EnumInfo(_TmcItem):
 
 class ArrayInfo(_TmcItem):
     '[TMC] Array information for a DataType or Symbol'
-    LBound: list
-    UBound: list
-    Elements: list
+    LBound: typing.List[_TmcItem]
+    UBound: typing.List[_TmcItem]
+    Elements: typing.List[_TmcItem]
 
     def post_init(self):
         lbound = (int(self.LBound[0].text)
@@ -763,37 +875,125 @@ class ArrayInfo(_TmcItem):
         self.bounds = (lbound, ubound)
         self.elements = elements
 
+    @property
+    def is_reference(self):
+        ref_value = self.attributes.get("ReferenceTo", None)
+        return (ref_value or '').lower() in _TRUE_VALUES
+
+    @property
+    def pointer_depth(self) -> int:
+        # 0 = Non-pointer
+        # 1 = POINTER TO
+        # 2 = POINTER TO POINTER TO
+        # 3 = ...
+        pointerto_value = self.attributes.get("PointerTo", None)
+        return int(pointerto_value or '0')
+
+    @property
+    def is_pointer(self) -> bool:
+        return self.pointer_depth > 0
+
+    @property
+    def level(self):
+        'ARRAY [] OF ARRAY [] level'
+        return self.attributes.get("Level", None)
+
 
 class ExtendsType(_TmcItem):
     '[TMC] A marker of inheritance / extension, found on DataType'
 
     @property
-    def qualified_type(self):
-        if 'Namespace' in self.attributes:
-            return f'{self.attributes["Namespace"]}.{self.text}'
-        return self.text
+    def namespace(self):
+        """
+        Namespace of the data type.
+        """
+        return self.attributes.get('Namespace', None)
+
+    @property
+    def guid(self):
+        """
+        Globally unique identifier for the data type.
+
+        Note
+        ----
+        This is not available for all data types.
+        """
+        try:
+            return self.attributes['GUID']
+        except KeyError:
+            raise AttributeError('GUID unavailable') from None
+
+    @property
+    def qualified_type_name(self):
+        namespace = self.namespace
+        return f'{namespace}.{self.text}' if namespace else self.text
+
+
+class BaseType(Type):
+    '[TMC] A reference to the data type of a symbol'
+    # Inherits everything from :class:`Type`
 
 
 class DataType(_TmcItem):
     '[TMC or TSPROJ] A DataType with SubItems, likely representing a structure'
-    Name: list
-    EnumInfo: list
-    SubItem: list
+    Action: typing.List[_TmcItem]
+    ArrayInfo: typing.List['ArrayInfo']
+    BaseType: typing.List['BaseType']
+    BitSize: typing.List[_TmcItem]
+    EnumInfo: typing.List['EnumInfo']
+    ExtendsType: typing.List[ExtendsType]
+    FunctionPointer: typing.List[_TmcItem]
+    Implements: typing.List[_TmcItem]
+    Name: typing.List['Name']
+    PropertyItem: typing.List[_TmcItem]
+    SubItem: typing.List['SubItem']
+    Unit: typing.List[_TmcItem]
 
     @property
-    def qualified_type(self):
+    def guid(self):
+        """
+        Globally unique identifier for the data type.
+
+        Note
+        ----
+        This is not available for all data types.
+        """
+        try:
+            return self.Name[0].attributes['GUID']
+        except KeyError:
+            raise AttributeError('GUID unavailable')
+
+    @property
+    def array_info(self) -> typing.Optional[ArrayInfo]:
+        return getattr(self, 'ArrayInfo', [None])[0]
+
+    @property
+    def array_bounds(self) -> typing.Optional[typing.Tuple[int, int]]:
+        return getattr(self.array_info, 'array_bounds', None)
+
+    @property
+    def summary_type_name(self):
+        summary = self.name
+        array_bounds = self.array_bounds
+        if array_bounds:
+            summary = 'ARRAY[{}..{}] OF '.format(*array_bounds) + summary
+        return summary
+
+    @property
+    def qualified_type_name(self):
         name_attrs = self.Name[0].attributes
         if 'Namespace' in name_attrs:
             return f'{name_attrs["Namespace"]}.{self.name}'
         return self.name
 
-    def _get_data_type(self, name):
-        if self.tmc is not None:
-            return self.tmc.get_data_type(name)
+    # Back-compat
+    qualified_type = qualified_type_name
 
-        project = self.find_ancestor(TcSmProject)
-        if project is not None:
-            return project.get_data_type(name)
+    def _get_data_type(self, data_type, *, array_info=None):
+        return get_data_type_by_reference(
+            data_type, (self.tmc, self.find_ancestor(TcSmProject)),
+            array_info=array_info
+        )
 
     @property
     def base_type(self):
@@ -801,22 +1001,25 @@ class DataType(_TmcItem):
         if base_type is None:
             return None
 
-        return self._get_data_type(base_type.text)
+        return self._get_data_type(base_type)
 
     @property
     def is_complex_type(self):
-        return True
+        base_type = self.base_type
+        if base_type is None:
+            return True
+
+        return base_type.is_complex_type
 
     def walk(self, condition=None):
         if self.is_enum:
-            # Ensure something is yielded for this type - it doesn't
-            # appear possible to have SubItems or use ExtendsType
-            # in this case.
+            # Ensure something is yielded for this type - it doesn't appear
+            # possible to have SubItems or use ExtendsType in this case.
             yield []
             return
 
         extends_types = [
-            self._get_data_type(ext_type.qualified_type)
+            self._get_data_type(ext_type)
             for ext_type in getattr(self, 'ExtendsType', [])
         ]
         for extend_type in extends_types:
@@ -845,30 +1048,100 @@ class DataType(_TmcItem):
         return False
 
     @property
-    def array_info(self):
-        try:
-            return self.ArrayInfo[0]
-        except (AttributeError, IndexError):
-            return None
-
-    @property
     def length(self):
         array_info = self.array_info
         return array_info.elements if array_info else 1
 
+    @property
+    def bit_size(self):
+        return int(self.BitSize[0].text)
+
+
+class BoundDataType:
+    """Binds a symbol or SubItem with array/pointer/etc information."""
+    _extra_attrs = ['data_type', 'array_info', 'is_pointer', 'is_reference']
+
+    def __init__(self, data_type,
+                 array_info: ArrayInfo = None,
+                 pointer: bool = False,
+                 reference: bool = False):
+        self.data_type = data_type
+        self.array_info = array_info
+        self.is_pointer = pointer
+        self.is_reference = reference
+
+    def __dir__(self):
+        return dir(self.data_type) + self._extra_attrs
+
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__name__} '
+            f'data_type={self.data_type.qualified_type_name!r} '
+            f'array_info={self.array_info} '
+            f'is_pointer={self.is_pointer} '
+            f'is_reference={self.is_reference}>'
+        )
+
+    @property
+    def summary_type_name(self):
+        summary = self.name
+        if self.is_pointer:
+            summary = 'POINTER TO ' + summary
+        if self.is_reference:
+            summary = 'REFERENCE TO ' + summary
+        array_bounds = self.data_type.array_bounds
+        if array_bounds:
+            summary = 'ARRAY[{}..{}] OF '.format(*array_bounds) + summary
+        return summary
+
+    def __getattr__(self, attr):
+        return getattr(self.data_type, attr)
+
+    def walk(self, condition=None):
+        yield from self.data_type.walk(condition=condition)
+
+
+class Name(_TmcItem):
+    @property
+    def guid(self) -> str:
+        return self.attributes.get('GUID', None)
+
+    @property
+    def namespace(self) -> str:
+        return self.attributes.get('Namespace', None)
+
+    @property
+    def tc_base_type(self) -> bool:
+        try:
+            return self.attributes['TcBaseType'] in _TRUE_VALUES
+        except KeyError:
+            ...
+
+    @property
+    def hide_type(self) -> bool:
+        try:
+            return self.attributes['HideType'] in _TRUE_VALUES
+        except KeyError:
+            ...
+
+    @property
+    def iec_declaration(self) -> str:
+        return self.attributes.get('IecDeclaration', None)
+
 
 class SubItem(_TmcItem):
     '[TMC] One element of a DataType'
-    Type: list
+    Type: typing.List[Type]
+    ArrayInfo: typing.List[ArrayInfo]
+    BitSize: typing.List[_TmcItem]
+    BitOffs: typing.List[_TmcItem]
 
     @property
     def data_type(self):
-        if self.tmc is not None:
-            return self.tmc.get_data_type(self.qualified_type_name)
-
-        project = self.find_ancestor(TcSmProject)
-        if project is not None:
-            return project.get_data_type(self.qualified_type_name)
+        return get_data_type_by_reference(
+            self.Type[0], (self.tmc, self.find_ancestor(TcSmProject)),
+            array_info=self.array_info,
+        )
 
     @property
     def array_info(self):
@@ -881,6 +1154,16 @@ class SubItem(_TmcItem):
     def type(self):
         'The base type'
         return self.Type[0].text
+
+    @property
+    def bit_size(self):
+        'The sub item size, in bits'
+        return int(self.BitSize[0].bit_size)
+
+    @property
+    def bit_offset(self):
+        'The sub item offset, in bits'
+        return int(self.BitOffs[0].bit_offset)
 
     @property
     def qualified_type_name(self):
@@ -957,6 +1240,17 @@ class BuiltinDataType:
         self.length = length
 
     @property
+    def qualified_type_name(self):
+        # Built-in types have no namespace prefix
+        return self.name
+
+    @property
+    def summary_type_name(self):
+        if self.length > 1:
+            return f'{self.name}({self.length})'
+        return self.name
+
+    @property
     def is_complex_type(self):
         return False
 
@@ -989,6 +1283,18 @@ class T_MaxString(BuiltinDataType):
         super().__init__(typename='STRING', length=255)
 
 
+class BitSize(_TmcItem):
+    @property
+    def bit_size(self) -> int:
+        return int(self.text)
+
+
+class BitOffs(_TmcItem):
+    @property
+    def bit_offset(self) -> int:
+        return int(self.text)
+
+
 class Symbol(_TmcItem):
     '''
     [TMC] A basic Symbol type
@@ -998,28 +1304,36 @@ class Symbol(_TmcItem):
     will become `Symbol_FB_MotionStage`.
     '''
 
-    BitOffs: list
-    BitSize: list
-    BaseType: list
+    ArrayInfo: typing.List[ArrayInfo]
+    BaseType: typing.List[BaseType]
+    BitOffs: typing.List[_TmcItem]
+    BitSize: typing.List[_TmcItem]
+    Properties: typing.List[_TmcItem]
 
     @property
-    def type_name(self):
-        'The base type'
-        return self.BaseType[0].text
+    def base_type(self) -> BaseType:
+        'The reference used to determine the data type (BaseType)'
+        return self.BaseType[0]
 
     @property
-    def qualified_type_name(self):
-        'The base type, including the namespace'
-        type_ = self.BaseType[0]
-        namespace = type_.attributes.get("Namespace", None)
-        return f'{namespace}.{type_.text}' if namespace else type_.text
+    def type_name(self) -> str:
+        'The base type name.'
+        return self.base_type.text
 
     @property
-    def data_type(self):
-        return self.tmc.get_data_type(self.qualified_type_name)
+    def qualified_type_name(self) -> str:
+        'The base type name, including the namespace'
+        return self.data_type.qualified_type
 
     @property
-    def module(self):
+    def data_type(self) -> DataType:
+        return get_data_type_by_reference(
+            self.base_type, (self.tmc, self.find_ancestor(TcSmProject)),
+            reference=self.is_reference, pointer=self.is_pointer,
+        )
+
+    @property
+    def module(self) -> Module:
         'The TMC Module containing the Symbol'
         return self.find_ancestor(Module)
 
@@ -1027,13 +1341,11 @@ class Symbol(_TmcItem):
     def info(self):
         return dict(name=self.name,
                     bit_size=self.BitSize[0].text,
-                    type=self.type_name,
-                    qualified_type_name=self.qualified_type_name,
                     bit_offs=self.BitOffs[0].text,
                     module=self.module.name,
-                    is_pointer=self.is_pointer,
                     array_bounds=self.array_bounds,
                     summary_type_name=self.summary_type_name,
+                    **self.base_type.info,
                     )
 
     def walk(self, condition=None):
@@ -1043,17 +1355,11 @@ class Symbol(_TmcItem):
 
     @property
     def array_info(self):
-        try:
-            return self.ArrayInfo[0]
-        except (AttributeError, IndexError):
-            return None
+        return getattr(self, 'ArrayInfo', [None])[0]
 
     @property
     def array_bounds(self):
-        try:
-            return self.array_info.bounds
-        except (AttributeError, IndexError):
-            return None
+        return getattr(self.array_info, 'array_bounds', None)
 
     def get_links(self, *, strict=False):
         sym_name = '^' + self.name.lower()
@@ -1068,20 +1374,16 @@ class Symbol(_TmcItem):
                 yield link
 
     @property
+    def is_reference(self):
+        return self.base_type.is_reference
+
+    @property
     def is_pointer(self):
-        type_ = self.BaseType[0]
-        pointer_info = type_.attributes.get("PointerTo", None)
-        return bool(pointer_info)
+        return self.base_type.is_pointer
 
     @property
     def summary_type_name(self):
-        summary = self.qualified_type_name
-        if self.is_pointer:
-            summary = 'POINTER TO ' + summary
-        array_bounds = self.array_bounds
-        if array_bounds:
-            summary = 'ARRAY[{}..{}] OF '.format(*array_bounds) + summary
-        return summary
+        return self.data_type.summary_type_name
 
 
 class Symbol_DUT_MotionStage(Symbol):

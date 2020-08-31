@@ -2,6 +2,37 @@
  Release History
 =================
 
+v2.7.5 (2020-08-31)
+===================
+
+
+Fixes
+-----
+
+* Relaxed end-of-pragma-line handling (any combination of ``;`` and newline are
+  all accepted).
+* Reworked XTI file loading for "devices" and "boxes".  This aims to be more
+  compatible with TwinCAT, which does not always relocate XTI files to be in
+  the correct hierarchical directory location.  It pre-loads all XTI files, and
+  when the project is fully loaded, it dereferences XTI files based on a key
+  including ``class``, ``filename``, and a small PLC-unique ``identifier``.
+* Better handling of data types in the project parser. Now supports data type
+  GUIDs, when available, for data type disambiguation.  Note that these are not
+  always present.
+* Better handling of references, pointers, and pointer depth.
+
+Development
+-----------
+
+* ``pytmc db --debug`` allows developers to more easily target exceptions
+  raised when generating database files.
+* Added more memory layout information for the benefit of other utilities such
+  as ``ads-async``. Its ADS server implementation in conjunction with pytmc may
+  be a good source of information regarding PLC memory layout in the future.
+* Started adding some annotations for clarity.  May retroactively add more as
+  time permits.
+
+
 v2.7.1 (2020-08-18)
 ===================
 

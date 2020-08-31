@@ -165,6 +165,16 @@ class RecordPackage:
 
         self._parse_config(self.config)
 
+    def __repr__(self):
+        items = {
+            attr: getattr(self, attr, None)
+            for attr in ('tcname', 'pvname', 'long_description',
+                         'linked_to_pv')
+        }
+        info = ', '.join(f'{k}={v!r}' for k, v in items.items()
+                         if v)
+        return f"{self.__class__.__name__}({info})"
+
     def _parse_config(self, config):
         'Parse the chain configuration'
         if config is None:
