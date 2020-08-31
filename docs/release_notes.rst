@@ -11,6 +11,11 @@ Fixes
 
 * Relaxed end-of-pragma-line handling (any combination of ``;`` and newline are
   all accepted).
+* Reworked XTI file loading for "devices" and "boxes".  This aims to be more
+  compatible with TwinCAT, which does not always relocate XTI files to be in
+  the correct hierarchical directory location.  It pre-loads all XTI files, and
+  when the project is fully loaded, it dereferences XTI files based on a key
+  including ``class``, ``filename``, and a small PLC-unique ``identifier``.
 * Better handling of data types in the project parser. Now supports data type
   GUIDs, when available, for data type disambiguation.  Note that these are not
   always present.
