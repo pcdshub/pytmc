@@ -80,7 +80,7 @@ def lint_pragma(pragma):
     '''
     Lint a pragma against the PRAGMA_RE regular expression. Raises LinterError
     '''
-    if 'pytmc' not in pragma:
+    if pragma is None or 'pytmc' not in pragma:
         return
 
     pragma = pragma.strip()
@@ -273,10 +273,12 @@ def main(filename, use_markdown=False, verbose=False):
                     pragma_count += 1
                     if info.exception is not None:
                         linter_errors += 1
-                        logger.error('Linter error: %s\n%s:line %s: %s',
-                                     info.exception, info.filename,
-                                     info.line_number,
-                                     textwrap.indent(info.pragma, '    '))
+                        logger.error(
+                            'Linter error: %s\n%s:line %s: %s',
+                            info.exception, info.filename,
+                            info.line_number,
+                            textwrap.indent(info.pragma or '', '    '),
+                        )
                         if hasattr(info.exception, 'original_ex'):
                             logger.error(
                                 'Unhandled exception (may be a pytmc bug)',
@@ -290,7 +292,7 @@ def main(filename, use_markdown=False, verbose=False):
                 linter_errors += 1
                 logger.error('Linter error: %s\n%s:line %s: %s',
                              info.exception, info.filename, info.line_number,
-                             textwrap.indent(info.pragma, '    '))
+                             textwrap.indent(info.pragma or '', '    '))
                 if hasattr(info.exception, 'original_ex'):
                     logger.error(
                         'Unhandled exception (may be a pytmc bug)',
