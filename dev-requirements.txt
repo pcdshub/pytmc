@@ -1,6 +1,6 @@
 codecov
 coverage
-pyqt5
+pyqt
 pytest
 pytest-qt
 qtpy
