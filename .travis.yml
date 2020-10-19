@@ -9,7 +9,7 @@ env:
 
     - CONDA_PACKAGE="pytmc"
     - CONDA_RECIPE_FOLDER="conda-recipe"
-    - CONDA_EXTRAS="pip pyqt=5"
+    - CONDA_EXTRAS="pip pyqt=5 qtpy"
     - CONDA_REQUIREMENTS="dev-requirements.txt"
 
     - PIP_EXTRAS="PyQt5"
