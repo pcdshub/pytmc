@@ -1,11 +1,6 @@
 codecov
 coverage
-doctr
+pyqt
 pytest
 pytest-qt
 qtpy
-sphinx
-sphinx-argparse
-sphinx_rtd_theme
-sphinx-autodoc-typehints
-sphinxcontrib-websupport
