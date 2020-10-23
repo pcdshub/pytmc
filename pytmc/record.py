@@ -12,7 +12,13 @@ import pytmc
 from .default_settings.unified_ordered_field_list import unified_lookup_list
 
 logger = logging.getLogger(__name__)
-MAX_ARCHIVE_ELEMENTS = 1024
+
+# NOTE: Some PLCs may fill a buffer on a per-cycle basis. At 1KHz, 1000 is the
+# magic number that would be used.  This threshold reflects the fact that we do
+# not want to include those PVs in the archiver:
+MAX_ARCHIVE_ELEMENTS = 999
+
+# This field length maximum is based on the .DESC field length in epics-base:
 MAX_DESC_FIELD_LENGTH = 40
 
 _default_jinja_env = jinja2.Environment(
@@ -596,6 +602,10 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a Twincat Array"""
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
+    field_defaults = {
+        'APST': 'On Change',
+        'MPST': 'On Change',
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

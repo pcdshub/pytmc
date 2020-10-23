@@ -4,10 +4,10 @@ import types
 import pytest
 
 from pytmc import parser, pragmas
-from pytmc.record import (BinaryRecordPackage, EnumRecordPackage,
-                          FloatRecordPackage, IntegerRecordPackage,
-                          RecordPackage, StringRecordPackage,
-                          WaveformRecordPackage)
+from pytmc.record import (MAX_ARCHIVE_ELEMENTS, BinaryRecordPackage,
+                          EnumRecordPackage, FloatRecordPackage,
+                          IntegerRecordPackage, RecordPackage,
+                          StringRecordPackage, WaveformRecordPackage)
 
 from . import conftest
 
@@ -466,3 +466,32 @@ def test_pv_linking_special():
     pkg, = list(pragmas.record_packages_from_symbol(struct))
     rec = pkg.generate_output_record()
     assert rec.fields['DOL'] == 'PREFIX:ABCD.STAT CPP MS'
+
+
+@pytest.mark.parametrize(
+    'elements, archive_settings',
+    [pytest.param(MAX_ARCHIVE_ELEMENTS + 1,
+                  None,
+                  id='over_threshold'),
+     pytest.param(MAX_ARCHIVE_ELEMENTS,
+                  {'frequency': 1, 'seconds': 1, 'method': 'scan',
+                   'fields': {'VAL'}},
+                  id='under_threshold'),
+     ],
+)
+def test_waveform_archive(chain, dbd_file, elements, archive_settings):
+    chain.data_type = make_mock_type('INT', is_array=True,
+                                     length=elements)
+    chain.config['io'] = 'io'
+    record = RecordPackage.from_chain(chain=chain, ads_port=851)
+    assert record.archive_settings == archive_settings
+    assert len(record.records) == 2
+    for rec in record.records:
+        print()
+        print('Archive settings', record.archive_settings)
+        print(rec.render())
+
+        assert rec.fields.get('APST') == 'On Change'
+        assert rec.fields.get('MPST') == 'On Change'
+
+    conftest.lint_record(dbd_file, record)
