@@ -2,9 +2,30 @@
  Release History
 =================
 
-v2.7.5 (2020-08-31)
+
+v2.7.6 (2020-10-23)
 ===================
 
+Fixes
+-----
+* Added handling for case where pragma is None
+* Lower array archive threshold to arrays with fewer than 1000 elements
+  to prevent our high-rate encoder and power meter readbacks. This is a good
+  threshold because it represents 1000Hz data with a 1Hz polling rate, a
+  very typical parameter.
+* Default APST and MPST fields to "On Change" for waveform PVs. These are
+  special waveform fields that tell monitors and the archiver when to take an
+  update, and previously they were set to "Always", causing influxes of data
+  from static char waveform strings.
+
+Maintenance
+-----------
+* Split dev/docs requirements
+* Fix jinja naming
+
+
+v2.7.5 (2020-08-31)
+===================
 
 Fixes
 -----
