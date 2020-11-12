@@ -125,6 +125,19 @@ class EPICSRecord:
                     fields = set(config[config_key].split(' '))
                     self.autosave[record_key] = fields
 
+    def update_pini_for_autosave(self):
+        """
+        Set PINI=1 if VAL is autosaved at pass1.
+
+        This is a bandaid fix for unexplained behavior where the
+        autosave pass1 does not send values to the PLC unless
+        PINI=1.
+
+        This is intended to be called for output records.
+        """
+        if 'VAL' in self.autosave['pass1']:
+            self.fields['PINI'] = 1
+
     def render(self, sort: bool = True):
         """Render the provided template"""
         for field, value in list(self.fields.items()):
@@ -509,6 +522,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         _update_description(record, self.chain.tcname)
 
         record.update_autosave_from_pragma(self.config)
+        record.update_pini_for_autosave()
         return record
 
     @property
