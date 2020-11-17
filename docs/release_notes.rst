@@ -2,6 +2,18 @@
  Release History
 =================
 
+v2.7.7 (2020-11-17)
+===================
+
+Fixes
+-----
+* Fix issue with pass1 autosave not appropriately writing values to the PLC
+  on IOC startup.
+
+Maintenance
+-----------
+* Regenerate doctr deploy key.
+
 
 v2.7.6 (2020-10-23)
 ===================
