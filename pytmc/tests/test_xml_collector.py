@@ -422,6 +422,17 @@ def test_complex_array():
                       'ARRAY:0099:subitem1',
                       'ARRAY:0100:subitem1'},
                      id='0..1,99..'),
+        pytest.param([0, 100],
+                     """
+                     array: 0
+                     pv: OTHER
+                     array: 2..3
+                     """,
+                     {'ARRAY:0000:subitem1',
+                      'OTHER:0002:subitem1',
+                      'OTHER:0003:subitem1',
+                      },
+                     id='separate_prefixes'),
     ]
 )
 def test_complex_array_partial(dimensions, pragma, expected_records):
