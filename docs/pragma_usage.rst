@@ -1,4 +1,4 @@
-Annotating a TwinCAT3 project 
+Annotating a TwinCAT3 project
 =============================
 
 Pytmc is capable of generating most of the DB file but some settings require
@@ -60,8 +60,8 @@ Pragma syntax
 At a minimum, developers must specify a PV. Specifying an IO direction for each
 field is recommended but not required. This would look like the following:
 
-.. code-block:: none 
-   
+.. code-block:: none
+
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
        io: i
@@ -78,12 +78,12 @@ colon. All parts thereafter are the 'tag' or the configuration state for this
 setting. Some title types such as ``field`` can have multiple settings for a
 single PV.
 
-A pragma could have multiple fields specified. For example, an ``ai`` record 
+A pragma could have multiple fields specified. For example, an ``ai`` record
 ``TEST:MAIN:SCALE`` would be generated from the following, with a slope of
 2.0 and an offset of 1.0, updating only at a rate of once per second:
 
-.. code-block:: none 
-   
+.. code-block:: none
+
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
        io: i
@@ -98,7 +98,7 @@ Declaring top level variables
 This is an example of the simplest configuration a developer can provide to
 instantiate a variable.
 
-.. code-block:: none 
+.. code-block:: none
 
    {attribute 'pytmc' := '
        pv: TEST:MAIN:SCALE
@@ -109,7 +109,7 @@ instantiate a variable.
 
 The developer must specify the PV name (``pv:`` line). All other fields are
 optional. We recommend that the user specify the direction of the
-data (``io:`` line) however. 
+data (``io:`` line) however.
 
 Pytmc needs no additional information but users have the option to override
 default settings manually. For information on all the pragma fields, consult
@@ -120,12 +120,12 @@ Declaring encapsulated variables
 ''''''''''''''''''''''''''''''''
 Variables declared inside of data structures can be processed by pytmc so long
 as each level of encapsulation, all the way down to the first level, is marked
-for pytmc. 
+for pytmc.
 
 The instantiation of encapsulating data types only needs the ``pv:`` line. The
 instantiation of a function block could resemble the following:
 
-.. code-block:: none 
+.. code-block:: none
 
    {attribute 'pytmc' := '
        pv: TEST:MAIN:COUNTER_B
@@ -136,19 +136,19 @@ A variable declared within the ``counter`` function block could resemble the
 following:
 
 .. code-block:: none
-  
+
    {attribute 'pytmc' := '
        pv: VALUE
        io: i
-   '}  
-   value_d : DINT; 
+   '}
+   value_d : DINT;
 
 
 When combined, the PV specified at the instantiation of the user-defined data
 type will be appended to the beginning of the PV for all data types defined
 within. Each step further into a data structure can add an additional section
 to the PV. In the example above the final PV will be
-``TEST:MAIN:COUNTER_B:VALUE``. The colons are automatically included. 
+``TEST:MAIN:COUNTER_B:VALUE``. The colons are automatically included.
 
 This can be recursively applied to data types containing data types.
 
@@ -159,25 +159,25 @@ specified either on a contained datatype or variable.
 
 For example the following code block will assign a ``field:`` of ``DESC test``
 to all the variables and datatypes that it contains unless they
-specify their own setting for ``DESC``.  
+specify their own setting for ``DESC``.
 
-.. code-block:: none 
+.. code-block:: none
 
    {attribute 'pytmc' := '
-       pv: BASE 
+       pv: BASE
        field: DESC test
    '}
    counter_b : counter;
 
 
 .. code-block:: none
-  
+
    {attribute 'pytmc' := '
        pv: VALUE_F_R
        field: DESC test
        io: i
-   '}  
-   value_d : DINT; 
+   '}
+   value_d : DINT;
 
 
 Declaring bidirectional PVs
@@ -191,7 +191,7 @@ be tied to a single TwinCAT variable.
    {attribute 'pytmc' := '
        pv: TEST:MAIN:ULIMIT
        io: io
-   '}  
+   '}
    upper_limit : DINT := 5000;
 
 
@@ -199,6 +199,66 @@ In this case, two records will be generated: ``TEST:MAIN:ULIMIT`` and
 ``TEST:MAIN:ULIMIT_RBV``.
 
 
+Arrays
+''''''
+
+By default, structures with a pragma will generate PVs for each array index,
+including all encapsulated sub-elements that also have an associated pragma.
+
+Depending on the number of elements in the array, the PV name will be
+zero-padded to aid in future expansion. Reminding ourselves that array bounds
+are inclusive in TwinCAT, the following pragma:
+
+.. code-block:: none
+
+    {attribute 'pytmc' := '
+        pv: MY:ARRAY
+    '}
+    myStructure : ARRAY [0..5] of DUT_MyStructure
+
+
+would generate these prefixes:
+
+.. code-block:: none
+
+    MY:ARRAY:00:
+    MY:ARRAY:01:
+    MY:ARRAY:02:
+    MY:ARRAY:03:
+    MY:ARRAY:04:
+    MY:ARRAY:05:
+
+
+The formatting of this may be customized, but it is not recommended to do so
+in general. Adding ``expand: :%.3d`` would extend the zero-padding to 3 digits,
+regardless of the number of array elements.
+
+It is also possible to select individual elements or a range of elements from
+a large array by way of the ``array`` pragma.
+
+To include only the first 2 elements (0 and 1) of this large 101 element array,
+the following pragma could be used:
+
+.. code-block:: none
+
+    {attribute 'pytmc' := '
+        pv: MY:ARRAY
+        array: 0..1
+    '}
+    myStructure : ARRAY [0..100] of DUT_MyStructure
+
+
+The array pragma is flexible, allowing for the following:
+
+============ ====================
+Array Pragma Elements Selected
+============ ====================
+0, 1, 2      0, 1, 2
+0..2         0, 1, 2
+99..         99, 100
+..5          0, 1, 2, 3, 4, 5
+..5, 99      0, 1, 2, 3, 4, 5, 99
+============ ====================
 Pragma fields
 '''''''''''''
 
@@ -211,7 +271,7 @@ pv
 ..
 This constructs the PV name that will represent this variable in EPICS. It is
 the only mandatory configuration line. This line can be used on specific
-variables as well as the instantiations of data types. 
+variables as well as the instantiations of data types.
 
 .. note::
 
@@ -328,7 +388,7 @@ documentation <https://slacmshankar.github.io/epicsarchiver_docs/faq.html>`_.
 .. note::
 
    Additional fields can be specified for archiving through the ``archive_fields``
-   key, which is a space-delimited list of field names. 
+   key, which is a space-delimited list of field names.
 
    Example: ``archive_fields: DESC PREC``
 
@@ -337,7 +397,7 @@ Record fields
 .............
 This specifies additional field(s) to be set on the generated EPICS record(s).
 Multiple field lines are allowed. These lines determine the PV's behaviors such
-as alarm limits and scanning frequency.  
+as alarm limits and scanning frequency.
 
 The format is as follows:
 
@@ -388,7 +448,7 @@ To only apply to output records, pragma keys ``autosave_output_pass0``
 For example, a pragma like the following:
 
 .. code-block:: none
-   
+
    autosave_pass0: VAL DESC
 
 
