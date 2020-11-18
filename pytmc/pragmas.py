@@ -231,7 +231,9 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
         expand_default = f':%.{expand_digits}d'
         for pvname, config in separate_configs_by_pv(
                 split_pytmc_pragma('\n'.join(pragmas))):
-            for idx in range(low, high + 1):
+
+            array_element_pragma = dictify_config(config).get('array', '')
+            for idx in parse_array_settings(array_element_pragma, (low, high)):
                 yield (parser._ArrayItemProxy(item, idx),
                        dictify_config(config, array_index=idx,
                                       expand_default=expand_default))
@@ -334,7 +336,7 @@ def _parse_rate(rate, hz_or_sec):
     Parameters
     ----------
     rate : str
-        The pragma-specified rate
+        The pragma-specified rate.
 
     hz_or_sec : str
         {'hz', 's'}
@@ -370,7 +372,7 @@ def parse_update_rate(update, default=UPDATE_RATE_DEFAULT):
     Parameters
     ----------
     update : str
-        The I/O specifier from the pragma
+        The update rate specifier from the pragma.
 
     Returns
     -------
@@ -416,7 +418,7 @@ def parse_archive_settings(archive, default=ARCHIVE_DEFAULT):
     Parameters
     ----------
     archive : str
-        The I/O specifier from the pragma
+        The archive specifier from the pragma.
 
     Returns
     -------
@@ -450,6 +452,71 @@ def parse_archive_settings(archive, default=ARCHIVE_DEFAULT):
         res.update(_parse_rate(d['rate'], d['hz_or_sec']))
 
     return res
+
+
+def parse_array_settings(pragma, dimensions):
+    '''
+    Parse an 'array' specifier in a pragma, yielding array elements.
+
+    Parameters
+    ----------
+    pragma : str
+        The I/O specifier from the pragma.
+
+    dimensions : 2-tuple
+        Lower and upper-bound of the array corresponding to the pragma.
+
+    Yields
+    ------
+    element : int
+        Integer element of selected array indices.
+
+    Raises
+    ------
+    ValueError
+        If an invalid pragma is supplied
+    '''
+    pragma = pragma.strip()
+
+    try:
+        low, high = dimensions
+    except Exception:
+        raise ValueError(
+            f'Invalid dimensions {dimensions!r} for array specifier in pragma '
+            f'{pragma!r}'
+        )
+
+    full_range = range(low, high + 1)
+    if not pragma:
+        yield from full_range
+        return
+
+    def _parse_element(elem):
+        if '..' not in elem:
+            return [int(elem)]
+
+        # Split by .., such that this will support:
+        #   ..to, from.., from..to, from..to..step
+        slice_args = [
+            int(idx) if idx else None
+            for idx in elem.split('..')
+        ]
+
+        # One exception is that the (normally exclusive slice) upper-bound has
+        # to be converted to being inclusive:
+        if slice_args[1] is not None:
+            slice_args[1] += 1
+
+        return full_range[slice(*slice_args)]
+
+    try:
+        for elem in pragma.split(','):
+            for idx in _parse_element(elem):
+                yield idx
+    except Exception as ex:
+        raise ValueError(
+            f'Invalid array pragma: {pragma} ({ex})'
+        )
 
 
 def normalize_config(config):

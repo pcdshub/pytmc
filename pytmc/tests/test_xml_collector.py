@@ -383,6 +383,69 @@ def test_complex_array():
     assert records['ARRAY:01:subitem2'].io_direction == 'input'
 
 
+@pytest.mark.parametrize(
+    'dimensions, pragma, expected_records',
+    [
+        pytest.param([0, 3],
+                     '',
+                     {'ARRAY:00:subitem1',
+                      'ARRAY:01:subitem1',
+                      'ARRAY:02:subitem1',
+                      'ARRAY:03:subitem1'},
+                     id='no-pragma'),
+        pytest.param([0, 3],
+                     'array: 0..1',
+                     {'ARRAY:00:subitem1',
+                      'ARRAY:01:subitem1'},
+                     id='0..1'),
+        pytest.param([0, 3],
+                     'array: 0..1, 3',
+                     {'ARRAY:00:subitem1',
+                      'ARRAY:01:subitem1',
+                      'ARRAY:03:subitem1'},
+                     id='0..1,3'),
+        pytest.param([0, 3],
+                     'array: ..1',
+                     {'ARRAY:00:subitem1',
+                      'ARRAY:01:subitem1'},
+                     id='..1'),
+        pytest.param([0, 3],
+                     'array: 1..',
+                     {'ARRAY:01:subitem1',
+                      'ARRAY:02:subitem1',
+                      'ARRAY:03:subitem1'},
+                     id='1..'),
+        pytest.param([0, 100],
+                     'array: 0..1, 99..',
+                     {'ARRAY:0000:subitem1',
+                      'ARRAY:0001:subitem1',
+                      'ARRAY:0099:subitem1',
+                      'ARRAY:0100:subitem1'},
+                     id='0..1,99..'),
+    ]
+)
+def test_complex_array_partial(dimensions, pragma, expected_records):
+    array = make_mock_twincatitem(
+        name='array_base',
+        data_type=make_mock_type('MY_DUT', is_complex_type=True),
+        pragma='\n'.join(('pv: ARRAY', pragma)),
+        array_info=dimensions,
+    )
+
+    subitem1 = make_mock_twincatitem(
+        name='subitem1', data_type=make_mock_type('INT'),
+        pragma='pv: subitem1')
+
+    def walk(condition=None):
+        # Two chains, one for each array + subitem
+        yield [array, subitem1]
+
+    array.walk = walk
+    record_names = (record.pvname for record in
+                    pragmas.record_packages_from_symbol(array))
+    assert set(record_names) == expected_records
+
+
 def test_enum_array():
     array = make_mock_twincatitem(
         name='enum_array',
