@@ -512,6 +512,11 @@ def parse_array_settings(pragma, dimensions):
     try:
         for elem in pragma.split(','):
             for idx in _parse_element(elem):
+                if not low <= idx <= high:
+                    raise ValueError(
+                        f'Array pragma index out of bounds: '
+                        f'{low} < {elem} < {high}'
+                    )
                 yield idx
     except Exception as ex:
         raise ValueError(
