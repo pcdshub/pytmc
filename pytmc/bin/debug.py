@@ -12,8 +12,8 @@ from qtpy import QtWidgets
 from qtpy.QtCore import Qt, Signal
 
 import pytmc
-from .db import process
 
+from .db import process
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def _grep_record_names(text):
     if not text:
         return []
 
-    records = [line.rstrip('{')
+    records = [line.rstrip('{ ')
                for line in text.splitlines()
                if line.startswith('record')   # regular line
                or line.startswith('. record')  # linted line
