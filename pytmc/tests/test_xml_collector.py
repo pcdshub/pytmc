@@ -437,7 +437,6 @@ def test_complex_array_partial(dimensions, pragma, expected_records):
         pragma='pv: subitem1')
 
     def walk(condition=None):
-        # Two chains, one for each array + subitem
         yield [array, subitem1]
 
     array.walk = walk
