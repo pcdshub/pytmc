@@ -212,17 +212,18 @@ def dictify_config(raw_conf, array_index=None):
         config['pv'] += get_array_suffix(config, array_index)
 
     def add_subitem(d, key, value):
+        """Add a subitem `key: value` to dictionary `d`."""
         if '.' in key:
             # The first a.b.c.pragma indicate the sub-(sub-) item for 'pragma':
             child, remainder = key.split('.', 1)
             if child not in d:
                 d[child] = {PRAGMA: []}
-            add_subitem(d[child], remainder, value)
-        else:
-            if key in DISALLOWED_SUBITEMS:
-                raise ValueError(f'Unsupported pragma key in subitem: {key}')
-            # The final key is a pytmc-supported pragma:
-            d[PRAGMA].append((key, value))
+            return add_subitem(d[child], remainder, value)
+
+        if key in DISALLOWED_SUBITEMS:
+            raise ValueError(f'Unsupported pragma key in subitem: {key}')
+        # The final key is a pytmc-supported pragma:
+        d[PRAGMA].append((key, value))
 
     for title, tag in title_tag_pairs:
         if '.' in title:
