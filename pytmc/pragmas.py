@@ -54,7 +54,7 @@ ARCHIVE_DEFAULT = {'frequency': 1, 'seconds': 1, 'method': 'scan'}
 # Special, reserved keys:
 SUBITEM = '_subitem_'
 PRAGMA = '_pragma_'
-DISALLOWED_SUBITEMS = {'pv', SUBITEM, PRAGMA}
+DISALLOWED_SUBITEMS = {'pv', SUBITEM, PRAGMA, 'field', 'link'}
 
 # Default for array index expansion:
 EXPAND_DEFAULT = ':%.2d'
