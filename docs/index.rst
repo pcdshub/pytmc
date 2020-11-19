@@ -26,7 +26,7 @@ requests. The ``question`` tag will be treated like an 'enhancements' tag for
 the documentation but regular questions can be posted there as well.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Contents:
 
    user_guide.rst

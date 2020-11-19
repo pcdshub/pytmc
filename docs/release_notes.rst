@@ -2,6 +2,19 @@
  Release History
 =================
 
+v2.8.0 (2020-??-??)
+===================
+
+Enhancements
+------------
+
+* Add support for partial pragmas of array elements.
+
+Fixes
+-----
+
+* Record names now displaying correctly in ``pytmc debug`` dialog
+
 v2.7.7 (2020-11-17)
 ===================
 
