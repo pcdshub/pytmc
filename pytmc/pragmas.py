@@ -678,12 +678,12 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
             except Exception as ex:
                 if yield_exceptions:
                     yield type(ex)(f"Symbol {symbol.name} "
-                                   f"chain: {chain.tcname}: {ex.args[0]}")
+                                   f"chain: {chain.tcname}: {ex}")
                 else:
                     raise
     except Exception as ex:
         if yield_exceptions:
-            yield type(ex)(f"Symbol {symbol.name} failure: {ex.args[0]}")
+            yield type(ex)(f"Symbol {symbol.name} failure: {ex}")
         else:
             raise
 
