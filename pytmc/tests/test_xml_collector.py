@@ -334,18 +334,18 @@ def test_BaseRecordPackage_guess_NELM(chain, tc_type, sing_index, is_str,
 
 def test_scalar():
     item = make_mock_twincatitem(
-        name='tcname', data_type=make_mock_type('DINT'),
+        name='Main.tcname', data_type=make_mock_type('DINT'),
         pragma='pv: PVNAME')
 
     record, = list(pragmas.record_packages_from_symbol(item))
     assert record.pvname == 'PVNAME'
-    assert record.tcname == 'tcname'
+    assert record.tcname == 'Main.tcname'
     assert isinstance(record, IntegerRecordPackage)
 
 
 def test_complex_array():
     array = make_mock_twincatitem(
-        name='array_base',
+        name='Main.array_base',
         data_type=make_mock_type('MY_DUT', is_complex_type=True),
         pragma='pv: ARRAY', array_info=(1, 4))
 
@@ -437,7 +437,7 @@ def test_complex_array():
 )
 def test_complex_array_partial(dimensions, pragma, expected_records):
     array = make_mock_twincatitem(
-        name='array_base',
+        name='Main.array_base',
         data_type=make_mock_type('MY_DUT', is_complex_type=True),
         pragma='\n'.join(('pv: ARRAY', pragma)),
         array_info=dimensions,
@@ -458,7 +458,7 @@ def test_complex_array_partial(dimensions, pragma, expected_records):
 
 def test_enum_array():
     array = make_mock_twincatitem(
-        name='enum_array',
+        name='Main.enum_array',
         data_type=make_mock_type('MY_ENUM', is_enum=True,
                                  enum_dict={1: 'ONE', 2: 'TWO'}),
         pragma='pv: ENUMS', array_info=(1, 4)
@@ -487,7 +487,7 @@ def test_enum_array():
 
 def test_unroll_formatting():
     array = make_mock_twincatitem(
-        name='enum_array',
+        name='Main.enum_array',
         data_type=make_mock_type('MY_ENUM', is_enum=True,
                                  enum_dict={1: 'ONE', 2: 'TWO'}),
         pragma='pv: ENUMS\nexpand: _EXPAND%d', array_info=(1, 4)
@@ -508,12 +508,12 @@ def test_unroll_formatting():
 
 def test_pv_linking():
     item = make_mock_twincatitem(
-        name='tcname', data_type=make_mock_type('DINT'),
+        name='Main.tcname', data_type=make_mock_type('DINT'),
         pragma='pv: PVNAME; link: OTHER:RECORD')
 
     pkg, = list(pragmas.record_packages_from_symbol(item))
     assert pkg.pvname == 'PVNAME'
-    assert pkg.tcname == 'tcname'
+    assert pkg.tcname == 'Main.tcname'
     assert isinstance(pkg, IntegerRecordPackage)
     rec = pkg.generate_output_record()
     assert rec.fields['OMSL'] == 'closed_loop'
@@ -523,7 +523,7 @@ def test_pv_linking():
 
 def test_pv_linking_special():
     struct = make_mock_twincatitem(
-        name='array_base',
+        name='Main.array_base',
         data_type=make_mock_type('MY_DUT', is_complex_type=True),
         pragma='pv: PREFIX')
 
