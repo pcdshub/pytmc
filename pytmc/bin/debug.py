@@ -86,7 +86,7 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     item_selected = Signal(object)
 
-    def __init__(self, tmc, dbd):
+    def __init__(self, tmc, dbd, allow_no_pragma=False):
         super().__init__()
         self.tmc = tmc
         self.chains = {}
@@ -94,7 +94,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.records = {}
 
         records, self.exceptions = process(tmc, allow_errors=True,
-                                           allow_no_pragma=True)
+                                           allow_no_pragma=allow_no_pragma)
 
         for record in records:
             if not record.valid:
@@ -311,16 +311,20 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.item_list.addItem(item)
 
 
-def create_debug_gui(tmc, dbd=None):
+def create_debug_gui(tmc, dbd=None, allow_no_pragma=False):
     '''
-    Show the results of tmc processing in a Qt gui
+    Show the results of tmc processing in a Qt gui.
 
     Parameters
     ----------
     tmc : TmcFile, str, pathlib.Path
-        The tmc file to show
+        The tmc file to show.
+
     dbd : DbdFile, optional
-        The dbd file to lint against
+        The dbd file to lint against.
+
+    allow_no_pragma : bool, optional
+        Look for chains that have missing pragmas.
     '''
 
     if isinstance(tmc, (str, pathlib.Path)):
@@ -329,7 +333,7 @@ def create_debug_gui(tmc, dbd=None):
     if dbd is not None and not isinstance(dbd, pytmc.linter.DbdFile):
         dbd = pytmc.linter.DbdFile(dbd)
 
-    return TmcSummary(tmc, dbd)
+    return TmcSummary(tmc, dbd, allow_no_pragma=allow_no_pragma)
 
 
 def build_arg_parser(parser=None):
@@ -352,11 +356,18 @@ def build_arg_parser(parser=None):
               '(requires pyPDB)')
     )
 
+    parser.add_argument(
+        '-a', '--allow-no-pragma',
+        action='store_true',
+        help='Show all items, even those missing pragmas (warning: slow)',
+    )
+
     return parser
 
 
-def main(tmc_file, *, dbd=None):
+def main(tmc_file, *, dbd=None, allow_no_pragma=False):
     app = QtWidgets.QApplication([])
-    interface = create_debug_gui(tmc_file, dbd)
+    interface = create_debug_gui(tmc_file, dbd,
+                                 allow_no_pragma=allow_no_pragma)
     interface.show()
     sys.exit(app.exec_())
