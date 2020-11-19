@@ -138,8 +138,10 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.item_view_type.addItem('Chains w/o Records')
         self.item_view_type.currentTextChanged.connect(self._update_view_type)
         self.item_list = QtWidgets.QListWidget()
+        self.item_list_filter = QtWidgets.QLineEdit()
 
         self.left_layout.addWidget(self.item_view_type)
+        self.left_layout.addWidget(self.item_list_filter)
         self.left_layout.addWidget(self.item_list)
 
         # Right part of the window
@@ -182,6 +184,14 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.item_selected.connect(self._update_chain_info)
         self.item_selected.connect(self._update_record_text)
 
+        def set_filter(text):
+            text = text.strip().lower()
+            for idx in range(self.item_list.count()):
+                item = self.item_list.item(idx)
+                item.setHidden(bool(text and text not in item.text().lower()))
+
+        self.item_list_filter.textEdited.connect(set_filter)
+
         self._update_item_list()
 
     def _item_selected(self, current, previous):
@@ -202,6 +212,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         chain = record.chain
 
         self.config_info.clear()
+        self.item_list_filter.setText('')
         self.config_info.setRowCount(len(chain.chain))
 
         def add_dict_to_table(row: int, d: dict):
