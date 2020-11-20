@@ -12,6 +12,8 @@ Enhancements
   function blocks.
 * Add support for partial pragmas of array elements.
 * Added text filter in ``pytmc debug`` dialog.
+* Check maximum record length when generating the database file.  This is a
+  constant defined at epics-base compile time, defaulting to 60.
 
 Fixes
 -----
