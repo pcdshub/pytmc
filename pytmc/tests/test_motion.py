@@ -1,5 +1,5 @@
 from pytmc import parser
-from pytmc.bin.stcmd import main as stcmd_main
+from pytmc.bin import stcmd
 
 
 def test_motion_stcmd(capsys, project_filename):
@@ -21,7 +21,7 @@ def test_motion_stcmd(capsys, project_filename):
         motors = list(plc_project.find(parser.Symbol_DUT_MotionStage))
         # Clear captured buffer just in case
         capsys.readouterr()
-        stcmd_main(project_filename, plc_name=plc_name,
+        stcmd.main(project_filename, plc_name=plc_name,
                    only_motor=True, allow_errors=True)
         output = capsys.readouterr().out
 
@@ -31,3 +31,37 @@ def test_motion_stcmd(capsys, project_filename):
             assert controller_func not in output
 
         assert output.count(motor_func) == len(motors)
+
+
+def test_axis_name_without_pragma():
+    from .test_xml_collector import make_mock_twincatitem, make_mock_type
+
+    axis = make_mock_twincatitem(
+        name='Main.my_axis',
+        data_type=make_mock_type('DUT_MotionStage', is_complex_type=True),
+        # pragma='pv: OUTER',
+    )
+
+    class NCAxis:
+        name = 'Axis 1'
+
+    axis.nc_axis = NCAxis
+    user_config = dict(delim=':', prefix='PREFIX')
+    prefix, name = stcmd.get_name(axis, user_config=user_config)
+    assert name == NCAxis.name.replace(' ', user_config['delim'])
+    assert prefix == user_config['prefix'] + user_config['delim']
+
+
+def test_axis_name_with_pragma():
+    from .test_xml_collector import make_mock_twincatitem, make_mock_type
+
+    axis = make_mock_twincatitem(
+        name='Main.my_axis',
+        data_type=make_mock_type('DUT_MotionStage', is_complex_type=True),
+        pragma='pv: MY:STAGE',
+    )
+
+    # axis.nc_axis is unimportant here as we have the pragma
+    user_config = dict(delim=':', prefix='PREFIX')
+    prefix, name = stcmd.get_name(axis, user_config=user_config)
+    assert (prefix, name) == ('MY:', 'STAGE')
