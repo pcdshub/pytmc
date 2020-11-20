@@ -757,8 +757,11 @@ def chains_from_symbol(symbol, *, pragma: str = 'pytmc',
     else:
         condition = has_pragma
     for full_chain in symbol.walk(condition=condition):
-        for item_and_config in expand_configurations_from_chain(
-                full_chain, allow_no_pragma=allow_no_pragma):
+        configs = itertools.product(
+            *_expand_configurations_from_chain(full_chain,
+                                               allow_no_pragma=allow_no_pragma)
+        )
+        for item_and_config in configs:
             yield SingularChain(dict(item_and_config))
 
 
