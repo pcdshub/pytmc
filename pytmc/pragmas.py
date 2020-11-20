@@ -355,6 +355,9 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
     result = _expand_configurations_from_chain(
         chain, pragma=pragma, allow_no_pragma=allow_no_pragma
     )
+    if not result:
+        return []
+
     return list(itertools.product(*result))
 
 
