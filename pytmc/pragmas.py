@@ -234,6 +234,34 @@ def dictify_config(raw_conf, array_index=None):
     return config
 
 
+def _merge_subitems(target: dict, source: dict):
+    """
+    In-place merge `source` into `target`.
+
+    Sub-item dictionaries, held at the top-level key ``_subitem_``, are nested
+    dictionaries containing sub-item names or the special key ``_pragma_``,
+    which can modify the pragma at the given level.
+
+    For example::
+
+        {'_subitem_': {'member1': {'_pragma_': [('key', '1')], ... }}}
+
+    This top-level _subitem_ pragma dictionary contains a pragma ``key: 1``
+    for the ".member1" member.  ``member1``, if structured, may also have
+    keys in its dictionary named after its members.
+    """
+    if PRAGMA not in target:
+        target[PRAGMA] = []
+
+    for key, value in source.items():
+        if key == PRAGMA:
+            target[PRAGMA].extend(value)
+        else:
+            if key not in target:
+                target[key] = {}
+            _merge_subitems(target[key], value)
+
+
 def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
                                      allow_no_pragma=False):
     '''
@@ -262,31 +290,39 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
     '''
     result = []
 
-    def dictify_scalar(item, pvname, config):
-        yield item, copy.deepcopy(config)
+    def handle_scalar(item, pvname, config):
+        """Handler for scalar simple or structured items."""
+        yield item, config
 
-    def dictify_complex_array(item, pvname, config):
+    def handle_array_complex(item, pvname, config):
+        """Handler for arrays of structured items (or enums)."""
         low, high = item.array_info.bounds
         expand_digits = math.floor(math.log10(high)) + 2
         array_element_pragma = config.get('array', '')
         for idx in parse_array_settings(array_element_pragma, (low, high)):
-            idx_config = copy.deepcopy(config)
+            # shallow-copy; only touching the top level "pv" key
+            idx_config = copy.copy(config)
             idx_config['pv'] += get_array_suffix(
                 config, idx, default=f':%.{expand_digits}d')
             yield parser._ArrayItemProxy(item, idx), idx_config
 
-    def merge_subitems(target, source):
-        if PRAGMA not in target:
-            target[PRAGMA] = []
+    def get_all_options(subitems, handler, pragmas):
+        split_pragma = split_pytmc_pragma('\n'.join(pragmas))
+        for pvname, separated_cfg in separate_configs_by_pv(split_pragma):
+            config = dictify_config(separated_cfg)
 
-        for key, value in source.items():
-            if key == PRAGMA:
-                target[PRAGMA].extend(value)
-            else:
-                if key not in target:
-                    target[key] = {}
-                merge_subitems(target[key], value)
+            # config will have the SUBITEM key, applicable to its level
+            # in the hierarchy. If it exists, merge it with our current set.
+            if SUBITEM in config:
+                _merge_subitems(subitems, config[SUBITEM])
 
+            for key, value in subitems.get(PRAGMA, []):
+                config[key] = value
+
+            yield from handler(item, pvname, config)
+
+    # `subitems` keeps track of forward references with pragmas of members
+    # and sub-members (and so on)
     subitems = {}
 
     for item in chain:
@@ -304,28 +340,11 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
 
         if item.array_info and (item.data_type.is_complex_type or
                                 item.data_type.is_enum):
-            dictify_func = dictify_complex_array
+            options = get_all_options(subitems, handle_array_complex, pragmas)
         else:
-            dictify_func = dictify_scalar
+            options = get_all_options(subitems, handle_scalar, pragmas)
 
-        split_pragma = split_pytmc_pragma('\n'.join(pragmas))
-        alternate_pvs = []
-        for pvname, separated_cfg in separate_configs_by_pv(split_pragma):
-            config = dictify_config(separated_cfg)
-
-            # config will have the SUBITEM key, applicable to its level
-            # in the hierarchy. If it exists, merge it with our current set.
-            if SUBITEM in config:
-                merge_subitems(subitems, config[SUBITEM])
-
-            for key, value in subitems.get(PRAGMA, []):
-                config[key] = value
-
-            alternate_pvs.extend(
-                list(dictify_func(item, pvname, config))
-            )
-
-        result.append(alternate_pvs)
+        result.append(list(options))
 
     return list(itertools.product(*result))
 
