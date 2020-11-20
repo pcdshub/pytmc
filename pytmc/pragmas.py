@@ -262,33 +262,12 @@ def _merge_subitems(target: dict, source: dict):
             _merge_subitems(target[key], value)
 
 
-def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
-                                     allow_no_pragma=False):
-    '''
-    Generate all possible configuration combinations
-
-    For example, from a chain with two items::
-
-        [item1, item2]
-
-    The latter of which has a configuration that creates two PVs (specified by
-    configuration dictionaries config1, config2), this function will return::
-
-        [
-            [(item1, config1), (item2, config1)],
-            [(item1, config1), (item2, config2)],
-        ]
-
-    Special handling for arrays of complex types will unroll the array into
-    individual elements.  That is, `arr : ARRAY [1..5] of ST_Structure` will be
-    unrolled into `arr[1]` through `arr[5]`.
-
-    Returns
-    -------
-    tuple
-        Tuple of tuples. See description above.
-    '''
-    result = []
+def _expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
+                                      allow_no_pragma=False):
+    """
+    Wrapped by ``expand_configurations_from_chain``, usable for callers that
+    don't want the full product of all configurations.
+    """
 
     def handle_scalar(item, pvname, config):
         """Handler for scalar simple or structured items."""
@@ -332,7 +311,7 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
         if not pragmas:
             if allow_no_pragma:
                 pragmas = [None]
-                result.append([(item, None)])
+                yield [(item, None)]
                 continue
 
             # If any pragma in the chain is unset, escape early
@@ -344,8 +323,38 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
         else:
             options = get_all_options(subitems, handle_scalar, pragmas)
 
-        result.append(list(options))
+        yield list(options)
 
+
+def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
+                                     allow_no_pragma=False):
+    '''
+    Generate all possible configuration combinations
+
+    For example, from a chain with two items::
+
+        [item1, item2]
+
+    The latter of which has a configuration that creates two PVs (specified by
+    configuration dictionaries config1, config2), this function will return::
+
+        [
+            [(item1, config1), (item2, config1)],
+            [(item1, config1), (item2, config2)],
+        ]
+
+    Special handling for arrays of complex types will unroll the array into
+    individual elements.  That is, `arr : ARRAY [1..5] of ST_Structure` will be
+    unrolled into `arr[1]` through `arr[5]`.
+
+    Returns
+    -------
+    tuple
+        Tuple of tuples. See description above.
+    '''
+    result = _expand_configurations_from_chain(
+        chain, pragma=pragma, allow_no_pragma=allow_no_pragma
+    )
     return list(itertools.product(*result))
 
 
