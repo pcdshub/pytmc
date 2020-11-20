@@ -1,7 +1,10 @@
 import os
+
 import pyPDB.dbd.yacc as _yacc
 import pyPDB.dbdlint as _dbdlint
 from pyPDB.dbdlint import DBSyntaxError
+
+MAX_RECORD_LENGTH = int(os.environ.get('EPICS_MAX_RECORD_LENGTH', '60'))
 
 
 class LinterResults(_dbdlint.Results):

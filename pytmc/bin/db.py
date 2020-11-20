@@ -141,6 +141,21 @@ def process(tmc, *, dbd_file=None, allow_errors=False, show_error_context=True,
         exceptions.append(ex)
         logger.error(message)
 
+    too_long = [record_name for record_name in record_names
+                if len(record_name) > linter.MAX_RECORD_LENGTH]
+    if too_long:
+        message = '\n'.join(
+            [f'Records exceeding the maximum length of '
+             f'{linter.MAX_RECORD_LENGTH} were found:'] +
+            [f'    {record}' for record in too_long]
+        )
+
+        ex = LinterError(message)
+        if not allow_errors:
+            raise ex
+        exceptions.append(ex)
+        logger.error(message)
+
     if dbd_file is not None:
         results, rendered = validate_with_dbd(records, dbd_file)
         for warning in results.warnings:
