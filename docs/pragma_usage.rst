@@ -468,3 +468,58 @@ autosaving:
       ...
       info(autosaveFields_pass0, "VAL DESC")
    }
+
+
+Sub-Items
+.........
+
+There is a special syntax to pragma a member of a structure differently
+depending on the instance.
+
+Given this example function block:
+
+.. code-block:: none
+
+    FUNCTION_BLOCK FB_Test
+    VAR
+        {attribute 'pytmc' := 'pv: variable1'}
+        variable1 : LREAL := 0.0;
+
+        {attribute 'pytmc' := 'pv: variable2'}
+        variable2 : LREAL := 0.0;
+    END_VAR
+    END_FUNCTION_BLOCK
+
+Adding these pragmas to two instances:
+
+.. code-block:: none
+
+    {attribute 'pytmc' := '
+        pv: TEST:A
+        variable1.io: i
+        variable2.io: i
+    '}
+    fbTestA : FB_Test;
+
+    {attribute 'pytmc' := '
+        pv: TEST:B
+        variable1.io: io
+        variable2.io: io
+    '}
+    fbTestB : FB_Test;
+
+The above would result in two different ``io`` settings for
+``fbTestA.variable1`` and ``fbTestB.variable1``.
+
+There are some limitations on this preliminary feature. You may not add or
+change the following fields for now:
+
+.. code-block:: none
+
+    pv
+    link
+    field
+
+
+The primary use case is expected to be ``array``, to limit the number of array
+instances generated with hard-coded upper bounds on encapsulated structures.

@@ -928,6 +928,11 @@ class ExtendsType(_TmcItem):
         namespace = self.namespace
         return f'{namespace}.{self.text}' if namespace else self.text
 
+    @property
+    def type_name(self):
+        """The type name, without a namespace."""
+        return self.text
+
 
 class BaseType(Type):
     '[TMC] A reference to the data type of a symbol'

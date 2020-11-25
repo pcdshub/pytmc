@@ -8,14 +8,19 @@ v2.8.0 (2020-??-??)
 Enhancements
 ------------
 
+* Add support for externally adding pragmas to members of structures and
+  function blocks.
 * Add support for partial pragmas of array elements.
+* Added text filter in ``pytmc debug`` dialog.
 * Check maximum record length when generating the database file.  This is a
   constant defined at epics-base compile time, defaulting to 60.
 
 Fixes
 -----
 
-* Record names now displaying correctly in ``pytmc debug`` dialog
+* Record names now displaying correctly in ``pytmc debug`` dialog.
+* ``pytmc debug`` no longer fails when it encounters types that extend
+  built-in data types by way of ``ExtendsType``.
 
 v2.7.7 (2020-11-17)
 ===================

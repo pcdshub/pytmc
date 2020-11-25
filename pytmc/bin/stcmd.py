@@ -12,11 +12,9 @@ import pathlib
 
 import jinja2
 
-from . import db, util
 from .. import pragmas
-
-from ..parser import parse, Symbol, separate_by_classname, NC
-
+from ..parser import NC, Symbol, parse, separate_by_classname
+from . import db, util
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
@@ -138,7 +136,7 @@ def get_name(obj, user_config):
         item_to_config = dict(item_and_config[0])
         config = pragmas.squash_configs(*item_to_config.values())
         # PV name specified in the pragma - use it as-is
-        if 'pv' in config:
+        if config.get('pv'):
             pv = delim.join(config['pv'])
             if delim in pv:
                 pv_parts = pv.split(delim)

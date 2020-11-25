@@ -2,6 +2,7 @@
 This file contains the objects for taking in pytmc-parsed TMC files and
 generating Python-level configuration information.
 """
+import copy
 import itertools
 import logging
 import math
@@ -49,6 +50,14 @@ _ARCHIVE_RE = re.compile(
     flags=re.IGNORECASE
 )
 ARCHIVE_DEFAULT = {'frequency': 1, 'seconds': 1, 'method': 'scan'}
+
+# Special, reserved keys:
+SUBITEM = '_subitem_'
+PRAGMA = '_pragma_'
+DISALLOWED_SUBITEMS = {'pv', SUBITEM, PRAGMA, 'field', 'link'}
+
+# Default for array index expansion:
+EXPAND_DEFAULT = ':%.2d'
 
 
 def split_pytmc_pragma(pragma_text):
@@ -158,7 +167,14 @@ def separate_configs_by_pv(config_lines):
         yield pv, config
 
 
-def dictify_config(conf, array_index=None, expand_default=':%.2d'):
+def get_array_suffix(config, array_index, *, default=EXPAND_DEFAULT):
+    '''
+    Return array index suffix based on the expand settings in the config.
+    '''
+    return config.get('expand', default) % array_index
+
+
+def dictify_config(raw_conf, array_index=None):
     '''
     Make a raw config list into an easier-to-use dictionary
 
@@ -175,20 +191,139 @@ def dictify_config(conf, array_index=None, expand_default=':%.2d'):
          'field': {'fieldname': 'value'}}
     '''
 
+    title_tag_pairs = [(item['title'], item['tag']) for item in raw_conf]
+
     fields = {
-        item['tag']['f_name']: item['tag']['f_set']
-        for item in conf
-        if item['title'] == 'field'
+        tag['f_name']: tag['f_set']
+        for title, tag in title_tag_pairs
+        if title == 'field'
     }
-    config = {item['title']: item['tag']
-              for item in conf}
+
+    config = {
+        title: tag
+        for title, tag in title_tag_pairs
+        if '.' not in title  # Handle subitem entries specially
+    }
+
     if fields:
         config['field'] = fields
 
     if array_index is not None:
-        config['pv'] += config.get('expand', expand_default) % array_index
+        config['pv'] += get_array_suffix(config, array_index)
+
+    def add_subitem(d, key, value):
+        """Add a subitem `key: value` to dictionary `d`."""
+        if '.' in key:
+            # The first a.b.c.pragma indicate the sub-(sub-) item for 'pragma':
+            child, remainder = key.split('.', 1)
+            if child not in d:
+                d[child] = {PRAGMA: []}
+            return add_subitem(d[child], remainder, value)
+
+        if key in DISALLOWED_SUBITEMS:
+            raise ValueError(f'Unsupported pragma key in subitem: {key}')
+        # The final key is a pytmc-supported pragma:
+        d[PRAGMA].append((key, value))
+
+    for title, tag in title_tag_pairs:
+        if '.' in title:
+            if SUBITEM not in config:
+                config[SUBITEM] = {}
+            add_subitem(config[SUBITEM], title, tag)
 
     return config
+
+
+def _merge_subitems(target: dict, source: dict):
+    """
+    In-place merge `source` into `target`.
+
+    Sub-item dictionaries, held at the top-level key ``_subitem_``, are nested
+    dictionaries containing sub-item names or the special key ``_pragma_``,
+    which can modify the pragma at the given level.
+
+    For example::
+
+        {'_subitem_': {'member1': {'_pragma_': [('key', '1')], ... }}}
+
+    This top-level _subitem_ pragma dictionary contains a pragma ``key: 1``
+    for the ".member1" member.  ``member1``, if structured, may also have
+    keys in its dictionary named after its members.
+    """
+    if PRAGMA not in target:
+        target[PRAGMA] = []
+
+    for key, value in source.items():
+        if key == PRAGMA:
+            target[PRAGMA].extend(value)
+        else:
+            if key not in target:
+                target[key] = {}
+            _merge_subitems(target[key], value)
+
+
+def _expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
+                                      allow_no_pragma=False):
+    """
+    Wrapped by ``expand_configurations_from_chain``, usable for callers that
+    don't want the full product of all configurations.
+    """
+
+    def handle_scalar(item, pvname, config):
+        """Handler for scalar simple or structured items."""
+        yield item, config
+
+    def handle_array_complex(item, pvname, config):
+        """Handler for arrays of structured items (or enums)."""
+        low, high = item.array_info.bounds
+        expand_digits = math.floor(math.log10(high)) + 2
+        array_element_pragma = config.get('array', '')
+        for idx in parse_array_settings(array_element_pragma, (low, high)):
+            # shallow-copy; only touching the top level "pv" key
+            idx_config = copy.copy(config)
+            idx_config['pv'] += get_array_suffix(
+                config, idx, default=f':%.{expand_digits}d')
+            yield parser._ArrayItemProxy(item, idx), idx_config
+
+    def get_all_options(subitems, handler, pragmas):
+        split_pragma = split_pytmc_pragma('\n'.join(pragmas))
+        for pvname, separated_cfg in separate_configs_by_pv(split_pragma):
+            config = dictify_config(separated_cfg)
+
+            # config will have the SUBITEM key, applicable to its level
+            # in the hierarchy. If it exists, merge it with our current set.
+            if SUBITEM in config:
+                _merge_subitems(subitems, config[SUBITEM])
+
+            for key, value in subitems.get(PRAGMA, []):
+                config[key] = value
+
+            yield from handler(item, pvname, config)
+
+    # `subitems` keeps track of forward references with pragmas of members
+    # and sub-members (and so on)
+    subitems = {}
+
+    for item in chain:
+        subitems = subitems.get(item.name, {})
+        pragmas = list(pragma for pragma in get_pragma(item, name=pragma)
+                       if pragma is not None)
+        if not pragmas:
+            if allow_no_pragma:
+                pragmas = [None]
+                yield [(item, None)]
+                continue
+
+            # If any pragma in the chain is unset, escape early
+            return []
+
+        if item.array_info and (item.data_type.is_complex_type or
+                                item.data_type.is_enum):
+            options = get_all_options(subitems, handle_array_complex, pragmas)
+        else:
+            options = get_all_options(subitems, handle_scalar, pragmas)
+
+        yield list(options)
 
 
 def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
@@ -216,47 +351,12 @@ def expand_configurations_from_chain(chain, *, pragma: str = 'pytmc',
     -------
     tuple
         Tuple of tuples. See description above.
-
     '''
-    result = []
-
-    def dictify_scalar(item):
-        for pvname, config in separate_configs_by_pv(
-                split_pytmc_pragma('\n'.join(pragmas))):
-            yield (item, dictify_config(config))
-
-    def dictify_complex_array(item):
-        low, high = item.array_info.bounds
-        expand_digits = math.floor(math.log10(high)) + 2
-        expand_default = f':%.{expand_digits}d'
-        for pvname, config in separate_configs_by_pv(
-                split_pytmc_pragma('\n'.join(pragmas))):
-
-            array_element_pragma = dictify_config(config).get('array', '')
-            for idx in parse_array_settings(array_element_pragma, (low, high)):
-                yield (parser._ArrayItemProxy(item, idx),
-                       dictify_config(config, array_index=idx,
-                                      expand_default=expand_default))
-
-    for item in chain:
-        pragmas = list(pragma for pragma in get_pragma(item, name=pragma)
-                       if pragma is not None)
-        if not pragmas:
-            if allow_no_pragma:
-                pragmas = [None]
-                result.append([(item, None)])
-                continue
-            else:
-                # If any pragma in the chain is unset, escape early
-                return []
-
-        if item.array_info and (item.data_type.is_complex_type or
-                                item.data_type.is_enum):
-            dictify_func = dictify_complex_array
-        else:
-            dictify_func = dictify_scalar
-
-        result.append(list(dictify_func(item)))
+    result = _expand_configurations_from_chain(
+        chain, pragma=pragma, allow_no_pragma=allow_no_pragma
+    )
+    if not result:
+        return []
 
     return list(itertools.product(*result))
 
@@ -486,9 +586,8 @@ def parse_array_settings(pragma, dimensions):
             f'{pragma!r}'
         )
 
-    full_range = range(low, high + 1)
     if not pragma:
-        yield from full_range
+        yield from range(low, high + 1)
         return
 
     def _parse_element(elem):
@@ -497,17 +596,18 @@ def parse_array_settings(pragma, dimensions):
 
         # Split by .., such that this will support:
         #   ..to, from.., from..to, from..to..step
-        slice_args = [
-            int(idx) if idx else None
-            for idx in elem.split('..')
-        ]
+        range_args = [int(idx) if idx else None
+                      for idx in elem.split('..')]
 
-        # One exception is that the (normally exclusive slice) upper-bound has
-        # to be converted to being inclusive:
-        if slice_args[1] is not None:
-            slice_args[1] += 1
+        # Ensure we have start, stop, step
+        range_args += [None] * (3 - len(range_args))
+        elem_low, elem_high, elem_step = range_args
 
-        return full_range[slice(*slice_args)]
+        elem_low = low if elem_low is None else elem_low
+        # Add one to make the exclusive upper bound inclusive:
+        elem_high = high + 1 if elem_high is None else elem_high + 1
+        elem_step = 1 if elem_step is None else elem_step
+        return range(elem_low, elem_high, elem_step)
 
     try:
         for elem in pragma.split(','):
@@ -660,8 +760,11 @@ def chains_from_symbol(symbol, *, pragma: str = 'pytmc',
     else:
         condition = has_pragma
     for full_chain in symbol.walk(condition=condition):
-        for item_and_config in expand_configurations_from_chain(
-                full_chain, allow_no_pragma=allow_no_pragma):
+        configs = itertools.product(
+            *_expand_configurations_from_chain(full_chain,
+                                               allow_no_pragma=allow_no_pragma)
+        )
+        for item_and_config in configs:
             yield SingularChain(dict(item_and_config))
 
 
@@ -678,12 +781,12 @@ def record_packages_from_symbol(symbol, *, pragma: str = 'pytmc',
             except Exception as ex:
                 if yield_exceptions:
                     yield type(ex)(f"Symbol {symbol.name} "
-                                   f"chain: {chain.tcname}: {ex.args[0]}")
+                                   f"chain: {chain.tcname}: {ex}")
                 else:
                     raise
     except Exception as ex:
         if yield_exceptions:
-            yield type(ex)(f"Symbol {symbol.name} failure: {ex.args[0]}")
+            yield type(ex)(f"Symbol {symbol.name} failure: {ex}")
         else:
             raise
 
