@@ -11,12 +11,11 @@ import logging
 
 import pytmc
 
-
 DESCRIPTION = __doc__
 
 
 MODULES = ('summary', 'stcmd', 'db', 'xmltranslate', 'debug', 'types',
-           'iocboot', 'pragmalint', 'code')
+           'iocboot', 'pragmalint', 'code', 'template')
 
 
 def _try_import(module):
