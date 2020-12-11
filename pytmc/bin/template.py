@@ -6,6 +6,7 @@ TwinCAT3 project (or XML-format file such as .TMC).
 import argparse
 import functools
 import logging
+import os
 import pathlib
 import sys
 
@@ -15,6 +16,7 @@ from .. import parser, pragmas
 from . import stcmd, summary, util
 
 DESCRIPTION = __doc__
+
 logger = logging.getLogger(__name__)
 
 
@@ -33,10 +35,10 @@ def build_arg_parser(argparser=None):
 
     argparser.add_argument(
         '-t', '--template',
-        dest='templates',
+        dest='template',
         type=argparse.FileType(mode='r'),
         help='Template filename (default: standard input)',
-        action='append',
+        default='-',
     )
 
     argparser.add_argument(
@@ -48,8 +50,13 @@ def build_arg_parser(argparser=None):
     return argparser
 
 
-def project_to_dict(path):
+def project_to_dict(path: str) -> dict:
     """
+    Create a user/template-facing dictionary of project information.
+
+    In the case of a tsproj or solution, returns keys solutions and projects.
+    All other formats (such as .tmc) fall under the "others" key, leaving it up
+    to the template to classify.
     """
     path = pathlib.Path(path)
     suffix = path.suffix.lower()
@@ -81,6 +88,15 @@ def project_to_dict(path):
 
 def projects_to_dict(*paths) -> dict:
     """
+    Create a user/template-facing dictionary of project information.
+
+    Returns
+    -------
+    dict
+        Information dictionary with keys::
+            solutions - {solution_filename: [project_fn: {...}, ...], ...}
+            projects - {project_filename: {...}, ...}
+            others - {filename: {...}, ...}
     """
     result = {
         'solutions': {},
@@ -133,7 +149,7 @@ def get_symbols(plc) -> dict:
 
 @functools.lru_cache()
 def get_motors(plc) -> list:
-    """Get motor symbols for the PLC (DUT_MotionStage)."""
+    """Get motor symbols for the PLC (non-pointer DUT_MotionStage)."""
     symbols = get_symbols(plc)
     return [
         mot for mot in symbols['Symbol_DUT_MotionStage']
@@ -218,26 +234,44 @@ def get_render_context() -> dict:
     return context
 
 
-def main(projects, templates=None, debug=False):
+def main(projects, template=sys.stdin, debug=False):
     """
+    Render a template based on a TwinCAT3 project, or XML-format file such as
+    TMC.
+
+    Parameters
+    ----------
+    projects : list
+        List of projects or TwinCAT project files (.sln, .tsproj, .tmc, etc.)
+
+    template : file-like object, optional
+        Read the template from the provided file or standard input (default).
+
+    debug : bool, optional
+        Open a debug session after rendering with IPython.
     """
 
-    if templates is None:
-        logger.warning('Reading template from standard input...')
-        templates = [sys.stdin.read()]
-        logger.warning('Read template from standard input (len=%d)',
-                       len(templates[0]))
+    if template is sys.stdin:
+        # Check if it's an interactive user to warn them what we're doing:
+        is_tty = os.isatty(sys.stdin.fileno())
+        if is_tty:
+            logger.warning('Reading template from standard input...')
+            logger.warning('Press ^D on a blank line when done.')
+
+        template_text = sys.stdin.read()
+        if is_tty:
+            logger.warning('Read template from standard input (len=%d)',
+                           len(template_text))
     else:
-        templates = [template.read() for template in templates]
-
-    template_args = get_render_context()
-    template_args.update(projects_to_dict(*projects))
+        template_text = template.read()
 
     stashed_exception = None
     rendered = []
     try:
-        for template in templates:
-            rendered.append(render_template(template, template_args))
+        template_args = get_render_context()
+        template_args.update(projects_to_dict(*projects))
+
+        rendered.append(render_template(template_text, template_args))
     except Exception as ex:
         stashed_exception = ex
         rendered = None
@@ -247,7 +281,9 @@ def main(projects, templates=None, debug=False):
             raise stashed_exception
         print('\n'.join(rendered))
     else:
-        message = ['Variables: projects, templates, template_args. ']
+        message = [
+            'Variables: projects, template_text, template, template_args. '
+        ]
         if stashed_exception is not None:
             message.append(f'Exception: {type(stashed_exception)} '
                            f'{stashed_exception}')
