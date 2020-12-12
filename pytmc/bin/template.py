@@ -9,6 +9,7 @@ import logging
 import os
 import pathlib
 import sys
+from typing import Optional
 
 import jinja2
 
@@ -234,7 +235,7 @@ def get_render_context() -> dict:
     return context
 
 
-def main(projects, template=sys.stdin, debug=False):
+def main(projects, template=sys.stdin, debug: bool = False) -> Optional[str]:
     """
     Render a template based on a TwinCAT3 project, or XML-format file such as
     TMC.
@@ -266,12 +267,11 @@ def main(projects, template=sys.stdin, debug=False):
         template_text = template.read()
 
     stashed_exception = None
-    rendered = []
     try:
         template_args = get_render_context()
         template_args.update(projects_to_dict(*projects))
 
-        rendered.append(render_template(template_text, template_args))
+        rendered = render_template(template_text, template_args)
     except Exception as ex:
         stashed_exception = ex
         rendered = None
@@ -279,10 +279,10 @@ def main(projects, template=sys.stdin, debug=False):
     if not debug:
         if stashed_exception is not None:
             raise stashed_exception
-        print('\n'.join(rendered))
+        print(rendered)
     else:
         message = [
-            'Variables: projects, template_text, template, template_args. '
+            'Variables: projects, template_text, rendered, template_args. '
         ]
         if stashed_exception is not None:
             message.append(f'Exception: {type(stashed_exception)} '
@@ -292,4 +292,4 @@ def main(projects, template=sys.stdin, debug=False):
             namespace=locals(),
             message='\n'.join(message)
         )
-    return projects
+    return rendered
