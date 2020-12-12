@@ -1,15 +1,18 @@
-import pytest
+import io
 import sys
 
+import pytest
+
 import pytmc.bin.pytmc as pytmc_main
+from pytmc.bin.code import main as code_main
 from pytmc.bin.db import main as db_main
 from pytmc.bin.debug import create_debug_gui
 from pytmc.bin.pragmalint import main as pragmalint_main
 from pytmc.bin.stcmd import main as stcmd_main
 from pytmc.bin.summary import main as summary_main
+from pytmc.bin.template import main as template_main
 from pytmc.bin.types import create_types_gui
 from pytmc.bin.xmltranslate import main as xmltranslate_main
-from pytmc.bin.code import main as code_main
 
 
 def test_help_main(monkeypatch):
@@ -79,3 +82,12 @@ def test_debug(qtbot, tmc_filename):
 
 def test_code(project_filename):
     code_main(project_filename)
+
+
+def test_template(project_filename):
+    template = '{% for project in projects %}{{ project }}{% endfor %}'
+    with io.StringIO(template) as template_fp:
+        templated = template_main([project_filename], template=template_fp)
+
+    print('templated', templated)
+    assert templated == project_filename
