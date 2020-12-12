@@ -242,7 +242,7 @@ def get_plc_records(plc: parser.Plc,
 
 
 @functools.lru_cache()
-def get_nc(project) -> parser.NC:
+def get_nc(project: parser.TopLevelProject) -> parser.NC:
     """Get the top-level NC settings for the project."""
     try:
         nc, = list(project.find(parser.NC, recurse=False))
@@ -252,11 +252,12 @@ def get_nc(project) -> parser.NC:
 
 
 @functools.lru_cache()
-def get_data_types(project):
+def get_data_types(project) -> List[dict]:
     """Get the data types container for the project."""
     data_types = getattr(project, 'DataTypes', [None])[0]
     if data_types is not None:
-        return summary.enumerate_types(data_types)
+        return list(summary.enumerate_types(data_types))
+    return []
 
 
 @functools.lru_cache()

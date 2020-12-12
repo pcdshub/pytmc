@@ -84,10 +84,50 @@ def test_code(project_filename):
     code_main(project_filename)
 
 
-def test_template(project_filename):
+def test_template_basic(project_filename):
     template = '{% for project in projects %}{{ project }}{% endfor %}'
     with io.StringIO(template) as template_fp:
         templated = template_main([project_filename], template=template_fp)
 
     print('templated', templated)
     assert templated == project_filename
+
+
+@pytest.mark.parametrize(
+    'template',
+    [
+        pytest.param(
+            """
+            {% for project_path, project in projects.items() %}
+                {% set nc = get_nc(project) %}
+                {% for box in get_boxes(project) %}
+                    box: {{ box.attributes["Id"] }}
+                {% endfor %}
+
+                {% for dt in get_data_types(project) %}
+                    data type: {{ dt }}
+                {% endfor %}
+
+                {% for link in get_links(project) %}
+                    link: {{ link.a }}
+                {% endfor %}
+
+                {% for plc in project.plcs %}
+                    {% set results = get_linter_results(plc) %}
+                    Pragma count: {{ results.pragma_count }}
+
+                    {% for lib in get_library_versions(plc) %}
+                        library: {{ lib }}
+                    {% endfor %}
+
+                {% endfor %}
+            {% endfor %}
+            """,
+            id='helpers'),
+    ],
+)
+def test_template_smoke(project_filename, template):
+    with io.StringIO(template) as template_fp:
+        templated = template_main([project_filename], template=template_fp)
+
+    print('templated', templated)
