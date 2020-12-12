@@ -1,6 +1,31 @@
 """
 "pytmc template" is a command line utility to expand a template based on a
 TwinCAT3 project (or XML-format file such as .TMC).
+
+The template file is expected to be in Jinja template format.
+
+The following dictionaries are available in the template context::
+
+    solutions - {solution_filename: [project_fn: {...}, ...], ...}
+    projects - {project_filename: {...}, ...}
+    others - {filename: {...}, ...}
+
+The following helpers are available in the environment::
+
+    get_symbols
+    get_motors
+    get_nc
+    get_data_types
+    get_boxes
+    get_links
+    get_data_type_by_reference
+    get_pou_call_blocks
+    separate_by_classname
+    element_to_class_name
+    determine_block_type
+    data_type_to_record_info
+    enumerate_types
+    list_types
 """
 
 import argparse
