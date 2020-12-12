@@ -12,20 +12,32 @@ The following dictionaries are available in the template context::
 
 The following helpers are available in the environment::
 
-    get_symbols
+    config_to_pragma
+    data_type_to_record_info
+    determine_block_type
+    element_to_class_name
+    enumerate_types
+    get_boxes
+    get_data_type_by_reference
+    get_data_types
+    get_library_versions
+    get_links
+    get_linter_results
     get_motors
     get_nc
-    get_data_types
-    get_boxes
-    get_links
-    get_data_type_by_reference
     get_pou_call_blocks
-    separate_by_classname
-    element_to_class_name
-    determine_block_type
-    data_type_to_record_info
-    enumerate_types
+    get_symbols
     list_types
+    max
+    min
+    separate_by_classname
+
+And the following filters::
+
+    epics_prefix
+    epics_suffix
+    pragma
+    title_fill
 """
 
 import argparse
@@ -34,12 +46,14 @@ import logging
 import os
 import pathlib
 import sys
-from typing import Optional
+from typing import Generator, List, Optional, Tuple
 
 import jinja2
 
 from .. import parser, pragmas
-from . import stcmd, summary, util
+from ..record import EPICSRecord
+from . import pragmalint, stcmd, summary, util
+from .db import process as db_process
 
 DESCRIPTION = __doc__
 
@@ -161,16 +175,22 @@ def get_jinja_filters(**user_config):
             return config.get(key, default)
         return default
 
+    @jinja2.evalcontextfilter
+    def title_fill(eval_ctx, text, fill_char):
+        return fill_char * len(text)
+
     return {
         key: value for key, value in locals().items()
         if not key.startswith('_')
     }
 
 
-@functools.lru_cache()
-def get_symbols(plc) -> dict:
+def get_symbols(plc) -> Generator[parser.Symbol, None, None]:
     """Get symbols for the PLC."""
-    return parser.separate_by_classname(plc.find(parser.Symbol))
+    for symbol in plc.find(parser.Symbol):
+        symbol.top_level_group = (
+            symbol.name.split('.')[0] if symbol.name else 'Unknown')
+        yield symbol
 
 
 @functools.lru_cache()
@@ -181,6 +201,44 @@ def get_motors(plc) -> list:
         mot for mot in symbols['Symbol_DUT_MotionStage']
         if not mot.is_pointer
     ]
+
+
+@functools.lru_cache()
+def get_plc_records(plc: parser.Plc,
+                    dbd: Optional[str] = None,
+                    ) -> Tuple[List[EPICSRecord], List[Exception]]:
+    """
+    Get EPICS records generated from a specific PLC.
+
+    Returns
+    -------
+    records : list of EPICSRecord
+        Records generated.
+
+    exceptions : list of Exception
+        Any exceptions raised during the generation process.
+    """
+    if plc.tmc is None:
+        return None, None
+
+    try:
+        packages, exceptions = db_process(
+            plc.tmc, dbd_file=dbd, allow_errors=True,
+            show_error_context=True,
+        )
+    except Exception:
+        logger.exception(
+            'Failed to create EPICS records'
+        )
+        return None, None
+
+    records = [
+        record
+        for package in packages
+        for record in package.records
+    ]
+
+    return records, exceptions
 
 
 @functools.lru_cache()
@@ -210,10 +268,127 @@ def get_boxes(project) -> list:
     )
 
 
+def _clean_link(link):
+    """Clean None from links for easier displaying."""
+    link.a = tuple(value or '' for value in link.a)
+    link.b = tuple(value or '' for value in link.b)
+    return link
+
+
 @functools.lru_cache()
 def get_links(project) -> list:
     """Get links contained in the project or PLC."""
-    return list(project.find(parser.Link))
+    return list(_clean_link(link) for link in project.find(parser.Link))
+
+
+@functools.lru_cache()
+def get_linter_results(plc: parser.Plc) -> dict:
+    """
+    Lint the provided PLC code pragmas.
+
+    Returns
+    -------
+    dict
+        Includes "pragma_count", "pragma_errors", and "linter_results" keys.
+    """
+    pragma_count = 0
+    linter_errors = 0
+    results = []
+
+    for fn, source in plc.source.items():
+        for info in pragmalint.lint_source(fn, source):
+            pragma_count += 1
+            if info.exception is not None:
+                linter_errors += 1
+                results.append(info)
+
+    return {
+        'pragma_count': pragma_count,
+        'pragma_errors': linter_errors,
+        'linter_results': results,
+    }
+
+
+def config_to_pragma(config: dict,
+                     skip_desc: bool = True,
+                     skip_pv: bool = True) -> Tuple[str, str]:
+    """
+    Convert a configuration dictionary into a single pragma string.
+
+    Yields
+    ------
+    key: str
+        Pragma key.
+
+    value: str
+        Pragma value.
+    """
+    if not config:
+        return
+
+    for key, value in config.items():
+        if key == 'archive':
+            seconds = value.get('seconds', 'unknown')
+            method = value.get('method', 'unknown')
+            fields = value.get('fields', {'VAL'})
+            if seconds != 1 or method != 'scan':
+                yield ('archive', f'{seconds}s {method}')
+            if fields != {'VAL'}:
+                yield ('archive_fields', ' '.join(fields))
+        elif key == 'update':
+            frequency = value.get('frequency', 1)
+            method = value.get('method', 'unknown')
+            if frequency != 1 or method != 'poll':
+                yield (key, f'{frequency}hz {method}')
+        elif key == 'field':
+            for field, value in value.items():
+                if field != 'DESC' or not skip_desc:
+                    yield ('field', f'{field} {value}')
+        elif key == 'pv':
+            if not skip_pv:
+                yield (key, ':'.join(value))
+        else:
+            yield (key, value)
+
+
+def get_library_versions(plc: parser.Plc) -> List[dict]:
+    """Get library version information for the given PLC."""
+    if 'DefaultResolution' not in parser.TWINCAT_TYPES:
+        return []
+
+    def parse_library(text, version_key):
+        library_name, version_and_vendor = text.split(', ')
+        version, vendor = version_and_vendor.split('(')
+        vendor = vendor.rstrip(')')
+        version = version.strip()
+
+        if version == '*':
+            version = 'Unset'
+
+        return (
+            library_name,
+            {'name': library_name,
+             'vendor': vendor,
+             version_key: version,
+             },
+        )
+
+    libraries = dict(
+        parse_library(lib.text, version_key='default')
+        for lib in plc.find(parser.TWINCAT_TYPES['DefaultResolution'])
+    )
+    resolved = dict(
+        parse_library(lib.text, version_key='version')
+        for lib in plc.find(parser.TWINCAT_TYPES['Resolution'])
+    )
+
+    for name, info in resolved.items():
+        if name not in libraries:
+            libraries[name] = info
+        else:
+            libraries[name]['version'] = info['version']
+
+    return list(libraries.values())
 
 
 def render_template(template: str, context: dict,
@@ -234,12 +409,15 @@ def render_template(template: str, context: dict,
 
 
 helpers = [
+    config_to_pragma,
     get_symbols,
     get_motors,
     get_nc,
     get_data_types,
     get_boxes,
     get_links,
+    get_linter_results,
+    get_library_versions,
     parser.get_data_type_by_reference,
     parser.get_pou_call_blocks,
     parser.separate_by_classname,
