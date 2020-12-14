@@ -1752,6 +1752,34 @@ class Box(_IoTreeItem):
     _load_path_hint = USE_NAME_AS_PATH
 
 
+class EtherCAT(TwincatItem):
+    """
+    EtherCAT information for a given Box.
+
+    Contains SyncMan, Fmmu, DcMode, Pdo, etc.
+    """
+    ...
+
+
+class Pdo(TwincatItem):
+    """Process data objects, part of an EtherCAT block."""
+    ...
+
+
+class Entry(TwincatItem):
+    """Pdo Entry, containing name and type information."""
+
+    @property
+    def entry_type(self) -> typing.Optional[Type]:
+        """The type of the entry."""
+        return getattr(self, 'Type', [None])[0]
+
+    @property
+    def comment(self) -> str:
+        """The comment associated with the entry."""
+        return self.Comment[0].text if hasattr(self, 'Comment') else ''
+
+
 class RemoteConnections(TwincatItem):
     '[StaticRoutes] Routes contained in the TwinCat configuration'
     def post_init(self):
