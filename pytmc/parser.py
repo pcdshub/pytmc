@@ -8,6 +8,7 @@ import pathlib
 import re
 import types
 import typing
+from typing import Optional, Union
 
 import lxml
 import lxml.etree
@@ -1799,6 +1800,109 @@ class RemoteConnections(TwincatItem):
         self.by_name = keyed_on('Name')
         self.by_address = keyed_on('Address')
         self.by_ams_id = keyed_on('NetId')
+
+
+class Resolution(TwincatItem):
+    """Library version resolution."""
+    @property
+    def resolution(self):
+        if not self.text:
+            return {}
+
+        return Resolution.split_resolution(self.text)
+
+    @staticmethod
+    def split_resolution(text):
+        library_name, version_and_vendor = text.split(',')
+        version, vendor = version_and_vendor.strip().split('(')
+        vendor = vendor.rstrip(')')
+        version = version.strip()
+
+        return {
+            'name': library_name,
+            'vendor': vendor,
+            'version': version,
+            'vendor_short': vendor.split(' ')[0] if ' ' in vendor else vendor,
+         }
+
+
+class DefaultResolution(Resolution):
+    """Library default version resolution."""
+
+
+class _VersionItemMixin:
+    @property
+    def resolution(self) -> Optional[Union[DefaultResolution, Resolution]]:
+        try:
+            resolution, = self.Resolution
+        except AttributeError:
+            try:
+                resolution, = self.DefaultResolution
+            except AttributeError:
+                resolution = None
+        return resolution
+
+    @property
+    def full_include_name(self) -> str:
+        if hasattr(self, 'Namespace'):
+            namespace, = self.Namespace
+            return f'{namespace.namespace}.{self.include_name}'
+
+        return self.include_name
+
+    @property
+    def include_name(self) -> str:
+        return self.attributes['Include']
+
+    def get_resolution_info(self):
+        resolution = self.resolution
+        resolution_info = (
+            resolution.resolution if resolution is not None else {}
+        )
+        return {
+            'resolution': resolution,
+            'name': self.include_name,
+            'full_name': self.full_include_name,
+            **resolution_info
+        }
+
+
+class PlaceholderReference(TwincatItem, _VersionItemMixin):
+    """Library placeholder reference."""
+
+
+class PlaceholderResolution(TwincatItem, _VersionItemMixin):
+    """Library placeholder resolution."""
+
+
+class LibraryReference(TwincatItem, _VersionItemMixin):
+    """Library reference."""
+
+    def get_resolution_info(self):
+        if ',' not in self.include_name:
+            # Unknown
+            return {}
+
+        name, version, vendor = self.include_name.split(',')
+        full_name = self.full_include_name
+        if ',' in full_name:
+            full_name = full_name.split(',')[0]
+
+        return {
+            'resolution': None,
+            'full_name': full_name,
+            'name': name,
+            'version': version,
+            'vendor': vendor,
+            'vendor_short': vendor.split(' ')[0] if ' ' in vendor else vendor,
+        }
+
+
+class Namespace(TwincatItem):
+    """Type / library namespace information."""
+    @property
+    def namespace(self) -> str:
+        return self.text
 
 
 class _ArrayItemProxy:

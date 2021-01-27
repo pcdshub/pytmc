@@ -352,44 +352,30 @@ def config_to_pragma(config: dict,
             yield (key, value)
 
 
+@functools.lru_cache()
 def get_library_versions(plc: parser.Plc) -> List[dict]:
     """Get library version information for the given PLC."""
-    if 'DefaultResolution' not in parser.TWINCAT_TYPES:
-        return []
-
-    def parse_library(text, version_key):
-        library_name, version_and_vendor = text.split(', ')
-        version, vendor = version_and_vendor.split('(')
-        vendor = vendor.rstrip(')')
-        version = version.strip()
-
-        if version == '*':
-            version = 'Unset'
-
-        return (
-            library_name,
-            {'name': library_name,
-             'vendor': vendor,
-             version_key: version,
-             },
-        )
-
-    libraries = dict(
-        parse_library(lib.text, version_key='default')
-        for lib in plc.find(parser.TWINCAT_TYPES['DefaultResolution'])
-    )
-    resolved = dict(
-        parse_library(lib.text, version_key='version')
-        for lib in plc.find(parser.TWINCAT_TYPES['Resolution'])
-    )
-
-    for name, info in resolved.items():
-        if name not in libraries:
-            libraries[name] = info
+    def find_by_name(cls_name):
+        try:
+            cls = parser.TWINCAT_TYPES[cls_name]
+        except KeyError:
+            return []
         else:
-            libraries[name]['version'] = info['version']
+            return list(plc.find(cls, recurse=False))
 
-    return list(libraries.values())
+    versions = {}
+
+    for category in ('PlaceholderReference', 'PlaceholderResolution',
+                     'LibraryReference'):
+        for obj in find_by_name(category):
+            info = obj.get_resolution_info()
+            info['category'] = category
+            if info['name'] not in versions:
+                versions[info['name']] = {}
+
+            versions[info['name']][category] = info
+
+    return dict(versions)
 
 
 def render_template(template: str, context: dict,
