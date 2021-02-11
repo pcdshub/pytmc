@@ -2,7 +2,25 @@
  Release History
 =================
 
-v2.8.0 (2020-??-??)
+v2.8.1 (2021-02-10)
+===================
+
+Fixes
+-----
+* Fix issues related to insufficient library dependency checking. Now,
+  all possible places where library version information is stored will
+  be checked.
+
+Maintenance
+-----------
+* Refactor the dependency-related twincat items and templating tools
+  to accomplish the above.
+* Move the repository landing zone from slaclab to pcdshub to take
+  advantage of our travis credits.
+* Redeploy doctr for pcdshub.
+
+
+v2.8.0 (2020-12-22)
 ===================
 
 Enhancements
@@ -21,6 +39,7 @@ Fixes
 * Record names now displaying correctly in ``pytmc debug`` dialog.
 * ``pytmc debug`` no longer fails when it encounters types that extend
   built-in data types by way of ``ExtendsType``.
+
 
 v2.7.7 (2020-11-17)
 ===================
