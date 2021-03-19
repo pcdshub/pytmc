@@ -204,7 +204,6 @@ def project_to_dict(path: str) -> dict:
                     "tree_urls": [],
                     "repo": None,
                 }
-                raise
 
         solutions = {solution: projects} if solution is not None else {}
 
