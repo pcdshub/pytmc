@@ -10,6 +10,8 @@ The following dictionaries are available in the template context::
     projects - {project_filename: {...}, ...}
     others - {filename: {...}, ...}
 
+If installed and available, ``git_info`` will be available on each project.
+
 The following helpers are available in the environment::
 
     config_to_pragma
@@ -55,6 +57,12 @@ from ..record import EPICSRecord
 from . import pragmalint, stcmd, summary, util
 from .db import process as db_process
 
+try:
+    import git
+except ImportError:
+    git = None
+
+
 DESCRIPTION = __doc__
 
 logger = logging.getLogger(__name__)
@@ -90,6 +98,72 @@ def build_arg_parser(argparser=None):
     return argparser
 
 
+def find_git_root(fn: pathlib.Path) -> Optional[pathlib.Path]:
+    """Given a file, find the git repository root (if it exists)."""
+    while fn:
+        if (fn / ".git").exists():
+            return fn
+        fn = fn.parent
+
+
+def _to_http_url(url: str) -> str:
+    """Git over SSH -> GitHub https URL."""
+    if url.startswith("git@github.com:"):
+        _, repo_slug = url.split(':')
+        return f"https://github.com/{repo_slug}"
+    return url
+
+
+def _to_doc_url(url: str) -> str:
+    """Git over SSH -> GitHub https URL."""
+    try:
+        org, repo = _to_repo_slug(url).split('/')
+        return f"https://{org}.github.io/{repo}"
+    except Exception:
+        return ""
+
+
+def _to_tree_url(url: str, hash: str) -> str:
+    """Get a github.com/org/repo/tree/master-style URL."""
+    url = _to_http_url(url)
+    if url.startswith("https://github.com"):
+        return f"{url}/tree/{hash}"
+    return url
+
+
+def _to_repo_slug(url: str) -> str:
+    """Get a org/repo from a full URL."""
+    url = _to_http_url(url)
+    github = "https://github.com/"
+    if url.startswith(github):
+        return url.split(github)[1]
+    return url
+
+
+def get_git_info(fn: pathlib.Path) -> str:
+    """Get the git hash and other info for the repository that ``fn`` is in."""
+    if git is None:
+        raise RuntimeError("gitpython not installed")
+    repo = git.Repo(find_git_root(fn))
+    urls = [
+        url
+        for remote in repo.remotes
+        for url in remote.urls
+    ]
+    repo_slugs = [_to_repo_slug(url) for url in urls]
+    return {
+        "describe": repo.git.describe("--always", "--tag"),
+        "sha": repo.head.commit.hexsha,
+        "repo_slug": repo_slugs[0] if repo_slugs else None,
+        "repo_slugs": repo_slugs,
+        "doc_urls": [_to_doc_url(url) for url in urls],
+        "repo_urls": [_to_http_url(url) for url in urls],
+        "tree_urls": [_to_tree_url(url, repo.head.commit.hexsha)
+                      for url in urls],
+        "repo": repo,
+    }
+
+
 def project_to_dict(path: str) -> dict:
     """
     Create a user/template-facing dictionary of project information.
@@ -113,6 +187,24 @@ def project_to_dict(path: str) -> dict:
             fn: parser.parse(fn)
             for fn in project_files
         }
+
+        for fn, project in projects.items():
+            try:
+                project.git_info = get_git_info(fn)
+            except Exception:
+                project.git_info = {
+                    "describe": "unknown",
+                    "sha": "unknown",
+                    "urls": [],
+                    "links": [],
+                    "repo_slug": "unknown",
+                    "repo_slugs": [],
+                    "doc_urls": [],
+                    "repo_urls": [],
+                    "tree_urls": [],
+                    "repo": None,
+                }
+                raise
 
         solutions = {solution: projects} if solution is not None else {}
 
