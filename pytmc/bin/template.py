@@ -151,15 +151,20 @@ def get_git_info(fn: pathlib.Path) -> str:
         for url in remote.urls
     ]
     repo_slugs = [_to_repo_slug(url) for url in urls]
+    head_sha = repo.head.commit.hexsha
+    try:
+        desc = repo.git.describe("--contains", head_sha)
+    except git.GitCommandError:
+        desc = repo.git.describe("--always", "--tags")
+
     return {
-        "describe": repo.git.describe("--always", "--tag"),
-        "sha": repo.head.commit.hexsha,
+        "describe": desc,
+        "sha": head_sha,
         "repo_slug": repo_slugs[0] if repo_slugs else None,
         "repo_slugs": repo_slugs,
         "doc_urls": [_to_doc_url(url) for url in urls],
         "repo_urls": [_to_http_url(url) for url in urls],
-        "tree_urls": [_to_tree_url(url, repo.head.commit.hexsha)
-                      for url in urls],
+        "tree_urls": [_to_tree_url(url, head_sha) for url in urls],
         "repo": repo,
     }
 
