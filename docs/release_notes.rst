@@ -2,6 +2,14 @@
  Release History
 =================
 
+v2.9.0 (2021-04-02)
+===================
+
+Enhancements
+------------
+* Add git information to the template tool if available.
+
+
 v2.8.1 (2021-02-10)
 ===================
 
