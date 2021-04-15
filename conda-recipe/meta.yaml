@@ -26,7 +26,6 @@ test:
   imports:
     - pytmc
   requires:
-    - codecov
     - coverage
     - pytest
     - pytest-qt
