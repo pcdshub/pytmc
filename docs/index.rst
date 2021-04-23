@@ -5,8 +5,8 @@
 
 Welcome to pytmc's documentation!
 =================================
-.. image:: https://travis-ci.org/slaclab/pytmc.svg?branch=master
-       :target: https://travis-ci.org/slaclab/pytmc
+.. image:: https://travis-ci.org/pcdshub/pytmc.svg?branch=master
+       :target: https://travis-ci.org/pcdshub/pytmc
 
 Pytmc helps developers automatically generate ADS based Epics records files
 from Beckhoff's TwinCAT3 projects.
@@ -14,10 +14,10 @@ from Beckhoff's TwinCAT3 projects.
 Pytmc is developed with these `guidelines
 <https://pcdshub.github.io/development.html>`_ in mind.
 
-The source code is hosted on `github <https://github.com/slaclab/pytmc>`_.
+The source code is hosted on `github <https://github.com/pcdshub/pytmc>`_.
 
 Issues and requests can be posted on the `github issue tracker
-<https://github.com/slaclab/pytmc/issues>`_. Use the ``bug`` tag for issues
+<https://github.com/pcdshub/pytmc/issues>`_. Use the ``bug`` tag for issues
 with intended features and the ``enhancement`` tag can be used for feature
 requests. The ``question`` tag will be treated like an 'enhancements' tag for
 the documentation but regular questions can be posted there as well.

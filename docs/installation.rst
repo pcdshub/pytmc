@@ -4,12 +4,12 @@ Installation
 Obtaining the code
 ++++++++++++++++++
 Download the code via the tagged releases posted on the `github releases page
-<https://github.com/slaclab/pytmc/releases>`_ or by cloning the source code
+<https://github.com/pcdshub/pytmc/releases>`_ or by cloning the source code
 with the following:
 
 .. code-block:: sh
 
-   $ git clone https://github.com/slaclab/pytmc.git
+   $ git clone https://github.com/pcdshub/pytmc.git
 
 Installing in an environment
 ++++++++++++++++++++++++++++
@@ -24,7 +24,7 @@ environment, you may skip this step.
 
    $ conda create --name [env-name]
 
-Activate your environment. 
+Activate your environment.
 
 .. code-block:: sh
 
@@ -65,19 +65,19 @@ If you've followed the previous steps correctly, pytmc should be installed now.
 This can be tested by seeing if the following bash commands can be found.
 
 .. code-block:: sh
-   
+
    $ pytmc --help
 
 Alternatively, a python shell can be opened and you can attempt to import
-pytmc. 
+pytmc.
 
 .. code-block:: python
 
    >>> import pytmc
 
-.. note::  
+.. note::
    While all of these instructions should work with python environments
-   managed by virtualenv and pipenv, only conda has been tested. 
+   managed by virtualenv and pipenv, only conda has been tested.
 
 
 Installing for development
@@ -86,17 +86,16 @@ To develop pytmc it is best to use a development install. This allows changes
 to the code to be immediately reflected in the program's functionality without
 needing to reinstall the code.This can be done by following the `Installing in
 an environment`_ section but with one change. The following code snippet should
-be removed: 
+be removed:
 
 .. code-block:: sh
-   
+
    $ # Don't use this step for a development install
    $ pip install .
 
 In place of the removed command, use the following to do a development install.
 
 .. code-block:: sh
-   
+
    $ # Use this command instead
    $ pip install -e .
-
