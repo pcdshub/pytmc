@@ -2,7 +2,7 @@ version: ~> 1.0
 
 env:
   global:
-    # Doctr deploy key for slaclab/pytmc
+    # Doctr deploy key for pcdshub/pytmc
     - secure: "qQgwWMYHy54oQDXFotIaKoIZq+fdYlGIRCfeOHimU/uRRHRMMcP1tjsup4zADQsGf+ym3Bcu9r/VezVU2zH5At8JJeR7Cq5ZUe88tKFezrL97iCKYLw4x+DigLsKujkdgmeBOoMlaNw8EIu1t8JtHXZZ5poz8HBeCc5dGOwYs84MRuqqBzWvs6O0snTwMRlbGSb7UlaEKXrGKRQ6CDolqy8w2KgDos+IHWCmkBspXcs8XBan20BZGJiGHYuJNMKimLeF/vTE6c0mRG9imjvKxRrXzbOLfPIpmoCj1tAqX/TCBe3L08kEskVDFRiWQM4bawS8EPXhIqmdxNwTDD0c0x4YS3sVsJAa8T3rMPSYJaJW+pndX9NNJPntsvJ6o3GXS1luiYwSGwYi6YuCYgUmz7DfM8SN6d+a9aMyNXu8rCd6xi+iFZd0YcdwePxpY+FrxWAWmxV7Sp71Zg7oYX/ig5VB0JZ6bSY5vvc2emjLi7ZIgDHx03cAod/XMWtk1k67VdJVMtayAoXKkCa65LOtnSNA2qmq5FFq1v6IeS4/J2Y95pn2pC1dOk4Ti6nnQ00kiad3PkD7W9khswvH00P5TeqXzM95w+wS3MOi/sb8ZqQS8Q45CrENoFj9WJ2N3Wvmbf6Gq50p37Fxm2QhLBUfFA/tQ7CwHAwouWn+Rf5xlbI="
 
     - DOCTR_VERSIONS_MENU="1"

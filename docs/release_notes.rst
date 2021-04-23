@@ -160,22 +160,22 @@ v2.6.6 (2020-06-24)
 ===================
 
 *  Add –types (–filter-types) to ``pytmc summary``
-   (`#213 <https://github.com/slaclab/pytmc/issues/213>`__)
+   (`#213 <https://github.com/pcdshub/pytmc/issues/213>`__)
 *  Fix internal usage of deprecated API
-   (`#212 <https://github.com/slaclab/pytmc/issues/212>`__)
+   (`#212 <https://github.com/pcdshub/pytmc/issues/212>`__)
 
 
 v2.6.5 (2020-06-09)
 ===================
 
 *  Add ``info(archive)`` nodes for ads-ioc
-   (`#188 <https://github.com/slaclab/pytmc/issues/188>`__)
+   (`#188 <https://github.com/pcdshub/pytmc/issues/188>`__)
 *  Adjust defaults for binary record enum strings
-   (`#191 <https://github.com/slaclab/pytmc/issues/191>`__)
+   (`#191 <https://github.com/pcdshub/pytmc/issues/191>`__)
 *  Better messages on pragma parsing failures
-   (`#200 <https://github.com/slaclab/pytmc/issues/200>`__)
+   (`#200 <https://github.com/pcdshub/pytmc/issues/200>`__)
 *  Do not include fields only intended for input/output records in the
-   other (`#205 <https://github.com/slaclab/pytmc/issues/205>`__)
+   other (`#205 <https://github.com/pcdshub/pytmc/issues/205>`__)
 *  (Development) Fix package manifest and continuous integration
 
 
@@ -196,7 +196,7 @@ v2.6.0 (2020-02-26)
 *  Show the chain name of a failed record generation attempt
 *  Fix loading of ``_Config/IO`` files in certain cases, though there is
    still work to be done here
-   (`#187 <https://github.com/slaclab/pytmc/issues/187>`__
+   (`#187 <https://github.com/pcdshub/pytmc/issues/187>`__
 
 
 v2.5.0 (2019-12-20)
@@ -205,16 +205,16 @@ v2.5.0 (2019-12-20)
 Features
 --------
 
-* Debug tool option for showing variables which do not generate records (`#159 <https://github.com/slaclab/pytmc/issues/159>`__) “incomplete pragmas/chains”
-* Automatic generation of archive support files (`#162 <https://github.com/slaclab/pytmc/issues/162>`__)
-* Support customization of update rates via poll/notify (`#151 <https://github.com/slaclab/pytmc/issues/151>`__), looking forward to new m-epics-twincat-ads releases
-* Support record aliases (`#150 <https://github.com/slaclab/pytmc/issues/150>`__)
-* Description defaults to PLC variable path if unspecified (`#152 <https://github.com/slaclab/pytmc/issues/152>`__)
+* Debug tool option for showing variables which do not generate records (`#159 <https://github.com/pcdshub/pytmc/issues/159>`__) “incomplete pragmas/chains”
+* Automatic generation of archive support files (`#162 <https://github.com/pcdshub/pytmc/issues/162>`__)
+* Support customization of update rates via poll/notify (`#151 <https://github.com/pcdshub/pytmc/issues/151>`__), looking forward to new m-epics-twincat-ads releases
+* Support record aliases (`#150 <https://github.com/pcdshub/pytmc/issues/150>`__)
+* Description defaults to PLC variable path if unspecified (`#152 <https://github.com/pcdshub/pytmc/issues/152>`__)
 
 Fixes
 -----
-* Ordering of autosave fields (`#154 <https://github.com/slaclab/pytmc/issues/154>`__)
-* Box summary ordering (`#164 <https://github.com/slaclab/pytmc/issues/164>`__)
+* Ordering of autosave fields (`#154 <https://github.com/pcdshub/pytmc/issues/154>`__)
+* Box summary ordering (`#164 <https://github.com/pcdshub/pytmc/issues/164>`__)
 * Allow alternative character for EPICS macros (default ``@``)
 * Documentation updates + pragma key clarification
 
@@ -243,14 +243,14 @@ Fixes
 Pull requests incorporated
 --------------------------
 
-* `#130 <https://github.com/slaclab/pytmc/issues/130>`__
-* `#135 <https://github.com/slaclab/pytmc/issues/135>`__
-* `#137 <https://github.com/slaclab/pytmc/issues/137>`__
-* `#138 <https://github.com/slaclab/pytmc/issues/138>`__
-* `#141 <https://github.com/slaclab/pytmc/issues/141>`__
-* `#142 <https://github.com/slaclab/pytmc/issues/142>`__
-* `#143 <https://github.com/slaclab/pytmc/issues/143>`__
-* `#144 <https://github.com/slaclab/pytmc/issues/144>`__
+* `#130 <https://github.com/pcdshub/pytmc/issues/130>`__
+* `#135 <https://github.com/pcdshub/pytmc/issues/135>`__
+* `#137 <https://github.com/pcdshub/pytmc/issues/137>`__
+* `#138 <https://github.com/pcdshub/pytmc/issues/138>`__
+* `#141 <https://github.com/pcdshub/pytmc/issues/141>`__
+* `#142 <https://github.com/pcdshub/pytmc/issues/142>`__
+* `#143 <https://github.com/pcdshub/pytmc/issues/143>`__
+* `#144 <https://github.com/pcdshub/pytmc/issues/144>`__
 
 
 v2.3.1 (2019-11-08)
@@ -275,9 +275,9 @@ v2.3.0 (2019-10-28)
 
 PRs
 ---
-* `#123 <https://github.com/slaclab/pytmc/issues/123>`__,
-* `#124 <https://github.com/slaclab/pytmc/issues/124>`__, and
-* `#125 <https://github.com/slaclab/pytmc/issues/125>`__ to an official release.
+* `#123 <https://github.com/pcdshub/pytmc/issues/123>`__,
+* `#124 <https://github.com/pcdshub/pytmc/issues/124>`__, and
+* `#125 <https://github.com/pcdshub/pytmc/issues/125>`__ to an official release.
 
 Features
 --------
