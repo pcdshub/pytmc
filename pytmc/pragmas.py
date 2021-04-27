@@ -624,6 +624,14 @@ def parse_array_settings(pragma, dimensions):
         )
 
 
+# Helpers which normalize various pragma values.
+_normalizers = {
+    'io': (normalize_io, 'io'),
+    'update': (parse_update_rate, '1s poll'),
+    'archive': (parse_archive_settings, '1s scan'),
+}
+
+
 def normalize_config(config):
     '''
     Parse and normalize pragma values into Python representations
@@ -640,12 +648,8 @@ def normalize_config(config):
     dict
         A shallow-copy of ``config`` with parsed and normalized values
     '''
-    key_to_parser = {'io': (normalize_io, 'io'),
-                     'update': (parse_update_rate, '1s poll'),
-                     'archive': (parse_archive_settings, '1s scan'),
-                     }
     ret = dict(config)
-    for key, (parser_func, default) in key_to_parser.items():
+    for key, (parser_func, default) in _normalizers.items():
         ret[key] = parser_func(ret.get(key, default))
     return ret
 

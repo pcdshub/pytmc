@@ -306,6 +306,12 @@ class RecordPackage:
                     f'Unsupported data type {data_type.name} in chain: '
                     f'{chain.tcname} record: {chain.pvname}'
                 ) from None
+            if spec is IntegerRecordPackage:
+                if "scale" in chain.config or "offset" in chain.config:
+                    # longin/longout do not support scaling. Special-case and
+                    # cast to a FloatRecordPackage.
+                    spec = FloatRecordPackage
+
         return spec(*args, chain=chain, **kwargs)
 
 
@@ -571,6 +577,37 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
         'output': dict(pass0={'VAL', 'PREC'},
                        pass1={}),
     }
+
+    def get_scale_offset(self):
+        """Get the scale and offset for the analog record(s)."""
+        scale = self.config.get("scale", None)
+        offset = self.config.get("offset", None)
+        if scale is None and offset is None:
+            return None, None
+
+        scale = "1.0" if scale is None else scale
+        offset = offset or "0.0"
+        return scale, offset
+
+    def generate_input_record(self):
+        record = super().generate_input_record()
+        scale, offset = self.get_scale_offset()
+        if scale is not None:
+            # If LINR==SLOPE, VAL = RVAL * ESLO + EOFF
+            record.fields["LINR"] = "SLOPE"
+            record.fields["ESLO"] = scale
+            record.fields["EOFF"] = offset
+        return record
+
+    def generate_output_record(self):
+        record = super().generate_output_record()
+        scale, offset = self.get_scale_offset()
+        if scale is not None:
+            # If LINR==SLOPE, then RVAL = (VAL - EOFF) / ESLO
+            record.fields["LINR"] = "SLOPE"
+            record.fields["ESLO"] = scale
+            record.fields["EOFF"] = offset
+        return record
 
 
 class EnumRecordPackage(TwincatTypeRecordPackage):

@@ -687,3 +687,51 @@ def test_sub_io_change(dimensions, pragma, expected_records):
                     for pkg in pragmas.record_packages_from_symbol(outer)
                     for record in pkg.records)
     assert set(record_names) == expected_records
+
+
+@pytest.mark.parametrize(
+    "data_type, pragma, expected_scale, expected_offset",
+    [
+        pytest.param(
+            "FLOAT",
+            "pv: PREFIX; scale: 2.0; offset: 1.0",
+            "2.0",
+            "1.0",
+            id="float-scale-and-offset",
+        ),
+        pytest.param(
+            "UDINT",
+            "pv: PREFIX; scale: 3.0; offset: 0.1",
+            "3.0",
+            "0.1",
+            id="int-scale-and-offset",
+        ),
+        pytest.param(
+            "UDINT",
+            "pv: PREFIX; scale: 3.0",
+            "3.0",
+            "0.0",
+            id="int-no-offset",
+        ),
+        pytest.param(
+            "UDINT",
+            "pv: PREFIX; offset: 3.0",
+            "1.0",
+            "3.0",
+            id="int-no-scale",
+        ),
+    ],
+)
+def test_scale_and_offset(data_type, pragma, expected_scale, expected_offset):
+    item = make_mock_twincatitem(
+        name='Main.obj',
+        data_type=make_mock_type('UDINT', is_complex_type=False),
+        pragma=pragma,
+    )
+
+    pkg, = list(pragmas.record_packages_from_symbol(item))
+    for rec in pkg.records:
+        assert rec.fields['LINR'] == "SLOPE"
+        assert rec.fields['ESLO'] == expected_scale
+        assert rec.fields['EOFF'] == expected_offset
+        assert rec.record_type in {"ai", "ao"}
