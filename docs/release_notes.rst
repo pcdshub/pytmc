@@ -2,6 +2,21 @@
  Release History
 =================
 
+v2.9.1 (2021-04-27)
+===================
+
+Enhancements
+------------
+
+* Added ``scale`` and ``offset`` pragma keys for integer and floating point
+  symbols.
+
+Maintenance
+-----------
+
+* Fixed remaining ``slaclab`` references, after the repository was moved to
+  ``pcdshub``.
+
 v2.9.0 (2021-04-02)
 ===================
 
