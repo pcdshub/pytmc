@@ -70,6 +70,14 @@ pytmc summary
    :prog: pytmc summary
 
 
+pytmc template
+--------------
+
+.. argparse::
+   :module: pytmc.bin.template
+   :func: build_arg_parser
+   :prog: pytmc template
+
 pytmc types
 -----------
 

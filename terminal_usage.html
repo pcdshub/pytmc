@@ -123,6 +123,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-template">pytmc template</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#pytmc-types">pytmc types</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
 </ul>
@@ -138,6 +143,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release History</a></li>
 </ul>
 
             
@@ -218,7 +224,8 @@ TwinCAT3 .tmc files. This program is designed to work in conjunction with ESS’
 m-epics-twincat-ads driver.</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">db</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">error</span><span class="o">-</span><span class="n">context</span><span class="p">]</span>
-                <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span> <span class="n">ARCHIVE_FILE</span> <span class="o">|</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span> <span class="n">ARCHIVE_FILE</span> <span class="o">|</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span><span class="p">]</span>
                 <span class="n">INPUT</span> <span class="p">[</span><span class="n">OUTPUT</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -250,6 +257,10 @@ m-epics-twincat-ads driver.</p>
 </dd>
 <dt><kbd>--plc</kbd></dt>
 <dd><p>The PLC name, if specifying a .tsproj file</p>
+</dd>
+<dt><kbd>--debug</kbd></dt>
+<dd><p>Raise exceptions immediately, such that the IPython debugger may be used</p>
+<p>Default: False</p>
 </dd>
 <dt><kbd>--archive-file</kbd></dt>
 <dd><p>Save an archive configuration file. Defaults to OUTPUT.archive if specified</p>
@@ -380,7 +391,7 @@ any xml formatted file.</p>
 <p><p>“pytmc-debug” is a Qt interface that shows information about how pytmc
 interprets TwinCAT3 .tmc files.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">debug</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DBD</span><span class="p">]</span> <span class="n">INPUT</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">debug</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="n">INPUT</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -396,6 +407,10 @@ interprets TwinCAT3 .tmc files.</p>
 <dl class="option-list">
 <dt><kbd>-d, --dbd</kbd></dt>
 <dd><p>Specify an expanded .dbd file for validating fields (requires pyPDB)</p>
+</dd>
+<dt><kbd>-a, --allow-no-pragma</kbd></dt>
+<dd><p>Show all items, even those missing pragmas (warning: slow)</p>
+<p>Default: False</p>
 </dd>
 </dl>
 </div>
@@ -512,7 +527,9 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 .tsproj projects.</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">summary</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">all</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outline</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">boxes</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">code</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plcs</span><span class="p">]</span>
-                     <span class="p">[</span><span class="o">--</span><span class="n">nc</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">symbols</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">links</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">markdown</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">nc</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">symbols</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">types</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="nb">filter</span><span class="o">-</span><span class="n">types</span> <span class="n">FILTER_TYPES</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">links</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">markdown</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
                      <span class="n">filename</span>
 </pre></div>
 </div>
@@ -555,6 +572,13 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <dd><p>Show symbols</p>
 <p>Default: False</p>
 </dd>
+<dt><kbd>--types</kbd></dt>
+<dd><p>Show TMC types and record suffixes, if available</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--filter-types</kbd></dt>
+<dd><p>Filter the types shown by name</p>
+</dd>
 <dt><kbd>--links, -l</kbd></dt>
 <dd><p>Show links</p>
 <p>Default: False</p>
@@ -565,6 +589,73 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </dd>
 <dt><kbd>--debug, -d</kbd></dt>
 <dd><p>Post-summary, open an interactive Python session</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="pytmc-template">
+<h2>pytmc template<a class="headerlink" href="#pytmc-template" title="Permalink to this headline">¶</a></h2>
+<p><p>“pytmc template” is a command line utility to expand a template based on a
+TwinCAT3 project (or XML-format file such as .TMC).</p>
+<p>The template file is expected to be in Jinja template format.</p>
+<p>The following dictionaries are available in the template context:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">solutions</span> <span class="o">-</span> <span class="p">{</span><span class="n">solution_filename</span><span class="p">:</span> <span class="p">[</span><span class="n">project_fn</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span><span class="p">],</span> <span class="o">...</span><span class="p">}</span>
+<span class="n">projects</span> <span class="o">-</span> <span class="p">{</span><span class="n">project_filename</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span><span class="p">}</span>
+<span class="n">others</span> <span class="o">-</span> <span class="p">{</span><span class="n">filename</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>If installed and available, <code class="docutils literal notranslate"><span class="pre">git_info</span></code> will be available on each project.</p>
+<p>The following helpers are available in the environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config_to_pragma</span>
+<span class="n">data_type_to_record_info</span>
+<span class="n">determine_block_type</span>
+<span class="n">element_to_class_name</span>
+<span class="n">enumerate_types</span>
+<span class="n">get_boxes</span>
+<span class="n">get_data_type_by_reference</span>
+<span class="n">get_data_types</span>
+<span class="n">get_library_versions</span>
+<span class="n">get_links</span>
+<span class="n">get_linter_results</span>
+<span class="n">get_motors</span>
+<span class="n">get_nc</span>
+<span class="n">get_pou_call_blocks</span>
+<span class="n">get_symbols</span>
+<span class="n">list_types</span>
+<span class="nb">max</span>
+<span class="nb">min</span>
+<span class="n">separate_by_classname</span>
+</pre></div>
+</div>
+<p>And the following filters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">epics_prefix</span>
+<span class="n">epics_suffix</span>
+<span class="n">pragma</span>
+<span class="n">title_fill</span>
+</pre></div>
+</div>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">template</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TEMPLATE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span> <span class="n">projects</span> <span class="p">[</span><span class="n">projects</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>projects</kbd></dt>
+<dd><p>Path to project or solution (.tsproj, .sln)</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>-t, --template</kbd></dt>
+<dd><p>Template filename (default: standard input)</p>
+<p>Default: -</p>
+</dd>
+<dt><kbd>--debug, -d</kbd></dt>
+<dd><p>Post template generation, open an interactive Python session</p>
 <p>Default: False</p>
 </dd>
 </dl>
@@ -710,6 +801,9 @@ tmc file.</p>
 <div class="section" id="asyn-standard-record-jinja2">
 <h2>asyn_standard_record.jinja2<a class="headerlink" href="#asyn-standard-record-jinja2" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">({{</span><span class="n">record</span><span class="o">.</span><span class="n">record_type</span><span class="p">}},</span> <span class="s2">&quot;{{record.pvname}}&quot;</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">long_description</span> <span class="o">%</span><span class="p">}</span>
+  <span class="c1"># {{ record.long_description }}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
 <span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">aliases</span> <span class="o">%</span><span class="p">}</span>
   <span class="n">alias</span><span class="p">(</span><span class="s2">&quot;{{alias}}&quot;</span><span class="p">)</span>
 <span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
