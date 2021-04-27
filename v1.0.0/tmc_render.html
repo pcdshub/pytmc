@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tmc_render.py &mdash; pytmc  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/doctr-versions-menu.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developer’s Notes" href="dev_notes.html" />
+    <link rel="prev" title="xml_collector.py" href="xml_collector.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pytmc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="source_docs.html">Source code documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="xml_obj.html">xml_obj.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xml_collector.html">xml_collector.py</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">tmc_render.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#singlerecorddata">SingleRecordData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#singleprotodata">SingleProtoData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#renderagent">RenderAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dbrenderagent">DbRenderAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#protorenderagent">ProtoRenderAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tmcexplorer">TmcExplorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fullrender">FullRender</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dev_notes.html">Developer’s Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="source_docs.html">Source code documentation</a> &raquo;</li>
+        
+      <li>tmc_render.py</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tmc_render.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pytmc.tmc_render">
+<span id="tmc-render-py"></span><h1>tmc_render.py<a class="headerlink" href="#module-pytmc.tmc_render" title="Permalink to this headline">¶</a></h1>
+<p>tmc_render.py</p>
+<p>This file contains the tools for recursively exploring the TwinCAT program
+structure, parsing relevant pragmas and rendering the resulting EPICS db file.</p>
+<div class="section" id="singlerecorddata">
+<h2>SingleRecordData<a class="headerlink" href="#singlerecorddata" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.SingleRecordData">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">SingleRecordData</code><span class="sig-paren">(</span><em class="sig-param">pv=None</em>, <em class="sig-param">rec_type=None</em>, <em class="sig-param">fields=None</em>, <em class="sig-param">comment=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.SingleRecordData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data structre for packaging all the information required to render an epics
+record.</p>
+<p>SingleRecordData supports equality testing. Two instances are equal if all
+their attributes are equal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The parameters for the constructor are for setting the attributes of this
+class.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pv</strong> (<em>str</em>) – </p></li>
+<li><p><strong>rec_type</strong> (<em>str</em>) – </p></li>
+<li><p><strong>fields</strong> (<em>dict</em>) – </p></li>
+<li><p><strong>comment</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.SingleRecordData.pv">
+<code class="sig-name descname">pv</code><a class="headerlink" href="#pytmc.SingleRecordData.pv" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full PV for the record</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleRecordData.rec_type">
+<code class="sig-name descname">rec_type</code><a class="headerlink" href="#pytmc.SingleRecordData.rec_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Code for record type (e.g. ‘ai’,’bo’, etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleRecordData.fields">
+<code class="sig-name descname">fields</code><a class="headerlink" href="#pytmc.SingleRecordData.fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifications for each field type and their settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleRecordData.comment">
+<code class="sig-name descname">comment</code><a class="headerlink" href="#pytmc.SingleRecordData.comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>An additional string to be printed above the record in the db file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="singleprotodata">
+<h2>SingleProtoData<a class="headerlink" href="#singleprotodata" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.SingleProtoData">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">SingleProtoData</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">out_field=None</em>, <em class="sig-param">in_field=None</em>, <em class="sig-param">init=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.SingleProtoData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data structre for packaging all the information required to render an epics
+proto entry.</p>
+<p>SingleProtoData supports equality testing. Two instances are equal if all
+their attributes are equal.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The parameters for the constructor are for setting the attributes of this
+class.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – </p></li>
+<li><p><strong>out_field</strong> (<em>str</em>) – </p></li>
+<li><p><strong>in_field</strong> (<em>str</em>) – </p></li>
+<li><p><strong>init</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#pytmc.SingleProtoData.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>This specifies the name of the proto ‘method’. This is the name used to
+refer to the proto in the .db file. Name collision is prevented in
+<code class="xref py py-func docutils literal notranslate"><span class="pre">make_intf()</span></code> by manually assigning a name for the
+<code class="xref py py-func docutils literal notranslate"><span class="pre">from_element_path()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.out_field">
+<code class="sig-name descname">out_field</code><a class="headerlink" href="#pytmc.SingleProtoData.out_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the content to be placed after the ‘out’ field in the proto
+file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.in_field">
+<code class="sig-name descname">in_field</code><a class="headerlink" href="#pytmc.SingleProtoData.in_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the content to be placed after the ‘in’ field in the proto
+file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.SingleProtoData.init">
+<code class="sig-name descname">init</code><a class="headerlink" href="#pytmc.SingleProtoData.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this field is meant to be initialized with another value, place the
+name of the proto here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="renderagent">
+<h2>RenderAgent<a class="headerlink" href="#renderagent" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.tmc_render.RenderAgent">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.tmc_render.</code><code class="sig-name descname">RenderAgent</code><span class="sig-paren">(</span><em class="sig-param">master_list=None</em>, <em class="sig-param">loader=('pytmc'</em>, <em class="sig-param">'templates')</em>, <em class="sig-param">template=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.tmc_render.RenderAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>RenderAgent provides convenient tools for rendering the final records
+file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>master_list</strong> (<em>list</em>) – list of <a class="reference internal" href="#pytmc.SingleRecordData" title="pytmc.SingleRecordData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRecordData</span></code></a> instances specifying all
+records to be made. This parameter can be accessed later.</p></li>
+<li><p><strong>loader</strong> (<em>tuple</em>) – Specify package location of jinja templates. Names in the package are
+speperated by tuple entries instead of periods like normal python
+packages. Uses Jinja2’s PackageLoader.</p></li>
+<li><p><strong>template</strong> (<em>str</em>) – name of the template to be used</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.tmc_render.RenderAgent.master_list">
+<code class="sig-name descname">master_list</code><a class="headerlink" href="#pytmc.tmc_render.RenderAgent.master_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of : instances specifying all records or protos to be made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="dbrenderagent">
+<h2>DbRenderAgent<a class="headerlink" href="#dbrenderagent" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.DbRenderAgent">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">DbRenderAgent</code><span class="sig-paren">(</span><em class="sig-param">master_list=None</em>, <em class="sig-param">loader=('pytmc'</em>, <em class="sig-param">'templates')</em>, <em class="sig-param">template='EPICS_record_template.db'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.DbRenderAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>DbRenderAgent provides convenient tools for rendering the final records
+file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>master_list</strong> (<em>list</em>) – list of <a class="reference internal" href="#pytmc.SingleRecordData" title="pytmc.SingleRecordData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRecordData</span></code></a> instances specifying all
+records to be made. This parameter can be accessed later.</p></li>
+<li><p><strong>loader</strong> (<em>tuple</em>) – Specify package location of jinja templates. Names in the package are
+speperated by tuple entries instead of periods like normal python
+packages. Uses Jinja2’s PackageLoader.</p></li>
+<li><p><strong>template</strong> (<em>str</em>) – name of the template to be used</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.DbRenderAgent.master_list">
+<code class="sig-name descname">master_list</code><a class="headerlink" href="#pytmc.DbRenderAgent.master_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of <a class="reference internal" href="#pytmc.SingleRecordData" title="pytmc.SingleRecordData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRecordData</span></code></a> instances specifying all
+records to be made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="protorenderagent">
+<h2>ProtoRenderAgent<a class="headerlink" href="#protorenderagent" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.ProtoRenderAgent">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">ProtoRenderAgent</code><span class="sig-paren">(</span><em class="sig-param">master_list=None</em>, <em class="sig-param">loader=('pytmc'</em>, <em class="sig-param">'templates')</em>, <em class="sig-param">template='EPICS_record_template.db'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.ProtoRenderAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>ProtoRenderAgent provides convenient tools for rendering the final proto
+file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>master_list</strong> (<em>list</em>) – list of <a class="reference internal" href="#pytmc.SingleRecordData" title="pytmc.SingleRecordData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRecordData</span></code></a> instances specifying all
+records to be made. This parameter can be accessed later.</p></li>
+<li><p><strong>loader</strong> (<em>tuple</em>) – Specify package location of jinja templates. Names in the package are
+speperated by tuple entries instead of periods like normal python
+packages. Uses Jinja2’s PackageLoader.</p></li>
+<li><p><strong>template</strong> (<em>str</em>) – name of the template to be used</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.ProtoRenderAgent.master_list">
+<code class="sig-name descname">master_list</code><a class="headerlink" href="#pytmc.ProtoRenderAgent.master_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of <a class="reference internal" href="#pytmc.SingleRecordData" title="pytmc.SingleRecordData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRecordData</span></code></a> instances specifying all
+records to be made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tmcexplorer">
+<h2>TmcExplorer<a class="headerlink" href="#tmcexplorer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.TmcExplorer">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">TmcExplorer</code><span class="sig-paren">(</span><em class="sig-param">tmc</em>, <em class="sig-param">proto_file=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.TmcExplorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>TmcExplorer contains the tools to compile a list of SingleRecordData
+instances from the <a class="reference internal" href="xml_collector.html#pytmc.TmcFile" title="pytmc.TmcFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TmcFile</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tmc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">TmcFile</span></code>) – </p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.TmcExplorer.tmc.all_records">
+<code class="sig-prename descclassname">tmc.</code><code class="sig-name descname">all_records</code><a class="headerlink" href="#pytmc.TmcExplorer.tmc.all_records" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a list of all records to be made for the DB file. Populated by
+running <code class="xref py py-func docutils literal notranslate"><span class="pre">exp_Symbols()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#pytmc.SingleRecordData" title="pytmc.SingleRecordData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleRecordData</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fullrender">
+<h2>FullRender<a class="headerlink" href="#fullrender" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.FullRender">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">FullRender</code><span class="sig-paren">(</span><em class="sig-param">tmc_path</em>, <em class="sig-param">outpath</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.FullRender" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dev_notes.html" class="btn btn-neutral float-right" title="Developer’s Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="xml_collector.html" class="btn btn-neutral float-left" title="xml_collector.py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; pytmc  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/doctr-versions-menu.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Annotating a TwinCAT3 project" href="pragma_usage.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pytmc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#obtaining-the-code">Obtaining the code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-in-an-environment">Installing in an environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-the-installation">Testing the installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-for-development">Installing for development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pragma_usage.html">Annotating a TwinCAT3 project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Command-line Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html#templates">Templates</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="user_guide.html">User Guide</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="obtaining-the-code">
+<h2>Obtaining the code<a class="headerlink" href="#obtaining-the-code" title="Permalink to this headline">¶</a></h2>
+<p>Download the code via the tagged releases posted on the <a class="reference external" href="https://github.com/pcdshub/pytmc/releases">github releases page</a> or by cloning the source code
+with the following:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/pcdshub/pytmc.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-in-an-environment">
+<h2>Installing in an environment<a class="headerlink" href="#installing-in-an-environment" title="Permalink to this headline">¶</a></h2>
+<p>Create a python virtual environment using conda and install the pytmc in that
+environment.</p>
+<p>Begin by creating an environment and replacing [env-name] with the
+name of your environment. If you’re installing pytmc in a preexisting
+environment, you may skip this step.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ conda create --name <span class="o">[</span>env-name<span class="o">]</span>
+</pre></div>
+</div>
+<p>Activate your environment.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> activate <span class="o">[</span>env-name<span class="o">]</span>
+</pre></div>
+</div>
+<p>Install pip in the current environment if it is not already. If pip is not
+installed in your environment, the system will default to using pip in the root
+environment. When the root environment’s version of pip is used. Pip will
+attempt to install the package in the root envirnoment as well.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ conda install pip
+</pre></div>
+</div>
+<p>After cloning or unzipping the package, navigate to the base directory of
+pytmc. There you will find a file titled <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> and another titles
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>. Run the following commands from this directory. Make sure
+to install pip in this conda environment prior to installing tools with pip.
+Using pip in an environment lacking a pip installation will install pytmc in
+your root environment.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># Install pytmc&#39;s dependencies</span>
+$ pip install -r requirements.txt
+$ <span class="c1"># Install pytmc to your environment</span>
+$ pip install .
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The last line in the code snippet above has a ‘.’ at the end. It is very
+difficult to see with certain browsers.</p>
+</div>
+</div>
+<div class="section" id="testing-the-installation">
+<h2>Testing the installation<a class="headerlink" href="#testing-the-installation" title="Permalink to this headline">¶</a></h2>
+<p>If you’ve followed the previous steps correctly, pytmc should be installed now.
+This can be tested by seeing if the following bash commands can be found.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ pytmc --help
+</pre></div>
+</div>
+<p>Alternatively, a python shell can be opened and you can attempt to import
+pytmc.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pytmc</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While all of these instructions should work with python environments
+managed by virtualenv and pipenv, only conda has been tested.</p>
+</div>
+</div>
+<div class="section" id="installing-for-development">
+<h2>Installing for development<a class="headerlink" href="#installing-for-development" title="Permalink to this headline">¶</a></h2>
+<p>To develop pytmc it is best to use a development install. This allows changes
+to the code to be immediately reflected in the program’s functionality without
+needing to reinstall the code.This can be done by following the <a class="reference internal" href="#installing-in-an-environment">Installing in
+an environment</a> section but with one change. The following code snippet should
+be removed:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># Don&#39;t use this step for a development install</span>
+$ pip install .
+</pre></div>
+</div>
+<p>In place of the removed command, use the following to do a development install.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># Use this command instead</span>
+$ pip install -e .
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pragma_usage.html" class="btn btn-neutral float-right" title="Annotating a TwinCAT3 project" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

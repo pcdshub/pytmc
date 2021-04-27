@@ -1,0 +1,1604 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API Documentation &mdash; pytmc  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/doctr-versions-menu.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Command-line Usage" href="terminal_usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pytmc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.pragmas">pytmc.pragmas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.record">pytmc.record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.parser">pytmc.parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pytmc.linter">pytmc.linter</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API Documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/source_code.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pytmc.pragmas">
+<span id="pytmc-pragmas"></span><h2>pytmc.pragmas<a class="headerlink" href="#module-pytmc.pragmas" title="Permalink to this headline">¶</a></h2>
+<p>This file contains the objects for taking in pytmc-parsed TMC files and
+generating Python-level configuration information.</p>
+<dl class="class">
+<dt id="pytmc.pragmas.SingularChain">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">SingularChain</code><span class="sig-paren">(</span><em class="sig-param">item_to_config</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.SingularChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A chain of data types, all with pytmc pragmas, representing a single piece
+of data that should be accessible via EPICS/ADS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>item_to_config</strong> (<em>dict</em>) – Keys would be <code class="docutils literal notranslate"><span class="pre">TwincatItem</span></code> s such as Symbol, and values would be
+dictionary configurations from parsed pytmc pragmas.</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.pragmas.SingularChain.item_to_config">
+<code class="sig-name descname">item_to_config</code><a class="headerlink" href="#pytmc.pragmas.SingularChain.item_to_config" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.pragmas.SingularChain.chain">
+<code class="sig-name descname">chain</code><a class="headerlink" href="#pytmc.pragmas.SingularChain.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>The chain of items (i.e., item_to_config keys)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.pragmas.SingularChain.tcname">
+<code class="sig-name descname">tcname</code><a class="headerlink" href="#pytmc.pragmas.SingularChain.tcname" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full TwinCAT name of the item</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.pragmas.SingularChain.pvname">
+<code class="sig-name descname">pvname</code><a class="headerlink" href="#pytmc.pragmas.SingularChain.pvname" title="Permalink to this definition">¶</a></dt>
+<dd><p>The user-specified PV name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.pragmas.SingularChain.last">
+<code class="sig-name descname">last</code><a class="headerlink" href="#pytmc.pragmas.SingularChain.last" title="Permalink to this definition">¶</a></dt>
+<dd><p>The last item, which determines the overall data type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.pragmas.SingularChain.data_type">
+<code class="sig-name descname">data_type</code><a class="headerlink" href="#pytmc.pragmas.SingularChain.data_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The data type of the last item</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pytmc.parser.DataType" title="pytmc.parser.DataType">DataType</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.pragmas.SingularChain.config">
+<code class="sig-name descname">config</code><a class="headerlink" href="#pytmc.pragmas.SingularChain.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>The final configuration based on the full chain of configurations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.chains_from_symbol">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">chains_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.chains_from_symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build all SingularChain instances from a Symbol</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.dictify_config">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">dictify_config</code><span class="sig-paren">(</span><em class="sig-param">conf</em>, <em class="sig-param">array_index=None</em>, <em class="sig-param">expand_default=':%.2d'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.dictify_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a raw config list into an easier-to-use dictionary</p>
+<dl class="simple">
+<dt>Example::</dt><dd><dl class="simple">
+<dt>[{‘title’: ‘pv’, ‘tag’: ‘a’},</dt><dd><p>{‘title’: ‘io’, ‘tag’: ‘io_for_a’},
+{‘title’: ‘field’, ‘tag’: {‘f_name’: ‘fieldname’, ‘f_set’: ‘value’}},
+]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Becomes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;pv&#39;</span><span class="p">:</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;io&#39;</span><span class="p">:</span> <span class="s1">&#39;io_for_a&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;fieldname&#39;</span><span class="p">:</span> <span class="s1">&#39;value&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.expand_configurations_from_chain">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">expand_configurations_from_chain</code><span class="sig-paren">(</span><em class="sig-param">chain</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.expand_configurations_from_chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate all possible configuration combinations</p>
+<p>For example, from a chain with two items:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The latter of which has a configuration that creates two PVs (specified by
+configuration dictionaries config1, config2), this function will return:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">[(</span><span class="n">item1</span><span class="p">,</span> <span class="n">config1</span><span class="p">),</span> <span class="p">(</span><span class="n">item2</span><span class="p">,</span> <span class="n">config1</span><span class="p">)],</span>
+    <span class="p">[(</span><span class="n">item1</span><span class="p">,</span> <span class="n">config1</span><span class="p">),</span> <span class="p">(</span><span class="n">item2</span><span class="p">,</span> <span class="n">config2</span><span class="p">)],</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Special handling for arrays of complex types will unroll the array into
+individual elements.  That is, <cite>arr : ARRAY [1..5] of ST_Structure</cite> will be
+unrolled into <cite>arr[1]</cite> through <cite>arr[5]</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Tuple of tuples. See description above.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.find_pytmc_symbols">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">find_pytmc_symbols</code><span class="sig-paren">(</span><em class="sig-param">tmc</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.find_pytmc_symbols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all symbols in a tmc file that contain pragmas</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.get_pragma">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">get_pragma</code><span class="sig-paren">(</span><em class="sig-param">item</em>, <em class="sig-param">*</em>, <em class="sig-param">name='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.get_pragma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all pragmas with a certain tag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> (<a class="reference internal" href="#pytmc.parser.SubItem" title="pytmc.parser.SubItem"><em>parser.SubItem</em></a><em>, </em><a class="reference internal" href="#pytmc.parser.Symbol" title="pytmc.parser.Symbol"><em>parser.Symbol</em></a><em>, </em><em>parser.Symbol subclass</em>) – Representation of beckhoff variable or data structure</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – Accept tmc entries where the &lt;Name&gt; field equals the passed string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>str</em></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.has_pragma">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">has_pragma</code><span class="sig-paren">(</span><em class="sig-param">item</em>, <em class="sig-param">*</em>, <em class="sig-param">name='pytmc'</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.has_pragma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does <cite>item</cite> have a pragma titled <cite>name</cite>?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.normalize_config">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">normalize_config</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.normalize_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and normalize pragma values into Python representations</p>
+<p>The following keys will be interpreted: <code class="docutils literal notranslate"><span class="pre">io</span></code>, <code class="docutils literal notranslate"><span class="pre">archive</span></code>, <code class="docutils literal notranslate"><span class="pre">update</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – The configuration</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A shallow-copy of <code class="docutils literal notranslate"><span class="pre">config</span></code> with parsed and normalized values</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.normalize_io">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">normalize_io</code><span class="sig-paren">(</span><em class="sig-param">io</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.normalize_io" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize an ‘io’ specifier in a pragma into either ‘input’ or ‘output’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>io</strong> (<em>str</em>) – The I/O specifier from the pragma</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>{‘input’, ‘output’}</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid specifier is given</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.parse_archive_settings">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">parse_archive_settings</code><span class="sig-paren">(</span><em class="sig-param">archive</em>, <em class="sig-param">default={'frequency': 1</em>, <em class="sig-param">'method': 'scan'</em>, <em class="sig-param">'seconds': 1}</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.parse_archive_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an ‘archive’ specifier in a pragma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>archive</strong> (<em>str</em>) – The I/O specifier from the pragma</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>With keys {‘seconds’, ‘frequency’, ‘method’}
+Where ‘method’ is one of: {‘scan’, ‘monitor’}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid pragma is supplied</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.parse_update_rate">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">parse_update_rate</code><span class="sig-paren">(</span><em class="sig-param">update</em>, <em class="sig-param">default={'frequency': 1</em>, <em class="sig-param">'method': 'poll'</em>, <em class="sig-param">'seconds': 1}</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.parse_update_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an ‘update’ specifier in a pragma</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>update</strong> (<em>str</em>) – The I/O specifier from the pragma</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>With keys {‘seconds’, ‘frequency’, ‘method’}
+Where ‘method’ is one of: {‘poll’, ‘notify’}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid pragma is supplied</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.record_packages_from_symbol">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">record_packages_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">symbol</em>, <em class="sig-param">*</em>, <em class="sig-param">pragma='pytmc'</em>, <em class="sig-param">yield_exceptions=False</em>, <em class="sig-param">allow_no_pragma=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.record_packages_from_symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create all record packages from a given Symbol</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.separate_configs_by_pv">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">separate_configs_by_pv</code><span class="sig-paren">(</span><em class="sig-param">config_lines</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.separate_configs_by_pv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take in a pre-parsed pragma such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;pv&#39;</span><span class="p">,</span> <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;a&#39;</span><span class="p">},</span>
+ <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span> <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;io_for_a&#39;</span><span class="p">},</span>
+ <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;pv&#39;</span><span class="p">,</span> <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">},</span>
+ <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span> <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;io_for_a&#39;</span><span class="p">},</span>
+ <span class="p">]</span>
+</pre></div>
+</div>
+<p>Which was generated from:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pv</span><span class="p">:</span> <span class="n">a</span>
+<span class="n">io</span><span class="p">:</span> <span class="n">io_for_a</span>
+<span class="n">pv</span><span class="p">:</span> <span class="n">b</span>
+<span class="n">io</span><span class="p">:</span> <span class="n">io_for_b</span>
+</pre></div>
+</div>
+<p>And yield the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="p">[{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span> <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;io_for_a&#39;</span><span class="p">}])</span>
+<span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="p">[{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span> <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;io_for_b&#39;</span><span class="p">}])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.split_field">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">split_field</code><span class="sig-paren">(</span><em class="sig-param">string</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.split_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>When applied to field line’s tag, break the string into its own dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) – This is the string to be broken into field name and field setting</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keys are ‘f_name’ for the field name and ‘f_set’ for the corresponding
+setting.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.split_pytmc_pragma">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">split_pytmc_pragma</code><span class="sig-paren">(</span><em class="sig-param">pragma_text</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.split_pytmc_pragma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dictionaries for each line.
+Derived from raw_config</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_config</strong> (<em>str</em>) – completely unformatted string from configuration. Defaults to
+raw_config.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>This list contains a dictionary for each line broken up into two
+keys: ‘title’ and ‘tag’.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.pragmas.squash_configs">
+<code class="sig-prename descclassname">pytmc.pragmas.</code><code class="sig-name descname">squash_configs</code><span class="sig-paren">(</span><em class="sig-param">*configs</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.pragmas.squash_configs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a list of configurations, and squash them into one dictionary</p>
+<p>The key ‘pv’ will be a list of all PV segments found.</p>
+<p>Later configurations override prior ones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*configs</strong> (<em>list of dict</em>) – Configurations to squash. Original configs will not be modified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pytmc.record">
+<span id="pytmc-record"></span><h2>pytmc.record<a class="headerlink" href="#module-pytmc.record" title="Permalink to this headline">¶</a></h2>
+<p>Record generation and templating</p>
+<dl class="class">
+<dt id="pytmc.record.BinaryRecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">BinaryRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.BinaryRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage" title="pytmc.record.TwincatTypeRecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.TwincatTypeRecordPackage</span></code></a></p>
+<p>Create a set of records for a binary Twincat Variable</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.EPICSRecord">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">EPICSRecord</code><span class="sig-paren">(</span><em class="sig-param">pvname</em>, <em class="sig-param">record_type</em>, <em class="sig-param">direction</em>, <em class="sig-param">fields=None</em>, <em class="sig-param">template=None</em>, <em class="sig-param">autosave=None</em>, <em class="sig-param">aliases=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Representation of a single EPICS Record</p>
+<dl class="method">
+<dt id="pytmc.record.EPICSRecord.render">
+<code class="sig-name descname">render</code><span class="sig-paren">(</span><em class="sig-param">sort=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the provided template</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.EPICSRecord.update_autosave_from_pragma">
+<code class="sig-name descname">update_autosave_from_pragma</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EPICSRecord.update_autosave_from_pragma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update autosave settings from a pragma configuration</p>
+<p>To apply to either input or output records, pragma keys
+<cite>autosave_pass0</cite> or <cite>autosave_pass1</cite> can be used.</p>
+<p>To only apply to input records, pragma keys <cite>autosave_input_pass0</cite>
+<cite>autosave_input_pass1</cite> can be used.</p>
+<p>To only apply to output records, pragma keys <cite>autosave_output_pass0</cite>
+<cite>autosave_output_pass1</cite> can be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – The pragma configuration dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.EnumRecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">EnumRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.EnumRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage" title="pytmc.record.TwincatTypeRecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.TwincatTypeRecordPackage</span></code></a></p>
+<p>Create a set of record for a ENUM Twincat Variable</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.FloatRecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">FloatRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.FloatRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage" title="pytmc.record.TwincatTypeRecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.TwincatTypeRecordPackage</span></code></a></p>
+<p>Create a set of records for a floating point Twincat Variable</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.IntegerRecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">IntegerRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.IntegerRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage" title="pytmc.record.TwincatTypeRecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.TwincatTypeRecordPackage</span></code></a></p>
+<p>Create a set of records for an integer Twincat Variable</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.RecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">RecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.RecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class to be inherited by all other RecordPackages</p>
+<p>The subclass must implement the <a class="reference internal" href="#pytmc.record.RecordPackage.records" title="pytmc.record.RecordPackage.records"><code class="xref py py-attr docutils literal notranslate"><span class="pre">records</span></code></a> property which returns the
+<a class="reference internal" href="#pytmc.record.EPICSRecord" title="pytmc.record.EPICSRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">EPICSRecord</span></code></a> objects which will be rendered from the package.
+Optionally, <code class="docutils literal notranslate"><span class="pre">RecordPackage</span></code> can have a <code class="docutils literal notranslate"><span class="pre">configure</span></code> method which does
+the necessary setup before the record can be configured.</p>
+<dl class="method">
+<dt id="pytmc.record.RecordPackage.from_chain">
+<em class="property">static </em><code class="sig-name descname">from_chain</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">chain</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.RecordPackage.from_chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the proper subclass of <code class="docutils literal notranslate"><span class="pre">TwincatRecordPackage</span></code> from chain</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.RecordPackage.records">
+<em class="property">property </em><code class="sig-name descname">records</code><a class="headerlink" href="#pytmc.record.RecordPackage.records" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generated <a class="reference internal" href="#pytmc.record.EPICSRecord" title="pytmc.record.EPICSRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">EPICSRecord</span></code></a> objects</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.RecordPackage.render">
+<code class="sig-name descname">render</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.RecordPackage.render" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Jinja rendered entry for the RecordPackage</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.RecordPackage.valid">
+<em class="property">property </em><code class="sig-name descname">valid</code><a class="headerlink" href="#pytmc.record.RecordPackage.valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns: Returns true if this record is fully specified and valid.
+:rtype: bool</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.StringRecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">StringRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.StringRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage" title="pytmc.record.TwincatTypeRecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.TwincatTypeRecordPackage</span></code></a></p>
+<p>RecordPackage for broadcasting string values</p>
+<dl class="method">
+<dt id="pytmc.record.StringRecordPackage.generate_input_record">
+<code class="sig-name descname">generate_input_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.StringRecordPackage.generate_input_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the record to read values into to the IOC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>record</strong> – Description of input record</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">EpicsRecord</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.StringRecordPackage.generate_output_record">
+<code class="sig-name descname">generate_output_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.StringRecordPackage.generate_output_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the record to write values back to the PLC</p>
+<p>This will only be called if the <code class="docutils literal notranslate"><span class="pre">io_direction</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>record</strong> – Description of output record</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">EpicsRecord</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.StringRecordPackage.nelm">
+<em class="property">property </em><code class="sig-name descname">nelm</code><a class="headerlink" href="#pytmc.record.StringRecordPackage.nelm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of elements in record</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.TwincatTypeRecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">TwincatTypeRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">ads_port</em>, <em class="sig-param">chain=None</em>, <em class="sig-param">origin=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.record.RecordPackage" title="pytmc.record.RecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.RecordPackage</span></code></a></p>
+<p>The common parent for all RecordPackages for basic Twincat types</p>
+<p>This main purpose of this class is to handle the parsing of the pragma
+chains that will be shared among all variable types. This includes setting
+the appropriate asyn port together and handling the “io” directionality. If
+you have a <code class="xref py py-class docutils literal notranslate"><span class="pre">TmcChain</span></code> but are not certain which class is
+appropriate use the <a class="reference internal" href="#pytmc.record.RecordPackage.from_chain" title="pytmc.record.RecordPackage.from_chain"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_chain()</span></code></a> class constructor and the correct
+subclass will be chosen based on the given variable information.</p>
+<p>In order to subclass:</p>
+<ol class="arabic simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">input_rtyp</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">output_rtyp</span></code> need to be provided. These
+are the EPICS RTYPs that are necessary for input and output variables.</p></li>
+<li><p>If there are default values for fields, these can be provided in the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">field_defaults</span></code>. Setting this on a subclass will only override
+fields in parent classes that are redundant. In other words,
+<code class="docutils literal notranslate"><span class="pre">default_fields</span></code> are inherited if not explicitly overwritten. Also
+note that these defaults are applied to both the input and output
+records.</p></li>
+<li><p><a class="reference internal" href="#pytmc.record.WaveformRecordPackage.dtyp" title="pytmc.record.WaveformRecordPackage.dtyp"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dtyp</span></code></a> needs to be set to the appropriate value for the Twincat
+type.</p></li>
+<li><p>The <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage.generate_input_record" title="pytmc.record.TwincatTypeRecordPackage.generate_input_record"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_input_record()</span></code></a> and <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage.generate_output_record" title="pytmc.record.TwincatTypeRecordPackage.generate_output_record"><code class="xref py py-meth docutils literal notranslate"><span class="pre">generate_output_record()</span></code></a>
+functions can be subclasses if further customisation is needed. This is
+not required.</p></li>
+</ol>
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.asyn_input_port_spec">
+<em class="property">property </em><code class="sig-name descname">asyn_input_port_spec</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.asyn_input_port_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asyn input port specification (for INP field)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.asyn_output_port_spec">
+<em class="property">property </em><code class="sig-name descname">asyn_output_port_spec</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.asyn_output_port_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asyn output port specification (for OUT field)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.asyn_update_options">
+<em class="property">property </em><code class="sig-name descname">asyn_update_options</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.asyn_update_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input record update options (TS_MS or POLL_RATE)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.generate_input_record">
+<code class="sig-name descname">generate_input_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.generate_input_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the record to read values into to the IOC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>record</strong> – Description of input record</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">EpicsRecord</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.generate_output_record">
+<code class="sig-name descname">generate_output_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.generate_output_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the record to write values back to the PLC</p>
+<p>This will only be called if the <code class="docutils literal notranslate"><span class="pre">io_direction</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>record</strong> – Description of output record</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">EpicsRecord</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.io_direction">
+<em class="property">property </em><code class="sig-name descname">io_direction</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.io_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the direction based on the <cite>io</cite> config lines</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>direction</strong> – {‘input’, ‘output’}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.TwincatTypeRecordPackage.records">
+<em class="property">property </em><code class="sig-name descname">records</code><a class="headerlink" href="#pytmc.record.TwincatTypeRecordPackage.records" title="Permalink to this definition">¶</a></dt>
+<dd><p>All records that will be created in the package</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.record.WaveformRecordPackage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">WaveformRecordPackage</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.WaveformRecordPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.record.TwincatTypeRecordPackage" title="pytmc.record.TwincatTypeRecordPackage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.record.TwincatTypeRecordPackage</span></code></a></p>
+<p>Create a set of records for a Twincat Array</p>
+<dl class="method">
+<dt id="pytmc.record.WaveformRecordPackage.dtyp">
+<em class="property">property </em><code class="sig-name descname">dtyp</code><a class="headerlink" href="#pytmc.record.WaveformRecordPackage.dtyp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add field specifying DTYP without specifying array direction</p>
+<p>The following is taken from the EPICS wiki: “This field specifies the
+device type for the record. Each record type has its own set of device
+support routines which are specified in devSup.ASCII. If a record type
+does not have any associated device support, DTYP and DSET are
+meaningless.”</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.WaveformRecordPackage.ftvl">
+<em class="property">property </em><code class="sig-name descname">ftvl</code><a class="headerlink" href="#pytmc.record.WaveformRecordPackage.ftvl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Field type of value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.WaveformRecordPackage.generate_input_record">
+<code class="sig-name descname">generate_input_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.WaveformRecordPackage.generate_input_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the record to read values into to the IOC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>record</strong> – Description of input record</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">EpicsRecord</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.WaveformRecordPackage.generate_output_record">
+<code class="sig-name descname">generate_output_record</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.WaveformRecordPackage.generate_output_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the record to write values back to the PLC</p>
+<p>This will only be called if the <code class="docutils literal notranslate"><span class="pre">io_direction</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>record</strong> – Description of output record</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">EpicsRecord</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.record.WaveformRecordPackage.nelm">
+<em class="property">property </em><code class="sig-name descname">nelm</code><a class="headerlink" href="#pytmc.record.WaveformRecordPackage.nelm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of elements in record</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.record.generate_archive_settings">
+<code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">generate_archive_settings</code><span class="sig-paren">(</span><em class="sig-param">packages</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.generate_archive_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an archive settings given a list of record packages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>packages</strong> (<em>list of record packages</em>) – </p>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>str</em> – One line from the archiver settings file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.record.sort_fields">
+<code class="sig-prename descclassname">pytmc.record.</code><code class="sig-name descname">sort_fields</code><span class="sig-paren">(</span><em class="sig-param">unsorted</em>, <em class="sig-param">sort_lookup=None</em>, <em class="sig-param">last=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.record.sort_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort the ordered dict according to the sort_scheme given at instantiation.
+Does NOT sort in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unsorted</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code>) – An OrderedDict in need of sorting.</p></li>
+<li><p><strong>sort_lookup</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – Requires a Dictionary, reverse lookup table for identifying sorting
+order. If left as None,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">default_settings.unified_ordered_field_list.unified_list</span></code>
+is used.</p></li>
+<li><p><strong>last</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – If True, place the alphabetized entries at the end, otherwise, place
+them at the start.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedDict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pytmc.parser">
+<span id="pytmc-parser"></span><h2>pytmc.parser<a class="headerlink" href="#module-pytmc.parser" title="Permalink to this headline">¶</a></h2>
+<p>TMC, XTI, tsproj parsing utilities</p>
+<dl class="class">
+<dt id="pytmc.parser.ArrayInfo">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">ArrayInfo</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.ArrayInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] Array information for a DataType or Symbol</p>
+<dl class="method">
+<dt id="pytmc.parser.ArrayInfo.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.ArrayInfo.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Axis">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Axis</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] A single NC axis</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.AxisPara">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">AxisPara</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.AxisPara" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] Axis Parameters</p>
+<p>Has information on units, acceleration, deadband, etc.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Box">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Box</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] A box / module</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.BuiltinDataType">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">BuiltinDataType</code><span class="sig-paren">(</span><em class="sig-param">typename</em>, <em class="sig-param">*</em>, <em class="sig-param">length=1</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.BuiltinDataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>[TMC] A built-in data type such as STRING, INT, REAL, etc.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Compile">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Compile</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] A code entry in a nested/virtual PLC project</p>
+<p>File to load is marked with ‘Include’
+May be TcTTO, TcPOU, TcDUT, GVL, etc.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.DataType">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">DataType</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.DataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] A DataType with SubItems, likely representing a structure</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.DataTypes">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">DataTypes</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.DataTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] Container of DataType</p>
+<dl class="method">
+<dt id="pytmc.parser.DataTypes.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.DataTypes.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Declaration">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Declaration</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Declaration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[XTI] Code declaration</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Device">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Device</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] Top-level IO device container</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.EncPara">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">EncPara</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.EncPara" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] Encoder parameters</p>
+<p>Includes such parameters as ScaleFactorNumerator, ScaleFactorDenominator,
+and so on.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Encoder">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Encoder</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] Encoder</p>
+<p>Contains EncPara, Vars, Mappings, etc.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.EnumInfo">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">EnumInfo</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.EnumInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] Enum values, strings, and associated comments</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.ExtendsType">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">ExtendsType</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.ExtendsType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] A marker of inheritance / extension, found on DataType</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.GVL">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">GVL</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.GVL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[XTI] A Global Variable List</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Implementation">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Implementation</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Implementation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[XTI] Code implementation</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Link">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Link</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] Links between NC/PLC/IO</p>
+<dl class="method">
+<dt id="pytmc.parser.Link.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Link.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Module">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Module</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] A Module</p>
+<p>Contains generated symbols, data areas, and miscellaneous properties.</p>
+<dl class="method">
+<dt id="pytmc.parser.Module.ads_port">
+<em class="property">property </em><code class="sig-name descname">ads_port</code><a class="headerlink" href="#pytmc.parser.Module.ads_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ADS port assigned to the Virtual PLC</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.NC">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">NC</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.NC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[tsproj or XTI] Top-level NC</p>
+<dl class="method">
+<dt id="pytmc.parser.NC.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.NC.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.OwnerA">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">OwnerA</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.OwnerA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] For a Link between VarA and VarB, this is the parent of VarA</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.OwnerB">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">OwnerB</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.OwnerB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] For a Link between VarA and VarB, this is the parent of VarB</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.POU">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">POU</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.POU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[XTI] A Program Organization Unit</p>
+<dl class="method">
+<dt id="pytmc.parser.POU.call_blocks">
+<em class="property">property </em><code class="sig-name descname">call_blocks</code><a class="headerlink" href="#pytmc.parser.POU.call_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of all implementation call blocks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.POU.declaration">
+<em class="property">property </em><code class="sig-name descname">declaration</code><a class="headerlink" href="#pytmc.parser.POU.declaration" title="Permalink to this definition">¶</a></dt>
+<dd><p>The declaration code; i.e., the top portion in visual studio</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.POU.implementation">
+<em class="property">property </em><code class="sig-name descname">implementation</code><a class="headerlink" href="#pytmc.parser.POU.implementation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The implementation code; i.e., the bottom portion in visual studio</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.POU.program_name">
+<em class="property">property </em><code class="sig-name descname">program_name</code><a class="headerlink" href="#pytmc.parser.POU.program_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The program name, determined from the declaration</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.POU.variables">
+<em class="property">property </em><code class="sig-name descname">variables</code><a class="headerlink" href="#pytmc.parser.POU.variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of variables defined in the POU</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Plc">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Plc</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Plc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[tsproj] A project which contains Plc, Io, Mappings, etc.</p>
+<dl class="method">
+<dt id="pytmc.parser.Plc.ams_id">
+<em class="property">property </em><code class="sig-name descname">ams_id</code><a class="headerlink" href="#pytmc.parser.Plc.ams_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The AMS ID of the configured target</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Plc.find">
+<code class="sig-name descname">find</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">*</em>, <em class="sig-param">recurse=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Plc.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find any descendents that are instances of cls</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cls</strong> (<em>TwincatItem</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Plc.port">
+<em class="property">property </em><code class="sig-name descname">port</code><a class="headerlink" href="#pytmc.parser.Plc.port" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ADS port for the project</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Plc.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Plc.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Plc.target_ip">
+<em class="property">property </em><code class="sig-name descname">target_ip</code><a class="headerlink" href="#pytmc.parser.Plc.target_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>A guess of the target IP, based on the AMS ID</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Property">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Property</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] A property containing a key/value pair</p>
+<p>Examples of TMC properties:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ApplicationName</span> <span class="p">(</span><span class="n">used</span> <span class="k">for</span> <span class="n">the</span> <span class="n">ADS</span> <span class="n">port</span><span class="p">)</span>
+<span class="n">ChangeDate</span>
+<span class="n">GeneratedCodeSize</span>
+<span class="n">GlobalDataSize</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pytmc.parser.Property.key">
+<em class="property">property </em><code class="sig-name descname">key</code><a class="headerlink" href="#pytmc.parser.Property.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The property key name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Property.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#pytmc.parser.Property.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The property value text</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.RemoteConnections">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">RemoteConnections</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.RemoteConnections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[StaticRoutes] Routes contained in the TwinCat configuration</p>
+<dl class="method">
+<dt id="pytmc.parser.RemoteConnections.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.RemoteConnections.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.ST">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">ST</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.ST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[XTI] Structured text</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.SubItem">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">SubItem</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.SubItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] One element of a DataType</p>
+<dl class="method">
+<dt id="pytmc.parser.SubItem.qualified_type_name">
+<em class="property">property </em><code class="sig-name descname">qualified_type_name</code><a class="headerlink" href="#pytmc.parser.SubItem.qualified_type_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base type, including the namespace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.SubItem.type">
+<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#pytmc.parser.SubItem.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base type</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Symbol">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Symbol</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] A basic Symbol type</p>
+<p>This is dynamically subclassed into new classes for ease of implementation
+and searching.  For example, a function block defined as <cite>FB_MotionStage</cite>
+will become <cite>Symbol_FB_MotionStage</cite>.</p>
+<dl class="method">
+<dt id="pytmc.parser.Symbol.module">
+<em class="property">property </em><code class="sig-name descname">module</code><a class="headerlink" href="#pytmc.parser.Symbol.module" title="Permalink to this definition">¶</a></dt>
+<dd><p>The TMC Module containing the Symbol</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Symbol.qualified_type_name">
+<em class="property">property </em><code class="sig-name descname">qualified_type_name</code><a class="headerlink" href="#pytmc.parser.Symbol.qualified_type_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base type, including the namespace</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Symbol.type_name">
+<em class="property">property </em><code class="sig-name descname">type_name</code><a class="headerlink" href="#pytmc.parser.Symbol.type_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base type</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Symbol_DUT_MotionStage">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Symbol_DUT_MotionStage</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.parser.Symbol" title="pytmc.parser.Symbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.Symbol</span></code></a></p>
+<p>[TMC] A customized Symbol, representing only DUT_MotionStage</p>
+<dl class="method">
+<dt id="pytmc.parser.Symbol_DUT_MotionStage.motor_name">
+<em class="property">property </em><code class="sig-name descname">motor_name</code><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.motor_name" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>M1</cite> of <cite>Main.M1</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Symbol_DUT_MotionStage.nc_axis">
+<em class="property">property </em><code class="sig-name descname">nc_axis</code><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.nc_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>The NC <cite>Axis</cite> associated with the DUT_MotionStage</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Symbol_DUT_MotionStage.nc_to_plc_link">
+<em class="property">property </em><code class="sig-name descname">nc_to_plc_link</code><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.nc_to_plc_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Link for NcToPlc</p>
+<p>That is, how the NC axis is connected to the DUT_MotionStage</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.Symbol_DUT_MotionStage.program_name">
+<em class="property">property </em><code class="sig-name descname">program_name</code><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.program_name" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>Main</cite> of <cite>Main.M1</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.T_MaxString">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">T_MaxString</code><a class="headerlink" href="#pytmc.parser.T_MaxString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pytmc.parser.BuiltinDataType" title="pytmc.parser.BuiltinDataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.BuiltinDataType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.TcModuleClass">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">TcModuleClass</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.TcModuleClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TwincatProjectSubItem</span></code></p>
+<p>[TMC] The top-level TMC file</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.TcSmItem">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">TcSmItem</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.TcSmItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] Top-level container for XTI files</p>
+<p>Visual Studio-level configuration changes the project layout significantly,
+with individual XTI files being created for axes, PLCs, etc. instead of
+updating the original tsproj file.</p>
+<p>The additional, optional, level of indirection here can make walking the
+tree frustrating. So, we squash these TcSmItems - skipping over them in the
+hierarchy - and pushing its children into its parent.</p>
+<p>The original container <cite>TcSmItem</cite> is accessible in those items through the
+<cite>.container</cite> attribute.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.TcSmProject">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">TcSmProject</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.TcSmProject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[tsproj] A top-level TwinCAT tsproj</p>
+<dl class="method">
+<dt id="pytmc.parser.TcSmProject.plcs">
+<em class="property">property </em><code class="sig-name descname">plcs</code><a class="headerlink" href="#pytmc.parser.TcSmProject.plcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>The virtual PLC projects contained in this TcSmProject</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.TcSmProject.plcs_by_link_name">
+<em class="property">property </em><code class="sig-name descname">plcs_by_link_name</code><a class="headerlink" href="#pytmc.parser.TcSmProject.plcs_by_link_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The virtual PLC projects in a dictionary keyed by link name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.TcSmProject.plcs_by_name">
+<em class="property">property </em><code class="sig-name descname">plcs_by_name</code><a class="headerlink" href="#pytmc.parser.TcSmProject.plcs_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The virtual PLC projects in a dictionary keyed by name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.TcSmProject.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.TcSmProject.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.TopLevelPlc">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">TopLevelPlc</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.TopLevelPlc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[XTI] Top-level PLC, contains one or more projects</p>
+<dl class="method">
+<dt id="pytmc.parser.TopLevelPlc.post_init">
+<code class="sig-name descname">post_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.TopLevelPlc.post_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook for subclasses; called after __init__</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.TopLevelProject">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">TopLevelProject</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.TopLevelProject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser.TwincatItem</span></code></p>
+<p>[tsproj] Containing Io, System, Motion, TopLevelPlc, etc.</p>
+<dl class="method">
+<dt id="pytmc.parser.TopLevelProject.ams_id">
+<em class="property">property </em><code class="sig-name descname">ams_id</code><a class="headerlink" href="#pytmc.parser.TopLevelProject.ams_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The AMS ID of the configured target</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.parser.TopLevelProject.target_ip">
+<em class="property">property </em><code class="sig-name descname">target_ip</code><a class="headerlink" href="#pytmc.parser.TopLevelProject.target_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>A guess of the target IP, based on the AMS ID</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.parser.Type">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">Type</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytmc.parser._TmcItem</span></code></p>
+<p>[TMC] DataTypes/DataType/SubItem/Type</p>
+<dl class="method">
+<dt id="pytmc.parser.Type.qualified_type">
+<em class="property">property </em><code class="sig-name descname">qualified_type</code><a class="headerlink" href="#pytmc.parser.Type.qualified_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base type, including the namespace</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.parser.case_insensitive_path">
+<code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">case_insensitive_path</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.case_insensitive_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match a path in a case-insensitive manner, returning the actual filename as
+it exists on the host machine</p>
+<p>Required on Linux to find files in a case-insensitive way. Not required on
+OSX/Windows, but platform checks are not done here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>pathlib.Path</em><em> or </em><em>str</em>) – The case-insensitive path</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>path</strong> – The case-corrected path</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pathlib.Path or str</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – When the file can’t be found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.parser.element_to_class_name">
+<code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">element_to_class_name</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.element_to_class_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the Python class name for an element</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>element</strong> (<em>lxml.etree.Element</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>class_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_class</strong> (<em>class</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.parser.parse">
+<code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param">fn</em>, <em class="sig-param">*</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a given tsproj, xti, or tmc file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>item</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>TwincatItem</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.parser.projects_from_solution">
+<code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">projects_from_solution</code><span class="sig-paren">(</span><em class="sig-param">fn</em>, <em class="sig-param">*</em>, <em class="sig-param">exclude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.projects_from_solution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find project filenames from a solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fn</strong> (<em>str</em><em>, </em><em>pathlib.Path</em>) – Solution filename</p></li>
+<li><p><strong>exclude</strong> (<em>list</em><em> or </em><em>None</em>) – Exclude certain extensions. Defaults to excluding .tcmproj</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.parser.separate_by_classname">
+<code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">separate_by_classname</code><span class="sig-paren">(</span><em class="sig-param">children</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.separate_by_classname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take in a list of <cite>TwincatItem</cite>, categorize each by their class name (based
+on XML tag), and return a dictionary keyed on that.</p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">a</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">a</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">b</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">b</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Would become:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">a</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">a</span><span class="o">&gt;</span><span class="p">],</span>
+ <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">b</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">b</span><span class="o">&gt;</span><span class="p">]</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>children</strong> (<em>list</em>) – list of TwincatItem</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Categorized children</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.parser.strip_namespace">
+<code class="sig-prename descclassname">pytmc.parser.</code><code class="sig-name descname">strip_namespace</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.strip_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strip off {{namespace}} from: {{namespace}}tag</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pytmc.linter">
+<span id="pytmc-linter"></span><h2>pytmc.linter<a class="headerlink" href="#module-pytmc.linter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.linter.DbdFile">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.linter.</code><code class="sig-name descname">DbdFile</code><span class="sig-paren">(</span><em class="sig-param">fn</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.linter.DbdFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An expanded EPICS dbd file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> (<em>str</em><em> or </em><em>file</em>) – dbd filename</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="pytmc.linter.DbdFile.filename">
+<code class="sig-name descname">filename</code><a class="headerlink" href="#pytmc.linter.DbdFile.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The dbd filename</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.linter.DbdFile.parsed">
+<code class="sig-name descname">parsed</code><a class="headerlink" href="#pytmc.linter.DbdFile.parsed" title="Permalink to this definition">¶</a></dt>
+<dd><p>pyPDB parsed dbd nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pytmc.linter.LinterResults">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.linter.</code><code class="sig-name descname">LinterResults</code><span class="sig-paren">(</span><em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.linter.LinterResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pyPDB.dbdlint.Results</span></code></p>
+<p>Container for dbdlint results, with easier-to-access attributes</p>
+<p>Extends pyPDB.dbdlint.Results</p>
+<p>Each error or warning has dictionary keys:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">name</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">raw_message</span><span class="p">,</span> <span class="n">format_args</span><span class="p">}</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="pytmc.linter.LinterResults.errors">
+<code class="sig-name descname">errors</code><a class="headerlink" href="#pytmc.linter.LinterResults.errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of errors found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pytmc.linter.LinterResults.warnings">
+<code class="sig-name descname">warnings</code><a class="headerlink" href="#pytmc.linter.LinterResults.warnings" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of warnings found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.linter.LinterResults.success">
+<em class="property">property </em><code class="sig-name descname">success</code><a class="headerlink" href="#pytmc.linter.LinterResults.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns: <strong>success</strong> – True if the linting process succeeded without errors
+:rtype: bool</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pytmc.linter.lint_db">
+<code class="sig-prename descclassname">pytmc.linter.</code><code class="sig-name descname">lint_db</code><span class="sig-paren">(</span><em class="sig-param">dbd</em>, <em class="sig-param">db</em>, <em class="sig-param">*</em>, <em class="sig-param">full=True</em>, <em class="sig-param">warn_ext_links=False</em>, <em class="sig-param">warn_bad_fields=True</em>, <em class="sig-param">warn_rec_append=False</em>, <em class="sig-param">warn_quoted=False</em>, <em class="sig-param">warn_varint=True</em>, <em class="sig-param">warn_spec_comm=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.linter.lint_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lint a db (database) file using its database definition file (dbd) using
+pyPDB.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dbd</strong> (<a class="reference internal" href="#pytmc.linter.DbdFile" title="pytmc.linter.DbdFile"><em>DbdFile</em></a><em> or </em><em>str</em>) – The database definition file; filename or pre-loaded DbdFile</p></li>
+<li><p><strong>db</strong> (<em>str</em>) – The database filename or text</p></li>
+<li><p><strong>full</strong> (<em>bool</em><em>, </em><em>optional</em>) – Validate as a complete database</p></li>
+<li><p><strong>warn_quoted</strong> (<em>bool</em><em>, </em><em>optional</em>) – A node argument isn’t quoted</p></li>
+<li><p><strong>warn_varint</strong> (<em>bool</em><em>, </em><em>optional</em>) – A variable(varname) node which doesn’t specify a type, which defaults
+to ‘int’</p></li>
+<li><p><strong>warn_spec_comm</strong> (<em>bool</em><em>, </em><em>optional</em>) – Syntax error in special #: comment line</p></li>
+<li><p><strong>warn_ext_link</strong> (<em>bool</em><em>, </em><em>optional</em>) – A DB/CA link to a PV which is not defined.  Add ‘#: external(“pv.FLD”)</p></li>
+<li><p><strong>warn_bad_field</strong> (<em>bool</em><em>, </em><em>optional</em>) – Unable to validate record instance field due to a previous error
+(missing recordtype).</p></li>
+<li><p><strong>warn_rec_append</strong> (<em>bool</em><em>, </em><em>optional</em>) – Not using Base &gt;=3.15 style recordtype “*” when appending/overwriting
+record instances</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>DBSyntaxError</strong> – When a syntax issue is discovered. Note that this exception contains
+    file and line number information (attributes: fname, lineno, results)</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>results</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pytmc.linter.LinterResults" title="pytmc.linter.LinterResults">LinterResults</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="terminal_usage.html" class="btn btn-neutral float-left" title="Command-line Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

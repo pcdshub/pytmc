@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xml_obj.py &mdash; pytmc  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/doctr-versions-menu.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="xml_collector.py" href="xml_collector.html" />
+    <link rel="prev" title="Source code documentation" href="source_docs.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pytmc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="source_docs.html">Source code documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">xml_obj.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#symbol">Symbol</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#datatype">DataType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subitem">SubItem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#baseelement">BaseElement</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="xml_collector.html">xml_collector.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tmc_render.html">tmc_render.py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dev_notes.html">Developer’s Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="source_docs.html">Source code documentation</a> &raquo;</li>
+        
+      <li>xml_obj.py</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/xml_obj.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pytmc.xml_obj">
+<span id="xml-obj-py"></span><h1>xml_obj.py<a class="headerlink" href="#module-pytmc.xml_obj" title="Permalink to this headline">¶</a></h1>
+<p>xml_obj.py</p>
+<p>This file contains the objects for representing the essential TwinCAT
+variables and data structures found in the xml (tmc) formatted file.</p>
+<div class="section" id="symbol">
+<h2>Symbol<a class="headerlink" href="#symbol" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.Symbol">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">Symbol</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">base=None</em>, <em class="sig-param">suffixes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.Symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <a class="reference internal" href="#pytmc.xml_obj.BaseElement" title="pytmc.xml_obj.BaseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseElement</span></code></a></p>
+<p>Symbol instances represent instantiated variables and DataTypes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</p></li>
+<li><p><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pytmc.Symbol.tc_type">
+<em class="property">property </em><code class="sig-name descname">tc_type</code><a class="headerlink" href="#pytmc.Symbol.tc_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the type of the data this symbol represents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of data type (e.g. DINT in the case of a basic type or
+‘iterator’ if it is an instance of a user defined struct/fb named
+‘iterator’</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="datatype">
+<h2>DataType<a class="headerlink" href="#datatype" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.DataType">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">DataType</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">base=None</em>, <em class="sig-param">suffixes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.DataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <a class="reference internal" href="#pytmc.xml_obj.BaseElement" title="pytmc.xml_obj.BaseElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseElement</span></code></a></p>
+<p>DataType instances represents the templates for uninstantiated
+FunctionBlocks, Enums, Structs, Unions, and Aliases.</p>
+<dl class="attribute">
+<dt id="pytmc.DataType.children">
+<code class="sig-name descname">children</code><a class="headerlink" href="#pytmc.DataType.children" title="Permalink to this definition">¶</a></dt>
+<dd><p>This list contains the <a class="reference internal" href="#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubItem</span></code></a> instances that this
+DataType contains. It is not recommended to set this attribute
+directly. Instead, set <a class="reference internal" href="#pytmc.SubItem.parent" title="pytmc.SubItem.parent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parent</span></code></a>, which
+automates the setup of <a class="reference internal" href="#pytmc.DataType.children" title="pytmc.DataType.children"><code class="xref py py-attr docutils literal notranslate"><span class="pre">children</span></code></a> for
+bi-directional look-up.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</p></li>
+<li><p><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pytmc.DataType.datatype">
+<em class="property">property </em><code class="sig-name descname">datatype</code><a class="headerlink" href="#pytmc.DataType.datatype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the type of the data this symbol represents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of data type</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.DataType.tc_extends">
+<em class="property">property </em><code class="sig-name descname">tc_extends</code><a class="headerlink" href="#pytmc.DataType.tc_extends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the DataType that this DataType is built upon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>DataType name or None if there is no parent</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="subitem">
+<h2>SubItem<a class="headerlink" href="#subitem" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.SubItem">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.</code><code class="sig-name descname">SubItem</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">base=None</em>, <em class="sig-param">suffixes=None</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.SubItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">baseElement</span></code></p>
+<p>SubItem instances represent variables and DataTypes instantiated within
+DataTypes.</p>
+<dl class="attribute">
+<dt id="pytmc.SubItem.parent">
+<code class="sig-name descname">parent</code><a class="headerlink" href="#pytmc.SubItem.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a reference to the <a class="reference internal" href="#pytmc.DataType" title="pytmc.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> that contains this
+<a class="reference internal" href="#pytmc.SubItem" title="pytmc.SubItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubItem</span></code></a>.  We reccommend setting this attribute directly
+instead of setting <a class="reference internal" href="#pytmc.DataType.children" title="pytmc.DataType.children"><code class="xref py py-attr docutils literal notranslate"><span class="pre">children</span></code></a>. This property
+automates settting <a class="reference internal" href="#pytmc.DataType.children" title="pytmc.DataType.children"><code class="xref py py-attr docutils literal notranslate"><span class="pre">children</span></code></a> for bi-directional
+look-up.  The relationship can be deleted using <cite>del
+SubItem_instance.parent</cite> or by setting <a class="reference internal" href="#pytmc.SubItem.parent" title="pytmc.SubItem.parent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parent</span></code></a>
+equal to None. To create a relationship, simply set
+<a class="reference internal" href="#pytmc.SubItem.parent" title="pytmc.SubItem.parent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parent</span></code></a> equal to the intended parent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</p></li>
+<li><p><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</p></li>
+<li><p><strong>parent</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">baseElement</span></code>) – The DataStructure in which this SubItem appears</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pytmc.SubItem.tc_type">
+<em class="property">property </em><code class="sig-name descname">tc_type</code><a class="headerlink" href="#pytmc.SubItem.tc_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the type of the data this symbol represents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of data type (e.g. DINT in the case of a basic type or
+‘iterator’ if it is an instance of a user defined struct/fb named
+‘iterator’</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="baseelement">
+<h2>BaseElement<a class="headerlink" href="#baseelement" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pytmc.xml_obj.BaseElement">
+<em class="property">class </em><code class="sig-prename descclassname">pytmc.xml_obj.</code><code class="sig-name descname">BaseElement</code><span class="sig-paren">(</span><em class="sig-param">element</em>, <em class="sig-param">base=None</em>, <em class="sig-param">suffixes=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.xml_obj.BaseElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for representing variables as they appear in the .tmc (xml)
+format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) – A python xml element object connected to the intended .tmc datagroup</p></li>
+<li><p><strong>base</strong> (<em>str</em>) – The prefix that will mark pragmas intended for pytmc’s consumption.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pytmc.xml_obj.BaseElement.has_config">
+<em class="property">property </em><code class="sig-name descname">has_config</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.has_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for determining if this element has pragmas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if there is a config pragma attached to this xml element</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_obj.BaseElement.is_array">
+<em class="property">property </em><code class="sig-name descname">is_array</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.is_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>This property is true if this twincat element is an array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>is true if this twincat element is an array</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_obj.BaseElement.is_str">
+<em class="property">property </em><code class="sig-name descname">is_str</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.is_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>This property is true if this twincat element is a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>is true if this twincat element is an string</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_obj.BaseElement.iterable_length">
+<em class="property">property </em><code class="sig-name descname">iterable_length</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.iterable_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the length of an iterable type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Return the length of the string/array if the element is a string or
+an array. Otherwise return None</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_obj.BaseElement.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the user assigned TwinCAT variable name for this
+Symbol/DataType/SubItem. This info is taken from the text of the name
+field sub-element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The name of the variable</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_obj.BaseElement.properties">
+<em class="property">property </em><code class="sig-name descname">properties</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a dictionary of lists for the properties associated with this
+element. The value of the dictionary is a list allowing for multiple
+properties w/ the same name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary. The key is the property name and the value is a list of
+values found in the xml</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pytmc.xml_obj.BaseElement.raw_config">
+<em class="property">property </em><code class="sig-name descname">raw_config</code><a class="headerlink" href="#pytmc.xml_obj.BaseElement.raw_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a stripped-down set of properties including only those that are
+recognized as pragmas intended for pytmc’s consumption.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>produce the string from the pragma marked for pytmc or a None if no
+such pragma can be found</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="xml_collector.html" class="btn btn-neutral float-right" title="xml_collector.py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="source_docs.html" class="btn btn-neutral float-left" title="Source code documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, SLAC National Accelerator Laboratory
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
