@@ -356,6 +356,35 @@ Use the ``notify`` keyword in the ``update`` setting to enable this:
 records will be processed at a rate of 1 Hz/the IOC-configured poll rate.
 
 
+Scale and Offset
+................
+
+Integer and floating point values may have an EPICS-side scaling applied.
+
+Example:
+
+.. code-block:: none
+
+    scale: 3.0
+    offset: 1.0
+
+Values will be scaled according to the following:
+
+.. code-block:: none
+
+    readback_value = raw_value * scale + offset
+    setpoint_value = (user_value - offset) / scale
+
+.. note::
+
+    If either ``scale`` or ``offset`` are applied to an integer symbol, the
+    generated EPICS record type will no longer be a "long" integer input/output
+    record but rather change to an analog input/output record.
+
+    Keep this in mind if using advanced "field" directives in your pragmas.
+
+If unspecified, ``scale`` will be assumed to be 1.0 and ``offset`` 0.0.
+
 Archiver settings
 .................
 
