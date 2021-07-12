@@ -357,6 +357,9 @@ class TwincatTypeRecordPackage(RecordPackage):
     output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL'}
     archive_fields = ['VAL']
 
+    # Is an auxiliary record required to support existing record linking?
+    link_requires_record = False
+
     def __init_subclass__(cls, **kwargs):
         """Magic to have field_defaults be the combination of hierarchy"""
         super().__init_subclass__(**kwargs)
@@ -524,8 +527,11 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
 
-        # Add on OMSL fields, if this is linked to an existing record:
-        record.fields.update(self._get_omsl_fields())
+        # Add on OMSL fields, if this is linked to an existing record.
+        # Some links (such as strings) may require auxiliary records, so
+        # don't repurpose the output record in that case.
+        if not self.link_requires_record:
+            record.fields.update(self._get_omsl_fields())
 
         # Update with given pragma fields - ignoring input-only fields:
         user_fields = self.config.get('field', {})
@@ -748,6 +754,10 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     dtyp = 'asynInt8'
     field_defaults = {'FTVL': 'CHAR'}
 
+    # Links to string PVs require auxiliary 'lso' record.
+    link_requires_record = True
+    link_suffix = "LSO"
+
     @property
     def nelm(self):
         """Number of elements in record"""
@@ -766,6 +776,37 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         record.fields['INP'] = record.fields.pop('OUT')
         record.fields['NELM'] = self.nelm
         return record
+
+    def generate_link_record(self):
+        """An auxiliary 'lso' link record to pass string PVs to the PLC."""
+        record = EPICSRecord(
+            self.delimiter.join((self.pvname, self.link_suffix)),
+            record_type="lso",
+            direction="output",
+            package=self,
+        )
+        record.fields.pop('TSE', None)
+        record.fields.pop('PINI', None)
+
+        # Add our port
+        record.fields.update(
+            self._get_omsl_fields()
+        )
+        record.fields['OUT'] = f"{self.pvname} PP MS"
+        _update_description(record, f"Aux link record for {self.chain.tcname}")
+        return record
+
+    @property
+    def records(self):
+        """All records that will be created in the package"""
+        records = [self.generate_input_record()]
+        link_fields = self._get_omsl_fields()
+        if self.io_direction == 'output' or link_fields:
+            records.append(self.generate_output_record())
+            if link_fields and self.link_requires_record:
+                records.append(self.generate_link_record())
+
+        return records
 
 
 DATA_TYPES = {
