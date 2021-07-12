@@ -523,8 +523,8 @@ def test_pv_linking():
 
 def test_pv_linking_string():
     item = make_mock_twincatitem(
-        name='Main.tcname', data_type=make_mock_type('STRING'),
-        pragma='pv: PVNAME; link: OTHER:RECORD')
+        name='Main.tcname', data_type=make_mock_type('STRING', length=70),
+        pragma='pv: PVNAME; link: OTHER:RECORD.VAL$')
 
     pkg, = list(pragmas.record_packages_from_symbol(item))
     assert pkg.pvname == 'PVNAME'
@@ -539,7 +539,7 @@ def test_pv_linking_string():
     assert lso_rec.pvname == lso_pvname
     assert lso_rec.record_type == "lso"
     assert lso_rec.fields["OMSL"] == "closed_loop"
-    assert lso_rec.fields["DOL"] == "OTHER:RECORD CPP MS"
+    assert lso_rec.fields["DOL"] == "OTHER:RECORD.VAL$ CPP MS"
     assert lso_rec.fields["SCAN"] == ".5 second"
     assert lso_rec.fields["SIZV"] == 70
 
