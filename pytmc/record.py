@@ -478,7 +478,7 @@ class TwincatTypeRecordPackage(RecordPackage):
             # Consider this temporary API, only to be used in
             # lcls-twincat-general for now.
             pv_parts = list(self.config['pv'])
-            linked_to_pv = ':'.join(
+            linked_to_pv = self.delimiter.join(
                 pv_parts[:-1] + [last_link.lstrip('*')]
             )
         else:
