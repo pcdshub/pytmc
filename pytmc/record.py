@@ -787,6 +787,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         )
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
+        record.fields["SIZV"] = self.nelm
 
         # Add our port
         record.fields.update(

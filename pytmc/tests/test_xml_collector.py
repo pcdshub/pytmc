@@ -541,6 +541,7 @@ def test_pv_linking_string():
     assert lso_rec.fields["OMSL"] == "closed_loop"
     assert lso_rec.fields["DOL"] == "OTHER:RECORD CPP MS"
     assert lso_rec.fields["SCAN"] == ".5 second"
+    assert lso_rec.fields["SIZV"] == 70
 
 
 def test_pv_linking_special():
