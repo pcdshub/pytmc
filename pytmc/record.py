@@ -465,6 +465,35 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         return record
 
+    def _get_omsl_fields(self):
+        """Get output mode select fields for the output record."""
+        if not self.linked_to_pv or self.linked_to_pv[-1] is None:
+            return {}
+
+        last_link = self.linked_to_pv[-1]
+        if last_link.startswith('*'):
+            # NOTE: A special, undocumented syntax for a lack of a better
+            # idea/more time:  need to allow pytmc to get access to a PV name
+            # it generates
+            # Consider this temporary API, only to be used in
+            # lcls-twincat-general for now.
+            pv_parts = list(self.config['pv'])
+            linked_to_pv = ':'.join(
+                pv_parts[:-1] + [last_link.lstrip('*')]
+            )
+        else:
+            linked_to_pv = ''.join(
+                part for part in self.linked_to_pv
+                if part is not None
+            )
+
+        linked_to_pv = linked_to_pv.replace(self.macro_character, '$')
+        return {
+            'OMSL': 'closed_loop',
+            'DOL': linked_to_pv + ' CPP MS',
+            'SCAN': self.config.get('link_scan', '.5 second'),
+        }
+
     def generate_output_record(self):
         """
         Generate the record to write values back to the PLC
@@ -495,26 +524,8 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
 
-        if self.linked_to_pv and self.linked_to_pv[-1] is not None:
-            record.fields['OMSL'] = 'closed_loop'
-
-            last_link = self.linked_to_pv[-1]
-            if last_link.startswith('*'):
-                # NOTE: A special, undocumented syntax for a lack of a better
-                # idea/more time:  need to allow pytmc to get access to a PV
-                # name it generates
-                # Consider this temporary API, only to be used in
-                # lcls-twincat-general for now.
-                pv_parts = list(self.config['pv'])
-                linked_to_pv = ':'.join(pv_parts[:-1] +
-                                        [last_link.lstrip('*')])
-            else:
-                linked_to_pv = ''.join([part for part in self.linked_to_pv
-                                        if part is not None])
-
-            linked_to_pv = linked_to_pv.replace(self.macro_character, '$')
-            record.fields['DOL'] = linked_to_pv + ' CPP MS'
-            record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
+        # Add on OMSL fields, if this is linked to an existing record:
+        record.fields.update(self._get_omsl_fields())
 
         # Update with given pragma fields - ignoring input-only fields:
         user_fields = self.config.get('field', {})
