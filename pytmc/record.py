@@ -752,7 +752,11 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
     dtyp = 'asynInt8'
-    field_defaults = {'FTVL': 'CHAR'}
+    field_defaults = {
+        'FTVL': 'CHAR',
+        'APST': 'On Change',
+        'MPST': 'On Change',
+    }
 
     # Links to string PVs require auxiliary 'lso' record.
     link_requires_record = True
