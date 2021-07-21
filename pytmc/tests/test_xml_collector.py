@@ -521,6 +521,29 @@ def test_pv_linking():
     assert rec.fields['SCAN'] == '.5 second'
 
 
+def test_pv_linking_string():
+    item = make_mock_twincatitem(
+        name='Main.tcname', data_type=make_mock_type('STRING', length=70),
+        pragma='pv: PVNAME; link: OTHER:RECORD.VAL$')
+
+    pkg, = list(pragmas.record_packages_from_symbol(item))
+    assert pkg.pvname == 'PVNAME'
+    assert pkg.tcname == 'Main.tcname'
+    assert isinstance(pkg, StringRecordPackage)
+
+    in_rec, out_rec, lso_rec = pkg.records
+    assert "OMSL" not in out_rec.fields
+    assert "DOL" not in out_rec.fields
+
+    lso_pvname = pkg.delimiter.join((out_rec.pvname, pkg.link_suffix))
+    assert lso_rec.pvname == lso_pvname
+    assert lso_rec.record_type == "lso"
+    assert lso_rec.fields["OMSL"] == "closed_loop"
+    assert lso_rec.fields["DOL"] == "OTHER:RECORD.VAL$ CPP MS"
+    assert lso_rec.fields["SCAN"] == ".5 second"
+    assert lso_rec.fields["SIZV"] == 70
+
+
 def test_pv_linking_special():
     struct = make_mock_twincatitem(
         name='Main.array_base',

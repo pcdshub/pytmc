@@ -357,6 +357,9 @@ class TwincatTypeRecordPackage(RecordPackage):
     output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL'}
     archive_fields = ['VAL']
 
+    # Is an auxiliary record required to support existing record linking?
+    link_requires_record = False
+
     def __init_subclass__(cls, **kwargs):
         """Magic to have field_defaults be the combination of hierarchy"""
         super().__init_subclass__(**kwargs)
@@ -465,6 +468,35 @@ class TwincatTypeRecordPackage(RecordPackage):
 
         return record
 
+    def _get_omsl_fields(self):
+        """Get output mode select fields for the output record."""
+        if not self.linked_to_pv or self.linked_to_pv[-1] is None:
+            return {}
+
+        last_link = self.linked_to_pv[-1]
+        if last_link.startswith('*'):
+            # NOTE: A special, undocumented syntax for a lack of a better
+            # idea/more time:  need to allow pytmc to get access to a PV name
+            # it generates
+            # Consider this temporary API, only to be used in
+            # lcls-twincat-general for now.
+            pv_parts = list(self.config['pv'])
+            linked_to_pv = self.delimiter.join(
+                pv_parts[:-1] + [last_link.lstrip('*')]
+            )
+        else:
+            linked_to_pv = ''.join(
+                part for part in self.linked_to_pv
+                if part is not None
+            )
+
+        linked_to_pv = linked_to_pv.replace(self.macro_character, '$')
+        return {
+            'OMSL': 'closed_loop',
+            'DOL': linked_to_pv + ' CPP MS',
+            'SCAN': self.config.get('link_scan', '.5 second'),
+        }
+
     def generate_output_record(self):
         """
         Generate the record to write values back to the PLC
@@ -495,26 +527,11 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
 
-        if self.linked_to_pv and self.linked_to_pv[-1] is not None:
-            record.fields['OMSL'] = 'closed_loop'
-
-            last_link = self.linked_to_pv[-1]
-            if last_link.startswith('*'):
-                # NOTE: A special, undocumented syntax for a lack of a better
-                # idea/more time:  need to allow pytmc to get access to a PV
-                # name it generates
-                # Consider this temporary API, only to be used in
-                # lcls-twincat-general for now.
-                pv_parts = list(self.config['pv'])
-                linked_to_pv = ':'.join(pv_parts[:-1] +
-                                        [last_link.lstrip('*')])
-            else:
-                linked_to_pv = ''.join([part for part in self.linked_to_pv
-                                        if part is not None])
-
-            linked_to_pv = linked_to_pv.replace(self.macro_character, '$')
-            record.fields['DOL'] = linked_to_pv + ' CPP MS'
-            record.fields['SCAN'] = self.config.get('link_scan', '.5 second')
+        # Add on OMSL fields, if this is linked to an existing record.
+        # Some links (such as strings) may require auxiliary records, so
+        # don't repurpose the output record in that case.
+        if not self.link_requires_record:
+            record.fields.update(self._get_omsl_fields())
 
         # Update with given pragma fields - ignoring input-only fields:
         user_fields = self.config.get('field', {})
@@ -735,7 +752,15 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     input_rtyp = 'waveform'
     output_rtyp = 'waveform'
     dtyp = 'asynInt8'
-    field_defaults = {'FTVL': 'CHAR'}
+    field_defaults = {
+        'FTVL': 'CHAR',
+        'APST': 'On Change',
+        'MPST': 'On Change',
+    }
+
+    # Links to string PVs require auxiliary 'lso' record.
+    link_requires_record = True
+    link_suffix = "LSO"
 
     @property
     def nelm(self):
@@ -755,6 +780,38 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         record.fields['INP'] = record.fields.pop('OUT')
         record.fields['NELM'] = self.nelm
         return record
+
+    def generate_link_record(self):
+        """An auxiliary 'lso' link record to pass string PVs to the PLC."""
+        record = EPICSRecord(
+            self.delimiter.join((self.pvname, self.link_suffix)),
+            record_type="lso",
+            direction="output",
+            package=self,
+        )
+        record.fields.pop('TSE', None)
+        record.fields.pop('PINI', None)
+        record.fields["SIZV"] = self.nelm
+
+        # Add our port
+        record.fields.update(
+            self._get_omsl_fields()
+        )
+        record.fields['OUT'] = f"{self.pvname} PP MS"
+        _update_description(record, f"Aux link record for {self.chain.tcname}")
+        return record
+
+    @property
+    def records(self):
+        """All records that will be created in the package"""
+        records = [self.generate_input_record()]
+        link_fields = self._get_omsl_fields()
+        if self.io_direction == 'output' or link_fields:
+            records.append(self.generate_output_record())
+            if link_fields and self.link_requires_record:
+                records.append(self.generate_link_record())
+
+        return records
 
 
 DATA_TYPES = {
