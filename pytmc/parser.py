@@ -329,7 +329,11 @@ class TwincatItem:
                 child._finish_lazy_loading(file_map)
 
     @staticmethod
-    def parse(element, parent=None, filename=None) -> TwincatItem:
+    def parse(
+        element: lxml.etree.Element,
+        parent: Optional[TwincatItem] = None,
+        filename: Optional[str] = None
+    ) -> TwincatItem:
         '''
         Parse an XML element and return a TwincatItem
 
@@ -1806,6 +1810,7 @@ class Pdo(TwincatItem):
 
 class Entry(TwincatItem):
     """Pdo Entry, containing name and type information."""
+    Comment: List[TwincatItem]
 
     @property
     def entry_type(self) -> Optional[Type]:
@@ -1868,6 +1873,10 @@ class DefaultResolution(Resolution):
 
 
 class _VersionItemMixin:
+    # Resolution: List[TwincatItem]
+    # DefaultResolution: List[TwincatItem]
+    # Namespace: List[TwincatItem]
+
     @property
     def resolution(self) -> Optional[Union[DefaultResolution, Resolution]]:
         try:
