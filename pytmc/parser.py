@@ -152,7 +152,6 @@ class TwincatItem:
     attributes: typing.Dict[str, str]
     children: types.SimpleNamespace
     comments: typing.List[str]
-    element: lxml.etree.Element
     filename: pathlib.Path
     name: str
     parent: 'TwincatItem'
@@ -178,7 +177,6 @@ class TwincatItem:
         self._children = []
         self.children = None  # populated later
         self.comments = []
-        self.element = element
         self.filename = filename
         self.name = name
         self.parent = parent
@@ -391,7 +389,8 @@ class TwincatItem:
 class _LazyLoadPlaceholder:
     def __init__(self, cls, element, parent):
         self.cls = cls
-        self.element = element
+        self.filename = element.attrib.get('File', "").lower()
+        self.identifier = element.attrib.get('Id', "")
         self.parent = parent
 
     def __repr__(self):
@@ -402,9 +401,7 @@ class _LazyLoadPlaceholder:
 
     @property
     def key(self):
-        filename = self.element.attrib['File'].lower()
-        identifier = self.element.attrib['Id']
-        return (self.cls, identifier, filename)
+        return (self.cls, self.identifier, self.filename)
 
     def load(self, file_map):
         info = file_map[self.key]
