@@ -515,7 +515,7 @@ class TopLevelProject(TwincatItem):
         ams_id = self.ams_id
         if ams_id.endswith('.1.1'):
             return ams_id[:-4]
-        return ams_id  # :(
+        return ams_id
 
 
 class PlcProject(TwincatItem):
@@ -585,7 +585,7 @@ def get_data_type_by_reference(
                 reference=reference
             )
 
-    if search_key.startswith('{'):
+    if search_key.startswith('{'):  # }
         type_name = getattr(ref, 'type_name', None)
         if type_name is None:
             raise ValueError(
@@ -1269,7 +1269,7 @@ class DataArea(_TmcItem):
 class BuiltinDataType:
     '[TMC] A built-in data type such as STRING, INT, REAL, etc.'
     def __init__(self, typename, *, length=1):
-        if '(' in typename:
+        if '(' in typename:  # ')'
             typename, length = typename.split('(')
             length = int(length.rstrip(')'))
 
@@ -1544,9 +1544,17 @@ class Action(_TwincatProjectSubItem):
     Implementation: list
 
     @property
+    def full_name(self) -> str:
+        """The full action name, including the associated function block."""
+        pou = self.find_ancestor(POU)
+        if pou is not None:
+            return f"{pou.name}.{self.name}"
+        return self.name
+
+    @property
     def source_code(self):
         return f'''\
-ACTION {self.name}:
+ACTION {self.full_name}:
 {self.implementation or ''}
 END_ACTION'''
 
@@ -1557,6 +1565,50 @@ END_ACTION'''
         if hasattr(impl, 'ST'):
             # NOTE: only ST for now
             return impl.ST[0].text
+
+
+class Method(_TwincatProjectSubItem):
+    '[TcPOU] Code declaration for function block methods'
+    Implementation: list
+    Declaration: list
+
+    @property
+    def full_name(self) -> str:
+        """The full method name, including the associated function block."""
+        pou = self.find_ancestor(POU)
+        if pou is not None:
+            return f"{pou.name}.{self.name}"
+        return self.name
+
+    @property
+    def source_code(self):
+        declaration = re.sub(
+            self.name,
+            self.full_name,
+            self.declaration,
+            count=1
+        )
+        return f'''\
+{declaration}
+{self.implementation or ''}
+END_METHOD'''
+
+    @property
+    def declaration(self) -> str:
+        'The declaration code; i.e., the top portion in visual studio'
+        try:
+            return self.Declaration[0].text
+        except (IndexError, AttributeError):
+            return ""
+
+    @property
+    def implementation(self) -> str:
+        "The implementation code; i.e., the bottom portion in visual studio"
+        impl = self.Implementation[0]
+        if hasattr(impl, 'ST'):
+            # NOTE: only ST for now
+            return impl.ST[0].text
+        return ""
 
 
 class POU(_TwincatProjectSubItem):
@@ -1591,6 +1643,11 @@ class POU(_TwincatProjectSubItem):
         'The action implementations (zero or more)'
         return list(getattr(self, 'Action', []))
 
+    @property
+    def methods(self) -> List[Method]:
+        'The method implementations (zero or more)'
+        return list(getattr(self, 'Method', []))
+
     def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration, implementation, and actions'
         source_code = [self.declaration or '',
@@ -1612,7 +1669,12 @@ class POU(_TwincatProjectSubItem):
 
         # TODO: actions defined outside of the block?
         for action in self.actions:
-            source_code.append(action.source_code)
+            source_code.append(f"\n{action.source_code}")
+
+        # TODO: methods defined outside of the block?  Dotted naming may be
+        # non-standard here.  Open to suggestions.
+        for method in self.methods:
+            source_code.append(f"\n{method.source_code}")
 
         return '\n'.join(source_code)
 
