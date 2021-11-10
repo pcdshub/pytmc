@@ -10,7 +10,7 @@ import pathlib
 import re
 import types
 import typing
-from typing import Dict, Generator, List, Optional, Tuple, Union
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import lxml
 import lxml.etree
@@ -23,7 +23,7 @@ TWINCAT_TYPES = {}
 USE_NAME_AS_PATH = object()
 
 T = typing.TypeVar("T")
-
+AnyPath = Union[pathlib.Path, str]
 
 logger = logging.getLogger(__name__)
 SLN_PROJECT_RE = re.compile(
@@ -33,7 +33,11 @@ SLN_PROJECT_RE = re.compile(
 _TRUE_VALUES = {'true', '1'}
 
 
-def parse(fn, *, parent=None):
+def parse(
+    fn: AnyPath,
+    *,
+    parent: Optional[TwincatItem] = None
+) -> TwincatItem:
     '''
     Parse a given tsproj, xti, or tmc file.
 
@@ -79,13 +83,19 @@ def projects_from_solution(fn, *, exclude=None):
             ]
 
 
-def element_to_class_name(element, *, parent=None):
+def element_to_class_name(
+    element: lxml.etree.Element,
+    *,
+    parent: Optional[TwincatItem] = None
+) -> Tuple[str, typing.Type[TwincatItem]]:
     '''
     Determine the Python class name for an element
 
     Parameters
     ----------
     element : lxml.etree.Element
+    parent : TwincatItem, optional
+        The parent to assign to the new element.
 
     Returns
     -------
@@ -112,7 +122,7 @@ def element_to_class_name(element, *, parent=None):
 
     if tag == 'Symbol':
         base_type, = element.xpath('BaseType')
-        return f'{tag}_' + base_type.text, Symbol
+        return f'{tag}_{base_type.text}', Symbol
 
     if extension == '.tmc':
         return tag, _TmcItem
@@ -157,7 +167,7 @@ class TwincatItem:
     attributes: Dict[str, str]
     children: Optional[types.SimpleNamespace]
     comments: List[str]
-    filename: Optional[pathlib.Path]
+    filename: pathlib.Path
     name: str
     parent: 'TwincatItem'
     tag: str
@@ -167,9 +177,9 @@ class TwincatItem:
         self,
         element: lxml.etree.Element,
         *,
+        filename: pathlib.Path,
         parent: Optional[TwincatItem] = None,
         name: Optional[str] = None,
-        filename: Optional[pathlib.Path] = None
     ):
         '''
         Represents a single TwinCAT project XML Element, for either tsproj,
@@ -227,7 +237,7 @@ class TwincatItem:
             parent = parent.parent
         return '/'.join(item.__class__.__name__ for item in reversed(hier))
 
-    def find_ancestor(self, cls):
+    def find_ancestor(self, cls: typing.Type[T]) -> Optional[T]:
         '''
         Find an ancestor of this instance
 
@@ -240,7 +250,7 @@ class TwincatItem:
             parent = parent.parent
         return parent
 
-    def get_relative_path(self, path):
+    def get_relative_path(self, path: AnyPath) -> pathlib.Path:
         '''
         Get an absolute path relative to this item
 
@@ -332,7 +342,7 @@ class TwincatItem:
     def parse(
         element: lxml.etree.Element,
         parent: Optional[TwincatItem] = None,
-        filename: Optional[str] = None
+        filename: Optional[AnyPath] = None
     ) -> TwincatItem:
         '''
         Parse an XML element and return a TwincatItem
@@ -743,7 +753,7 @@ class Plc(TwincatItem):
         if self.tmc is not None:
             yield from self.tmc.find(cls, recurse=recurse)
 
-    def get_source_code(self):
+    def get_source_code(self) -> str:
         'Get the full source code, DUTs, GVLs, and then POUs'
         source_items = (
             list(self.dut_by_name.values()) +
@@ -1484,7 +1494,7 @@ class GVL(_TwincatProjectSubItem):
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
-    def get_source_code(self, *, close_block=True):
+    def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration only in the case of a GVL'
         return self.declaration
 
@@ -1498,7 +1508,7 @@ class EnumerationTextList(_TwincatProjectSubItem):
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
-    def get_source_code(self, *, close_block=True):
+    def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration only in the case of an ENUM'
         return self.declaration
 
@@ -1524,7 +1534,7 @@ class DUT(_TwincatProjectSubItem):
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
-    def get_source_code(self, *, close_block=True):
+    def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration only in the case of a DUT'
         return self.declaration
 
@@ -1565,23 +1575,23 @@ class POU(_TwincatProjectSubItem):
         return f'{self.name}.{name}'
 
     @property
-    def declaration(self):
+    def declaration(self) -> str:
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
     @property
-    def implementation(self):
+    def implementation(self) -> str:
         'The implementation code; i.e., the bottom portion in visual studio'
         impl = self.Implementation[0]
         if hasattr(impl, 'ST'):
             return impl.ST[0].text
 
     @property
-    def actions(self):
+    def actions(self) -> List[Action]:
         'The action implementations (zero or more)'
         return list(getattr(self, 'Action', []))
 
-    def get_source_code(self, *, close_block=True):
+    def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration, implementation, and actions'
         source_code = [self.declaration or '',
                        self.implementation or '',
@@ -1607,12 +1617,12 @@ class POU(_TwincatProjectSubItem):
         return '\n'.join(source_code)
 
     @property
-    def call_blocks(self):
+    def call_blocks(self) -> dict:
         'A dictionary of all implementation call blocks'
         return get_pou_call_blocks(self.declaration, self.implementation)
 
     @property
-    def program_name(self):
+    def program_name(self) -> str:
         'The program name, determined from the declaration'
         return program_name_from_declaration(self.declaration)
 
@@ -1671,7 +1681,7 @@ class Axis(TwincatItem):
         # in the xti files:
         return 'mm'
 
-    def summarize(self):
+    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
         yield from self.attributes.items()
         for param in self.find(AxisPara, recurse=False):
             yield from param.attributes.items()
@@ -1699,7 +1709,7 @@ class Encoder(TwincatItem):
 
     Contains EncPara, Vars, Mappings, etc.
     '''
-    def summarize(self):
+    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
         yield 'EncType', self.attributes['EncType']
         for param in self.find(EncPara, recurse=False):
             yield from param.attributes.items()
@@ -2009,7 +2019,7 @@ def _make_fake_item(name, parent=None, item_name=None, *, text=None,
     return item
 
 
-def case_insensitive_path(path):
+def case_insensitive_path(path: AnyPath) -> pathlib.Path:
     '''
     Match a path in a case-insensitive manner, returning the actual filename as
     it exists on the host machine
@@ -2024,7 +2034,7 @@ def case_insensitive_path(path):
 
     Returns
     -------
-    path : pathlib.Path or str
+    path : pathlib.Path
         The case-corrected path
 
     Raises
@@ -2054,7 +2064,9 @@ def case_insensitive_path(path):
     return new_path.resolve()
 
 
-def separate_by_classname(children):
+def separate_by_classname(
+    children: List[TwincatItem]
+) -> Dict[str, List[TwincatItem]]:
     '''
     Take in a list of `TwincatItem`, categorize each by their class name (based
     on XML tag), and return a dictionary keyed on that.
@@ -2083,9 +2095,9 @@ def separate_by_classname(children):
     for child in children:
         d[child.__class__.__name__].append(child)
 
-    return d
+    return dict(d)
 
 
-def strip_namespace(tag):
+def strip_namespace(tag: str) -> str:
     'Strip off {{namespace}} from: {{namespace}}tag'
     return lxml.etree.QName(tag).localname

@@ -148,7 +148,7 @@ def variables_from_declaration(declaration, *, start_marker='var'):
     return variables
 
 
-def get_pou_call_blocks(declaration, implementation):
+def get_pou_call_blocks(declaration: str, implementation: str):
     '''
     Find all call blocks given a specific POU declaration and implementation.
     Note that this function is not "smart". Further calls will be squashed into
