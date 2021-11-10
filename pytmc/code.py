@@ -1,10 +1,9 @@
 '''
 Code parsing-related utilities
 '''
-import logging
 import collections
+import logging
 import re
-
 
 logger = logging.getLogger(__name__)
 
@@ -70,10 +69,11 @@ def lines_between(text, start_marker, end_marker, *, include_blank=False):
     for line in text.splitlines():
         if line.strip().lower() == start_marker:
             found_start = True
-        elif line.strip().lower() == end_marker:
-            break
-        elif found_start and (line.strip() or include_blank):
-            yield line
+        elif found_start:
+            if line.strip().lower() == end_marker:
+                break
+            elif line.strip() or include_blank:
+                yield line
 
 
 def variables_from_declaration(declaration, *, start_marker='var'):
@@ -148,7 +148,7 @@ def variables_from_declaration(declaration, *, start_marker='var'):
     return variables
 
 
-def get_pou_call_blocks(declaration, implementation):
+def get_pou_call_blocks(declaration: str, implementation: str):
     '''
     Find all call blocks given a specific POU declaration and implementation.
     Note that this function is not "smart". Further calls will be squashed into
