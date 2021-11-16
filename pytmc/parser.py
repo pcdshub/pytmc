@@ -1522,9 +1522,7 @@ class _POUMember:
     def pou_qualified_name(self) -> str:
         """The full name, including the associated function block."""
         pou = self.pou
-        if pou is not None:
-            return f"{pou.name}.{self.name}"
-        return self.name
+        return f"{pou.name}.{self.name}" if pou is not None else self.name
 
     @property
     def declaration(self) -> str:
@@ -1545,14 +1543,14 @@ class _POUMember:
 
 
 class Action(_TwincatProjectSubItem, _POUMember):
-    '[TcPOU] Code declaration for actions'
+    "[TcPOU] Code declaration for actions."
     Implementation: list
 
     @property
     def source_code(self):
         return "\n".join(
             (
-                f"ACTION {self.pou_qualified_name}:",
+                f"ACTION {self.name}:",
                 self.implementation,
                 "END_ACTION",
             )
@@ -1560,18 +1558,15 @@ class Action(_TwincatProjectSubItem, _POUMember):
 
 
 class Method(_TwincatProjectSubItem, _POUMember):
-    '[TcPOU] Code declaration for function block methods'
+    "[TcPOU] Code declaration for function block methods."
     Implementation: list
     Declaration: list
 
     @property
     def source_code(self):
-        declaration = re.sub(
-            self.name, self.pou_qualified_name, self.declaration, count=1
-        )
         return "\n".join(
             (
-                declaration,
+                self.declaration,
                 self.implementation,
                 "END_METHOD",
             )
@@ -1579,7 +1574,7 @@ class Method(_TwincatProjectSubItem, _POUMember):
 
 
 class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
-    _property_suffix = ".GET"
+    "[TcPOU] Code declaration container for function block properties."
 
     @property
     def property_(self) -> Optional[Property]:
@@ -1588,11 +1583,8 @@ class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
     @property
     def pou_qualified_name(self) -> str:
         """The full name, including the associated function block."""
-        pou = self.pou
         name = self.property_.name
-        if pou is not None:
-            name = f"{pou.name}.{name}"
-        return f"{name}{self._property_suffix}"
+        return f"{self.pou.name}.{name}" if self.pou is not None else name
 
     @property
     def source_code(self) -> str:
@@ -1600,7 +1592,7 @@ class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
         if not property_:
             return ""
 
-        source_code = "\n".join(
+        return "\n".join(
             (
                 property_.declaration,
                 self.declaration,
@@ -1608,27 +1600,14 @@ class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
                 "END_PROPERTY",
             )
         )
-        return re.sub(
-            property_.name, self.pou_qualified_name, source_code, count=1
-        )
 
 
 class Get(_POUPropertyMember):
     """POU Property getter."""
-    _property_suffix = ".GET"
 
 
 class Set(_POUPropertyMember):
     """POU Property setter."""
-    _property_suffix = ".SET"
-
-    @property
-    def source_code(self) -> str:
-        return re.sub(
-            "(property.*):.*$", r"\1:",
-            super().source_code,
-            count=1, flags=re.IGNORECASE | re.MULTILINE
-        )
 
 
 class Property(_TmcItem, _TwincatProjectSubItem, _POUMember):
@@ -1676,7 +1655,7 @@ class Property(_TmcItem, _TwincatProjectSubItem, _POUMember):
             else:
                 source.append(obj.source_code)
 
-        return "\n".join(source)
+        return "\n\n".join(source)
 
 
 class POU(_TwincatProjectSubItem):
@@ -1740,8 +1719,6 @@ class POU(_TwincatProjectSubItem):
                             '# pytmc: unknown block type')
             )
 
-        # TODO: methods defined outside of the block?  Dotted naming may be
-        # non-standard here.  Open to suggestions.
         for obj in self.actions + self.methods + self.properties:
             source_code.append(f"\n{obj.source_code}")
 
