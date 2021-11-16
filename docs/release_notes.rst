@@ -2,6 +2,30 @@
  Release History
 =================
 
+v2.11.0 (2021-11-15)
+====================
+
+Enhancements
+------------
+* Add ``EnumerationTextList`` with ``get_source_code`` support.
+  Previously, these translatable types were missing.
+* Add actions, methods, and properties to the ``pytmc code`` output.
+* Allow for ``pytmc code`` to work with just a single code object,
+  rather than requiring the whole project.
+* Add ``pytmc.__main__`` such that
+  ``python -m pytmc {code,summary} ...`` works.
+
+Fixes
+-----
+* Fix rare bug in `lines_between` function, probably never hit.
+
+Maintenance
+-----------
+* Type annotation cleanups and fixes
+* Reduce memory consumption slightly by not caching the xml element
+  on every `TwincatItem`
+
+
 v2.10.0 (2021-08-09)
 ====================
 
