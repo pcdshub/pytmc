@@ -515,7 +515,7 @@ class TopLevelProject(TwincatItem):
         ams_id = self.ams_id
         if ams_id.endswith('.1.1'):
             return ams_id[:-4]
-        return ams_id  # :(
+        return ams_id
 
 
 class PlcProject(TwincatItem):
@@ -585,7 +585,7 @@ def get_data_type_by_reference(
                 reference=reference
             )
 
-    if search_key.startswith('{'):
+    if search_key.startswith('{'):  # }
         type_name = getattr(ref, 'type_name', None)
         if type_name is None:
             raise ValueError(
@@ -1235,33 +1235,6 @@ class Module(_TmcItem):
         return self._ads_port
 
 
-class Property(_TmcItem):
-    '''
-    [TMC] A property containing a key/value pair
-
-    Examples of TMC properties::
-
-          ApplicationName (used for the ADS port)
-          ChangeDate
-          GeneratedCodeSize
-          GlobalDataSize
-    '''
-    Value: list
-
-    @property
-    def key(self):
-        'The property key name'
-        return self.name
-
-    @property
-    def value(self):
-        'The property value text'
-        return self.Value[0].text if hasattr(self, 'Value') else self.text
-
-    def __repr__(self):
-        return f'<Property {self.key}={self.value!r}>'
-
-
 class DataArea(_TmcItem):
     '[TMC] Container that holds symbols'
 
@@ -1269,7 +1242,7 @@ class DataArea(_TmcItem):
 class BuiltinDataType:
     '[TMC] A built-in data type such as STRING, INT, REAL, etc.'
     def __init__(self, typename, *, length=1):
-        if '(' in typename:
+        if '(' in typename:  # ')'
             typename, length = typename.split('(')
             length = int(length.rstrip(')'))
 
@@ -1539,24 +1512,150 @@ class DUT(_TwincatProjectSubItem):
         return self.declaration
 
 
-class Action(_TwincatProjectSubItem):
-    '[TcPOU] Code declaration for actions'
+class _POUMember:
+    @property
+    def pou(self) -> Optional[POU]:
+        """The associated POU."""
+        return self.find_ancestor(POU)
+
+    @property
+    def pou_qualified_name(self) -> str:
+        """The full name, including the associated function block."""
+        pou = self.pou
+        return f"{pou.name}.{self.name}" if pou is not None else self.name
+
+    @property
+    def declaration(self) -> str:
+        'The declaration code; i.e., the top portion in visual studio'
+        try:
+            return self.Declaration[0].text or ""
+        except (IndexError, AttributeError):
+            return ""
+
+    @property
+    def implementation(self) -> str:
+        'The implementation code; i.e., the bottom portion in visual studio'
+        try:
+            # NOTE: only ST for now
+            return self.Implementation[0].ST[0].text or ""
+        except (IndexError, AttributeError):
+            return ""
+
+
+class Action(_TwincatProjectSubItem, _POUMember):
+    "[TcPOU] Code declaration for actions."
     Implementation: list
 
     @property
     def source_code(self):
-        return f'''\
-ACTION {self.name}:
-{self.implementation or ''}
-END_ACTION'''
+        return "\n".join(
+            (
+                f"ACTION {self.name}:",
+                self.implementation,
+                "END_ACTION",
+            )
+        )
+
+
+class Method(_TwincatProjectSubItem, _POUMember):
+    "[TcPOU] Code declaration for function block methods."
+    Implementation: list
+    Declaration: list
 
     @property
-    def implementation(self):
-        'The implementation code; i.e., the bottom portion in visual studio'
-        impl = self.Implementation[0]
-        if hasattr(impl, 'ST'):
-            # NOTE: only ST for now
-            return impl.ST[0].text
+    def source_code(self):
+        return "\n".join(
+            (
+                self.declaration,
+                self.implementation,
+                "END_METHOD",
+            )
+        )
+
+
+class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
+    "[TcPOU] Code declaration container for function block properties."
+
+    @property
+    def property_(self) -> Optional[Property]:
+        return self.find_ancestor(Property)
+
+    @property
+    def pou_qualified_name(self) -> str:
+        """The full name, including the associated function block."""
+        name = self.property_.name
+        return f"{self.pou.name}.{name}" if self.pou is not None else name
+
+    @property
+    def source_code(self) -> str:
+        property_ = self.property_
+        if not property_:
+            return ""
+
+        return "\n".join(
+            (
+                property_.declaration,
+                self.declaration,
+                self.implementation,
+                "END_PROPERTY",
+            )
+        )
+
+
+class Get(_POUPropertyMember):
+    """POU Property getter."""
+
+
+class Set(_POUPropertyMember):
+    """POU Property setter."""
+
+
+class Property(_TmcItem, _TwincatProjectSubItem, _POUMember):
+    """
+    Two possibilities:
+    [TcPOU] Code declaration for function block properties
+    [TMC] A property containing a key/value pair
+
+    Examples of TMC properties::
+
+          ApplicationName (used for the ADS port)
+          ChangeDate
+          GeneratedCodeSize
+          GlobalDataSize
+    """
+
+    Implementation: list
+    Declaration: list
+    Value: list
+
+    @property
+    def key(self):
+        'The property key name'
+        return self.name
+
+    @property
+    def value(self):
+        'The property value text'
+        return self.Value[0].text if hasattr(self, 'Value') else self.text
+
+    def __repr__(self):
+        return f'<Property {self.key}={self.value!r}>'
+
+    @property
+    def source_code(self) -> str:
+        if not self.declaration:
+            return ""
+
+        source = []
+        for attr in ("Get", "Set"):
+            try:
+                obj = getattr(self, attr, [])[0]
+            except IndexError:
+                ...
+            else:
+                source.append(obj.source_code)
+
+        return "\n\n".join(source)
 
 
 class POU(_TwincatProjectSubItem):
@@ -1591,6 +1690,16 @@ class POU(_TwincatProjectSubItem):
         'The action implementations (zero or more)'
         return list(getattr(self, 'Action', []))
 
+    @property
+    def methods(self) -> List[Method]:
+        'The method implementations (zero or more)'
+        return list(getattr(self, 'Method', []))
+
+    @property
+    def properties(self) -> List[Property]:
+        'The property implementations (zero or more)'
+        return list(getattr(self, 'Property', []))
+
     def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration, implementation, and actions'
         source_code = [self.declaration or '',
@@ -1610,9 +1719,8 @@ class POU(_TwincatProjectSubItem):
                             '# pytmc: unknown block type')
             )
 
-        # TODO: actions defined outside of the block?
-        for action in self.actions:
-            source_code.append(action.source_code)
+        for obj in self.actions + self.methods + self.properties:
+            source_code.append(f"\n{obj.source_code}")
 
         return '\n'.join(source_code)
 
