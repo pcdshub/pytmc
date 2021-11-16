@@ -8,7 +8,6 @@ import pathlib
 
 from .. import parser
 
-
 DESCRIPTION = __doc__
 
 
@@ -21,18 +20,27 @@ def build_arg_parser(argparser=None):
 
     argparser.add_argument(
         'filename', type=str,
-        help='Path to project (.tsproj)'
+        help='Path to project (.tsproj) or source code filename'
     )
 
     return argparser
 
 
-def dump_source_code(tsproj_project):
+def dump_source_code(filename):
     'Return the source code for a given tsproj project'
-    proj_path = pathlib.Path(tsproj_project)
+    proj_path = pathlib.Path(filename)
 
     if proj_path.suffix.lower() not in ('.tsproj', ):
-        raise ValueError('Expected a .tsproj file')
+        parsed = parser.parse(proj_path)
+        code_containers = [
+            item for item in parsed.find(parser.TwincatItem, recurse=False)
+            if hasattr(item, "get_source_code")
+        ]
+        source = "\n\n".join(
+            code_container.get_source_code() or ""
+            for code_container in code_containers
+        )
+        return parsed, source
 
     project = parser.parse(proj_path)
     full_source = []
@@ -45,11 +53,11 @@ def dump_source_code(tsproj_project):
         )
         for name, source in source_items:
             if hasattr(source, 'get_source_code'):
-                source_text = source.get_source_code() or ''
+                source_text = source.get_source_code() or ""
                 if source_text.strip():
                     full_source.append(source_text)
 
-    return project, '\n\n'.join(full_source)
+    return project, "\n\n".join(full_source)
 
 
 def main(filename):
@@ -57,16 +65,10 @@ def main(filename):
     Output the source code of a project given its filename.
     '''
 
+    results = {}
     path = pathlib.Path(filename)
-    if path.suffix.lower() in ('.tsproj', ):
-        project_fns = [path]
-    else:
-        raise ValueError(f'Expected a tsproj, but got: {path.suffix}')
 
-    projects = {}
-    for fn in project_fns:
-        project, source_code = dump_source_code(fn)
-        print(source_code)
-        projects[project] = source_code
-
-    return projects
+    project, source_code = dump_source_code(path)
+    print(source_code)
+    results[project] = source_code
+    return results

@@ -1,6 +1,8 @@
 '''
 TMC, XTI, tsproj parsing utilities
 '''
+from __future__ import annotations
+
 import collections
 import logging
 import os
@@ -8,7 +10,7 @@ import pathlib
 import re
 import types
 import typing
-from typing import Optional, Union
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import lxml
 import lxml.etree
@@ -20,6 +22,9 @@ from .code import (determine_block_type, get_pou_call_blocks,
 TWINCAT_TYPES = {}
 USE_NAME_AS_PATH = object()
 
+T = typing.TypeVar("T")
+AnyPath = Union[pathlib.Path, str]
+
 logger = logging.getLogger(__name__)
 SLN_PROJECT_RE = re.compile(
     r"^Project.*?=\s*\"(.*?)\",\s*\"(.*?)\"\s*,\s*(.*?)\"\s*$",
@@ -28,7 +33,11 @@ SLN_PROJECT_RE = re.compile(
 _TRUE_VALUES = {'true', '1'}
 
 
-def parse(fn, *, parent=None):
+def parse(
+    fn: AnyPath,
+    *,
+    parent: Optional[TwincatItem] = None
+) -> TwincatItem:
     '''
     Parse a given tsproj, xti, or tmc file.
 
@@ -74,13 +83,19 @@ def projects_from_solution(fn, *, exclude=None):
             ]
 
 
-def element_to_class_name(element, *, parent=None):
+def element_to_class_name(
+    element: lxml.etree.Element,
+    *,
+    parent: Optional[TwincatItem] = None
+) -> Tuple[str, typing.Type[TwincatItem]]:
     '''
     Determine the Python class name for an element
 
     Parameters
     ----------
     element : lxml.etree.Element
+    parent : TwincatItem, optional
+        The parent to assign to the new element.
 
     Returns
     -------
@@ -107,7 +122,7 @@ def element_to_class_name(element, *, parent=None):
 
     if tag == 'Symbol':
         base_type, = element.xpath('BaseType')
-        return f'{tag}_' + base_type.text, Symbol
+        return f'{tag}_{base_type.text}', Symbol
 
     if extension == '.tmc':
         return tag, _TmcItem
@@ -148,18 +163,24 @@ def _determine_path(base_path, name, class_hint):
 class TwincatItem:
     _load_path_hint: str = ''
     _lazy_load: bool = False
-    _children: typing.List['TwincatItem']
-    attributes: typing.Dict[str, str]
-    children: types.SimpleNamespace
-    comments: typing.List[str]
-    element: lxml.etree.Element
+    _children: List['TwincatItem']
+    attributes: Dict[str, str]
+    children: Optional[types.SimpleNamespace]
+    comments: List[str]
     filename: pathlib.Path
     name: str
     parent: 'TwincatItem'
     tag: str
-    text: typing.Optional[str]
+    text: Optional[str]
 
-    def __init__(self, element, *, parent=None, name=None, filename=None):
+    def __init__(
+        self,
+        element: lxml.etree.Element,
+        *,
+        filename: pathlib.Path,
+        parent: Optional[TwincatItem] = None,
+        name: Optional[str] = None,
+    ):
         '''
         Represents a single TwinCAT project XML Element, for either tsproj,
         xti, tmc, etc.
@@ -172,13 +193,15 @@ class TwincatItem:
         filename : pathlib.Path, optional
         '''
         self.child_load_path = _determine_path(
-            filename.parent, name, self._load_path_hint)
+            filename.parent if filename else pathlib.Path(),
+            name,
+            self._load_path_hint
+        )
 
         self.attributes = dict(element.attrib)
         self._children = []
         self.children = None  # populated later
         self.comments = []
-        self.element = element
         self.filename = filename
         self.name = name
         self.parent = parent
@@ -214,7 +237,7 @@ class TwincatItem:
             parent = parent.parent
         return '/'.join(item.__class__.__name__ for item in reversed(hier))
 
-    def find_ancestor(self, cls):
+    def find_ancestor(self, cls: typing.Type[T]) -> Optional[T]:
         '''
         Find an ancestor of this instance
 
@@ -227,7 +250,7 @@ class TwincatItem:
             parent = parent.parent
         return parent
 
-    def get_relative_path(self, path):
+    def get_relative_path(self, path: AnyPath) -> pathlib.Path:
         '''
         Get an absolute path relative to this item
 
@@ -239,14 +262,19 @@ class TwincatItem:
         rel_path = pathlib.PureWindowsPath(path)
         return (root / rel_path).resolve()
 
-    def find(self, cls, *, recurse=True):
-        '''
-        Find any descendents that are instances of cls
+    def find(
+        self,
+        cls: typing.Type[T],
+        *,
+        recurse: bool = True
+    ) -> Generator[T, None, None]:
+        """
+        Find any descendents that are instances of cls.
 
         Parameters
         ----------
         cls : TwincatItem
-        '''
+        """
         for child in self._children:
             if isinstance(child, cls):
                 yield child
@@ -269,7 +297,7 @@ class TwincatItem:
             if not hasattr(self, key):
                 setattr(self, key, value)
 
-    def _add_child(self, element):
+    def _add_child(self, element: lxml.etree.Element):
         child = self.parse(element, parent=self, filename=self.filename)
         if child is None:
             return
@@ -311,7 +339,11 @@ class TwincatItem:
                 child._finish_lazy_loading(file_map)
 
     @staticmethod
-    def parse(element, parent=None, filename=None):
+    def parse(
+        element: lxml.etree.Element,
+        parent: Optional[TwincatItem] = None,
+        filename: Optional[AnyPath] = None
+    ) -> TwincatItem:
         '''
         Parse an XML element and return a TwincatItem
 
@@ -391,7 +423,8 @@ class TwincatItem:
 class _LazyLoadPlaceholder:
     def __init__(self, cls, element, parent):
         self.cls = cls
-        self.element = element
+        self.filename = element.attrib.get('File', "").lower()
+        self.identifier = element.attrib.get('Id', "")
         self.parent = parent
 
     def __repr__(self):
@@ -402,11 +435,9 @@ class _LazyLoadPlaceholder:
 
     @property
     def key(self):
-        filename = self.element.attrib['File'].lower()
-        identifier = self.element.attrib['Id']
-        return (self.cls, identifier, filename)
+        return (self.cls, self.identifier, self.filename)
 
-    def load(self, file_map):
+    def load(self, file_map) -> TwincatItem:
         info = file_map[self.key]
         obj = info['obj']
         obj._finish_lazy_loading(file_map)
@@ -417,14 +448,14 @@ class _TwincatProjectSubItem(TwincatItem):
     '[XTI/TMC/...] A base class for items that appear in virtual PLC projects'
 
     @property
-    def plc(self):
+    def plc(self) -> Optional[Plc]:
         'The nested project (virtual PLC project) associated with the item'
         return self.find_ancestor(Plc)
 
 
 class TcModuleClass(_TwincatProjectSubItem):
     '[TMC] The top-level TMC file'
-    DataTypes: typing.List['DataTypes']
+    DataTypes: List['DataTypes']
 
     def create_data_area(self, module_index=0):
         """
@@ -484,7 +515,7 @@ class TopLevelProject(TwincatItem):
         ams_id = self.ams_id
         if ams_id.endswith('.1.1'):
             return ams_id[:-4]
-        return ams_id  # :(
+        return ams_id
 
 
 class PlcProject(TwincatItem):
@@ -554,7 +585,7 @@ def get_data_type_by_reference(
                 reference=reference
             )
 
-    if search_key.startswith('{'):
+    if search_key.startswith('{'):  # }
         type_name = getattr(ref, 'type_name', None)
         if type_name is None:
             raise ValueError(
@@ -722,12 +753,12 @@ class Plc(TwincatItem):
         if self.tmc is not None:
             yield from self.tmc.find(cls, recurse=recurse)
 
-    def get_source_code(self):
+    def get_source_code(self) -> str:
         'Get the full source code, DUTs, GVLs, and then POUs'
         source_items = (
-            list(self.dut_by_name.items()) +
-            list(self.gvl_by_name.items()) +
-            list(self.pou_by_name.items())
+            list(self.dut_by_name.values()) +
+            list(self.gvl_by_name.values()) +
+            list(self.pou_by_name.values())
         )
 
         return '\n'.join(
@@ -856,9 +887,9 @@ class EnumInfo(_TmcItem):
 
 class ArrayInfo(_TmcItem):
     '[TMC] Array information for a DataType or Symbol'
-    LBound: typing.List[_TmcItem]
-    UBound: typing.List[_TmcItem]
-    Elements: typing.List[_TmcItem]
+    LBound: List[_TmcItem]
+    UBound: List[_TmcItem]
+    Elements: List[_TmcItem]
 
     def post_init(self):
         lbound = (int(self.LBound[0].text)
@@ -942,18 +973,18 @@ class BaseType(Type):
 
 class DataType(_TmcItem):
     '[TMC or TSPROJ] A DataType with SubItems, likely representing a structure'
-    Action: typing.List[_TmcItem]
-    ArrayInfo: typing.List['ArrayInfo']
-    BaseType: typing.List['BaseType']
-    BitSize: typing.List[_TmcItem]
-    EnumInfo: typing.List['EnumInfo']
-    ExtendsType: typing.List[ExtendsType]
-    FunctionPointer: typing.List[_TmcItem]
-    Implements: typing.List[_TmcItem]
-    Name: typing.List['Name']
-    PropertyItem: typing.List[_TmcItem]
-    SubItem: typing.List['SubItem']
-    Unit: typing.List[_TmcItem]
+    Action: List[_TmcItem]
+    ArrayInfo: List['ArrayInfo']
+    BaseType: List['BaseType']
+    BitSize: List[_TmcItem]
+    EnumInfo: List['EnumInfo']
+    ExtendsType: List[ExtendsType]
+    FunctionPointer: List[_TmcItem]
+    Implements: List[_TmcItem]
+    Name: List['Name']
+    PropertyItem: List[_TmcItem]
+    SubItem: List['SubItem']
+    Unit: List[_TmcItem]
 
     @property
     def guid(self):
@@ -970,11 +1001,11 @@ class DataType(_TmcItem):
             raise AttributeError('GUID unavailable')
 
     @property
-    def array_info(self) -> typing.Optional[ArrayInfo]:
+    def array_info(self) -> Optional[ArrayInfo]:
         return getattr(self, 'ArrayInfo', [None])[0]
 
     @property
-    def array_bounds(self) -> typing.Optional[typing.Tuple[int, int]]:
+    def array_bounds(self) -> Optional[Tuple[int, int]]:
         return getattr(self.array_info, 'array_bounds', None)
 
     @property
@@ -1117,30 +1148,30 @@ class Name(_TmcItem):
         return self.attributes.get('Namespace', None)
 
     @property
-    def tc_base_type(self) -> bool:
+    def tc_base_type(self) -> Optional[bool]:
         try:
             return self.attributes['TcBaseType'] in _TRUE_VALUES
         except KeyError:
-            ...
+            return None
 
     @property
-    def hide_type(self) -> bool:
+    def hide_type(self) -> Optional[bool]:
         try:
             return self.attributes['HideType'] in _TRUE_VALUES
         except KeyError:
-            ...
+            return None
 
     @property
-    def iec_declaration(self) -> str:
+    def iec_declaration(self) -> Optional[str]:
         return self.attributes.get('IecDeclaration', None)
 
 
 class SubItem(_TmcItem):
     '[TMC] One element of a DataType'
-    Type: typing.List[Type]
-    ArrayInfo: typing.List[ArrayInfo]
-    BitSize: typing.List[_TmcItem]
-    BitOffs: typing.List[_TmcItem]
+    Type: List[Type]
+    ArrayInfo: List[ArrayInfo]
+    BitSize: List[_TmcItem]
+    BitOffs: List[_TmcItem]
 
     @property
     def data_type(self):
@@ -1204,33 +1235,6 @@ class Module(_TmcItem):
         return self._ads_port
 
 
-class Property(_TmcItem):
-    '''
-    [TMC] A property containing a key/value pair
-
-    Examples of TMC properties::
-
-          ApplicationName (used for the ADS port)
-          ChangeDate
-          GeneratedCodeSize
-          GlobalDataSize
-    '''
-    Value: list
-
-    @property
-    def key(self):
-        'The property key name'
-        return self.name
-
-    @property
-    def value(self):
-        'The property value text'
-        return self.Value[0].text if hasattr(self, 'Value') else self.text
-
-    def __repr__(self):
-        return f'<Property {self.key}={self.value!r}>'
-
-
 class DataArea(_TmcItem):
     '[TMC] Container that holds symbols'
 
@@ -1238,7 +1242,7 @@ class DataArea(_TmcItem):
 class BuiltinDataType:
     '[TMC] A built-in data type such as STRING, INT, REAL, etc.'
     def __init__(self, typename, *, length=1):
-        if '(' in typename:
+        if '(' in typename:  # ')'
             typename, length = typename.split('(')
             length = int(length.rstrip(')'))
 
@@ -1310,11 +1314,11 @@ class Symbol(_TmcItem):
     will become `Symbol_FB_MotionStage`.
     '''
 
-    ArrayInfo: typing.List[ArrayInfo]
-    BaseType: typing.List[BaseType]
-    BitOffs: typing.List[_TmcItem]
-    BitSize: typing.List[_TmcItem]
-    Properties: typing.List[_TmcItem]
+    ArrayInfo: List[ArrayInfo]
+    BaseType: List[BaseType]
+    BitOffs: List[_TmcItem]
+    BitSize: List[_TmcItem]
+    Properties: List[_TmcItem]
 
     @property
     def base_type(self) -> BaseType:
@@ -1416,15 +1420,18 @@ class Symbol_DUT_MotionStage(Symbol):
         return self.name.split('.')[1]
 
     @property
-    def nc_to_plc_link(self):
+    def nc_to_plc_link(self) -> Optional[Link]:
         '''
         The Link for NcToPlc
 
         That is, how the NC axis is connected to the DUT_MotionStage
         '''
+        plc = self.plc
+        if self.plc is None:
+            return None
         expected = '^' + self.name.lower() + '.axis.nctoplc'
         links = [link
-                 for link in self.plc.find(Link, recurse=False)
+                 for link in plc.find(Link, recurse=False)
                  if expected in link.a[1].lower()
                  ]
 
@@ -1453,14 +1460,29 @@ class Symbol_DUT_MotionStage(Symbol):
 
 class GVL(_TwincatProjectSubItem):
     '[TcGVL] A Global Variable List'
+    Declaration: list
 
     @property
     def declaration(self):
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
-    def get_source_code(self, *, close_block=True):
+    def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration only in the case of a GVL'
+        return self.declaration
+
+
+class EnumerationTextList(_TwincatProjectSubItem):
+    '[TcDUT] An enumerated text list type'
+    Declaration: list
+
+    @property
+    def declaration(self):
+        'The declaration code; i.e., the top portion in visual studio'
+        return self.Declaration[0].text
+
+    def get_source_code(self, *, close_block=True) -> str:
+        'The full source code - declaration only in the case of an ENUM'
         return self.declaration
 
 
@@ -1478,34 +1500,162 @@ class Declaration(_TwincatProjectSubItem):
 
 class DUT(_TwincatProjectSubItem):
     '[TcDUT] Data unit type (DUT)'
+    Declaration: list
 
     @property
     def declaration(self):
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
-    def get_source_code(self, *, close_block=True):
+    def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration only in the case of a DUT'
         return self.declaration
 
 
-class Action(_TwincatProjectSubItem):
-    '[TcPOU] Code declaration for actions'
+class _POUMember:
+    @property
+    def pou(self) -> Optional[POU]:
+        """The associated POU."""
+        return self.find_ancestor(POU)
+
+    @property
+    def pou_qualified_name(self) -> str:
+        """The full name, including the associated function block."""
+        pou = self.pou
+        return f"{pou.name}.{self.name}" if pou is not None else self.name
+
+    @property
+    def declaration(self) -> str:
+        'The declaration code; i.e., the top portion in visual studio'
+        try:
+            return self.Declaration[0].text or ""
+        except (IndexError, AttributeError):
+            return ""
+
+    @property
+    def implementation(self) -> str:
+        'The implementation code; i.e., the bottom portion in visual studio'
+        try:
+            # NOTE: only ST for now
+            return self.Implementation[0].ST[0].text or ""
+        except (IndexError, AttributeError):
+            return ""
+
+
+class Action(_TwincatProjectSubItem, _POUMember):
+    "[TcPOU] Code declaration for actions."
+    Implementation: list
 
     @property
     def source_code(self):
-        return f'''\
-ACTION {self.name}:
-{self.implementation or ''}
-END_ACTION'''
+        return "\n".join(
+            (
+                f"ACTION {self.name}:",
+                self.implementation,
+                "END_ACTION",
+            )
+        )
+
+
+class Method(_TwincatProjectSubItem, _POUMember):
+    "[TcPOU] Code declaration for function block methods."
+    Implementation: list
+    Declaration: list
 
     @property
-    def implementation(self):
-        'The implementation code; i.e., the bottom portion in visual studio'
-        impl = self.Implementation[0]
-        if hasattr(impl, 'ST'):
-            # NOTE: only ST for now
-            return impl.ST[0].text
+    def source_code(self):
+        return "\n".join(
+            (
+                self.declaration,
+                self.implementation,
+                "END_METHOD",
+            )
+        )
+
+
+class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
+    "[TcPOU] Code declaration container for function block properties."
+
+    @property
+    def property_(self) -> Optional[Property]:
+        return self.find_ancestor(Property)
+
+    @property
+    def pou_qualified_name(self) -> str:
+        """The full name, including the associated function block."""
+        name = self.property_.name
+        return f"{self.pou.name}.{name}" if self.pou is not None else name
+
+    @property
+    def source_code(self) -> str:
+        property_ = self.property_
+        if not property_:
+            return ""
+
+        return "\n".join(
+            (
+                property_.declaration,
+                self.declaration,
+                self.implementation,
+                "END_PROPERTY",
+            )
+        )
+
+
+class Get(_POUPropertyMember):
+    """POU Property getter."""
+
+
+class Set(_POUPropertyMember):
+    """POU Property setter."""
+
+
+class Property(_TmcItem, _TwincatProjectSubItem, _POUMember):
+    """
+    Two possibilities:
+    [TcPOU] Code declaration for function block properties
+    [TMC] A property containing a key/value pair
+
+    Examples of TMC properties::
+
+          ApplicationName (used for the ADS port)
+          ChangeDate
+          GeneratedCodeSize
+          GlobalDataSize
+    """
+
+    Implementation: list
+    Declaration: list
+    Value: list
+
+    @property
+    def key(self):
+        'The property key name'
+        return self.name
+
+    @property
+    def value(self):
+        'The property value text'
+        return self.Value[0].text if hasattr(self, 'Value') else self.text
+
+    def __repr__(self):
+        return f'<Property {self.key}={self.value!r}>'
+
+    @property
+    def source_code(self) -> str:
+        if not self.declaration:
+            return ""
+
+        source = []
+        for attr in ("Get", "Set"):
+            try:
+                obj = getattr(self, attr, [])[0]
+            except IndexError:
+                ...
+            else:
+                source.append(obj.source_code)
+
+        return "\n\n".join(source)
 
 
 class POU(_TwincatProjectSubItem):
@@ -1524,23 +1674,33 @@ class POU(_TwincatProjectSubItem):
         return f'{self.name}.{name}'
 
     @property
-    def declaration(self):
+    def declaration(self) -> str:
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
     @property
-    def implementation(self):
+    def implementation(self) -> str:
         'The implementation code; i.e., the bottom portion in visual studio'
         impl = self.Implementation[0]
         if hasattr(impl, 'ST'):
             return impl.ST[0].text
 
     @property
-    def actions(self):
+    def actions(self) -> List[Action]:
         'The action implementations (zero or more)'
         return list(getattr(self, 'Action', []))
 
-    def get_source_code(self, *, close_block=True):
+    @property
+    def methods(self) -> List[Method]:
+        'The method implementations (zero or more)'
+        return list(getattr(self, 'Method', []))
+
+    @property
+    def properties(self) -> List[Property]:
+        'The property implementations (zero or more)'
+        return list(getattr(self, 'Property', []))
+
+    def get_source_code(self, *, close_block=True) -> str:
         'The full source code - declaration, implementation, and actions'
         source_code = [self.declaration or '',
                        self.implementation or '',
@@ -1559,19 +1719,18 @@ class POU(_TwincatProjectSubItem):
                             '# pytmc: unknown block type')
             )
 
-        # TODO: actions defined outside of the block?
-        for action in self.actions:
-            source_code.append(action.source_code)
+        for obj in self.actions + self.methods + self.properties:
+            source_code.append(f"\n{obj.source_code}")
 
         return '\n'.join(source_code)
 
     @property
-    def call_blocks(self):
+    def call_blocks(self) -> dict:
         'A dictionary of all implementation call blocks'
         return get_pou_call_blocks(self.declaration, self.implementation)
 
     @property
-    def program_name(self):
+    def program_name(self) -> str:
         'The program name, determined from the declaration'
         return program_name_from_declaration(self.declaration)
 
@@ -1630,7 +1789,7 @@ class Axis(TwincatItem):
         # in the xti files:
         return 'mm'
 
-    def summarize(self):
+    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
         yield from self.attributes.items()
         for param in self.find(AxisPara, recurse=False):
             yield from param.attributes.items()
@@ -1658,7 +1817,7 @@ class Encoder(TwincatItem):
 
     Contains EncPara, Vars, Mappings, etc.
     '''
-    def summarize(self):
+    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
         yield 'EncType', self.attributes['EncType']
         for param in self.find(EncPara, recurse=False):
             yield from param.attributes.items()
@@ -1769,9 +1928,10 @@ class Pdo(TwincatItem):
 
 class Entry(TwincatItem):
     """Pdo Entry, containing name and type information."""
+    Comment: List[TwincatItem]
 
     @property
-    def entry_type(self) -> typing.Optional[Type]:
+    def entry_type(self) -> Optional[Type]:
         """The type of the entry."""
         return getattr(self, 'Type', [None])[0]
 
@@ -1831,6 +1991,10 @@ class DefaultResolution(Resolution):
 
 
 class _VersionItemMixin:
+    # Resolution: List[TwincatItem]
+    # DefaultResolution: List[TwincatItem]
+    # Namespace: List[TwincatItem]
+
     @property
     def resolution(self) -> Optional[Union[DefaultResolution, Resolution]]:
         try:
@@ -1963,7 +2127,7 @@ def _make_fake_item(name, parent=None, item_name=None, *, text=None,
     return item
 
 
-def case_insensitive_path(path):
+def case_insensitive_path(path: AnyPath) -> pathlib.Path:
     '''
     Match a path in a case-insensitive manner, returning the actual filename as
     it exists on the host machine
@@ -1978,7 +2142,7 @@ def case_insensitive_path(path):
 
     Returns
     -------
-    path : pathlib.Path or str
+    path : pathlib.Path
         The case-corrected path
 
     Raises
@@ -2008,7 +2172,9 @@ def case_insensitive_path(path):
     return new_path.resolve()
 
 
-def separate_by_classname(children):
+def separate_by_classname(
+    children: List[TwincatItem]
+) -> Dict[str, List[TwincatItem]]:
     '''
     Take in a list of `TwincatItem`, categorize each by their class name (based
     on XML tag), and return a dictionary keyed on that.
@@ -2037,9 +2203,9 @@ def separate_by_classname(children):
     for child in children:
         d[child.__class__.__name__].append(child)
 
-    return d
+    return dict(d)
 
 
-def strip_namespace(tag):
+def strip_namespace(tag: str) -> str:
     'Strip off {{namespace}} from: {{namespace}}tag'
     return lxml.etree.QName(tag).localname

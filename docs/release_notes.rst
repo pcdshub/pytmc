@@ -31,8 +31,8 @@ v2.10.0 (2021-08-09)
 
 Enhancements
 ------------
-* Allow strings to be linked using the ``link:`` pragma key.
-  Previously, this was only implemented for numeric scalar values.
+* Allow strings to be linked using the ``link:`` pragma key. Previously,
+  this was only implemented for numeric scalar values.
 
 
 v2.9.1 (2021-04-27)
@@ -40,15 +40,14 @@ v2.9.1 (2021-04-27)
 
 Enhancements
 ------------
-
 * Added ``scale`` and ``offset`` pragma keys for integer and floating point
   symbols.
 
 Maintenance
 -----------
-
 * Fixed remaining ``slaclab`` references, after the repository was moved to
   ``pcdshub``.
+
 
 v2.9.0 (2021-04-02)
 ===================
