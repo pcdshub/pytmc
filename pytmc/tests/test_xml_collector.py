@@ -544,6 +544,39 @@ def test_pv_linking_string():
     assert lso_rec.fields["SIZV"] == 70
 
 
+def test_pv_linking_struct():
+    struct = make_mock_twincatitem(
+        name='Main.my_dut',
+        data_type=make_mock_type('MY_DUT', is_complex_type=True),
+        pragma='pv: PREFIX; link: LINK:'
+    )
+
+    subitem1 = make_mock_twincatitem(
+        name='subitem1',
+        data_type=make_mock_type('INT'),
+        pragma='pv: ABCD; link: **ABCD.STAT'
+    )
+
+    subitem2 = make_mock_twincatitem(
+        name='subitem2',
+        data_type=make_mock_type('INT'),
+        pragma='pv: EFGH; link: OTHER_PV'
+    )
+
+    def walk(condition=None):
+        yield [struct, subitem1]
+        yield [struct, subitem2]
+
+    struct.walk = walk
+
+    pkg1, pkg2 = list(pragmas.record_packages_from_symbol(struct))
+    rec = pkg1.generate_output_record()
+    assert rec.fields['DOL'] == 'PREFIX:ABCD.STAT CPP MS'
+
+    rec = pkg2.generate_output_record()
+    assert rec.fields['DOL'] == 'LINK:OTHER_PV CPP MS'
+
+
 def test_pv_linking_special():
     struct = make_mock_twincatitem(
         name='Main.array_base',
