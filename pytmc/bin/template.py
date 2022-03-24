@@ -254,16 +254,13 @@ def get_jinja_filters(**user_config):
     if 'prefix' not in user_config:
         user_config['prefix'] = 'PREFIX'
 
-    @jinja2.evalcontextfilter
-    def epics_prefix(eval_ctx, obj):
+    def epics_prefix(obj):
         return stcmd.get_name(obj, user_config)[0]
 
-    @jinja2.evalcontextfilter
-    def epics_suffix(eval_ctx, obj):
+    def epics_suffix(obj):
         return stcmd.get_name(obj, user_config)[1]
 
-    @jinja2.evalcontextfilter
-    def pragma(eval_ctx, obj, key, default=''):
+    def pragma(obj, key, default=''):
         item_and_config = pragmas.expand_configurations_from_chain([obj])
         if item_and_config:
             item_to_config = dict(item_and_config[0])
@@ -271,8 +268,7 @@ def get_jinja_filters(**user_config):
             return config.get(key, default)
         return default
 
-    @jinja2.evalcontextfilter
-    def title_fill(eval_ctx, text, fill_char):
+    def title_fill(text, fill_char):
         return fill_char * len(text)
 
     return {
