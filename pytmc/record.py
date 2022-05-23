@@ -214,7 +214,7 @@ class RecordPackage:
         return config
 
     def _configure_link(self):
-        'Link this record to a pre-existing EPICS record via a CA (CPP) link'
+        'Link this record to a pre-existing EPICS record via a CA (CP) link'
         self.linked_to_pv = self.config.get('link') or None
 
     def _configure_pvname(self):
@@ -493,7 +493,7 @@ class TwincatTypeRecordPackage(RecordPackage):
         linked_to_pv = linked_to_pv.replace(self.macro_character, '$')
         return {
             'OMSL': 'closed_loop',
-            'DOL': linked_to_pv + ' CPP MS',
+            'DOL': linked_to_pv + ' CP MS',
             'SCAN': self.config.get('link_scan', '.5 second'),
         }
 
