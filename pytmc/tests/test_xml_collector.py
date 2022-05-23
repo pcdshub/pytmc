@@ -517,7 +517,7 @@ def test_pv_linking():
     assert isinstance(pkg, IntegerRecordPackage)
     rec = pkg.generate_output_record()
     assert rec.fields['OMSL'] == 'closed_loop'
-    assert rec.fields['DOL'] == 'OTHER:RECORD CPP MS'
+    assert rec.fields['DOL'] == 'OTHER:RECORD CP MS'
     assert rec.fields['SCAN'] == '.5 second'
 
 
@@ -539,7 +539,7 @@ def test_pv_linking_string():
     assert lso_rec.pvname == lso_pvname
     assert lso_rec.record_type == "lso"
     assert lso_rec.fields["OMSL"] == "closed_loop"
-    assert lso_rec.fields["DOL"] == "OTHER:RECORD.VAL$ CPP MS"
+    assert lso_rec.fields["DOL"] == "OTHER:RECORD.VAL$ CP MS"
     assert lso_rec.fields["SCAN"] == ".5 second"
     assert lso_rec.fields["SIZV"] == 70
 
@@ -571,10 +571,10 @@ def test_pv_linking_struct():
 
     pkg1, pkg2 = list(pragmas.record_packages_from_symbol(struct))
     rec = pkg1.generate_output_record()
-    assert rec.fields['DOL'] == 'PREFIX:ABCD.STAT CPP MS'
+    assert rec.fields['DOL'] == 'PREFIX:ABCD.STAT CP MS'
 
     rec = pkg2.generate_output_record()
-    assert rec.fields['DOL'] == 'LINK:OTHER_PV CPP MS'
+    assert rec.fields['DOL'] == 'LINK:OTHER_PV CP MS'
 
 
 def test_pv_linking_special():
@@ -594,7 +594,7 @@ def test_pv_linking_special():
 
     pkg, = list(pragmas.record_packages_from_symbol(struct))
     rec = pkg.generate_output_record()
-    assert rec.fields['DOL'] == 'PREFIX:ABCD.STAT CPP MS'
+    assert rec.fields['DOL'] == 'PREFIX:ABCD.STAT CP MS'
 
 
 @pytest.mark.parametrize(
