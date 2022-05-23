@@ -24,6 +24,7 @@ repos:
     -   id: check-yaml
         exclude: '^(conda-recipe/meta.yaml)$'
     -   id: debug-statements
+        exclude: '^(pytmc/bin/util.py)$'
 
 -   repo: https://gitlab.com/pycqa/flake8.git
     rev: 3.9.2

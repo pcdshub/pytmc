@@ -1,10 +1,8 @@
 import logging
 
+from . import linter, parser, pragmas
 from ._version import get_versions
-from .record import RecordPackage, EPICSRecord
-from . import pragmas
-from . import parser
-from . import linter
+from .record import EPICSRecord, RecordPackage
 
 logger = logging.getLogger(__name__)
 __version__ = get_versions()['version']

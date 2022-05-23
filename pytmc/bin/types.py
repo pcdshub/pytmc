@@ -12,7 +12,6 @@ from qtpy.QtCore import Qt, Signal
 
 import pytmc
 
-
 DESCRIPTION = __doc__
 
 

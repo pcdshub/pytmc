@@ -5,7 +5,7 @@
     out "{{proto.out_field}}";
     in "{{proto.in_field}}";
     {% if proto.has_init %}
-    @init { {{proto.init}}; }; 
+    @init { {{proto.init}}; };
     {% endif %}
 }
 

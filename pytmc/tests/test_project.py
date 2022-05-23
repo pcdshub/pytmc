@@ -1,5 +1,6 @@
-import pytest
 import pprint
+
+import pytest
 
 from pytmc import parser
 

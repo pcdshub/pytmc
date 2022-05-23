@@ -1,6 +1,6 @@
 [run]
 source =
-    
+
 [report]
 omit =
     #tests

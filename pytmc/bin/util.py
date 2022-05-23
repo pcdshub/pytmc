@@ -1,7 +1,7 @@
 import sys
 
 import pytmc
-from pytmc.parser import TwincatItem, TWINCAT_TYPES
+from pytmc.parser import TWINCAT_TYPES, TwincatItem
 
 
 def python_debug_session(namespace, message):
