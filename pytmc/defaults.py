@@ -1,6 +1,8 @@
 import configparser
-import pkg_resources
 import logging
+
+import pkg_resources
+
 logger = logging.getLogger(__name__)
 
 

@@ -15,10 +15,9 @@ This tool was created for exploring .tpy files but is well suited to reading
 any xml formatted file.
 """
 
-import xml.etree.ElementTree as ET
-import textwrap
 import argparse
-
+import textwrap
+import xml.etree.ElementTree as ET
 
 DESCRIPTION = __doc__
 

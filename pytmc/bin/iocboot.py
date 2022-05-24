@@ -11,10 +11,8 @@ import pathlib
 
 import jinja2
 
-from . import util
-
 from ..parser import parse
-
+from . import util
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)

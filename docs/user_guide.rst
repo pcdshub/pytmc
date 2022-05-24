@@ -9,6 +9,3 @@ User Guide
    installation.rst
    pragma_usage.rst
    terminal_usage.rst
-
-
-

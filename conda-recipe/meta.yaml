@@ -21,6 +21,8 @@ requirements:
     - jinja2
     - lxml
     - epics-pypdb >=0.1.5
+  run_constrained:
+    - pyqt <5.15
 
 test:
   imports:

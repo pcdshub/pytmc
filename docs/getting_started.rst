@@ -38,7 +38,7 @@ Python Usage
 ++++++++++++
 Once installed pytmc and its components can be imported into a python program
 or shell like any normal python package. Consult the source code documentation
-for specifics. 
+for specifics.
 
 
 Full IOC Creation
