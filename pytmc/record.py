@@ -354,7 +354,7 @@ def make_autosave_defaults(
             "UDFS",  # Undefined Alarm Sevrty
         }
         default_output_pass0 = {
-            "VAL",  # The value
+            "VAL",  # The value (pass 0, does not cause a write)
             "DISS",  # Disable Alarm Sevrty
             "UDFS",  # Undefined Alarm Sevrty
         }
@@ -577,6 +577,9 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['DTYP'] = self.dtyp
         record.fields['OUT'] = self.asyn_output_port_spec
 
+        # By default, NO_ALARM if the output record has not processed yet:
+        record.fields.setdefault("UDFS", "0")
+
         # Remove timestamp source and process-on-init for output records:
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
@@ -689,7 +692,6 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
             "LSV",  # Low Severity
             "PREC",  # precision
             "SIMS",  # Simulation Mode Severity
-            "VAL",  # the value
         ],
     )
 
