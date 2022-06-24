@@ -352,11 +352,13 @@ def make_autosave_defaults(
         default_input_pass0 = {
             "DISS",  # Disable Alarm Sevrty
             "UDFS",  # Undefined Alarm Sevrty
+            "DESC",  # Description
         }
         default_output_pass0 = {
             "VAL",  # The value (pass 0, does not cause a write)
             "DISS",  # Disable Alarm Sevrty
             "UDFS",  # Undefined Alarm Sevrty
+            "DESC",  # Description
         }
     else:
         default_input_pass0 = set()
@@ -649,18 +651,33 @@ class IntegerRecordPackage(TwincatTypeRecordPackage):
 
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
+            # Alarm severities
             "HHSV",  # Hihi Severity
             "HSV",  # High Severity
             "LLSV",  # Lolo Severity
             "LSV",  # Low Severity
             "SIMS",  # Simulation Mode Severity
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
         ],
         output_pass0=[
+            # Alarm severities
             "HHSV",  # Hihi Severity
             "HSV",  # High Severity
             "LLSV",  # Lolo Severity
             "LSV",  # Low Severity
             "SIMS",  # Simulation Mode Severity
+            # Control limits
+            "DRVH",  # Drive High Limit
+            "DRVL",  # Drive Low Limit
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
         ],
     )
 
@@ -678,20 +695,37 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
 
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
+            # Basics
+            "PREC",  # precision
+            # Alarm severities
             "HHSV",  # Hihi Severity
             "HSV",  # High Severity
             "LLSV",  # Lolo Severity
             "LSV",  # Low Severity
-            "PREC",  # precision
             "SIMS",  # Simulation Mode Severity
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
         ],
         output_pass0=[
+            # Basics
+            "PREC",  # precision
+            # Alarm severities
             "HHSV",  # Hihi Severity
             "HSV",  # High Severity
             "LLSV",  # Lolo Severity
             "LSV",  # Low Severity
-            "PREC",  # precision
             "SIMS",  # Simulation Mode Severity
+            # Control limits
+            "DRVH",  # Drive High Limit
+            "DRVL",  # Drive Low Limit
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
         ],
     )
 
@@ -736,6 +770,7 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
     input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
+            # Per-state severities
             "ZRSV",  # State Zero Severity
             "ONSV",  # State One Severity
             "TWSV",  # State Two Severity
@@ -756,6 +791,7 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
             "SIMS",  # Simulation Mode Severity
         ],
         output_pass0=[
+            # Per-state severities
             "ZRSV",  # State Zero Severity
             "ONSV",  # State One Severity
             "TWSV",  # State Two Severity
