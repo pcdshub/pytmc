@@ -3,7 +3,7 @@ Record generation and templating
 """
 import logging
 from collections import ChainMap, OrderedDict
-from typing import Optional
+from typing import Dict, List, Optional, Set
 
 import jinja2
 
@@ -315,6 +315,67 @@ class RecordPackage:
         return spec(*args, chain=chain, **kwargs)
 
 
+AutosaveDefaults = Dict[str, Dict[str, Set[str]]]
+
+
+def make_autosave_defaults(
+    input_pass0: Optional[List[str]] = None,
+    input_pass1: Optional[List[str]] = None,
+    output_pass0: Optional[List[str]] = None,
+    output_pass1: Optional[List[str]] = None,
+    exclude_defaults: bool = False,
+) -> AutosaveDefaults:
+    """
+    Create autosave defaults for a given record type.
+
+    Parameters
+    ----------
+    input_pass0 : List[str]
+        Fields to save on the input record for pass 0 (pre-iocInit)
+    input_pass1 : List[str]
+        Fields to save on the input record for pass 1 (post-iocInit)
+    output_pass0 : List[str]
+        Fields to save on the output record for pass 0 (pre-iocInit)
+    output_pass1 : List[str]
+        Fields to save on the output record for pass 1 (post-iocInit)
+    exclude_defaults : bool, optional
+        Exclude the defaults normally used for all records.
+
+    Returns
+    -------
+    dict
+        Dictionary of defaults with keys "input" and "output", under which
+        are keys "pass0" and "pass1".
+    """
+
+    if not exclude_defaults:
+        default_input_pass0 = {
+            "DISS",  # Disable Alarm Sevrty
+            "UDFS",  # Undefined Alarm Sevrty
+            "DESC",  # Description
+        }
+        default_output_pass0 = {
+            "VAL",  # The value (pass 0, does not cause a write)
+            "DISS",  # Disable Alarm Sevrty
+            "UDFS",  # Undefined Alarm Sevrty
+            "DESC",  # Description
+        }
+    else:
+        default_input_pass0 = set()
+        default_output_pass0 = set()
+
+    return dict(
+        input=dict(
+            pass0=set(input_pass0 or []) | default_input_pass0,
+            pass1=set(input_pass1 or []),
+        ),
+        output=dict(
+            pass0=set(output_pass0 or []) | default_output_pass0,
+            pass1=set(output_pass1 or []),
+        ),
+    )
+
+
 class TwincatTypeRecordPackage(RecordPackage):
     """
     The common parent for all RecordPackages for basic Twincat types
@@ -343,12 +404,7 @@ class TwincatTypeRecordPackage(RecordPackage):
        not required.
     """
     field_defaults = {'PINI': 1, 'TSE': -2}
-    autosave_defaults = {
-        'input': dict(pass0={},
-                      pass1={}),
-        'output': dict(pass0={'VAL'},
-                       pass1={}),
-    }
+    autosave_defaults = make_autosave_defaults()
 
     dtyp = NotImplemented
     input_rtyp = NotImplemented
@@ -523,6 +579,9 @@ class TwincatTypeRecordPackage(RecordPackage):
         record.fields['DTYP'] = self.dtyp
         record.fields['OUT'] = self.asyn_output_port_spec
 
+        # By default, NO_ALARM if the output record has not processed yet:
+        record.fields.setdefault("UDFS", "0")
+
         # Remove timestamp source and process-on-init for output records:
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
@@ -567,6 +626,20 @@ class BinaryRecordPackage(TwincatTypeRecordPackage):
                           'OUT', 'RBV', 'RPVT', 'WDPT'}
     input_only_fields = {'SVAL'}
 
+    autosave_defaults = make_autosave_defaults(
+        input_pass0=[
+            "ZSV",  # Zero Error Severity
+            "OSV",  # One Error Severity
+            "SIMS",  # Simulation Mode Severity
+        ],
+        output_pass0=[
+            "ZSV",  # Zero Error Severity
+            "OSV",  # One Error Severity
+            "COSV",  # Change of State Sevr
+            "SIMS",  # Simulation Mode Severity
+        ],
+    )
+
 
 class IntegerRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for an integer Twincat Variable"""
@@ -575,6 +648,38 @@ class IntegerRecordPackage(TwincatTypeRecordPackage):
     output_only_fields = {'DOL', 'DRVH', 'DRVL', 'IVOA', 'IVOV', 'OMSL'}
     input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
     dtyp = 'asynInt32'
+
+    autosave_defaults = make_autosave_defaults(
+        input_pass0=[
+            # Alarm severities
+            "HHSV",  # Hihi Severity
+            "HSV",  # High Severity
+            "LLSV",  # Lolo Severity
+            "LSV",  # Low Severity
+            "SIMS",  # Simulation Mode Severity
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
+        ],
+        output_pass0=[
+            # Alarm severities
+            "HHSV",  # Hihi Severity
+            "HSV",  # High Severity
+            "LLSV",  # Lolo Severity
+            "LSV",  # Low Severity
+            "SIMS",  # Simulation Mode Severity
+            # Control limits
+            "DRVH",  # Drive High Limit
+            "DRVL",  # Drive Low Limit
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
+        ],
+    )
 
 
 class FloatRecordPackage(TwincatTypeRecordPackage):
@@ -588,12 +693,41 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
                           'RBV'}
     input_only_fields = {'AFTC', 'AFVL', 'SMOO', 'SVAL'}
 
-    autosave_defaults = {
-        'input': dict(pass0={'PREC'},
-                      pass1={}),
-        'output': dict(pass0={'VAL', 'PREC'},
-                       pass1={}),
-    }
+    autosave_defaults = make_autosave_defaults(
+        input_pass0=[
+            # Basics
+            "PREC",  # precision
+            # Alarm severities
+            "HHSV",  # Hihi Severity
+            "HSV",  # High Severity
+            "LLSV",  # Lolo Severity
+            "LSV",  # Low Severity
+            "SIMS",  # Simulation Mode Severity
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
+        ],
+        output_pass0=[
+            # Basics
+            "PREC",  # precision
+            # Alarm severities
+            "HHSV",  # Hihi Severity
+            "HSV",  # High Severity
+            "LLSV",  # Lolo Severity
+            "LSV",  # Low Severity
+            "SIMS",  # Simulation Mode Severity
+            # Control limits
+            "DRVH",  # Drive High Limit
+            "DRVL",  # Drive Low Limit
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",  # Low Alarm Limit
+        ],
+    )
 
     def get_scale_offset(self):
         """Get the scale and offset for the analog record(s)."""
@@ -634,6 +768,51 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
     dtyp = 'asynInt32'
     output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL', 'ORBV', 'RBV'}
     input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
+    autosave_defaults = make_autosave_defaults(
+        input_pass0=[
+            # Per-state severities
+            "ZRSV",  # State Zero Severity
+            "ONSV",  # State One Severity
+            "TWSV",  # State Two Severity
+            "THSV",  # State Three Severity
+            "FRSV",  # State Four Severity
+            "FVSV",  # State Five Severity
+            "SXSV",  # State Six Severity
+            "SVSV",  # State Seven Severity
+            "EISV",  # State Eight Severity
+            "NISV",  # State Nine Severity
+            "TESV",  # State Ten Severity
+            "ELSV",  # State Eleven Severity
+            "TVSV",  # State Twelve Severity
+            "TTSV",  # State Thirteen Sevr
+            "FTSV",  # State Fourteen Sevr
+            "FFSV",  # State Fifteen Severity
+            "UNSV",  # Unknown State Severity
+            "SIMS",  # Simulation Mode Severity
+        ],
+        output_pass0=[
+            # Per-state severities
+            "ZRSV",  # State Zero Severity
+            "ONSV",  # State One Severity
+            "TWSV",  # State Two Severity
+            "THSV",  # State Three Severity
+            "FRSV",  # State Four Severity
+            "FVSV",  # State Five Severity
+            "SXSV",  # State Six Severity
+            "SVSV",  # State Seven Severity
+            "EISV",  # State Eight Severity
+            "NISV",  # State Nine Severity
+            "TESV",  # State Ten Severity
+            "ELSV",  # State Eleven Severity
+            "TVSV",  # State Twelve Severity
+            "TTSV",  # State Thirteen Sevr
+            "FTSV",  # State Fourteen Sevr
+            "FFSV",  # State Fifteen Sevr
+            "UNSV",  # Unknown State Sevr
+            "COSV",  # Change of State Sevr
+            "SIMS",  # Simulation Mode Severity
+        ],
+    )
 
     mbb_fields = [
         ('ZRVL', 'ZRST'),
@@ -674,6 +853,14 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
         'APST': 'On Change',
         'MPST': 'On Change',
     }
+    autosave_defaults = make_autosave_defaults(
+        input_pass0=[
+            "SIMS",  # Simulation Mode Severity
+        ],
+        output_pass0=[
+            "SIMS",  # Simulation Mode Severity
+        ],
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -757,6 +944,24 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         'APST': 'On Change',
         'MPST': 'On Change',
     }
+    autosave_defaults = make_autosave_defaults(
+        input_pass0=[
+            "SIMS",  # Simulation Mode Severity
+        ],
+        output_pass0=[
+            "SIMS",  # Simulation Mode Severity
+        ],
+    )
+    # The LSO record that gets generated when a "link" is used to write
+    # string data into the PLC from another EPICS PV:
+    autosave_defaults_for_link = make_autosave_defaults(
+        input_pass0=[
+            "SIMS",  # Simulation Mode Severity
+        ],
+        output_pass0=[
+            "SIMS",  # Simulation Mode Severity
+        ],
+    )
 
     # Links to string PVs require auxiliary 'lso' record.
     link_requires_record = True
@@ -788,6 +993,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
             record_type="lso",
             direction="output",
             package=self,
+            autosave=self.autosave_defaults_for_link["output"],
         )
         record.fields.pop('TSE', None)
         record.fields.pop('PINI', None)
