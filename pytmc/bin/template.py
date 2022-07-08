@@ -470,7 +470,7 @@ def generate_records(
     if exceptions and not allow_errors:
         logger.exception(
             'Linter errors - failed to create database. To create the database'
-            ' ignoring these errors, use the flag `--allow-errors`'
+            ' ignoring these errors, set allow_errors=True'
         )
         sys.exit(1)
 
