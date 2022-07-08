@@ -109,6 +109,8 @@ def element_to_class_name(
     if tag == 'Project':
         if isinstance(parent, TcSmProject):
             return 'TopLevelProject', TwincatItem
+        if isinstance(parent, Safety):
+            return 'SafetyPlc', TwincatItem
         if 'File' in element.attrib:
             # File to be loaded will contain PrjFilePath
             return 'Plc', TwincatItem
@@ -359,7 +361,6 @@ class TwincatItem:
         -------
         item : TwincatItem
         '''
-
         classname, base = element_to_class_name(element, parent=parent)
 
         try:
@@ -766,6 +767,15 @@ class Plc(TwincatItem):
             for item in source_items
             if hasattr(item, 'get_source_code')
         )
+
+
+class Safety(TwincatItem):
+    '[tsproj] A container for a safety PLC project (SafetyPlc)'
+
+
+class SafetyPlc(TwincatItem):
+    '[tsproj] A safety PLC project'
+    _load_path_hint = pathlib.Path('_Config') / 'SPLC'
 
 
 class Compile(TwincatItem):
