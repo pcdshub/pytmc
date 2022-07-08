@@ -19,6 +19,7 @@ The following helpers are available in the environment::
     determine_block_type
     element_to_class_name
     enumerate_types
+    generate_records
     get_boxes
     get_data_type_by_reference
     get_data_types
@@ -27,6 +28,7 @@ The following helpers are available in the environment::
     get_linter_results
     get_motors
     get_nc
+    get_plc_by_name
     get_pou_call_blocks
     get_symbols
     get_symbols_by_type
@@ -41,6 +43,11 @@ And the following filters::
     epics_suffix
     pragma
     title_fill
+
+And the following variables::
+
+    pytmc_version
+    types
 """
 
 import argparse
