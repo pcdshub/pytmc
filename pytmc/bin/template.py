@@ -29,6 +29,7 @@ The following helpers are available in the environment::
     get_nc
     get_pou_call_blocks
     get_symbols
+    get_symbols_by_type
     list_types
     max
     min
@@ -48,13 +49,15 @@ import logging
 import os
 import pathlib
 import sys
-from typing import Generator, List, Optional, Tuple
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import jinja2
 
+from .. import __version__ as pytmc_version
 from .. import parser, pragmas
-from ..record import EPICSRecord
+from ..record import RecordPackage
 from . import pragmalint, stcmd, summary, util
+from .db import generate_archive_settings
 from .db import process as db_process
 
 try:
@@ -87,6 +90,16 @@ def build_arg_parser(argparser=None):
         type=argparse.FileType(mode='r'),
         help='Template filename (default: standard input)',
         default='-',
+    )
+
+    argparser.add_argument(
+        "--macro",
+        "-m",
+        type=str,
+        required=False,
+        action="append",
+        dest="macros",
+        help="Define a macro for the template in the form MACRO=VALUE"
     )
 
     argparser.add_argument(
@@ -140,7 +153,7 @@ def _to_repo_slug(url: str) -> str:
     return url
 
 
-def get_git_info(fn: pathlib.Path) -> str:
+def get_git_info(fn: pathlib.Path) -> Dict[str, Any]:
     """Get the git hash and other info for the repository that ``fn`` is in."""
     if git is None:
         raise RuntimeError("gitpython not installed")
@@ -152,13 +165,16 @@ def get_git_info(fn: pathlib.Path) -> str:
     ]
     repo_slugs = [_to_repo_slug(url) for url in urls]
     head_sha = repo.head.commit.hexsha
-    try:
-        desc = repo.git.describe("--contains", head_sha)
-    except git.GitCommandError:
-        desc = repo.git.describe("--always", "--tags")
+    if repo.git is not None:
+        try:
+            desc = repo.git.describe("--contains", head_sha)
+        except git.GitCommandError:
+            desc = repo.git.describe("--always", "--tags")
+    else:
+        desc = "unknown"
 
     return {
-        "describe": desc,
+        "describe": desc or "unknown",
         "sha": head_sha,
         "repo_slug": repo_slugs[0] if repo_slugs else None,
         "repo_slugs": repo_slugs,
@@ -169,7 +185,7 @@ def get_git_info(fn: pathlib.Path) -> str:
     }
 
 
-def project_to_dict(path: str) -> dict:
+def project_to_dict(path: parser.AnyPath) -> dict:
     """
     Create a user/template-facing dictionary of project information.
 
@@ -285,27 +301,64 @@ def get_symbols(plc) -> Generator[parser.Symbol, None, None]:
         yield symbol
 
 
+def get_symbols_by_type(plc: parser.Plc) -> Dict[str, List[parser.Symbol]]:
+    """Get symbols for the PLC."""
+    symbols = plc.find(parser.Symbol, recurse=False)
+    return parser.separate_by_classname(symbols)
+
+
 @functools.lru_cache()
-def get_motors(plc) -> list:
-    """Get motor symbols for the PLC (non-pointer DUT_MotionStage)."""
-    symbols = get_symbols(plc)
+def get_motors(plc: parser.Plc) -> list:
+    """Get pragma'd motor symbols for the PLC (non-pointer DUT_MotionStage)."""
+    symbols = get_symbols_by_type(plc)
     return [
-        mot for mot in symbols['Symbol_DUT_MotionStage']
-        if not mot.is_pointer
+        stage
+        for stage in symbols.get("Symbol_DUT_MotionStage", [])
+        if not stage.is_pointer and pragmas.has_pragma(stage)
     ]
 
 
-@functools.lru_cache()
-def get_plc_records(plc: parser.Plc,
-                    dbd: Optional[str] = None,
-                    ) -> Tuple[List[EPICSRecord], List[Exception]]:
+def get_plc_by_name(
+    projects: Dict[parser.AnyPath, parser.TcSmProject],
+    plc_name: str
+) -> Tuple[Optional[parser.TcSmProject], Optional[parser.Plc]]:
     """
-    Get EPICS records generated from a specific PLC.
+    Get a Plc instance by name.
+
+    Parameters
+    ----------
+    projects : Dict[Path, parser.TcSmProject]
+        The projects to search, as provided by pytmc template.
+    plc_name : str
+        The name of the PLC to search for.
 
     Returns
     -------
-    records : list of EPICSRecord
-        Records generated.
+    project : parser.TcSmProject or None
+        The project containing the PLC.
+    plc : parser.Plc or None
+        The PLC instance.
+    """
+    for _, project in projects.items():
+        for plc in project.plcs:
+            if plc.name == plc_name:
+                return project, plc
+
+    return None, None
+
+
+@functools.lru_cache()
+def get_plc_record_packages(
+    plc: parser.Plc,
+    dbd: Optional[str] = None,
+) -> Tuple[List[RecordPackage], List[Exception]]:
+    """
+    Get EPICS record packages generated from a specific PLC.
+
+    Returns
+    -------
+    records : list of RecordPackage
+        Record packages generated.
 
     exceptions : list of Exception
         Any exceptions raised during the generation process.
@@ -324,13 +377,7 @@ def get_plc_records(plc: parser.Plc,
         )
         return None, None
 
-    records = [
-        record
-        for package in packages
-        for record in package.records
-    ]
-
-    return records, exceptions
+    return packages, exceptions
 
 
 @functools.lru_cache()
@@ -344,7 +391,7 @@ def get_nc(project: parser.TopLevelProject) -> parser.NC:
 
 
 @functools.lru_cache()
-def get_data_types(project) -> List[dict]:
+def get_data_types(project: parser.TwincatItem) -> List[dict]:
     """Get the data types container for the project."""
     data_types = getattr(project, 'DataTypes', [None])[0]
     if data_types is not None:
@@ -361,7 +408,7 @@ def get_boxes(project) -> list:
     )
 
 
-def _clean_link(link):
+def _clean_link(link: parser.Link):
     """Clean None from links for easier displaying."""
     link.a = tuple(value or '' for value in link.a)
     link.b = tuple(value or '' for value in link.b)
@@ -369,9 +416,78 @@ def _clean_link(link):
 
 
 @functools.lru_cache()
-def get_links(project) -> list:
+def get_links(project: parser.TwincatItem) -> list:
     """Get links contained in the project or PLC."""
     return list(_clean_link(link) for link in project.find(parser.Link))
+
+
+def generate_records(
+    plc: parser.Plc,
+    path: Optional[parser.AnyPath] = None,
+    dbd: Optional[parser.AnyPath] = None,
+    allow_errors: bool = False,
+    write_archive_file: bool = True,
+) -> Tuple[List[str], Dict[str, Any]]:
+    """
+    Generate records from ``plc`` writing to ``path``.
+
+    Optionally lint with ``dbd``.
+
+    Parameters
+    ----------
+    plc : parser.Plc
+
+    path : AnyPath, optional
+        Defaults to {{plc.name}}.db
+
+    dbd : parser.AnyPath, optional
+        Lint the generated database file with the provided dbd.
+
+    allow_errors : bool, optional
+        Allow errors when generating the .db file.
+
+    write_archive_file : bool, optional
+        Write archive file to {{plc.name}}.archive
+
+    Returns
+    -------
+    filenames : list of str
+        Database filenames.
+    records : Dict[str, RecordPackage]
+        Records by name.
+    """
+    if plc.tmc is None:
+        return [], {}
+
+    packages, exceptions = get_plc_record_packages(plc, dbd=dbd)
+    if exceptions and not allow_errors:
+        logger.exception(
+            'Linter errors - failed to create database. To create the database'
+            ' ignoring these errors, use the flag `--allow-errors`'
+        )
+        sys.exit(1)
+
+    db_string = "\n\n".join(package.render() or "" for package in packages)
+
+    if path is None:
+        path = f"{plc.name}.db"
+        archive_path = f"{plc.name}.archive"
+    else:
+        archive_path = f"{path}.archive"
+
+    with open(path, "wt") as fp:
+        fp.write(db_string)
+
+    if write_archive_file:
+        with open(archive_path, "wt") as fp:
+            fp.write('\n'.join(generate_archive_settings(packages)))
+
+    by_pvname = {
+        record.pvname: record
+        for package in packages
+        for record in package.records
+    }
+    return [str(path)], by_pvname
 
 
 @functools.lru_cache()
@@ -402,9 +518,11 @@ def get_linter_results(plc: parser.Plc) -> dict:
     }
 
 
-def config_to_pragma(config: dict,
-                     skip_desc: bool = True,
-                     skip_pv: bool = True) -> Tuple[str, str]:
+def config_to_pragma(
+    config: dict,
+    skip_desc: bool = True,
+    skip_pv: bool = True
+) -> Generator[Tuple[str, str], None, None]:
     """
     Convert a configuration dictionary into a single pragma string.
 
@@ -445,7 +563,7 @@ def config_to_pragma(config: dict,
 
 
 @functools.lru_cache()
-def get_library_versions(plc: parser.Plc) -> List[dict]:
+def get_library_versions(plc: parser.Plc) -> Dict[str, Dict[str, Any]]:
     """Get library version information for the given PLC."""
     def find_by_name(cls_name):
         try:
@@ -467,12 +585,16 @@ def get_library_versions(plc: parser.Plc) -> List[dict]:
 
             versions[info['name']][category] = info
 
-    return dict(versions)
+    return versions
 
 
-def render_template(template: str, context: dict,
-                    trim_blocks=True, lstrip_blocks=True,
-                    **env_kwargs):
+def render_template(
+    template: str,
+    context: dict,
+    trim_blocks=True,
+    lstrip_blocks=True,
+    **env_kwargs
+):
     """
     One-time-use jinja environment + template rendering helper.
     """
@@ -489,6 +611,8 @@ def render_template(template: str, context: dict,
 
 helpers = [
     config_to_pragma,
+    generate_records,
+    get_symbols_by_type,
     get_symbols,
     get_motors,
     get_nc,
@@ -497,6 +621,7 @@ helpers = [
     get_links,
     get_linter_results,
     get_library_versions,
+    get_plc_by_name,
     parser.get_data_type_by_reference,
     parser.get_pou_call_blocks,
     parser.separate_by_classname,
@@ -514,10 +639,36 @@ def get_render_context() -> dict:
     """Jinja template context dictionary - helper functions."""
     context = {func.__name__: func for func in helpers}
     context['types'] = parser.TWINCAT_TYPES
+    context['pytmc_version'] = pytmc_version
     return context
 
 
-def main(projects, template=sys.stdin, debug: bool = False) -> Optional[str]:
+def _split_macro(macro: str) -> Tuple[str, str]:
+    """
+    Split a macro of the form NAME=VALUE into ("NAME", "VALUE").
+
+    Parameters
+    ----------
+    macro : str
+        The raw macro string.
+
+    Returns
+    -------
+    name : str
+    value : str
+    """
+    parts = macro.split("=", 1)
+    if len(parts) != 2:
+        raise ValueError(f"Macro not in the format ``NAME=VALUE``: {macro!r}")
+    return tuple(parts)
+
+
+def main(
+    projects: List[parser.AnyPath],
+    template=sys.stdin,
+    macros: Union[List[str], Dict[str, str], None] = None,
+    debug: bool = False
+) -> Optional[str]:
     """
     Render a template based on a TwinCAT3 project, or XML-format file such as
     TMC.
@@ -534,6 +685,11 @@ def main(projects, template=sys.stdin, debug: bool = False) -> Optional[str]:
         Open a debug session after rendering with IPython.
     """
 
+    macros = macros or {}
+    if not isinstance(macros, dict):
+        macros = dict(_split_macro(macro) for macro in macros)
+
+    logger.debug("Macros: %s", macros)
     if template is sys.stdin:
         # Check if it's an interactive user to warn them what we're doing:
         is_tty = os.isatty(sys.stdin.fileno())
@@ -552,7 +708,7 @@ def main(projects, template=sys.stdin, debug: bool = False) -> Optional[str]:
     try:
         template_args = get_render_context()
         template_args.update(projects_to_dict(*projects))
-
+        template_args.update(**macros)
         rendered = render_template(template_text, template_args)
     except Exception as ex:
         stashed_exception = ex
