@@ -93,10 +93,15 @@ def build_arg_parser(argparser=None):
 
     argparser.add_argument(
         '-t', '--template',
-        dest='template',
-        type=argparse.FileType(mode='r'),
-        help='Template filename (default: standard input)',
-        default='-',
+        type=str,
+        dest='templates',
+        required=False,
+        action="append",
+        help=(
+            f"Template filename with optional output filename. "
+            f"In the form ``input_filename[{os.pathsep}output_filename]``."
+            f"Defaults to '-' (standard input -> standard output)."
+        ),
     )
 
     argparser.add_argument(
@@ -672,12 +677,12 @@ def _split_macro(macro: str) -> Tuple[str, str]:
 
 def main(
     projects: List[parser.AnyPath],
-    template=sys.stdin,
+    templates: Optional[Union[List[str], str]] = None,
     macros: Union[List[str], Dict[str, str], None] = None,
-    debug: bool = False
-) -> Optional[str]:
+    debug: bool = False,
+) -> Dict[str, str]:
     """
-    Render a template based on a TwinCAT3 project, or XML-format file such as
+    Render template(s) based on a TwinCAT3 project, or XML-format file such as
     TMC.
 
     Parameters
@@ -685,8 +690,10 @@ def main(
     projects : list
         List of projects or TwinCAT project files (.sln, .tsproj, .tmc, etc.)
 
-    template : file-like object, optional
-        Read the template from the provided file or standard input (default).
+    templates : str or list of str, optional
+        Template filename (default: standard input) to output filename
+        in the form ``input_filename[{os.pathsep}output_filename]``
+        Defaults to '-' (standard input -> standard output)
 
     debug : bool, optional
         Open a debug session after rendering with IPython.
@@ -697,44 +704,60 @@ def main(
         macros = dict(_split_macro(macro) for macro in macros)
 
     logger.debug("Macros: %s", macros)
-    if template is sys.stdin:
-        # Check if it's an interactive user to warn them what we're doing:
-        is_tty = os.isatty(sys.stdin.fileno())
-        if is_tty:
-            logger.warning('Reading template from standard input...')
-            logger.warning('Press ^D on a blank line when done.')
+    if not templates:
+        templates = ["-"]
+    if isinstance(templates, str):
+        templates = [templates]
 
-        template_text = sys.stdin.read()
-        if is_tty:
-            logger.warning('Read template from standard input (len=%d)',
-                           len(template_text))
-    else:
-        template_text = template.read()
+    all_rendered = {}
+    for template in templates:
+        input_filename, output_filename = template.split(os.pathsep, 1)
+        if input_filename == "-":
+            # Check if it's an interactive user to warn them what we're doing:
+            is_tty = os.isatty(sys.stdin.fileno())
+            if is_tty:
+                logger.warning('Reading template from standard input...')
+                logger.warning('Press ^D on a blank line when done.')
 
-    stashed_exception = None
-    try:
-        template_args = get_render_context()
-        template_args.update(projects_to_dict(*projects))
-        template_args.update(**macros)
-        rendered = render_template(template_text, template_args)
-    except Exception as ex:
-        stashed_exception = ex
-        rendered = None
+            template_text = sys.stdin.read()
+            if is_tty:
+                logger.warning('Read template from standard input (len=%d)',
+                               len(template_text))
+        else:
+            with open(input_filename, "rt") as fp:
+                template_text = fp.read()
 
-    if not debug:
-        if stashed_exception is not None:
-            raise stashed_exception
-        print(rendered)
-    else:
-        message = [
-            'Variables: projects, template_text, rendered, template_args. '
-        ]
-        if stashed_exception is not None:
-            message.append(f'Exception: {type(stashed_exception)} '
-                           f'{stashed_exception}')
+        stashed_exception = None
+        try:
+            template_args = get_render_context()
+            template_args.update(projects_to_dict(*projects))
+            template_args.update(**macros)
+            rendered = render_template(template_text, template_args)
+        except Exception as ex:
+            stashed_exception = ex
+            rendered = None
 
-        util.python_debug_session(
-            namespace=locals(),
-            message='\n'.join(message)
-        )
-    return rendered
+        if not debug:
+            if stashed_exception is not None:
+                raise stashed_exception
+
+            if output_filename:
+                with open(output_filename, "wt") as fp:
+                    print(rendered, file=fp)
+            else:
+                print(rendered)
+        else:
+            message = [
+                'Variables: projects, template_text, rendered, template_args. '
+            ]
+            if stashed_exception is not None:
+                message.append(f'Exception: {type(stashed_exception)} '
+                               f'{stashed_exception}')
+
+            util.python_debug_session(
+                namespace=locals(),
+                message='\n'.join(message)
+            )
+        all_rendered[input_filename] = rendered
+
+    return all_rendered
