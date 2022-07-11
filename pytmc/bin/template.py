@@ -197,7 +197,7 @@ def get_git_info(fn: pathlib.Path) -> Dict[str, Any]:
     }
 
 
-def project_to_dict(path: parser.AnyPath) -> dict:
+def project_to_dict(path: parser.AnyPath) -> Dict[str, Any]:
     """
     Create a user/template-facing dictionary of project information.
 
@@ -250,7 +250,7 @@ def project_to_dict(path: parser.AnyPath) -> dict:
     }
 
 
-def projects_to_dict(*paths) -> dict:
+def projects_to_dict(*paths) -> Dict[str, Dict[pathlib.Path, Any]]:
     """
     Create a user/template-facing dictionary of project information.
 
@@ -273,7 +273,7 @@ def projects_to_dict(*paths) -> dict:
     return result
 
 
-def get_jinja_filters(**user_config):
+def get_jinja_filters(**user_config) -> Dict[str, callable]:
     """All jinja filters."""
 
     if 'delim' not in user_config:
@@ -282,13 +282,13 @@ def get_jinja_filters(**user_config):
     if 'prefix' not in user_config:
         user_config['prefix'] = 'PREFIX'
 
-    def epics_prefix(obj):
+    def epics_prefix(obj: parser.TwincatItem) -> str:
         return stcmd.get_name(obj, user_config)[0]
 
-    def epics_suffix(obj):
+    def epics_suffix(obj: parser.TwincatItem) -> str:
         return stcmd.get_name(obj, user_config)[1]
 
-    def pragma(obj, key, default=''):
+    def pragma(obj: parser.TwincatItem, key: str, default: str = "") -> str:
         item_and_config = pragmas.expand_configurations_from_chain([obj])
         if item_and_config:
             item_to_config = dict(item_and_config[0])
@@ -296,7 +296,7 @@ def get_jinja_filters(**user_config):
             return config.get(key, default)
         return default
 
-    def title_fill(text, fill_char):
+    def title_fill(text: str, fill_char: str) -> str:
         return fill_char * len(text)
 
     return {
@@ -320,7 +320,7 @@ def get_symbols_by_type(plc: parser.Plc) -> Dict[str, List[parser.Symbol]]:
 
 
 @functools.lru_cache()
-def get_motors(plc: parser.Plc) -> list:
+def get_motors(plc: parser.Plc) -> List[parser.Symbol_DUT_MotionStage]:
     """Get pragma'd motor symbols for the PLC (non-pointer DUT_MotionStage)."""
     symbols = get_symbols_by_type(plc)
     return [
@@ -412,7 +412,7 @@ def get_data_types(project: parser.TwincatItem) -> List[dict]:
 
 
 @functools.lru_cache()
-def get_boxes(project) -> list:
+def get_boxes(project) -> List[parser.Box]:
     """Get boxes contained in the project."""
     return list(
         sorted(project.find(parser.Box),
@@ -428,7 +428,7 @@ def _clean_link(link: parser.Link):
 
 
 @functools.lru_cache()
-def get_links(project: parser.TwincatItem) -> list:
+def get_links(project: parser.TwincatItem) -> List[parser.Link]:
     """Get links contained in the project or PLC."""
     return list(_clean_link(link) for link in project.find(parser.Link))
 
@@ -503,7 +503,7 @@ def generate_records(
 
 
 @functools.lru_cache()
-def get_linter_results(plc: parser.Plc) -> dict:
+def get_linter_results(plc: parser.Plc) -> Dict[str, Any]:
     """
     Lint the provided PLC code pragmas.
 
@@ -647,7 +647,7 @@ helpers = [
 ]
 
 
-def get_render_context() -> dict:
+def get_render_context() -> Dict[str, Any]:
     """Jinja template context dictionary - helper functions."""
     context = {func.__name__: func for func in helpers}
     context['types'] = parser.TWINCAT_TYPES
