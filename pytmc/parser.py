@@ -106,9 +106,30 @@ def element_to_class_name(
     tag = strip_namespace(element.tag)
     extension = os.path.splitext(element.base)[-1].lower()
 
+    # `Project` is an overloaded tag in TwinCAT XML files. It can be:
+    # * A `TcSmProject`
+    #     - The `.tsproj` root node
+    # * A top-level project -> `TopLevelProject`
+    #     - This contains PLCs, motion, safety, IO
+    #     - Found in `.tsproj` under `TcSmProject`
+    # * An embedded PLC project -> `Plc`
+    #     - Found in `.tsproj`
+    #     - `Project` inside a `Plc` node underneath a `TopLevelProject`
+    # * An external PLC project reference -> `Plc`
+    #     - Marked with "File" or "PrjFilePath" attributes
+    #     - Found under `TcSmProject` / `TopLevelProject` / `Plc`
+    # * The top-level of an external `.plcproj` project -> `PlcProject`
+    #     - Found in the `.plcproj` file referenced via `TcSmProject` /
+    #     `TopLevelProject` / `Plc`
+    # * A safety PLC (found under a `Safety` node) -> `SafetyPlc`
+    #     - Found under `TcSmProject` / `TopLevelProject` / `Safety`
+    # * A give-up fallback `Project` container that is pretty much ignored in
+    #   pytmc
     if tag == 'Project':
         if isinstance(parent, TcSmProject):
             return 'TopLevelProject', TwincatItem
+        if isinstance(parent, Safety):
+            return 'SafetyPlc', TwincatItem
         if 'File' in element.attrib:
             # File to be loaded will contain PrjFilePath
             return 'Plc', TwincatItem
@@ -359,7 +380,6 @@ class TwincatItem:
         -------
         item : TwincatItem
         '''
-
         classname, base = element_to_class_name(element, parent=parent)
 
         try:
@@ -498,7 +518,12 @@ class Link(TwincatItem):
 
 
 class TopLevelProject(TwincatItem):
-    '[tsproj] Containing Io, System, Motion, TopLevelPlc, etc.'
+    """
+    [tsproj] A top-level project.
+
+    Contains Io, System, Motion, Safety, TopLevelPlc, etc.
+    Found in ``.tsproj`` under ``TcSmProject``.
+    """
 
     System: List["System"]
 
@@ -521,11 +546,20 @@ class TopLevelProject(TwincatItem):
 
 
 class PlcProject(TwincatItem):
-    ...
+    """
+    The top-level of an external ``.plcproj`` project -> ``PlcProject``.
+
+    Found in the ``.plcproj`` file referenced via ``TcSmProject`` /
+    ``TopLevelProject`` / ``Plc``
+    """
 
 
 class TcSmProject(TwincatItem):
-    '[tsproj] A top-level TwinCAT tsproj'
+    """
+    [tsproj] A top-level TwinCAT tsproj
+
+    The ``.tsproj`` root node.
+    """
     def post_init(self):
         self.top_level_plc, = list(self.find(TopLevelPlc, recurse=False))
 
@@ -665,7 +699,15 @@ class TopLevelPlc(TwincatItem):
 
 
 class Plc(TwincatItem):
-    '[tsproj] A project which contains Plc, Io, Mappings, etc.'
+    """
+    [tsproj] A project which contains Plc, Io, Mappings, etc.
+
+    This can be an embedded ``Plc`` node in a ``TopLeveLProject`` or an
+    external PLC project reference in a ``Plc`` node marked with "File" or
+    "PrjFilePath" attributes.
+
+    These can be found under ``TcSmProject`` / ``TopLevelProject`` / ``Plc``.
+    """
     _load_path_hint = pathlib.Path('_Config') / 'PLC'
     instance: Optional["Instance"]
 
@@ -791,6 +833,19 @@ class Instance(_TwincatProjectSubItem):
             int(pou.attributes["Prio"]): pou.attributes["OTCID"]
             for pou in getattr(task_pou_oids, "TaskPouOid", [])
         }
+
+
+class Safety(TwincatItem):
+    '[tsproj] A container for a safety PLC project (SafetyPlc)'
+
+
+class SafetyPlc(TwincatItem):
+    """
+    [tsproj] A safety PLC project
+
+    Found under ``TcSmProject`` / ``TopLevelProject`` / ``Safety``.
+    """
+    _load_path_hint = pathlib.Path('_Config') / 'SPLC'
 
 
 class Compile(TwincatItem):
