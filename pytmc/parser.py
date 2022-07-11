@@ -161,7 +161,7 @@ def _determine_path(base_path, name, class_hint):
 
 
 class TwincatItem:
-    _load_path_hint: str = ''
+    _load_path_hint: Union[str, pathlib.Path] = ''
     _lazy_load: bool = False
     _children: List['TwincatItem']
     attributes: Dict[str, str]
@@ -500,6 +500,8 @@ class Link(TwincatItem):
 class TopLevelProject(TwincatItem):
     '[tsproj] Containing Io, System, Motion, TopLevelPlc, etc.'
 
+    System: List["System"]
+
     @property
     def ams_id(self):
         '''
@@ -665,11 +667,16 @@ class TopLevelPlc(TwincatItem):
 class Plc(TwincatItem):
     '[tsproj] A project which contains Plc, Io, Mappings, etc.'
     _load_path_hint = pathlib.Path('_Config') / 'PLC'
+    instance: Optional["Instance"]
 
     def post_init(self):
-        self.link_name = (self.Instance[0].name
-                          if hasattr(self, 'Instance')
-                          else self.name)
+        instances = getattr(self, "Instance", None)
+        if instances is not None:
+            self.instance, = instances
+            self.link_name = self.instance.name
+        else:
+            self.instance = None
+            self.link_name = self.name
 
         self.namespaces = {}
         self.project_path = self.get_relative_path(
@@ -714,7 +721,7 @@ class Plc(TwincatItem):
         self.namespaces.update(self.dut_by_name)
 
     @property
-    def links(self):
+    def links(self) -> List[Link]:
         return [link
                 for mapping in self.Mappings
                 for link in mapping.find(Link, recurse=False)
@@ -766,6 +773,24 @@ class Plc(TwincatItem):
             for item in source_items
             if hasattr(item, 'get_source_code')
         )
+
+
+class Instance(_TwincatProjectSubItem):
+    """[tsproj] PLC Instance."""
+    TaskPouOids: List[TwincatItem]
+
+    @property
+    def task_pous(self) -> Dict[int, str]:
+        """Index to Object ID."""
+        try:
+            task_pou_oids, = self.TaskPouOids
+        except (AttributeError, ValueError):
+            return {}
+
+        return {
+            int(pou.attributes["Prio"]): pou.attributes["OTCID"]
+            for pou in getattr(task_pou_oids, "TaskPouOid", [])
+        }
 
 
 class Compile(TwincatItem):
@@ -1492,6 +1517,8 @@ class ST(_TwincatProjectSubItem):
 
 class Implementation(_TwincatProjectSubItem):
     '[TcDUT/TcPOU] Code implementation'
+    #: Structured text code if it exists:
+    ST: List[ST]
 
 
 class Declaration(_TwincatProjectSubItem):
@@ -1500,10 +1527,10 @@ class Declaration(_TwincatProjectSubItem):
 
 class DUT(_TwincatProjectSubItem):
     '[TcDUT] Data unit type (DUT)'
-    Declaration: list
+    Declaration: List[Declaration]
 
     @property
-    def declaration(self):
+    def declaration(self) -> str:
         'The declaration code; i.e., the top portion in visual studio'
         return self.Declaration[0].text
 
@@ -1513,6 +1540,9 @@ class DUT(_TwincatProjectSubItem):
 
 
 class _POUMember:
+    Declaration: List[Declaration]
+    Implementation: List[Implementation]
+
     @property
     def pou(self) -> Optional[POU]:
         """The associated POU."""
@@ -1738,6 +1768,49 @@ class POU(_TwincatProjectSubItem):
     def variables(self):
         'A dictionary of variables defined in the POU'
         return variables_from_declaration(self.declaration)
+
+
+class Task(TwincatItem):
+    """
+    [tsproj] Task instance defined at the project-level (not per PLC).
+
+    ``TcSmProject/TopLevelProject/System/Tasks/Task``
+    """
+    parent: "Tasks"
+
+    @property
+    def array_index(self) -> int:
+        """Array index in SystemInfoVarList._TaskInfo."""
+        return self.parent.by_priority.index(self) + 1
+
+    @property
+    def priority(self) -> int:
+        """Task priority which also defines the task index."""
+        return int(self.attributes.get("Priority", -1))
+
+
+class Tasks(TwincatItem):
+    """
+    [tsproj] Task container.
+
+    ``TcSmProject/TopLevelProject/System/Tasks``
+    """
+
+    Tasks: List[Task]
+    #: Tasks by priority.
+    by_priority: List[Task]
+
+    def post_init(self):
+        def by_priority(task: Task) -> int:
+            return task.priority
+
+        self.by_priority = sorted(
+            [
+                task
+                for task in getattr(self, "Task", [])
+            ],
+            key=by_priority
+        )
 
 
 class AxisPara(TwincatItem):
