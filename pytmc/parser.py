@@ -4,6 +4,7 @@ TMC, XTI, tsproj parsing utilities
 from __future__ import annotations
 
 import collections
+import functools
 import logging
 import os
 import pathlib
@@ -2387,6 +2388,7 @@ def separate_by_classname(
     return dict(d)
 
 
+@functools.lru_cache(maxsize=2048)
 def strip_namespace(tag: str) -> str:
     'Strip off {{namespace}} from: {{namespace}}tag'
     return lxml.etree.QName(tag).localname
