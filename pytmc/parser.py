@@ -468,6 +468,11 @@ class _TwincatProjectSubItem(TwincatItem):
     '[XTI/TMC/...] A base class for items that appear in virtual PLC projects'
 
     @property
+    def top_level_project(self) -> Optional[TopLevelProject]:
+        'The top-level project.'
+        return self.find_ancestor(TopLevelProject)
+
+    @property
     def plc(self) -> Optional[Plc]:
         'The nested project (virtual PLC project) associated with the item'
         return self.find_ancestor(Plc)
@@ -526,16 +531,29 @@ class TopLevelProject(TwincatItem):
     """
 
     System: List["System"]
+    TopLevelPlc: List["TopLevelPlc"]
 
     @property
-    def ams_id(self):
+    def top_level_plc(self) -> Optional["TopLevelPlc"]:
+        """
+        The top-level PLC associated with the project.
+
+        This may contain one or more PLC projects.
+        """
+        try:
+            return self.TopLevelPlc[0]
+        except (AttributeError, ValueError):
+            return None
+
+    @property
+    def ams_id(self) -> str:
         '''
         The AMS ID of the configured target
         '''
         return self.attributes.get('TargetNetId', '')
 
     @property
-    def target_ip(self):
+    def target_ip(self) -> str:
         '''
         A guess of the target IP, based on the AMS ID
         '''
@@ -543,6 +561,24 @@ class TopLevelProject(TwincatItem):
         if ams_id.endswith('.1.1'):
             return ams_id[:-4]
         return ams_id
+
+    @property
+    def tasks(self) -> Optional[Tasks]:
+        """Tasks defined in the project."""
+        try:
+            return self.System[0].Tasks[0]
+        except (AttributeError, ValueError):
+            return None
+
+
+class System(TwincatItem):
+    """
+    [tsproj] Top-level system settings.
+
+    ```TcSmProject/TopLevelProject/System```
+    """
+    Licenses: List[TwincatItem]
+    Tasks: List[Tasks]
 
 
 class PlcProject(TwincatItem):
@@ -559,22 +595,35 @@ class TcSmProject(TwincatItem):
     [tsproj] A top-level TwinCAT tsproj
 
     The ``.tsproj`` root node.
+
+    Contains a "top_level_plc" which can contain one or more PLC projects.
     """
+
+    TopLevelProject: List[TopLevelProject]
+    top_level_project: TopLevelProject
+    top_level_plc: TopLevelPlc
+
     def post_init(self):
-        self.top_level_plc, = list(self.find(TopLevelPlc, recurse=False))
+        try:
+            self.top_level_project, = self.TopLevelProject
+        except (AttributeError, ValueError):
+            self.top_level_project = None
+            self.top_level_plc = None
+        else:
+            self.top_level_plc = self.top_level_project.top_level_plc
 
     @property
-    def plcs(self):
+    def plcs(self) -> Generator[Plc, None, None]:
         'The virtual PLC projects contained in this TcSmProject'
         yield from self.top_level_plc.projects.values()
 
     @property
-    def plcs_by_name(self):
+    def plcs_by_name(self) -> Dict[str, Plc]:
         'The virtual PLC projects in a dictionary keyed by name'
         return {plc.name: plc for plc in self.plcs}
 
     @property
-    def plcs_by_link_name(self):
+    def plcs_by_link_name(self) -> Dict[str, Plc]:
         'The virtual PLC projects in a dictionary keyed by link name'
         return {plc.link_name: plc for plc in self.plcs}
 
@@ -822,17 +871,25 @@ class Instance(_TwincatProjectSubItem):
     TaskPouOids: List[TwincatItem]
 
     @property
-    def task_pous(self) -> Dict[int, str]:
+    def task_pous(self) -> Dict[int, Tuple[str, Task]]:
         """Index to Object ID."""
         try:
-            task_pou_oids, = self.TaskPouOids
+            task_task_oids, = self.TaskPouOids
         except (AttributeError, ValueError):
             return {}
 
-        return {
-            int(pou.attributes["Prio"]): pou.attributes["OTCID"]
-            for pou in getattr(task_pou_oids, "TaskPouOid", [])
-        }
+        project_tasks = self.top_level_project.tasks.priority_to_task
+
+        def get_task_name_and_value(task: Task):
+            priority = int(task.attributes["Prio"])
+            identifier = task.attributes["OTCID"]
+            value = (identifier, project_tasks[priority])
+            return (priority, value)
+
+        return dict(
+            get_task_name_and_value(task)
+            for task in getattr(task_task_oids, "TaskPouOid", [])
+        )
 
 
 class Safety(TwincatItem):
@@ -1836,7 +1893,8 @@ class Task(TwincatItem):
     @property
     def array_index(self) -> int:
         """Array index in SystemInfoVarList._TaskInfo."""
-        return self.parent.by_priority.index(self) + 1
+        priority_list = list(self.parent.priority_to_task)
+        return priority_list.index(self.priority) + 1
 
     @property
     def priority(self) -> int:
@@ -1851,21 +1909,16 @@ class Tasks(TwincatItem):
     ``TcSmProject/TopLevelProject/System/Tasks``
     """
 
-    Tasks: List[Task]
-    #: Tasks by priority.
-    by_priority: List[Task]
+    Task: List[Task]
+    #: Unique priority to task.
+    priority_to_task: Dict[int, Task]
 
     def post_init(self):
-        def by_priority(task: Task) -> int:
-            return task.priority
-
-        self.by_priority = sorted(
-            [
-                task
-                for task in getattr(self, "Task", [])
-            ],
-            key=by_priority
-        )
+        priority_and_task = [
+            (task.priority, task)
+            for task in self.Task
+        ]
+        self.priority_to_task = dict(sorted(priority_and_task))
 
 
 class AxisPara(TwincatItem):
