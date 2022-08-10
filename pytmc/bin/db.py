@@ -10,10 +10,11 @@ import os
 import pathlib
 import sys
 from collections import defaultdict
+from typing import List, Optional, Tuple
 
 from .. import linter, parser
 from ..pragmas import find_pytmc_symbols, record_packages_from_symbol
-from ..record import generate_archive_settings
+from ..record import RecordPackage, generate_archive_settings
 
 logger = logging.getLogger(__name__)
 DESCRIPTION = __doc__
@@ -74,14 +75,33 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
     return results, db_text
 
 
-def process(tmc, *, dbd_file=None, allow_errors=False, show_error_context=True,
-            allow_no_pragma=False, debug=False):
+def process(
+    tmc: parser.TcModuleClass,
+    *,
+    dbd_file: Optional[parser.AnyPath] = None,
+    allow_errors: bool = False,
+    show_error_context: bool = True,
+    allow_no_pragma: bool = False,
+    debug: bool = False
+) -> Tuple[List[RecordPackage], List[Exception]]:
     '''
     Process a TMC
 
     Parameters
     ----------
     tmc : TcModuleClass
+        The parsed TMC file instance.
+    dbd_file : str or DbdFile, optional
+        The dbd file with which to validate
+    allow_errors : bool, optional
+        Allow processing to continue even with errors.
+    show_error_context : bool, optional
+        Show context from the database file around the error.
+    allow_no_pragma : bool, optional
+        Allow intermediate objects to not have a pytmc pragma and still regard
+        it as valid, assuming at least the first and last item have pragmas.
+    debug : bool, optional
+        Debug mode.
 
     Returns
     -------
@@ -89,6 +109,11 @@ def process(tmc, *, dbd_file=None, allow_errors=False, show_error_context=True,
         List of RecordPackage
     exceptions : list
         List of exceptions raised during parsing
+
+    Raises
+    ------
+    LinterError
+        If ``allow_errors`` is unset and an error is found.
     '''
     def _show_context_from_line(rendered, from_line):
         lines = list(enumerate(rendered.splitlines()[:from_line + 1], 1))
@@ -107,8 +132,8 @@ def process(tmc, *, dbd_file=None, allow_errors=False, show_error_context=True,
         record
         for symbol in find_pytmc_symbols(tmc, allow_no_pragma=allow_no_pragma)
         for record in record_packages_from_symbol(
-            symbol, yield_exceptions=not debug,
-            allow_no_pragma=allow_no_pragma)
+            symbol, yield_exceptions=not debug, allow_no_pragma=allow_no_pragma
+        )
     ]
 
     exceptions = [ex for ex in records
@@ -121,10 +146,20 @@ def process(tmc, *, dbd_file=None, allow_errors=False, show_error_context=True,
     if exceptions and not allow_errors:
         raise LinterError('Failed to create database')
 
-    record_names = [single_record.pvname
-                    for record_package in records if record_package.valid
-                    for single_record in record_package.records
-                    ]
+    # We removed exceptions from the record list above:
+    records: List[RecordPackage]
+
+    def by_tcname(record: RecordPackage):
+        return record.tcname
+
+    records.sort(key=by_tcname)
+
+    record_names = [
+        single_record.pvname
+        for record_package in records
+        if record_package.valid
+        for single_record in record_package.records
+    ]
 
     if len(record_names) != len(set(record_names)):
         dupes = {name: record_names.count(name)
