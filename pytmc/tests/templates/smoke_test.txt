@@ -1,0 +1,24 @@
+{% for project_path, project in projects.items() %}
+    {% set nc = get_nc(project) %}
+    {% for box in get_boxes(project) %}
+        box: {{ box.attributes["Id"] }}
+    {% endfor %}
+
+    {% for dt in get_data_types(project) %}
+        data type: {{ dt }}
+    {% endfor %}
+
+    {% for link in get_links(project) %}
+        link: {{ link.a }}
+    {% endfor %}
+
+    {% for plc in project.plcs %}
+        {% set results = get_linter_results(plc) %}
+        Pragma count: {{ results.pragma_count }}
+
+        {% for lib in get_library_versions(plc) %}
+            library: {{ lib }}
+        {% endfor %}
+
+    {% endfor %}
+{% endfor %}

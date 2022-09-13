@@ -15,6 +15,7 @@ TMC_FILES = list(TMC_ROOT.glob('*.tmc'))
 INVALID_TMC_FILES = list((TMC_ROOT / 'invalid').glob('*.tmc'))
 PROJ_ROOT = TEST_PATH / 'projects'
 TSPROJ_PROJECTS = list(str(fn) for fn in TEST_PATH.glob('**/*.tsproj'))
+TEMPLATES = TEST_PATH / 'templates'
 
 
 @pytest.fixture(scope='module')

@@ -1,0 +1,1 @@
+{% for project in projects %}{{ project }}{% endfor %}
