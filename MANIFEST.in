@@ -4,3 +4,4 @@ include README.rst
 include pytmc/templates/*
 include pytmc/_version.py
 include LICENSE
+recursive-include pytmc/tests *.txt
