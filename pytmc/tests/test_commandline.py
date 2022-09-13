@@ -1,4 +1,3 @@
-import io
 import sys
 
 import pytest
@@ -86,8 +85,7 @@ def test_code(project_filename):
 
 def test_template_basic(project_filename):
     template = '{% for project in projects %}{{ project }}{% endfor %}'
-    with io.StringIO(template) as template_fp:
-        templated = template_main([project_filename], templates=template_fp)
+    templated = template_main([project_filename], templates=[template])
 
     print('templated', templated)
     assert templated == project_filename
@@ -127,7 +125,6 @@ def test_template_basic(project_filename):
     ],
 )
 def test_template_smoke(project_filename, template):
-    with io.StringIO(template) as template_fp:
-        templated = template_main([project_filename], templates=template_fp)
+    templated = template_main([project_filename], templates=[template])
 
     print('templated', templated)
