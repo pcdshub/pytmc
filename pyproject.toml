@@ -3,9 +3,9 @@ build-backend = "setuptools.build_meta"
 requires = [ "setuptools>=45", "setuptools_scm[toml]>=6.2",]
 
 [project]
-classifiers = [ "Development Status :: 2 - Pre-Alpha", "Natural Language :: English", "Programming Language :: Python :: 3",]
+classifiers = [ "Development Status :: 5 - Production/Stable", "Natural Language :: English", "Programming Language :: Python :: 3",]
 description = "Generate Epics DB records from TwinCAT .tmc files"
-dynamic = [ "version", "readme", "dependencies", "optional-dependencies", "optional-dependencies",]
+dynamic = [ "version", "readme", "dependencies", "optional-dependencies", ]
 keywords = []
 name = "pytmc"
 requires-python = ">=3.9"
