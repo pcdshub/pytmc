@@ -2,7 +2,7 @@
  Release History
 =================
 
-v2.12.0 (2023-04-??)
+v2.12.0 (2023-04-04)
 ====================
 
 Python 3.9 is now the minimum supported version for pytmc.
