@@ -14,21 +14,17 @@ build:
   noarch: python
   script: {{ PYTHON }} -m pip install . -vv
 
-
-
 requirements:
   host:
-  - python >=3.6
+  - python >=3.9
   - pip
   run:
-  - python >=3.6
+  - python >=3.9
   - jinja2
   - lxml
   - epics-pypdb >=0.1.5
   run_constrained:
   - pyqt <5.15
-
-
 
 test:
   imports:
@@ -39,8 +35,6 @@ test:
   - pytest-qt
   - qtpy
   - pyqt
-
-
 
 about:
   doc_url: https://pcdshub.github.io/pytmc/
