@@ -420,6 +420,58 @@ def get_boxes(project) -> List[parser.Box]:
     )
 
 
+def _get_box_to_children(boxes: List[parser.Box]) -> Dict[parser.Box, List[parser.Box]]:
+    parent_to_children = {}
+
+    for box in boxes:
+        for child in box._children:
+            if isinstance(child, parser.TcSmItem):
+                child_box, = child.Box
+            elif isinstance(child, parser.Box):
+                child_box = child
+            else:
+                continue
+
+            parent_to_children.setdefault(box, []).append(child_box)
+
+    return parent_to_children
+
+
+def _get_root_boxes(parent_to_children: Dict[parser.Box, List[parser.Box]]) -> List[parser.Box]:
+    root = []
+    for box in parent_to_children:
+        for children in parent_to_children.values():
+            if box in children:
+                break
+        else:
+            root.append(box)
+    return root
+
+
+BoxHierarchy = Dict[parser.Box, "BoxHierarchy"]
+
+
+def get_box_hierarchy(project) -> BoxHierarchy:
+    """
+    Get boxes contained in the project in a hierarchical fashion.
+
+    This is in the form: ``{box: {child: grandchild: {}}}``.
+    """
+
+    def recurse_children(box: parser.Box) -> BoxHierarchy:
+        return {
+            child: recurse_children(child)
+            for child in parent_to_children.get(box, [])
+        }
+
+    boxes = get_boxes(project)
+    parent_to_children = _get_box_to_children(boxes)
+    return {
+        root: recurse_children(root)
+        for root in _get_root_boxes(parent_to_children)
+    }
+
+
 def _clean_link(link: parser.Link):
     """Clean None from links for easier displaying."""
     link.a = tuple(value or '' for value in link.a)
@@ -625,6 +677,7 @@ helpers = [
     config_to_pragma,
     generate_records,
     get_boxes,
+    get_box_hierarchy,
     get_data_types,
     get_library_versions,
     get_links,
