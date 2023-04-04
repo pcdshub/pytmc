@@ -1,50 +1,60 @@
-{% set data = load_setup_py_data() %}
+{% set package_name = "pytmc" %}
+{% set import_name = "pytmc" %}
+{% set version = load_file_regex(load_file=os.path.join(import_name, "_version.py"), regex_pattern=".*version = '(\S+)'").group(1) %}
 
 package:
-  name: pytmc
-  version : {{ data.get('version') }}
+  name: {{ package_name }}
+  version: {{ version }}
 
 source:
   path: ..
 
 build:
-  noarch: python
   number: 0
-  script: "{{ PYTHON }} -m pip install . -vv"
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv
+
+
 
 requirements:
   host:
-    - python >=3.6
-    - pip
+  - python >=3.6
+  - pip
   run:
-    - python >=3.6
-    - jinja2
-    - lxml
-    - epics-pypdb >=0.1.5
+  - python >=3.6
+  - jinja2
+  - lxml
+  - epics-pypdb >=0.1.5
   run_constrained:
-    - pyqt <5.15
+  - pyqt <5.15
+
+
 
 test:
   imports:
-    - pytmc
+  - pytmc
   requires:
-    - coverage
-    - pytest
-    - pytest-qt
-    - qtpy
-    - pyqt
+  - coverage
+  - pytest
+  - pytest-qt
+  - qtpy
+  - pyqt
+
+
 
 about:
-  home: https://github.com/pcdshub/pytmc
   doc_url: https://pcdshub.github.io/pytmc/
+  home: https://github.com/pcdshub/pytmc
   license: SLAC Open
   license_family: Other
   license_file: LICENSE
-  summary: 'Generate EPICS IOCs and records from Beckhoff TwinCAT projects'
+  summary: Generate EPICS IOCs and records from Beckhoff TwinCAT projects
+
+
 
 extra:
   recipe-maintainers:
-    - klauer
-    - hhslepicka
-    - zllentz
-    - n-wbrown
+  - klauer
+  - hhslepicka
+  - zllentz
+  - n-wbrown
