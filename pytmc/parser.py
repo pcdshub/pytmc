@@ -11,7 +11,7 @@ import pathlib
 import re
 import types
 import typing
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Union
 from collections.abc import Generator
 
 import lxml

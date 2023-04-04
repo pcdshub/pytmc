@@ -10,7 +10,7 @@ import os
 import pathlib
 import sys
 from collections import defaultdict
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from .. import linter, parser
 from ..pragmas import find_pytmc_symbols, record_packages_from_symbol

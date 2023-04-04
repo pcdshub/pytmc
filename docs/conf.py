@@ -33,7 +33,6 @@ module_path = os.path.join(
 )
 sys.path.insert(0,module_path)
 '''
-import pytmc
 # sys.path.insert(0, os.path.abspath('.'))
 
 

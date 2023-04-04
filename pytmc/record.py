@@ -3,7 +3,7 @@ Record generation and templating
 """
 import logging
 from collections import ChainMap, OrderedDict
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import jinja2
 

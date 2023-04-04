@@ -7,7 +7,7 @@ import itertools
 import logging
 import math
 import re
-from typing import Type, Union
+from typing import Union
 from collections.abc import Generator
 
 from . import parser
