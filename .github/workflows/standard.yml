@@ -1,0 +1,24 @@
+name: PCDS Standard Testing
+
+on:
+  push:
+  pull_request:
+  release:
+    types:
+      - published
+
+jobs:
+  standard:
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-standard.yml@master
+    with:
+      # The workflow needs to know the package name.  This can be determined
+      # automatically if the repository name is the same as the import name.
+      package-name: "pytmc"
+      # Extras that will be installed for both conda/pip:
+      testing-extras: ""
+      # Extras to be installed only for conda-based testing:
+      conda-testing-extras: "pyqt=5 qtpy"
+      # Extras to be installed only for pip-based testing:
+      pip-testing-extras: "PyQt5"
+      # Set if using setuptools-scm for the conda-build workflow
+      use-setuptools-scm: true
