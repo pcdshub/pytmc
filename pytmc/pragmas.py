@@ -7,8 +7,8 @@ import itertools
 import logging
 import math
 import re
-from typing import Union
 from collections.abc import Generator
+from typing import Union
 
 from . import parser
 from .record import RecordPackage

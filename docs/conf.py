@@ -18,23 +18,14 @@
 #
 import os
 import sys
-module_path = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    os.pardir,
-    'pytmc'
-)
-sys.path.insert(0,module_path)
-'''
+
 module_path = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     os.pardir,
     'pytmc',
-
 )
-sys.path.insert(0,module_path)
-'''
-# sys.path.insert(0, os.path.abspath('.'))
 
+sys.path.insert(0, module_path)
 
 # -- General configuration ------------------------------------------------
 
@@ -186,6 +177,3 @@ texinfo_documents = [
      author, 'pytmc', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-

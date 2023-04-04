@@ -153,7 +153,7 @@
                 <Name>rPRESS</Name>
                 <Type>REAL</Type>
                 <Comment><![CDATA[ A general gauge structure is used to make the rest of the interlocking simpler. There are some parameters for cold cathodes that are not used by pirani.
-These features aren't disabled, they just aren't used, think child/parent classes. 
+These features aren't disabled, they just aren't used, think child/parent classes.
  ]]></Comment>
                 <BitSize>32</BitSize>
                 <BitOffs>0</BitOffs>
@@ -192,7 +192,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
                         <Name>pytmc</Name>
                         <Value>
     pv: PRESS_OK;
-	field: ZNAM PRESS NOT OK; 
+	field: ZNAM PRESS NOT OK;
 	field: ONAM PRESS OK;
 	io: i;
     </Value>
@@ -273,7 +273,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
                         <Name>pytmc</Name>
                         <Value>
     pv: DISC_ACTIVE;
-	field: ZNAM Discharge not active; 
+	field: ZNAM Discharge not active;
 	field: ONAM Discharge Active;
 	io: i;
     </Value>
@@ -1442,7 +1442,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
         <DataType>
             <Name Namespace="L2Si_Vacuum_Library.Tc2_Utilities">FB_MemRingBuffer</Name>
             <Comment><![CDATA[ 	This function block implements ring buffer fifo functionality.
-	A_AddTail adds new entry, 
+	A_AddTail adds new entry,
 	A_GetHead gets first (oldest) entry
 	A_RemoveHead gets and removes first (oldest) entry. Use A_Reset to clear all fifo data. ]]></Comment>
             <BitSize>768</BitSize>
@@ -1683,7 +1683,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
         <DataType>
             <Name Namespace="L2Si_Vacuum_Library.Tc2_Utilities">FB_StringRingBuffer</Name>
             <Comment><![CDATA[ 	This function block implements string ring buffer fifo functionality.
-	A_AddTail adds new string. 
+	A_AddTail adds new string.
 	A_GetHead gets first (oldest) string.
 	A_RemoveHead gets and removes first (oldest) string. Use A_Reset to clear all fifo data. ]]></Comment>
             <BitSize>5184</BitSize>
@@ -2144,7 +2144,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
         <DataType>
             <Name Namespace="L2Si_Vacuum_Library">FB_MKS275</Name>
             <Comment><![CDATA[ This function block is used to provide protection and automatic turn on of ion gauges,
- it also manages the turn on of the AT_VAC boolean, and checks to make sure the pressure is good 
+ it also manages the turn on of the AT_VAC boolean, and checks to make sure the pressure is good
  For MKS 275 mini-convectron ]]></Comment>
             <BitSize>704</BitSize>
             <SubItem>
@@ -2160,7 +2160,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
                     <Property>
                         <Name>pytmc</Name>
                         <Value>
-    pv: 
+    pv:
 	</Value>
                     </Property>
                 </Properties>
@@ -2312,7 +2312,7 @@ These features aren't disabled, they just aren't used, think child/parent classe
         <DataType>
             <Name Namespace="L2Si_Vacuum_Library">FB_MKS500</Name>
             <Comment><![CDATA[ This function is for the Cold Cathode MKS 500 connected to Beckhoff EL terminals
- 500 Logarithmic Output Conversion, factory default configuration 
+ 500 Logarithmic Output Conversion, factory default configuration
 This function provides ILK and Set Point Protection for the Cold Cathode]]></Comment>
             <BitSize>1408</BitSize>
             <SubItem>
@@ -2340,7 +2340,7 @@ This function provides ILK and Set Point Protection for the Cold Cathode]]></Com
                     <Property>
                         <Name>pytmc</Name>
                         <Value>
-    pv: 
+    pv:
 	</Value>
                     </Property>
                 </Properties>
@@ -2546,8 +2546,8 @@ This function provides ILK and Set Point Protection for the Cold Cathode]]></Com
                     <Property>
                         <Name>pytmc</Name>
                         <Value>
-	pv: OPN_SW; 
-	field: ZNAM CLOSED; 
+	pv: OPN_SW;
+	field: ZNAM CLOSED;
 	field: ONAM OPEN;
 	io: io ;
 	</Value>
@@ -2670,7 +2670,7 @@ This function provides ILK and Set Point Protection for the Cold Cathode]]></Com
                 <Properties>
                     <Property>
                         <Name>pytmc</Name>
-                        <Value> 
+                        <Value>
 	pv: AT_VAC_SP;
 	io: o;
 	</Value>
@@ -2735,7 +2735,7 @@ This function provides ILK and Set Point Protection for the Cold Cathode]]></Com
                     <Property>
                         <Name>pytmc</Name>
                         <Value>
-	pv: AT_VAC ; 
+	pv: AT_VAC ;
 	field: ZNAM NOT AT VAC ;
 	field: ONAM AT VAC ;
 	io: i;
@@ -3195,8 +3195,8 @@ This function block also implements PMPS and EPS interlocks, as well as Fast MPS
             <SubItem>
                 <Name>xHV_ExtIlk</Name>
                 <Type>BOOL</Type>
-                <Comment><![CDATA[ Read back 
- 	i_xHVisON : BOOL; 
+                <Comment><![CDATA[ Read back
+ 	i_xHVisON : BOOL;
  Interlock ]]></Comment>
                 <BitSize>8</BitSize>
                 <BitOffs>0</BitOffs>
@@ -3324,7 +3324,7 @@ This function block also implements PMPS and EPS interlocks, as well as Fast MPS
                     <Property>
                         <Name>pytmc</Name>
                         <Value>
-    pv: 
+    pv:
 	</Value>
                     </Property>
                 </Properties>

@@ -127,8 +127,8 @@ def lint_pragma(pragma):
         raise LinterError("No pv line(s) detected in a pragma")
 
     for pvname, configs in pragmas.separate_configs_by_pv(
-                pragmas.split_pytmc_pragma(pragma_setting)
-            ):
+        pragmas.split_pytmc_pragma(pragma_setting)
+    ):
         if ' ' in pvname:
             raise LinterError(
                 f'Space found in PV name: {pvname!r} (missing delimiter?)')

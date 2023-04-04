@@ -11,8 +11,8 @@ import pathlib
 import re
 import types
 import typing
-from typing import Any, Union
 from collections.abc import Generator
+from typing import Any, Union
 
 import lxml
 import lxml.etree
@@ -631,10 +631,14 @@ class TcSmProject(TwincatItem):
 
 
 def get_data_type_by_reference(
-        ref, data_type_holders, *,
-        fallback_to_builtin=True,
-        array_info=None, reference=None, pointer=None,
-        ):
+    ref,
+    data_type_holders,
+    *,
+    fallback_to_builtin=True,
+    array_info=None,
+    reference=None,
+    pointer=None,
+):
     """Get a data type from the project, falling back to the tmc file."""
     if isinstance(ref, str):
         search_key = ref
@@ -2166,7 +2170,7 @@ class Resolution(TwincatItem):
             'vendor': vendor,
             'version': version,
             'vendor_short': vendor.split(' ')[0] if ' ' in vendor else vendor,
-         }
+        }
 
 
 class DefaultResolution(Resolution):

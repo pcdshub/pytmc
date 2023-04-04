@@ -213,7 +213,7 @@ scan_test_params = [   # default update rates:
 @pytest.mark.parametrize(
     "tc_type, sing_index, update, field_type, final_INP_OUT",
     scan_test_params
-    )
+)
 def test_input_output_scan(chain, dbd_file, tc_type, sing_index, update,
                            field_type, final_INP_OUT):
     chain.data_type = make_mock_type(tc_type, is_array=False)

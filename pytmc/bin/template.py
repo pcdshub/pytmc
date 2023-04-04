@@ -56,8 +56,8 @@ import logging
 import os
 import pathlib
 import sys
-from typing import Any, Optional, Union
 from collections.abc import Generator
+from typing import Any, Optional, Union
 
 import jinja2
 
