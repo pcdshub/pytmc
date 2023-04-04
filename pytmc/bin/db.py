@@ -83,7 +83,7 @@ def process(
     show_error_context: bool = True,
     allow_no_pragma: bool = False,
     debug: bool = False
-) -> Tuple[List[RecordPackage], List[Exception]]:
+) -> tuple[list[RecordPackage], list[Exception]]:
     '''
     Process a TMC
 
@@ -147,7 +147,7 @@ def process(
         raise LinterError('Failed to create database')
 
     # We removed exceptions from the record list above:
-    records: List[RecordPackage]
+    records: list[RecordPackage]
 
     def by_tcname(record: RecordPackage):
         return record.tcname
@@ -282,7 +282,7 @@ def build_arg_parser(parser=None):
             if namespace.no_archive_file or not os.path.exists(value.name):
                 namespace.archive_file = None
             else:
-                namespace.archive_file = open(value.name + '.archive', 'wt')
+                namespace.archive_file = open(value.name + '.archive', 'w')
             namespace.record_file = value
 
     parser.add_argument(

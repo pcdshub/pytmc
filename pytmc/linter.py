@@ -83,7 +83,7 @@ class DbdFile:
             contents = fn.read()
         else:
             self.filename = str(fn)
-            with open(fn, 'rt') as f:
+            with open(fn) as f:
                 contents = f.read()
 
         self.parsed = _yacc.parse(contents)
@@ -159,7 +159,7 @@ def lint_db(dbd, db, *, full=True, warn_ext_links=False, warn_bad_fields=True,
     results = LinterResults(args)
 
     if os.path.exists(db):
-        with open(db, 'r') as f:
+        with open(db) as f:
             db_content = f.read()
     else:
         db_content = db

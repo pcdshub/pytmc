@@ -11,7 +11,8 @@ import pathlib
 import re
 import types
 import typing
-from typing import Any, Dict, Generator, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+from collections.abc import Generator
 
 import lxml
 import lxml.etree
@@ -37,7 +38,7 @@ _TRUE_VALUES = {'true', '1'}
 def parse(
     fn: AnyPath,
     *,
-    parent: Optional[TwincatItem] = None
+    parent: TwincatItem | None = None
 ) -> TwincatItem:
     '''
     Parse a given tsproj, xti, or tmc file.
@@ -66,7 +67,7 @@ def projects_from_solution(fn, *, exclude=None):
     exclude : list or None
         Exclude certain extensions. Defaults to excluding .tcmproj
     '''
-    with open(fn, 'rt') as f:
+    with open(fn) as f:
         solution_text = f.read()
 
     if exclude is None:
@@ -87,8 +88,8 @@ def projects_from_solution(fn, *, exclude=None):
 def element_to_class_name(
     element: lxml.etree.Element,
     *,
-    parent: Optional[TwincatItem] = None
-) -> Tuple[str, typing.Type[TwincatItem]]:
+    parent: TwincatItem | None = None
+) -> tuple[str, type[TwincatItem]]:
     '''
     Determine the Python class name for an element
 
@@ -183,25 +184,25 @@ def _determine_path(base_path, name, class_hint):
 
 
 class TwincatItem:
-    _load_path_hint: Union[str, pathlib.Path] = ''
+    _load_path_hint: str | pathlib.Path = ''
     _lazy_load: bool = False
-    _children: List['TwincatItem']
-    attributes: Dict[str, str]
-    children: Optional[types.SimpleNamespace]
-    comments: List[str]
+    _children: list[TwincatItem]
+    attributes: dict[str, str]
+    children: types.SimpleNamespace | None
+    comments: list[str]
     filename: pathlib.Path
     name: str
-    parent: 'TwincatItem'
+    parent: TwincatItem
     tag: str
-    text: Optional[str]
+    text: str | None
 
     def __init__(
         self,
         element: lxml.etree.Element,
         *,
         filename: pathlib.Path,
-        parent: Optional[TwincatItem] = None,
-        name: Optional[str] = None,
+        parent: TwincatItem | None = None,
+        name: str | None = None,
     ):
         '''
         Represents a single TwinCAT project XML Element, for either tsproj,
@@ -259,7 +260,7 @@ class TwincatItem:
             parent = parent.parent
         return '/'.join(item.__class__.__name__ for item in reversed(hier))
 
-    def find_ancestor(self, cls: typing.Type[T]) -> Optional[T]:
+    def find_ancestor(self, cls: type[T]) -> T | None:
         '''
         Find an ancestor of this instance
 
@@ -286,7 +287,7 @@ class TwincatItem:
 
     def find(
         self,
-        cls: typing.Type[T],
+        cls: type[T],
         *,
         recurse: bool = True
     ) -> Generator[T, None, None]:
@@ -363,8 +364,8 @@ class TwincatItem:
     @staticmethod
     def parse(
         element: lxml.etree.Element,
-        parent: Optional[TwincatItem] = None,
-        filename: Optional[AnyPath] = None
+        parent: TwincatItem | None = None,
+        filename: AnyPath | None = None
     ) -> TwincatItem:
         '''
         Parse an XML element and return a TwincatItem
@@ -469,19 +470,19 @@ class _TwincatProjectSubItem(TwincatItem):
     '[XTI/TMC/...] A base class for items that appear in virtual PLC projects'
 
     @property
-    def top_level_project(self) -> Optional[TopLevelProject]:
+    def top_level_project(self) -> TopLevelProject | None:
         'The top-level project.'
         return self.find_ancestor(TopLevelProject)
 
     @property
-    def plc(self) -> Optional[Plc]:
+    def plc(self) -> Plc | None:
         'The nested project (virtual PLC project) associated with the item'
         return self.find_ancestor(Plc)
 
 
 class TcModuleClass(_TwincatProjectSubItem):
     '[TMC] The top-level TMC file'
-    DataTypes: List['DataTypes']
+    DataTypes: list[DataTypes]
 
     def create_data_area(self, module_index=0):
         """
@@ -531,11 +532,11 @@ class TopLevelProject(TwincatItem):
     Found in ``.tsproj`` under ``TcSmProject``.
     """
 
-    System: List["System"]
-    TopLevelPlc: List["TopLevelPlc"]
+    System: list[System]
+    TopLevelPlc: list[TopLevelPlc]
 
     @property
-    def top_level_plc(self) -> Optional["TopLevelPlc"]:
+    def top_level_plc(self) -> TopLevelPlc | None:
         """
         The top-level PLC associated with the project.
 
@@ -564,7 +565,7 @@ class TopLevelProject(TwincatItem):
         return ams_id
 
     @property
-    def tasks(self) -> Optional[Tasks]:
+    def tasks(self) -> Tasks | None:
         """Tasks defined in the project."""
         try:
             return self.System[0].Tasks[0]
@@ -578,8 +579,8 @@ class System(TwincatItem):
 
     ```TcSmProject/TopLevelProject/System```
     """
-    Licenses: List[TwincatItem]
-    Tasks: List[Tasks]
+    Licenses: list[TwincatItem]
+    Tasks: list[Tasks]
 
 
 class PlcProject(TwincatItem):
@@ -600,7 +601,7 @@ class TcSmProject(TwincatItem):
     Contains a "top_level_plc" which can contain one or more PLC projects.
     """
 
-    TopLevelProject: List[TopLevelProject]
+    TopLevelProject: list[TopLevelProject]
     top_level_project: TopLevelProject
     top_level_plc: TopLevelPlc
 
@@ -619,12 +620,12 @@ class TcSmProject(TwincatItem):
         yield from self.top_level_plc.projects.values()
 
     @property
-    def plcs_by_name(self) -> Dict[str, Plc]:
+    def plcs_by_name(self) -> dict[str, Plc]:
         'The virtual PLC projects in a dictionary keyed by name'
         return {plc.name: plc for plc in self.plcs}
 
     @property
-    def plcs_by_link_name(self) -> Dict[str, Plc]:
+    def plcs_by_link_name(self) -> dict[str, Plc]:
         'The virtual PLC projects in a dictionary keyed by link name'
         return {plc.link_name: plc for plc in self.plcs}
 
@@ -759,7 +760,7 @@ class Plc(TwincatItem):
     These can be found under ``TcSmProject`` / ``TopLevelProject`` / ``Plc``.
     """
     _load_path_hint = pathlib.Path('_Config') / 'PLC'
-    instance: Optional["Instance"]
+    instance: Instance | None
 
     def post_init(self):
         instances = getattr(self, "Instance", None)
@@ -813,7 +814,7 @@ class Plc(TwincatItem):
         self.namespaces.update(self.dut_by_name)
 
     @property
-    def links(self) -> List[Link]:
+    def links(self) -> list[Link]:
         return [link
                 for mapping in self.Mappings
                 for link in mapping.find(Link, recurse=False)
@@ -869,10 +870,10 @@ class Plc(TwincatItem):
 
 class Instance(_TwincatProjectSubItem):
     """[tsproj] PLC Instance."""
-    TaskPouOids: List[TwincatItem]
+    TaskPouOids: list[TwincatItem]
 
     @property
-    def task_pous(self) -> Dict[int, Tuple[str, Task]]:
+    def task_pous(self) -> dict[int, tuple[str, Task]]:
         """Index to Object ID."""
         try:
             task_task_oids, = self.TaskPouOids
@@ -1025,9 +1026,9 @@ class EnumInfo(_TmcItem):
 
 class ArrayInfo(_TmcItem):
     '[TMC] Array information for a DataType or Symbol'
-    LBound: List[_TmcItem]
-    UBound: List[_TmcItem]
-    Elements: List[_TmcItem]
+    LBound: list[_TmcItem]
+    UBound: list[_TmcItem]
+    Elements: list[_TmcItem]
 
     def post_init(self):
         lbound = (int(self.LBound[0].text)
@@ -1111,18 +1112,18 @@ class BaseType(Type):
 
 class DataType(_TmcItem):
     '[TMC or TSPROJ] A DataType with SubItems, likely representing a structure'
-    Action: List[_TmcItem]
-    ArrayInfo: List['ArrayInfo']
-    BaseType: List['BaseType']
-    BitSize: List[_TmcItem]
-    EnumInfo: List['EnumInfo']
-    ExtendsType: List[ExtendsType]
-    FunctionPointer: List[_TmcItem]
-    Implements: List[_TmcItem]
-    Name: List['Name']
-    PropertyItem: List[_TmcItem]
-    SubItem: List['SubItem']
-    Unit: List[_TmcItem]
+    Action: list[_TmcItem]
+    ArrayInfo: list[ArrayInfo]
+    BaseType: list[BaseType]
+    BitSize: list[_TmcItem]
+    EnumInfo: list[EnumInfo]
+    ExtendsType: list[ExtendsType]
+    FunctionPointer: list[_TmcItem]
+    Implements: list[_TmcItem]
+    Name: list[Name]
+    PropertyItem: list[_TmcItem]
+    SubItem: list[SubItem]
+    Unit: list[_TmcItem]
 
     @property
     def guid(self):
@@ -1139,11 +1140,11 @@ class DataType(_TmcItem):
             raise AttributeError('GUID unavailable')
 
     @property
-    def array_info(self) -> Optional[ArrayInfo]:
+    def array_info(self) -> ArrayInfo | None:
         return getattr(self, 'ArrayInfo', [None])[0]
 
     @property
-    def array_bounds(self) -> Optional[Tuple[int, int]]:
+    def array_bounds(self) -> tuple[int, int] | None:
         return getattr(self.array_info, 'array_bounds', None)
 
     @property
@@ -1286,30 +1287,30 @@ class Name(_TmcItem):
         return self.attributes.get('Namespace', None)
 
     @property
-    def tc_base_type(self) -> Optional[bool]:
+    def tc_base_type(self) -> bool | None:
         try:
             return self.attributes['TcBaseType'] in _TRUE_VALUES
         except KeyError:
             return None
 
     @property
-    def hide_type(self) -> Optional[bool]:
+    def hide_type(self) -> bool | None:
         try:
             return self.attributes['HideType'] in _TRUE_VALUES
         except KeyError:
             return None
 
     @property
-    def iec_declaration(self) -> Optional[str]:
+    def iec_declaration(self) -> str | None:
         return self.attributes.get('IecDeclaration', None)
 
 
 class SubItem(_TmcItem):
     '[TMC] One element of a DataType'
-    Type: List[Type]
-    ArrayInfo: List[ArrayInfo]
-    BitSize: List[_TmcItem]
-    BitOffs: List[_TmcItem]
+    Type: list[Type]
+    ArrayInfo: list[ArrayInfo]
+    BitSize: list[_TmcItem]
+    BitOffs: list[_TmcItem]
 
     @property
     def data_type(self):
@@ -1365,8 +1366,8 @@ class Module(_TmcItem):
         try:
             return self._ads_port
         except AttributeError:
-            app_prop, = [prop for prop in self.find(Property)
-                         if prop.name == 'ApplicationName']
+            app_prop, = (prop for prop in self.find(Property)
+                         if prop.name == 'ApplicationName')
             port_text = app_prop.value
             self._ads_port = int(port_text.split('Port_')[1])
 
@@ -1452,11 +1453,11 @@ class Symbol(_TmcItem):
     will become `Symbol_FB_MotionStage`.
     '''
 
-    ArrayInfo: List[ArrayInfo]
-    BaseType: List[BaseType]
-    BitOffs: List[_TmcItem]
-    BitSize: List[_TmcItem]
-    Properties: List[_TmcItem]
+    ArrayInfo: list[ArrayInfo]
+    BaseType: list[BaseType]
+    BitOffs: list[_TmcItem]
+    BitSize: list[_TmcItem]
+    Properties: list[_TmcItem]
 
     @property
     def base_type(self) -> BaseType:
@@ -1558,7 +1559,7 @@ class Symbol_DUT_MotionStage(Symbol):
         return self.name.split('.')[1]
 
     @property
-    def nc_to_plc_link(self) -> Optional[Link]:
+    def nc_to_plc_link(self) -> Link | None:
         '''
         The Link for NcToPlc
 
@@ -1631,7 +1632,7 @@ class ST(_TwincatProjectSubItem):
 class Implementation(_TwincatProjectSubItem):
     '[TcDUT/TcPOU] Code implementation'
     #: Structured text code if it exists:
-    ST: List[ST]
+    ST: list[ST]
 
 
 class Declaration(_TwincatProjectSubItem):
@@ -1640,7 +1641,7 @@ class Declaration(_TwincatProjectSubItem):
 
 class DUT(_TwincatProjectSubItem):
     '[TcDUT] Data unit type (DUT)'
-    Declaration: List[Declaration]
+    Declaration: list[Declaration]
 
     @property
     def declaration(self) -> str:
@@ -1653,11 +1654,11 @@ class DUT(_TwincatProjectSubItem):
 
 
 class _POUMember:
-    Declaration: List[Declaration]
-    Implementation: List[Implementation]
+    Declaration: list[Declaration]
+    Implementation: list[Implementation]
 
     @property
-    def pou(self) -> Optional[POU]:
+    def pou(self) -> POU | None:
         """The associated POU."""
         return self.find_ancestor(POU)
 
@@ -1720,7 +1721,7 @@ class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
     "[TcPOU] Code declaration container for function block properties."
 
     @property
-    def property_(self) -> Optional[Property]:
+    def property_(self) -> Property | None:
         return self.find_ancestor(Property)
 
     @property
@@ -1829,17 +1830,17 @@ class POU(_TwincatProjectSubItem):
             return impl.ST[0].text
 
     @property
-    def actions(self) -> List[Action]:
+    def actions(self) -> list[Action]:
         'The action implementations (zero or more)'
         return list(getattr(self, 'Action', []))
 
     @property
-    def methods(self) -> List[Method]:
+    def methods(self) -> list[Method]:
         'The method implementations (zero or more)'
         return list(getattr(self, 'Method', []))
 
     @property
-    def properties(self) -> List[Property]:
+    def properties(self) -> list[Property]:
         'The property implementations (zero or more)'
         return list(getattr(self, 'Property', []))
 
@@ -1889,7 +1890,7 @@ class Task(TwincatItem):
 
     ``TcSmProject/TopLevelProject/System/Tasks/Task``
     """
-    parent: "Tasks"
+    parent: Tasks
 
     @property
     def array_index(self) -> int:
@@ -1910,9 +1911,9 @@ class Tasks(TwincatItem):
     ``TcSmProject/TopLevelProject/System/Tasks``
     """
 
-    Task: List[Task]
+    Task: list[Task]
     #: Unique priority to task.
-    priority_to_task: Dict[int, Task]
+    priority_to_task: dict[int, Task]
 
     def post_init(self):
         priority_and_task = [
@@ -1971,7 +1972,7 @@ class Axis(TwincatItem):
         # in the xti files:
         return 'mm'
 
-    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
+    def summarize(self) -> Generator[tuple[str, Any], None, None]:
         yield from self.attributes.items()
         for param in self.find(AxisPara, recurse=False):
             yield from param.attributes.items()
@@ -1999,7 +2000,7 @@ class Encoder(TwincatItem):
 
     Contains EncPara, Vars, Mappings, etc.
     '''
-    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
+    def summarize(self) -> Generator[tuple[str, Any], None, None]:
         yield 'EncType', self.attributes['EncType']
         for param in self.find(EncPara, recurse=False):
             yield from param.attributes.items()
@@ -2110,10 +2111,10 @@ class Pdo(TwincatItem):
 
 class Entry(TwincatItem):
     """Pdo Entry, containing name and type information."""
-    Comment: List[TwincatItem]
+    Comment: list[TwincatItem]
 
     @property
-    def entry_type(self) -> Optional[Type]:
+    def entry_type(self) -> Type | None:
         """The type of the entry."""
         return getattr(self, 'Type', [None])[0]
 
@@ -2178,7 +2179,7 @@ class _VersionItemMixin:
     # Namespace: List[TwincatItem]
 
     @property
-    def resolution(self) -> Optional[Union[DefaultResolution, Resolution]]:
+    def resolution(self) -> DefaultResolution | Resolution | None:
         try:
             resolution, = self.Resolution
         except AttributeError:
@@ -2355,8 +2356,8 @@ def case_insensitive_path(path: AnyPath) -> pathlib.Path:
 
 
 def separate_by_classname(
-    children: List[TwincatItem]
-) -> Dict[str, List[TwincatItem]]:
+    children: list[TwincatItem]
+) -> dict[str, list[TwincatItem]]:
     '''
     Take in a list of `TwincatItem`, categorize each by their class name (based
     on XML tag), and return a dictionary keyed on that.

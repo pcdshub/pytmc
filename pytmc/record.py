@@ -315,14 +315,14 @@ class RecordPackage:
         return spec(*args, chain=chain, **kwargs)
 
 
-AutosaveDefaults = Dict[str, Dict[str, Set[str]]]
+AutosaveDefaults = dict[str, dict[str, set[str]]]
 
 
 def make_autosave_defaults(
-    input_pass0: Optional[List[str]] = None,
-    input_pass1: Optional[List[str]] = None,
-    output_pass0: Optional[List[str]] = None,
-    output_pass1: Optional[List[str]] = None,
+    input_pass0: Optional[list[str]] = None,
+    input_pass1: Optional[list[str]] = None,
+    output_pass0: Optional[list[str]] = None,
+    output_pass1: Optional[list[str]] = None,
     exclude_defaults: bool = False,
 ) -> AutosaveDefaults:
     """

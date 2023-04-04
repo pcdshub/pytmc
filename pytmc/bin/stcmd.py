@@ -242,7 +242,7 @@ def main(tsproj_project, *, name=None, prefix=None,
             db_path = pathlib.Path(db_path) / db_filename
             logger.info('Found %d additional records; writing to %s',
                         len(other_records), db_path)
-            with open(db_path, 'wt') as db_file:
+            with open(db_path, 'w') as db_file:
                 db_file.write('\n\n'.join(rec.render()
                                           for rec in other_records))
             additional_db_files.append({'file': db_filename, 'macros': ''})

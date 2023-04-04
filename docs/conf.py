@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # pytmc documentation build configuration file, created by
 # sphinx-quickstart on Thu Dec  7 12:54:14 2017.

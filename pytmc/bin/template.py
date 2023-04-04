@@ -56,7 +56,8 @@ import logging
 import os
 import pathlib
 import sys
-from typing import Any, Dict, Generator, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+from collections.abc import Generator
 
 import jinja2
 
@@ -165,7 +166,7 @@ def _to_repo_slug(url: str) -> str:
     return url
 
 
-def get_git_info(fn: pathlib.Path) -> Dict[str, Any]:
+def get_git_info(fn: pathlib.Path) -> dict[str, Any]:
     """Get the git hash and other info for the repository that ``fn`` is in."""
     if git is None:
         raise RuntimeError("gitpython not installed")
@@ -197,7 +198,7 @@ def get_git_info(fn: pathlib.Path) -> Dict[str, Any]:
     }
 
 
-def project_to_dict(path: parser.AnyPath) -> Dict[str, Any]:
+def project_to_dict(path: parser.AnyPath) -> dict[str, Any]:
     """
     Create a user/template-facing dictionary of project information.
 
@@ -250,7 +251,7 @@ def project_to_dict(path: parser.AnyPath) -> Dict[str, Any]:
     }
 
 
-def projects_to_dict(*paths) -> Dict[str, Dict[pathlib.Path, Any]]:
+def projects_to_dict(*paths) -> dict[str, dict[pathlib.Path, Any]]:
     """
     Create a user/template-facing dictionary of project information.
 
@@ -273,7 +274,7 @@ def projects_to_dict(*paths) -> Dict[str, Dict[pathlib.Path, Any]]:
     return result
 
 
-def get_jinja_filters(**user_config) -> Dict[str, callable]:
+def get_jinja_filters(**user_config) -> dict[str, callable]:
     """All jinja filters."""
 
     if 'delim' not in user_config:
@@ -313,14 +314,14 @@ def get_symbols(plc) -> Generator[parser.Symbol, None, None]:
         yield symbol
 
 
-def get_symbols_by_type(plc: parser.Plc) -> Dict[str, List[parser.Symbol]]:
+def get_symbols_by_type(plc: parser.Plc) -> dict[str, list[parser.Symbol]]:
     """Get symbols for the PLC."""
     symbols = plc.find(parser.Symbol, recurse=False)
     return parser.separate_by_classname(symbols)
 
 
-@functools.lru_cache()
-def get_motors(plc: parser.Plc) -> List[parser.Symbol_DUT_MotionStage]:
+@functools.lru_cache
+def get_motors(plc: parser.Plc) -> list[parser.Symbol_DUT_MotionStage]:
     """Get pragma'd motor symbols for the PLC (non-pointer DUT_MotionStage)."""
     symbols = get_symbols_by_type(plc)
     return [
@@ -331,9 +332,9 @@ def get_motors(plc: parser.Plc) -> List[parser.Symbol_DUT_MotionStage]:
 
 
 def get_plc_by_name(
-    projects: Dict[parser.AnyPath, parser.TcSmProject],
+    projects: dict[parser.AnyPath, parser.TcSmProject],
     plc_name: str
-) -> Tuple[Optional[parser.TcSmProject], Optional[parser.Plc]]:
+) -> tuple[Optional[parser.TcSmProject], Optional[parser.Plc]]:
     """
     Get a Plc instance by name.
 
@@ -359,11 +360,11 @@ def get_plc_by_name(
     return None, None
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_plc_record_packages(
     plc: parser.Plc,
     dbd: Optional[str] = None,
-) -> Tuple[List[RecordPackage], List[Exception]]:
+) -> tuple[list[RecordPackage], list[Exception]]:
     """
     Get EPICS record packages generated from a specific PLC.
 
@@ -392,7 +393,7 @@ def get_plc_record_packages(
     return packages, exceptions
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_nc(project: parser.TopLevelProject) -> parser.NC:
     """Get the top-level NC settings for the project."""
     try:
@@ -402,8 +403,8 @@ def get_nc(project: parser.TopLevelProject) -> parser.NC:
         return None
 
 
-@functools.lru_cache()
-def get_data_types(project: parser.TwincatItem) -> List[dict]:
+@functools.lru_cache
+def get_data_types(project: parser.TwincatItem) -> list[dict]:
     """Get the data types container for the project."""
     data_types = getattr(project, 'DataTypes', [None])[0]
     if data_types is not None:
@@ -411,8 +412,8 @@ def get_data_types(project: parser.TwincatItem) -> List[dict]:
     return []
 
 
-@functools.lru_cache()
-def get_boxes(project) -> List[parser.Box]:
+@functools.lru_cache
+def get_boxes(project) -> list[parser.Box]:
     """Get boxes contained in the project."""
     return list(
         sorted(project.find(parser.Box),
@@ -420,7 +421,7 @@ def get_boxes(project) -> List[parser.Box]:
     )
 
 
-def _get_box_to_children(boxes: List[parser.Box]) -> Dict[parser.Box, List[parser.Box]]:
+def _get_box_to_children(boxes: list[parser.Box]) -> dict[parser.Box, list[parser.Box]]:
     parent_to_children = {}
 
     for box in boxes:
@@ -437,7 +438,7 @@ def _get_box_to_children(boxes: List[parser.Box]) -> Dict[parser.Box, List[parse
     return parent_to_children
 
 
-def _get_root_boxes(parent_to_children: Dict[parser.Box, List[parser.Box]]) -> List[parser.Box]:
+def _get_root_boxes(parent_to_children: dict[parser.Box, list[parser.Box]]) -> list[parser.Box]:
     root = []
     for box in parent_to_children:
         for children in parent_to_children.values():
@@ -448,7 +449,7 @@ def _get_root_boxes(parent_to_children: Dict[parser.Box, List[parser.Box]]) -> L
     return root
 
 
-BoxHierarchy = Dict[parser.Box, "BoxHierarchy"]
+BoxHierarchy = dict[parser.Box, "BoxHierarchy"]
 
 
 def get_box_hierarchy(project) -> BoxHierarchy:
@@ -479,8 +480,8 @@ def _clean_link(link: parser.Link):
     return link
 
 
-@functools.lru_cache()
-def get_links(project: parser.TwincatItem) -> List[parser.Link]:
+@functools.lru_cache
+def get_links(project: parser.TwincatItem) -> list[parser.Link]:
     """Get links contained in the project or PLC."""
     return list(_clean_link(link) for link in project.find(parser.Link))
 
@@ -491,7 +492,7 @@ def generate_records(
     dbd: Optional[parser.AnyPath] = None,
     allow_errors: bool = False,
     write_archive_file: bool = True,
-) -> Tuple[List[str], Dict[str, Any]]:
+) -> tuple[list[str], dict[str, Any]]:
     """
     Generate records from ``plc`` writing to ``path``.
 
@@ -539,11 +540,11 @@ def generate_records(
     else:
         archive_path = f"{path}.archive"
 
-    with open(path, "wt") as fp:
+    with open(path, "w") as fp:
         fp.write(db_string)
 
     if write_archive_file:
-        with open(archive_path, "wt") as fp:
+        with open(archive_path, "w") as fp:
             fp.write('\n'.join(generate_archive_settings(packages)))
 
     by_pvname = {
@@ -554,8 +555,8 @@ def generate_records(
     return [str(path)], by_pvname
 
 
-@functools.lru_cache()
-def get_linter_results(plc: parser.Plc) -> Dict[str, Any]:
+@functools.lru_cache
+def get_linter_results(plc: parser.Plc) -> dict[str, Any]:
     """
     Lint the provided PLC code pragmas.
 
@@ -586,7 +587,7 @@ def config_to_pragma(
     config: dict,
     skip_desc: bool = True,
     skip_pv: bool = True
-) -> Generator[Tuple[str, str], None, None]:
+) -> Generator[tuple[str, str], None, None]:
     """
     Convert a configuration dictionary into a single pragma string.
 
@@ -626,8 +627,8 @@ def config_to_pragma(
             yield (key, value)
 
 
-@functools.lru_cache()
-def get_library_versions(plc: parser.Plc) -> Dict[str, Dict[str, Any]]:
+@functools.lru_cache
+def get_library_versions(plc: parser.Plc) -> dict[str, dict[str, Any]]:
     """Get library version information for the given PLC."""
     def find_by_name(cls_name):
         try:
@@ -700,7 +701,7 @@ helpers = [
 ]
 
 
-def get_render_context() -> Dict[str, Any]:
+def get_render_context() -> dict[str, Any]:
     """Jinja template context dictionary - helper functions."""
     context = {func.__name__: func for func in helpers}
     context['types'] = parser.TWINCAT_TYPES
@@ -708,7 +709,7 @@ def get_render_context() -> Dict[str, Any]:
     return context
 
 
-def _split_macro(macro: str) -> Tuple[str, str]:
+def _split_macro(macro: str) -> tuple[str, str]:
     """
     Split a macro of the form NAME=VALUE into ("NAME", "VALUE").
 
@@ -729,11 +730,11 @@ def _split_macro(macro: str) -> Tuple[str, str]:
 
 
 def main(
-    projects: List[parser.AnyPath],
-    templates: Optional[Union[List[str], str]] = None,
-    macros: Union[List[str], Dict[str, str], None] = None,
+    projects: list[parser.AnyPath],
+    templates: Optional[Union[list[str], str]] = None,
+    macros: Union[list[str], dict[str, str], None] = None,
     debug: bool = False,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """
     Render template(s) based on a TwinCAT3 project, or XML-format file such as
     TMC.
@@ -777,7 +778,7 @@ def main(
                 logger.warning('Read template from standard input (len=%d)',
                                len(template_text))
         else:
-            with open(input_filename, "rt") as fp:
+            with open(input_filename) as fp:
                 template_text = fp.read()
 
         stashed_exception = None
@@ -795,7 +796,7 @@ def main(
                 raise stashed_exception
 
             if output_filename:
-                with open(output_filename, "wt") as fp:
+                with open(output_filename, "w") as fp:
                     print(rendered, file=fp)
             else:
                 print(rendered)

@@ -151,7 +151,7 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
                 if makefile_path.exists() and not overwrite:
                     raise RuntimeError('Must specify --overwrite to write over'
                                        ' existing Makefiles')
-                with open(makefile_path, 'wt') as f:
+                with open(makefile_path, 'w') as f:
                     print(rendered, file=f)
 
         else:
