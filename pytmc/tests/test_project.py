@@ -7,7 +7,7 @@ from pytmc import parser
 
 def test_load_and_repr(project):
     info = repr(project)
-    print(info[:1000], '...')
+    print(info[:1000], "...")
 
 
 def test_summarize(project):
@@ -15,7 +15,7 @@ def test_summarize(project):
     for cls in [parser.Axis, parser.Encoder]:
         for inst in project.find(cls):
             print(inst.path)
-            print('-----------------')
+            print("-----------------")
             pprint.pprint(dict(inst.summarize()))
 
     for inst in project.find(parser.Symbol):
@@ -28,7 +28,7 @@ def test_module_ads_port(project):
         assert inst.ads_port == 851 or inst.ads_port == 852  # probably!
 
 
-@pytest.mark.xfail(reason='TODO / project')
+@pytest.mark.xfail(reason="TODO / project")
 def test_smoke_ams_id(project):
     print(project.ams_id)
     print(project.target_ip)
@@ -37,10 +37,10 @@ def test_smoke_ams_id(project):
 def test_fb_motionstage_linking(project):
     for inst in project.find(parser.Symbol_DUT_MotionStage):
         pprint.pprint(inst)
-        print('Program name', inst.program_name)
-        print('Motor name', inst.motor_name)
-        print('NC to PLC link', inst.nc_to_plc_link)
+        print("Program name", inst.program_name)
+        print("Motor name", inst.motor_name)
+        print("NC to PLC link", inst.nc_to_plc_link)
 
         nc_axis = inst.nc_axis
-        print('Short NC axis name', nc_axis.name)
-        print('NC axis', nc_axis)
+        print("Short NC axis name", nc_axis.name)
+        print("NC axis", nc_axis)

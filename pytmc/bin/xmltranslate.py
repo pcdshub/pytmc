@@ -29,20 +29,22 @@ def build_arg_parser(parser=None):
     parser.description = DESCRIPTION
     parser.formatter_class = argparse.RawTextHelpFormatter
 
+    parser.add_argument("input_file", type=str, help="input file")
+
     parser.add_argument(
-        'input_file', type=str, help='input file'
+        "-d",
+        "--depth",
+        type=int,
+        help="Recursive limit for exploring the file",
+        default=7,
     )
 
     parser.add_argument(
-        '-d', '--depth', type=int,
-        help='Recursive limit for exploring the file',
-        default=7
-    )
-
-    parser.add_argument(
-        '-i', '--indent_size',
-        type=int, help='Indent size for output formatting',
-        default=4
+        "-i",
+        "--indent_size",
+        type=int,
+        help="Indent size for output formatting",
+        default=4,
     )
 
     return parser
@@ -58,16 +60,13 @@ def recursive(branch, level=1, indent_size=4, indent=0):
         #    print("    ",end="")
         print(
             textwrap.indent(
-                " ".join([
-                    str(limb.attrib),
-                    str(limb.tag),
-                    str(limb.text),
-                    str(limb.tail)
-                ]),
-                "".join([" "]*indent_size*indent)
+                " ".join(
+                    [str(limb.attrib), str(limb.tag), str(limb.text), str(limb.tail)]
+                ),
+                "".join([" "] * indent_size * indent),
             )
         )
-        recursive(limb, level-1, indent_size, indent+1)
+        recursive(limb, level - 1, indent_size, indent + 1)
 
 
 def main(input_file, *, indent_size=4, depth=7):

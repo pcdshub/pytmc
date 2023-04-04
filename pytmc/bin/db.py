@@ -24,9 +24,8 @@ class LinterError(Exception):
     ...
 
 
-def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
-                      **linter_options):
-    '''
+def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True, **linter_options):
+    """
     Validate all to-be-generated record fields
 
     Parameters
@@ -53,25 +52,23 @@ def validate_with_dbd(packages, dbd_file, remove_invalid_fields=True,
     See also
     --------
     pytmc.linter.lint_db
-    '''
-    db_text = '\n\n'.join(record.render() for record in packages)
+    """
+    db_text = "\n\n".join(record.render() for record in packages)
     results = linter.lint_db(dbd=dbd_file, db=db_text, **linter_options)
     if remove_invalid_fields:
         all_invalid_fields = [
-            error['format_args']
+            error["format_args"]
             for error in results.errors
-            if error['name'] == 'bad-field'
-            and len(error['format_args']) == 2
+            if error["name"] == "bad-field" and len(error["format_args"]) == 2
         ]
         invalid_fields_by_record = defaultdict(set)
         for record_type, field_name in all_invalid_fields:
             invalid_fields_by_record[record_type].add(field_name)
 
         for pack in packages:
-            for record in getattr(pack, 'records', []):
-                for field in invalid_fields_by_record.get(
-                        record.record_type, []):
-                    pack.config['field'].pop(field, None)
+            for record in getattr(pack, "records", []):
+                for field in invalid_fields_by_record.get(record.record_type, []):
+                    pack.config["field"].pop(field, None)
     return results, db_text
 
 
@@ -82,9 +79,9 @@ def process(
     allow_errors: bool = False,
     show_error_context: bool = True,
     allow_no_pragma: bool = False,
-    debug: bool = False
+    debug: bool = False,
 ) -> tuple[list[RecordPackage], list[Exception]]:
-    '''
+    """
     Process a TMC
 
     Parameters
@@ -114,18 +111,19 @@ def process(
     ------
     LinterError
         If ``allow_errors`` is unset and an error is found.
-    '''
+    """
+
     def _show_context_from_line(rendered, from_line):
-        lines = list(enumerate(rendered.splitlines()[:from_line + 1], 1))
+        lines = list(enumerate(rendered.splitlines()[: from_line + 1], 1))
         context = []
         for line_num, line in reversed(lines):
             context.append((line_num, line))
-            if line.lstrip().startswith('record'):
+            if line.lstrip().startswith("record"):
                 break
 
         context.reverse()
         for line_num, line in context:
-            logger.error('   [db:%d] %s', line_num, line)
+            logger.error("   [db:%d] %s", line_num, line)
         return context
 
     records = [
@@ -136,15 +134,14 @@ def process(
         )
     ]
 
-    exceptions = [ex for ex in records
-                  if isinstance(ex, Exception)]
+    exceptions = [ex for ex in records if isinstance(ex, Exception)]
 
     for ex in exceptions:
-        logger.error('Error creating record: %s', ex)
+        logger.error("Error creating record: %s", ex)
         records.remove(ex)
 
     if exceptions and not allow_errors:
-        raise LinterError('Failed to create database')
+        raise LinterError("Failed to create database")
 
     # We removed exceptions from the record list above:
     records: list[RecordPackage]
@@ -162,13 +159,15 @@ def process(
     ]
 
     if len(record_names) != len(set(record_names)):
-        dupes = {name: record_names.count(name)
-                 for name in record_names
-                 if record_names.count(name) > 1
-                 }
-        message = '\n'.join(['Duplicate records encountered:'] +
-                            [f'    {dupe} ({count})'
-                             for dupe, count in sorted(dupes.items())])
+        dupes = {
+            name: record_names.count(name)
+            for name in record_names
+            if record_names.count(name) > 1
+        }
+        message = "\n".join(
+            ["Duplicate records encountered:"]
+            + [f"    {dupe} ({count})" for dupe, count in sorted(dupes.items())]
+        )
 
         ex = LinterError(message)
         if not allow_errors:
@@ -176,13 +175,18 @@ def process(
         exceptions.append(ex)
         logger.error(message)
 
-    too_long = [record_name for record_name in record_names
-                if len(record_name) > linter.MAX_RECORD_LENGTH]
+    too_long = [
+        record_name
+        for record_name in record_names
+        if len(record_name) > linter.MAX_RECORD_LENGTH
+    ]
     if too_long:
-        message = '\n'.join(
-            [f'Records exceeding the maximum length of '
-             f'{linter.MAX_RECORD_LENGTH} were found:'] +
-            [f'    {record}' for record in too_long]
+        message = "\n".join(
+            [
+                f"Records exceeding the maximum length of "
+                f"{linter.MAX_RECORD_LENGTH} were found:"
+            ]
+            + [f"    {record}" for record in too_long]
         )
 
         ex = LinterError(message)
@@ -194,20 +198,25 @@ def process(
     if dbd_file is not None:
         results, rendered = validate_with_dbd(records, dbd_file)
         for warning in results.warnings:
-            logger.warning('[%s line %s] %s', warning['file'], warning['line'],
-                           warning['message'])
+            logger.warning(
+                "[%s line %s] %s", warning["file"], warning["line"], warning["message"]
+            )
         for error in results.errors:
-            logger.error('[%s line %s] %s', error['file'], error['line'],
-                         error['message'])
-            if "Can't change record" in error['message']:
-                logger.error('[%s line %s] One or more pragmas result in the '
-                             'same generated PV name.  This must be fixed.',
-                             error['file'], error['line'])
+            logger.error(
+                "[%s line %s] %s", error["file"], error["line"], error["message"]
+            )
+            if "Can't change record" in error["message"]:
+                logger.error(
+                    "[%s line %s] One or more pragmas result in the "
+                    "same generated PV name.  This must be fixed.",
+                    error["file"],
+                    error["line"],
+                )
 
             if show_error_context:
-                _show_context_from_line(rendered, error['line'])
+                _show_context_from_line(rendered, error["line"])
         if not results.success and not allow_errors:
-            raise LinterError('Failed to create database')
+            raise LinterError("Failed to create database")
 
     return records, exceptions
 
@@ -220,61 +229,70 @@ def build_arg_parser(parser=None):
     parser.formatter_class = argparse.RawTextHelpFormatter
 
     parser.add_argument(
-        '--dbd',
-        '-d',
+        "--dbd",
+        "-d",
         default=None,
         type=str,
-        help=('Specify an expanded .dbd file for validating fields '
-              '(requires pyPDB)')
+        help=(
+            "Specify an expanded .dbd file for validating fields " "(requires pyPDB)"
+        ),
     )
 
     parser.add_argument(
-        '--allow-errors',
-        '-i',
-        action='store_true',
+        "--allow-errors",
+        "-i",
+        action="store_true",
         default=False,
-        help='Generate the .db file even if linter issues are found'
+        help="Generate the .db file even if linter issues are found",
     )
 
     parser.add_argument(
-        '--no-error-context',
-        action='store_true',
+        "--no-error-context",
+        action="store_true",
         default=False,
-        help='Do not show db file context around errors'
+        help="Do not show db file context around errors",
     )
 
     parser.add_argument(
-        '--plc',
+        "--plc",
         default=None,
         type=str,
-        help='The PLC name, if specifying a .tsproj file'
+        help="The PLC name, if specifying a .tsproj file",
     )
 
     parser.add_argument(
-        '--debug',
-        action='store_true',
-        help=('Raise exceptions immediately, such that the IPython debugger '
-              'may be used')
+        "--debug",
+        action="store_true",
+        help=(
+            "Raise exceptions immediately, such that the IPython debugger "
+            "may be used"
+        ),
     )
 
     archive_group = parser.add_mutually_exclusive_group()
     archive_group.add_argument(
-        '--archive-file',
-        type=argparse.FileType('wt', encoding='ascii'),
-        help=('Save an archive configuration file. Defaults to '
-              'OUTPUT.archive if specified')
+        "--archive-file",
+        type=argparse.FileType("wt", encoding="ascii"),
+        help=(
+            "Save an archive configuration file. Defaults to "
+            "OUTPUT.archive if specified"
+        ),
     )
 
     archive_group.add_argument(
-        '--no-archive-file',
-        action='store_true', default=False,
-        help=('Do not write the archive file, regardless of OUTPUT '
-              'filename settings.')
+        "--no-archive-file",
+        action="store_true",
+        default=False,
+        help=(
+            "Do not write the archive file, regardless of OUTPUT " "filename settings."
+        ),
     )
 
     parser.add_argument(
-        'tmc_file', metavar="INPUT", type=str,
-        help='Path to interpreted .tmc file, or a .tsproj project'
+        "tmc_file",
+        metavar="INPUT",
+        type=str,
+        help="Path to interpreted .tmc file, or a .tsproj project",
     )
 
     class OutputFileAction(argparse.Action):
@@ -282,39 +300,50 @@ def build_arg_parser(parser=None):
             if namespace.no_archive_file or not os.path.exists(value.name):
                 namespace.archive_file = None
             else:
-                namespace.archive_file = open(value.name + '.archive', 'w')
+                namespace.archive_file = open(value.name + ".archive", "w")
             namespace.record_file = value
 
     parser.add_argument(
-        'record_file',
+        "record_file",
         metavar="OUTPUT",
         action=OutputFileAction,
-        type=argparse.FileType('wt', encoding='ascii'),
+        type=argparse.FileType("wt", encoding="ascii"),
         default=sys.stdout,
-        nargs='?',
-        help='Path to output .db file'
+        nargs="?",
+        help="Path to output .db file",
     )
 
     return parser
 
 
-def main(tmc_file, record_file=sys.stdout, *, dbd=None, allow_errors=False,
-         no_error_context=False, archive_file=None, no_archive_file=False,
-         plc=None, debug=False):
+def main(
+    tmc_file,
+    record_file=sys.stdout,
+    *,
+    dbd=None,
+    allow_errors=False,
+    no_error_context=False,
+    archive_file=None,
+    no_archive_file=False,
+    plc=None,
+    debug=False,
+):
     if archive_file and no_archive_file:
-        raise ValueError('Invalid options specified (specify zero or one of '
-                         'archive_file or no_archive_file)')
+        raise ValueError(
+            "Invalid options specified (specify zero or one of "
+            "archive_file or no_archive_file)"
+        )
 
     proj_path = pathlib.Path(tmc_file)
-    if proj_path.suffix.lower() == '.tsproj':
+    if proj_path.suffix.lower() == ".tsproj":
         project = parser.parse(proj_path)
         if plc is None:
             try:
-                plc_inst, = project.plcs
+                (plc_inst,) = project.plcs
             except TypeError:
                 raise RuntimeError(
-                    'A .tsproj file was specified without --plc. Available '
-                    'PLCs: ' + ', '.join(plc.name for plc in project.plcs)
+                    "A .tsproj file was specified without --plc. Available "
+                    "PLCs: " + ", ".join(plc.name for plc in project.plcs)
                 )
             plc = plc_inst.name
         tmc_file = project.plcs_by_name[plc].tmc_path
@@ -323,18 +352,21 @@ def main(tmc_file, record_file=sys.stdout, *, dbd=None, allow_errors=False,
 
     try:
         records, exceptions = process(
-            tmc, dbd_file=dbd, allow_errors=allow_errors,
+            tmc,
+            dbd_file=dbd,
+            allow_errors=allow_errors,
             show_error_context=not no_error_context,
             debug=debug,
         )
     except LinterError:
         logger.exception(
-            'Linter errors - failed to create database. To create the database'
-            ' ignoring these errors, use the flag `--allow-errors`')
+            "Linter errors - failed to create database. To create the database"
+            " ignoring these errors, use the flag `--allow-errors`"
+        )
         sys.exit(1)
 
-    db_string = '\n\n'.join(record.render() for record in records)
+    db_string = "\n\n".join(record.render() for record in records)
     record_file.write(db_string)
 
     if archive_file:
-        archive_file.write('\n'.join(generate_archive_settings(records)))
+        archive_file.write("\n".join(generate_archive_settings(records)))

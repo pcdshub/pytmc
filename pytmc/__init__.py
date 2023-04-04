@@ -8,10 +8,10 @@ logger = logging.getLogger(__name__)
 
 
 __all__ = [
-    'EPICSRecord',
-    'RecordPackage',
-    'linter',
-    'logger',
-    'parser',
-    'pragmas',
+    "EPICSRecord",
+    "RecordPackage",
+    "linter",
+    "logger",
+    "parser",
+    "pragmas",
 ]

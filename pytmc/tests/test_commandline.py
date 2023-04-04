@@ -18,27 +18,31 @@ from .conftest import TEMPLATES
 
 
 def test_help_main(monkeypatch):
-    monkeypatch.setattr(sys, 'argv', ['--help'])
+    monkeypatch.setattr(sys, "argv", ["--help"])
     pytmc_main.main()
 
 
-@pytest.mark.parametrize('subcommand',
-                         pytmc_main.COMMANDS.keys()
-                         )
+@pytest.mark.parametrize("subcommand", pytmc_main.COMMANDS.keys())
 def test_help_module(monkeypatch, subcommand):
-    monkeypatch.setattr(sys, 'argv', [subcommand, '--help'])
+    monkeypatch.setattr(sys, "argv", [subcommand, "--help"])
     with pytest.raises(SystemExit):
         pytmc_main.main()
 
 
 def test_summary(project_filename):
-    summary_main(project_filename, show_all=True, show_code=True,
-                 use_markdown=True, show_types=True, filter_types=['*'])
+    summary_main(
+        project_filename,
+        show_all=True,
+        show_code=True,
+        use_markdown=True,
+        show_types=True,
+        filter_types=["*"],
+    )
 
 
 @pytest.fixture()
 def project_filename_linter_success(project_filename):
-    """ Return True if project should pass the linter test"""
+    """Return True if project should pass the linter test"""
     if "lcls-twincat-pmps.tsproj" in project_filename:
         return False
     return True
@@ -53,9 +57,10 @@ def test_pragmalint(project_filename, project_filename_linter_success):
 def test_stcmd(project_and_plc):
     project_filename = project_and_plc.project
     plc_name = project_and_plc.plc_name
-    allow_errors = any(name in project_filename
-                       for name in ('lcls-twincat-motion', 'XtesSxrPlc',
-                                    'plc-kfe-gmd-vac'))
+    allow_errors = any(
+        name in project_filename
+        for name in ("lcls-twincat-motion", "XtesSxrPlc", "plc-kfe-gmd-vac")
+    )
     stcmd_main(project_filename, plc_name=plc_name, allow_errors=allow_errors)
 
 
@@ -87,22 +92,20 @@ def test_code(project_filename):
 
 
 def test_template_basic(project_filename):
-    template = str(TEMPLATES / 'basic_test.txt')
+    template = str(TEMPLATES / "basic_test.txt")
     templated = template_main(
         [project_filename],
         templates=[template + os.pathsep],
     )
 
-    print('templated', templated)
+    print("templated", templated)
     assert templated[template] == project_filename
 
 
 @pytest.mark.parametrize(
-    'template',
+    "template",
     [
-        pytest.param(
-            str(TEMPLATES / 'smoke_test.txt'),
-            id='helpers'),
+        pytest.param(str(TEMPLATES / "smoke_test.txt"), id="helpers"),
     ],
 )
 def test_template_smoke(project_filename, template):
@@ -111,4 +114,4 @@ def test_template_smoke(project_filename, template):
         templates=[template + os.pathsep],
     )
 
-    print('templated', templated)
+    print("templated", templated)

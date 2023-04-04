@@ -12,15 +12,15 @@ from .conftest import PROJ_ROOT, TMC_ROOT
 
 
 @pytest.mark.parametrize(
-    'tmc_file_name, target_pv',
+    "tmc_file_name, target_pv",
     [
         pytest.param(TMC_ROOT / "ArbiterPLC.tmc", "BeamClass"),
         pytest.param(
             PROJ_ROOT / "pmps-dev-arbiter/Arbiter/ArbiterPLC/ArbiterPLC.tmc",
             "Attenuationsssss",  # sic
-            marks=pytest.mark.xfail
-        )
-    ]
+            marks=pytest.mark.xfail,
+        ),
+    ],
 )
 def test_global_pinned_variables(tmc_file_name, target_pv):
     """
@@ -32,8 +32,7 @@ def test_global_pinned_variables(tmc_file_name, target_pv):
     tmc = parser.parse(tmc_file_name)
 
     records, exceptions = db_process(
-        tmc, dbd_file=None, allow_errors=False,
-        show_error_context=True
+        tmc, dbd_file=None, allow_errors=False, show_error_context=True
     )
 
     assert any((target_pv in x.pvname) for x in records)
@@ -50,13 +49,19 @@ def test_allow_no_pragma():
     tmc = parser.parse(tmc_file_name)
 
     records, exceptions = db_process(
-        tmc, dbd_file=None, allow_errors=True,
-        show_error_context=True, allow_no_pragma=False
+        tmc,
+        dbd_file=None,
+        allow_errors=True,
+        show_error_context=True,
+        allow_no_pragma=False,
     )
 
     all_records, exceptions = db_process(
-        tmc, dbd_file=None, allow_errors=True,
-        show_error_context=True, allow_no_pragma=True
+        tmc,
+        dbd_file=None,
+        allow_errors=True,
+        show_error_context=True,
+        allow_no_pragma=True,
     )
     good_records = 129
     total_records = 1002
