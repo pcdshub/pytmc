@@ -30,7 +30,6 @@ test:
   imports:
   - pytmc
   requires:
-  - coverage
   - pytest
   - pytest-qt
   - qtpy
@@ -43,12 +42,3 @@ about:
   license_family: Other
   license_file: LICENSE
   summary: Generate EPICS IOCs and records from Beckhoff TwinCAT projects
-
-
-
-extra:
-  recipe-maintainers:
-  - klauer
-  - hhslepicka
-  - zllentz
-  - n-wbrown
