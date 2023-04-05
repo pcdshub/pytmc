@@ -22,10 +22,7 @@ def build_arg_parser(parser=None):
     parser.description = DESCRIPTION
     parser.formatter_class = argparse.RawTextHelpFormatter
 
-    parser.add_argument(
-        'tmc_file', metavar="INPUT", type=str,
-        help='Path to .tmc file'
-    )
+    parser.add_argument("tmc_file", metavar="INPUT", type=str, help="Path to .tmc file")
 
     return parser
 
@@ -35,14 +32,14 @@ def find_data_types(tmc):
 
 
 class TmcTypes(QtWidgets.QMainWindow):
-    '''
+    """
     pytmc debug interface
 
     Parameters
     ----------
     tmc : TmcFile
         The tmc file to inspect
-    '''
+    """
 
     item_selected = Signal(object)
 
@@ -65,20 +62,19 @@ class TmcTypes(QtWidgets.QMainWindow):
 
         self.item_list.currentItemChanged.connect(self._data_type_selected)
 
-        for dtype in sorted(find_data_types(tmc),
-                            key=lambda item: item.name):
+        for dtype in sorted(find_data_types(tmc), key=lambda item: item.name):
             item = QtWidgets.QListWidgetItem(dtype.name)
             item.setData(Qt.UserRole, dtype)
             self.item_list.addItem(item)
 
     def _data_type_selected(self, current, previous):
-        'Slot - new list item selected'
+        "Slot - new list item selected"
         if current is None:
             return
 
         dtype = current.data(Qt.UserRole)
         self._set_list_count(1)
-        list_widget, = self.lists
+        (list_widget,) = self.lists
         self.types[0] = dtype
         self._update_list_by_index(0)
 
@@ -97,9 +93,10 @@ class TmcTypes(QtWidgets.QMainWindow):
         list_widget.clear()
 
         dtype = self.types[idx]
-        for subitem in getattr(dtype, 'SubItem', []):
+        for subitem in getattr(dtype, "SubItem", []):
             item = QtWidgets.QListWidgetItem(
-                f'{subitem.name} : {subitem.data_type.name}')
+                f"{subitem.name} : {subitem.data_type.name}"
+            )
             item.setData(Qt.UserRole, subitem.data_type)
             list_widget.addItem(item)
 
@@ -113,14 +110,15 @@ class TmcTypes(QtWidgets.QMainWindow):
             if current is not None:
                 child_dtype = current.data(Qt.UserRole)
                 child_index = list_index + 1
-                if not hasattr(child_dtype, 'SubItem'):
+                if not hasattr(child_dtype, "SubItem"):
                     self._set_list_count(child_index)
                 else:
                     self._set_list_count(child_index + 1)
                     self.types[child_index] = (
                         child_dtype.data_type
-                        if hasattr(child_dtype, 'data_type')
-                        else child_dtype)
+                        if hasattr(child_dtype, "data_type")
+                        else child_dtype
+                    )
                     self._update_list_by_index(child_index)
 
         item_list.currentItemChanged.connect(changed)
@@ -128,14 +126,14 @@ class TmcTypes(QtWidgets.QMainWindow):
 
 
 def create_types_gui(tmc):
-    '''
+    """
     Show the data type information gui
 
     Parameters
     ----------
     tmc : TmcFile, str, pathlib.Path
         The tmc file to show
-    '''
+    """
     if isinstance(tmc, (str, pathlib.Path)):
         tmc = pytmc.parser.parse(tmc)
 

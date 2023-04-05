@@ -23,66 +23,63 @@ def _grep_record_names(text):
     if not text:
         return []
 
-    records = [line.rstrip('{ ')
-               for line in text.splitlines()
-               if line.startswith('record')   # regular line
-               or line.startswith('. record')  # linted line
-               or line.startswith('X record')  # linted error line
-               ]
+    records = [
+        line.rstrip("{ ")
+        for line in text.splitlines()
+        if line.startswith("record")  # regular line
+        or line.startswith(". record")  # linted line
+        or line.startswith("X record")  # linted error line
+    ]
 
     def split_rtyp(line):
-        line = line.split('record(', 1)[1].rstrip('")')
-        rtyp, record = line.split(',', 1)
-        record = record.strip('"\' ')
-        return f'{record} ({rtyp})'
+        line = line.split("record(", 1)[1].rstrip('")')
+        rtyp, record = line.split(",", 1)
+        record = record.strip("\"' ")
+        return f"{record} ({rtyp})"
 
-    return [split_rtyp(record)
-            for record in records
-            ]
+    return [split_rtyp(record) for record in records]
 
 
 def _annotate_record_text(linter_results, record_text):
     if not record_text:
         return record_text
-    if not linter_results or not (linter_results.warnings or
-                                  linter_results.errors):
+    if not linter_results or not (linter_results.warnings or linter_results.errors):
         return record_text
 
-    lines = [([], line)
-             for line in record_text.splitlines()]
+    lines = [([], line) for line in record_text.splitlines()]
 
     for item in linter_results.warnings + linter_results.errors:
         try:
-            lint_md, line = lines[item['line'] - 1]
+            lint_md, line = lines[item["line"] - 1]
         except IndexError:
             continue
 
         if item in linter_results.warnings:
-            lint_md.append('X Warning: {}'.format(item['message']))
+            lint_md.append("X Warning: {}".format(item["message"]))
         else:
-            lint_md.append('X Error: {}'.format(item['message']))
+            lint_md.append("X Error: {}".format(item["message"]))
 
     display_lines = []
     for lint_md, line in lines:
         if not lint_md:
-            display_lines.append(f'. {line}')
+            display_lines.append(f". {line}")
         else:
-            display_lines.append(f'X {line}')
+            display_lines.append(f"X {line}")
             for lint_line in lint_md:
                 display_lines.append(lint_line)
 
-    return '\n'.join(display_lines)
+    return "\n".join(display_lines)
 
 
 class TmcSummary(QtWidgets.QMainWindow):
-    '''
+    """
     pytmc debug interface
 
     Parameters
     ----------
     tmc : TmcFile
         The tmc file to inspect
-    '''
+    """
 
     item_selected = Signal(object)
 
@@ -93,8 +90,9 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.incomplete_chains = {}
         self.records = {}
 
-        records, self.exceptions = process(tmc, allow_errors=True,
-                                           allow_no_pragma=allow_no_pragma)
+        records, self.exceptions = process(
+            tmc, allow_errors=True, allow_no_pragma=allow_no_pragma
+        )
 
         for record in records:
             if not record.valid:
@@ -104,10 +102,12 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.chains[record.tcname] = record
             try:
                 record_text = record.render()
-                linter_results = (pytmc.linter.lint_db(dbd, record_text)
-                                  if dbd and record_text else None)
-                record_text = _annotate_record_text(linter_results,
-                                                    record_text)
+                linter_results = (
+                    pytmc.linter.lint_db(dbd, record_text)
+                    if dbd and record_text
+                    else None
+                )
+                record_text = _annotate_record_text(linter_results, record_text)
             except Exception as ex:
                 try:
                     record_text
@@ -115,17 +115,17 @@ class TmcSummary(QtWidgets.QMainWindow):
                     record_text = "Record not rendered"
 
                 record_text = (
-                    f'!! Linter failure: {ex.__class__.__name__} {ex}'
-                    f'\n\n{record_text}'
+                    f"!! Linter failure: {ex.__class__.__name__} {ex}"
+                    f"\n\n{record_text}"
                 )
 
-                logger.exception('Linter failure')
+                logger.exception("Linter failure")
 
             self.records[record] = record_text
 
-        self.setWindowTitle(f'pytmc-debug summary - {tmc.filename}')
+        self.setWindowTitle(f"pytmc-debug summary - {tmc.filename}")
 
-        self._mode = 'chains'
+        self._mode = "chains"
 
         # Left part of the window
         self.left_frame = QtWidgets.QFrame()
@@ -133,9 +133,9 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.left_frame.setLayout(self.left_layout)
 
         self.item_view_type = QtWidgets.QComboBox()
-        self.item_view_type.addItem('Chains')
-        self.item_view_type.addItem('Records')
-        self.item_view_type.addItem('Chains w/o Records')
+        self.item_view_type.addItem("Chains")
+        self.item_view_type.addItem("Records")
+        self.item_view_type.addItem("Chains w/o Records")
         self.item_view_type.currentTextChanged.connect(self._update_view_type)
         self.item_list = QtWidgets.QListWidget()
         self.item_list_filter = QtWidgets.QLineEdit()
@@ -150,7 +150,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self.right_frame.setLayout(self.right_layout)
 
         self.record_text = QtWidgets.QTextEdit()
-        self.record_text.setFontFamily('Courier New')
+        self.record_text.setFontFamily("Courier New")
         self.chain_info = QtWidgets.QListWidget()
         self.config_info = QtWidgets.QTableWidget()
 
@@ -169,7 +169,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.error_list.setReadOnly(True)
 
             for ex in self.exceptions:
-                self.error_list.append(f'({ex.__class__.__name__}) {ex}\n')
+                self.error_list.append(f"({ex.__class__.__name__}) {ex}\n")
 
             self.error_splitter = QtWidgets.QSplitter()
             self.error_splitter.setOrientation(Qt.Vertical)
@@ -195,7 +195,7 @@ class TmcSummary(QtWidgets.QMainWindow):
         self._update_item_list()
 
     def _item_selected(self, current, previous):
-        'Slot - new list item selected'
+        "Slot - new list item selected"
         if current is None:
             return
 
@@ -208,11 +208,11 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.item_selected.emit(record)
 
     def _update_config_info(self, record):
-        'Slot - update config information when a new record is selected'
+        "Slot - update config information when a new record is selected"
         chain = record.chain
 
         self.config_info.clear()
-        self.item_list_filter.setText('')
+        self.item_list_filter.setText("")
         self.config_info.setRowCount(len(chain.chain))
 
         def add_dict_to_table(row: int, d: dict):
@@ -234,31 +234,23 @@ class TmcSummary(QtWidgets.QMainWindow):
                 if isinstance(value, dict):
                     yield from add_dict_to_table(row, value)
                 else:
-                    yield (
-                        row, columns[key],
-                        QtWidgets.QTableWidgetItem(str(value))
-                    )
+                    yield (row, columns[key], QtWidgets.QTableWidgetItem(str(value)))
 
         columns = {}
         column_write_entries = []
 
-        items = zip(chain.config['pv'], chain.item_to_config.items())
+        items = zip(chain.config["pv"], chain.item_to_config.items())
         for row, (pv, (item, config)) in enumerate(items):
             # info_dict is a collection of the non-field pragma lines
             info_dict = dict(pv=pv)
             if config is not None:
-                info_dict.update(
-                    {k: v for k, v in config.items() if k != 'field'})
+                info_dict.update({k: v for k, v in config.items() if k != "field"})
                 new_entries = add_dict_to_table(row, info_dict)
                 column_write_entries.extend(new_entries)
                 # fields is a dictionary exclusively contining fields
-                fields = config.get('field', {})
+                fields = config.get("field", {})
                 new_entries = add_dict_to_table(
-                    row, {
-                        f'field_{k}': v
-                        for k, v in fields.items()
-                        if k != 'field'
-                    }
+                    row, {f"field_{k}": v for k, v in fields.items() if k != "field"}
                 )
                 column_write_entries.extend(new_entries)
 
@@ -271,10 +263,11 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.config_info.setItem(*line)
 
         self.config_info.setVerticalHeaderLabels(
-            list(item.name for item in chain.item_to_config))
+            list(item.name for item in chain.item_to_config)
+        )
 
     def _update_record_text(self, record):
-        'Slot - update record text when a new record is selected'
+        "Slot - update record text when a new record is selected"
         if self._mode.lower() == "chains w/o records":
             # TODO: a more helpful message oculd be useful
             self.record_text.setText("NOT GENERATED")
@@ -282,7 +275,7 @@ class TmcSummary(QtWidgets.QMainWindow):
             self.record_text.setText(self.records[record])
 
     def _update_chain_info(self, record):
-        'Slot - update chain information when a new record is selected'
+        "Slot - update chain information when a new record is selected"
         self.chain_info.clear()
         for chain in record.chain.chain:
             self.chain_info.addItem(str(chain))
@@ -293,26 +286,25 @@ class TmcSummary(QtWidgets.QMainWindow):
 
     def _update_item_list(self):
         self.item_list.clear()
-        if self._mode == 'chains':
+        if self._mode == "chains":
             items = self.chains.items()
-        elif self._mode == 'records':
+        elif self._mode == "records":
             items = [
-                (' / '.join(_grep_record_names(db_text)) or 'Unknown', record)
+                (" / ".join(_grep_record_names(db_text)) or "Unknown", record)
                 for record, db_text in self.records.items()
             ]
         elif self._mode == "chains w/o records":
             items = self.incomplete_chains.items()
         else:
             return
-        for name, record in sorted(items,
-                                   key=lambda item: item[0]):
+        for name, record in sorted(items, key=lambda item: item[0]):
             item = QtWidgets.QListWidgetItem(name)
             item.setData(Qt.UserRole, record)
             self.item_list.addItem(item)
 
 
 def create_debug_gui(tmc, dbd=None, allow_no_pragma=False):
-    '''
+    """
     Show the results of tmc processing in a Qt gui.
 
     Parameters
@@ -325,7 +317,7 @@ def create_debug_gui(tmc, dbd=None, allow_no_pragma=False):
 
     allow_no_pragma : bool, optional
         Look for chains that have missing pragmas.
-    '''
+    """
 
     if isinstance(tmc, (str, pathlib.Path)):
         tmc = pytmc.parser.parse(tmc)
@@ -343,23 +335,23 @@ def build_arg_parser(parser=None):
     parser.description = DESCRIPTION
     parser.formatter_class = argparse.RawTextHelpFormatter
 
-    parser.add_argument(
-        'tmc_file', metavar="INPUT", type=str,
-        help='Path to .tmc file'
-    )
+    parser.add_argument("tmc_file", metavar="INPUT", type=str, help="Path to .tmc file")
 
     parser.add_argument(
-        '-d', '--dbd',
+        "-d",
+        "--dbd",
         default=None,
         type=str,
-        help=('Specify an expanded .dbd file for validating fields '
-              '(requires pyPDB)')
+        help=(
+            "Specify an expanded .dbd file for validating fields " "(requires pyPDB)"
+        ),
     )
 
     parser.add_argument(
-        '-a', '--allow-no-pragma',
-        action='store_true',
-        help='Show all items, even those missing pragmas (warning: slow)',
+        "-a",
+        "--allow-no-pragma",
+        action="store_true",
+        help="Show all items, even those missing pragmas (warning: slow)",
     )
 
     return parser
@@ -367,7 +359,6 @@ def build_arg_parser(parser=None):
 
 def main(tmc_file, *, dbd=None, allow_no_pragma=False):
     app = QtWidgets.QApplication([])
-    interface = create_debug_gui(tmc_file, dbd,
-                                 allow_no_pragma=allow_no_pragma)
+    interface = create_debug_gui(tmc_file, dbd, allow_no_pragma=allow_no_pragma)
     interface.show()
     sys.exit(app.exec_())

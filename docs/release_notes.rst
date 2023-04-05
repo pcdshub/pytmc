@@ -2,6 +2,21 @@
  Release History
 =================
 
+v2.12.0 (2023-04-04)
+====================
+
+Python 3.9 is now the minimum supported version for pytmc.
+
+Maintenance
+-----------
+* Fixes pre-commit repository settings for flake8.
+* Migrates from Travis CI to GitHub Actions for continuous integration testing, and documentation deployment.
+* Updates pytmc to use setuptools-scm, replacing versioneer, as its version-string management tool of choice.
+* Syntax has been updated to Python 3.9+ via ``pyupgrade``.
+* pytmc has migrated to modern ``pyproject.toml``, replacing ``setup.py``.
+* Sphinx 6.0 now supported for documentation building.
+* ``docs-versions-menu`` is now used for documentation deployment on GitHub Actions.
+
 v2.11.0 (2021-11-15)
 ====================
 

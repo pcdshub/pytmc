@@ -3,7 +3,7 @@ Record generation and templating
 """
 import logging
 from collections import ChainMap, OrderedDict
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import jinja2
 
@@ -29,7 +29,7 @@ _default_jinja_env = jinja2.Environment(
 
 
 def _truncate_middle(string, max_length):
-    '''
+    """
     Truncate a string to a maximum length, replacing the skipped middle section
     with an ellipsis.
 
@@ -39,7 +39,7 @@ def _truncate_middle(string, max_length):
         The string to optionally truncate
     max_length : int
         The maximum length
-    '''
+    """
     # Based on https://www.xormedia.com/string-truncate-middle-with-ellipsis/
     if len(string) <= max_length:
         return string
@@ -47,7 +47,7 @@ def _truncate_middle(string, max_length):
     # half of the size, minus the 3 dots
     n2 = max_length // 2 - 3
     n1 = max_length - n2 - 3
-    return '...'.join((string[:n1], string[-n2:]))
+    return "...".join((string[:n1], string[-n2:]))
 
 
 def _update_description(record, default):
@@ -66,7 +66,7 @@ def _update_description(record, default):
         The default description.
     """
     fields = record.fields
-    desc = fields.setdefault('DESC', default)
+    desc = fields.setdefault("DESC", default)
     if len(desc) <= MAX_DESC_FIELD_LENGTH:
         return
 
@@ -74,27 +74,35 @@ def _update_description(record, default):
     record.long_description = desc
 
     # And truncate the one available to EPICS:
-    fields['DESC'] = _truncate_middle(desc, MAX_DESC_FIELD_LENGTH)
+    fields["DESC"] = _truncate_middle(desc, MAX_DESC_FIELD_LENGTH)
 
 
 class EPICSRecord:
     """Representation of a single EPICS Record"""
 
-    def __init__(self, pvname, record_type, direction, fields=None,
-                 template=None, autosave=None, aliases=None,
-                 archive_settings=None, package=None):
+    def __init__(
+        self,
+        pvname,
+        record_type,
+        direction,
+        fields=None,
+        template=None,
+        autosave=None,
+        aliases=None,
+        archive_settings=None,
+        package=None,
+    ):
         self.pvname = pvname
         self.record_type = record_type
         self.direction = direction
         self.fields = OrderedDict(fields) if fields is not None else {}
         self.aliases = list(aliases) if aliases is not None else []
-        self.template = template or 'asyn_standard_record.jinja2'
+        self.template = template or "asyn_standard_record.jinja2"
         self.autosave = dict(autosave) if autosave else {}
         self.package = package
-        self.archive_settings = (dict(archive_settings)
-                                 if archive_settings else {})
+        self.archive_settings = dict(archive_settings) if archive_settings else {}
 
-        if 'fields' not in self.archive_settings:
+        if "fields" not in self.archive_settings:
             self.archive_settings = {}
 
         self.record_template = _default_jinja_env.get_template(self.template)
@@ -118,11 +126,13 @@ class EPICSRecord:
             The pragma configuration dictionary
         """
         for pass_ in [0, 1]:
-            for config_key in [f'autosave_pass{pass_}',
-                               f'autosave_{self.direction}_pass{pass_}']:
+            for config_key in [
+                f"autosave_pass{pass_}",
+                f"autosave_{self.direction}_pass{pass_}",
+            ]:
                 if config_key in config:
-                    record_key = f'pass{pass_}'
-                    fields = set(config[config_key].split(' '))
+                    record_key = f"pass{pass_}"
+                    fields = set(config[config_key].split(" "))
                     self.autosave[record_key] = fields
 
     def update_pini_for_autosave(self):
@@ -135,8 +145,8 @@ class EPICSRecord:
 
         This is intended to be called for output records.
         """
-        if 'VAL' in self.autosave['pass1']:
-            self.fields['PINI'] = 1
+        if "VAL" in self.autosave["pass1"]:
+            self.fields["PINI"] = 1
 
     def render(self, sort: bool = True):
         """Render the provided template"""
@@ -149,8 +159,7 @@ class EPICSRecord:
         return self.record_template.render(record=self)
 
     def __repr__(self):
-        return (f"EPICSRecord({self.pvname!r}, "
-                f"record_type={self.record_type!r})")
+        return f"EPICSRecord({self.pvname!r}, " f"record_type={self.record_type!r})"
 
 
 class RecordPackage:
@@ -162,6 +171,7 @@ class RecordPackage:
     Optionally, ``RecordPackage`` can have a ``configure`` method which does
     the necessary setup before the record can be configured.
     """
+
     _required_keys = {}
     _required_fields = {}
     archive_fields = []
@@ -177,8 +187,8 @@ class RecordPackage:
         self.pvname = None
         self.tcname = chain.tcname
         self.linked_to_pv = None
-        self.macro_character = '@'
-        self.delimiter = ':'
+        self.macro_character = "@"
+        self.delimiter = ":"
         self.config = pytmc.pragmas.normalize_config(self.chain.config)
         self.long_description = None
 
@@ -187,68 +197,65 @@ class RecordPackage:
     def __repr__(self):
         items = {
             attr: getattr(self, attr, None)
-            for attr in ('tcname', 'pvname', 'long_description',
-                         'linked_to_pv')
+            for attr in ("tcname", "pvname", "long_description", "linked_to_pv")
         }
-        info = ', '.join(f'{k}={v!r}' for k, v in items.items()
-                         if v)
+        info = ", ".join(f"{k}={v!r}" for k, v in items.items() if v)
         return f"{self.__class__.__name__}({info})"
 
     def _parse_config(self, config):
-        'Parse the chain configuration'
+        "Parse the chain configuration"
         if config is None:
             return
 
-        self.macro_character = config.get('macro_character', '@')
+        self.macro_character = config.get("macro_character", "@")
 
         self._configure_pvname()
         self._configure_link()
         self._configure_archive_settings(
-            archive_settings=config['archive'],
-            archive_fields=config.get('archive_fields', '')
+            archive_settings=config["archive"],
+            archive_fields=config.get("archive_fields", ""),
         )
-        self._configure_aliases(pv=config['pv'],
-                                macro_character=self.macro_character,
-                                alias_setting=config.get('alias', ''))
+        self._configure_aliases(
+            pv=config["pv"],
+            macro_character=self.macro_character,
+            alias_setting=config.get("alias", ""),
+        )
 
         return config
 
     def _configure_link(self):
-        'Link this record to a pre-existing EPICS record via a CA (CP) link'
-        self.linked_to_pv = self.config.get('link') or None
+        "Link this record to a pre-existing EPICS record via a CA (CP) link"
+        self.linked_to_pv = self.config.get("link") or None
 
     def _configure_pvname(self):
-        'Configure the pvname, based on the given macro character'
+        "Configure the pvname, based on the given macro character"
         # Due to a twincat pragma limitation, EPICS macro prefix '$' cannot be
         # used or escaped.  Allow the configuration to specify an alternate
         # character in the pragma, defaulting to '@'.
-        self.pvname = self.chain.pvname.replace(self.macro_character, '$')
+        self.pvname = self.chain.pvname.replace(self.macro_character, "$")
 
     def _configure_aliases(self, pv, macro_character, alias_setting):
-        'Configure aliases from the configuration (aliases attribute)'
+        "Configure aliases from the configuration (aliases attribute)"
         # The base for the alias does not include the final pvname:
         alias_base = self.delimiter.join(
-            pv_segment for pv_segment in pv[:-1]
-            if pv_segment
+            pv_segment for pv_segment in pv[:-1] if pv_segment
         )
 
         # Split user-specified aliases for the record:
         self.aliases = [
-            self.delimiter.join(
-                (alias_base, alias)).replace(self.macro_character, '$')
-            for alias in alias_setting.split(' ')
+            self.delimiter.join((alias_base, alias)).replace(self.macro_character, "$")
+            for alias in alias_setting.split(" ")
             if alias.strip()
         ]
 
     def _configure_archive_settings(self, archive_settings, archive_fields):
-        'Parse archive settings pragma key (archive_settings attribute)'
+        "Parse archive settings pragma key (archive_settings attribute)"
         self.archive_settings = archive_settings
         if archive_settings:
             # Fields are those from the pragma (key: archive_fields) plus
             # those set by default on the RecordPackage class
-            fields = set(archive_fields.split(' ')
-                         if archive_fields else [])
-            archive_settings['fields'] = fields.union(set(self.archive_fields))
+            fields = set(archive_fields.split(" ") if archive_fields else [])
+            archive_settings["fields"] = fields.union(set(self.archive_fields))
 
     @property
     def valid(self):
@@ -260,12 +267,10 @@ class RecordPackage:
         """
         if self.pvname is None or not self.chain.valid:
             return False
-        has_required_keys = all(self.config.get(key)
-                                for key in self._required_keys)
+        has_required_keys = all(self.config.get(key) for key in self._required_keys)
 
-        fields = self.config.get('field', {})
-        has_required_fields = all(fields.get(key)
-                                  for key in self._required_fields)
+        fields = self.config.get("field", {})
+        has_required_fields = all(fields.get(key) for key in self._required_fields)
         return has_required_keys and has_required_fields
 
     @property
@@ -281,10 +286,9 @@ class RecordPackage:
             Jinja rendered entry for the RecordPackage
         """
         if not self.valid:
-            logger.error('Unable to render record: %s', self)
+            logger.error("Unable to render record: %s", self)
             return
-        return '\n\n'.join([record.render().strip()
-                            for record in self.records])
+        return "\n\n".join([record.render().strip() for record in self.records])
 
     @staticmethod
     def from_chain(*args, chain, **kwargs):
@@ -303,8 +307,8 @@ class RecordPackage:
                 spec = DATA_TYPES[data_type.name]
             except KeyError:
                 raise ValueError(
-                    f'Unsupported data type {data_type.name} in chain: '
-                    f'{chain.tcname} record: {chain.pvname}'
+                    f"Unsupported data type {data_type.name} in chain: "
+                    f"{chain.tcname} record: {chain.pvname}"
                 ) from None
             if spec is IntegerRecordPackage:
                 if "scale" in chain.config or "offset" in chain.config:
@@ -315,14 +319,14 @@ class RecordPackage:
         return spec(*args, chain=chain, **kwargs)
 
 
-AutosaveDefaults = Dict[str, Dict[str, Set[str]]]
+AutosaveDefaults = dict[str, dict[str, set[str]]]
 
 
 def make_autosave_defaults(
-    input_pass0: Optional[List[str]] = None,
-    input_pass1: Optional[List[str]] = None,
-    output_pass0: Optional[List[str]] = None,
-    output_pass1: Optional[List[str]] = None,
+    input_pass0: Optional[list[str]] = None,
+    input_pass1: Optional[list[str]] = None,
+    output_pass0: Optional[list[str]] = None,
+    output_pass1: Optional[list[str]] = None,
     exclude_defaults: bool = False,
 ) -> AutosaveDefaults:
     """
@@ -403,15 +407,16 @@ class TwincatTypeRecordPackage(RecordPackage):
        functions can be subclasses if further customisation is needed. This is
        not required.
     """
-    field_defaults = {'PINI': 1, 'TSE': -2}
+
+    field_defaults = {"PINI": 1, "TSE": -2}
     autosave_defaults = make_autosave_defaults()
 
     dtyp = NotImplemented
     input_rtyp = NotImplemented
     output_rtyp = NotImplemented
-    input_only_fields = {'SVAL'}
-    output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL'}
-    archive_fields = ['VAL']
+    input_only_fields = {"SVAL"}
+    output_only_fields = {"DOL", "IVOA", "IVOV", "OMSL"}
+    archive_fields = ["VAL"]
 
     # Is an auxiliary record required to support existing record linking?
     link_requires_record = False
@@ -420,14 +425,15 @@ class TwincatTypeRecordPackage(RecordPackage):
         """Magic to have field_defaults be the combination of hierarchy"""
         super().__init_subclass__(**kwargs)
         # Create an empty set of defaults if not provided
-        if not hasattr(cls, 'field_defaults'):
+        if not hasattr(cls, "field_defaults"):
             cls.field_defaults = {}
         # Walk backwards through class hierarchy
         for parent in reversed(cls.mro()):
             # When we find a class with field_defaults append our own
-            if hasattr(parent, 'field_defaults'):
-                cls.field_defaults = dict(ChainMap(cls.field_defaults,
-                                                   parent.field_defaults))
+            if hasattr(parent, "field_defaults"):
+                cls.field_defaults = dict(
+                    ChainMap(cls.field_defaults, parent.field_defaults)
+                )
                 break
 
     @property
@@ -440,39 +446,35 @@ class TwincatTypeRecordPackage(RecordPackage):
         direction : str
             {'input', 'output'}
         """
-        return self.config['io']
+        return self.config["io"]
 
     @property
     def _asyn_port_spec(self):
-        'Asyn port specification without io direction, with room for options'
-        return (f'@asyn($(PORT),0,1)'
-                f'ADSPORT={self.ads_port}/{{options}}{self.tcname}'
-                )
+        "Asyn port specification without io direction, with room for options"
+        return f"@asyn($(PORT),0,1)" f"ADSPORT={self.ads_port}/{{options}}{self.tcname}"
 
     @property
     def asyn_update_options(self):
-        'Input record update options (TS_MS or POLL_RATE)'
-        update = self.config['update']
-        if update['method'] == 'poll':
-            freq = update['frequency']
+        "Input record update options (TS_MS or POLL_RATE)"
+        update = self.config["update"]
+        if update["method"] == "poll":
+            freq = update["frequency"]
             if int(freq) == float(freq):
-                return f'POLL_RATE={int(freq)}/'
-            return f'POLL_RATE={freq:.2f}'.rstrip('0') + '/'
+                return f"POLL_RATE={int(freq)}/"
+            return f"POLL_RATE={freq:.2f}".rstrip("0") + "/"
 
-        milliseconds = int(1000 * update['seconds'])
-        return f'TS_MS={milliseconds}/'
+        milliseconds = int(1000 * update["seconds"])
+        return f"TS_MS={milliseconds}/"
 
     @property
     def asyn_input_port_spec(self):
         """Asyn input port specification (for INP field)"""
-        return (
-            self._asyn_port_spec.format(options=self.asyn_update_options) + '?'
-        )
+        return self._asyn_port_spec.format(options=self.asyn_update_options) + "?"
 
     @property
     def asyn_output_port_spec(self):
         """Asyn output port specification (for OUT field)"""
-        return self._asyn_port_spec.format(options='') + '='
+        return self._asyn_port_spec.format(options="") + "="
 
     def generate_input_record(self):
         """
@@ -483,42 +485,46 @@ class TwincatTypeRecordPackage(RecordPackage):
         record: :class:`.EpicsRecord`
             Description of input record
         """
+
         # Base record with defaults
         def add_rbv(pvname):
-            if pvname and not pvname.endswith('RBV'):
-                return pvname + '_RBV'
+            if pvname and not pvname.endswith("RBV"):
+                return pvname + "_RBV"
             return pvname
 
         pvname = add_rbv(self.pvname)
         aliases = [add_rbv(alias) for alias in self.aliases]
 
-        record = EPICSRecord(pvname,
-                             self.input_rtyp,
-                             'input',
-                             fields=self.field_defaults,
-                             autosave=self.autosave_defaults.get('input'),
-                             aliases=aliases,
-                             archive_settings=self.archive_settings,
-                             package=self,
-                             )
+        record = EPICSRecord(
+            pvname,
+            self.input_rtyp,
+            "input",
+            fields=self.field_defaults,
+            autosave=self.autosave_defaults.get("input"),
+            aliases=aliases,
+            archive_settings=self.archive_settings,
+            package=self,
+        )
 
         # Add our port
-        record.fields['INP'] = self.asyn_input_port_spec
-        record.fields['DTYP'] = self.dtyp
+        record.fields["INP"] = self.asyn_input_port_spec
+        record.fields["DTYP"] = self.dtyp
 
         # Update with given pragma fields - ignoring output-only fields:
-        user_fields = self.config.get('field', {})
+        user_fields = self.config.get("field", {})
         record.fields.update(
-            {field: value for field, value in user_fields.items()
-             if field not in self.output_only_fields
-             }
+            {
+                field: value
+                for field, value in user_fields.items()
+                if field not in self.output_only_fields
+            }
         )
 
         # Set a default description to the tcname
         _update_description(record, self.chain.tcname)
 
         # Records must always be I/O Intr, regardless of the pragma:
-        record.fields['SCAN'] = 'I/O Intr'
+        record.fields["SCAN"] = "I/O Intr"
 
         record.update_autosave_from_pragma(self.config)
 
@@ -530,27 +536,24 @@ class TwincatTypeRecordPackage(RecordPackage):
             return {}
 
         last_link = self.linked_to_pv[-1]
-        if last_link.startswith('*'):
+        if last_link.startswith("*"):
             # NOTE: A special, undocumented syntax for a lack of a better
             # idea/more time:  need to allow pytmc to get access to a PV name
             # it generates
             # Consider this temporary API, only to be used in
             # lcls-twincat-general for now.
-            pv_parts = list(self.config['pv'])
-            linked_to_pv = self.delimiter.join(
-                pv_parts[:-1] + [last_link.lstrip('*')]
-            )
+            pv_parts = list(self.config["pv"])
+            linked_to_pv = self.delimiter.join(pv_parts[:-1] + [last_link.lstrip("*")])
         else:
-            linked_to_pv = ''.join(
-                part for part in self.linked_to_pv
-                if part is not None
+            linked_to_pv = "".join(
+                part for part in self.linked_to_pv if part is not None
             )
 
-        linked_to_pv = linked_to_pv.replace(self.macro_character, '$')
+        linked_to_pv = linked_to_pv.replace(self.macro_character, "$")
         return {
-            'OMSL': 'closed_loop',
-            'DOL': linked_to_pv + ' CP MS',
-            'SCAN': self.config.get('link_scan', '.5 second'),
+            "OMSL": "closed_loop",
+            "DOL": linked_to_pv + " CP MS",
+            "SCAN": self.config.get("link_scan", ".5 second"),
         }
 
     def generate_output_record(self):
@@ -565,26 +568,27 @@ class TwincatTypeRecordPackage(RecordPackage):
             Description of output record
         """
         # Base record with defaults
-        record = EPICSRecord(self.pvname,
-                             self.output_rtyp,
-                             'output',
-                             fields=self.field_defaults,
-                             autosave=self.autosave_defaults.get('output'),
-                             aliases=self.aliases,
-                             archive_settings=self.archive_settings,
-                             package=self,
-                             )
+        record = EPICSRecord(
+            self.pvname,
+            self.output_rtyp,
+            "output",
+            fields=self.field_defaults,
+            autosave=self.autosave_defaults.get("output"),
+            aliases=self.aliases,
+            archive_settings=self.archive_settings,
+            package=self,
+        )
 
         # Add our port
-        record.fields['DTYP'] = self.dtyp
-        record.fields['OUT'] = self.asyn_output_port_spec
+        record.fields["DTYP"] = self.dtyp
+        record.fields["OUT"] = self.asyn_output_port_spec
 
         # By default, NO_ALARM if the output record has not processed yet:
         record.fields.setdefault("UDFS", "0")
 
         # Remove timestamp source and process-on-init for output records:
-        record.fields.pop('TSE', None)
-        record.fields.pop('PINI', None)
+        record.fields.pop("TSE", None)
+        record.fields.pop("PINI", None)
 
         # Add on OMSL fields, if this is linked to an existing record.
         # Some links (such as strings) may require auxiliary records, so
@@ -593,11 +597,13 @@ class TwincatTypeRecordPackage(RecordPackage):
             record.fields.update(self._get_omsl_fields())
 
         # Update with given pragma fields - ignoring input-only fields:
-        user_fields = self.config.get('field', {})
+        user_fields = self.config.get("field", {})
         record.fields.update(
-            {field: value for field, value in user_fields.items()
-             if field not in self.input_only_fields
-             }
+            {
+                field: value
+                for field, value in user_fields.items()
+                if field not in self.input_only_fields
+            }
         )
 
         # Set a default description to the tcname
@@ -611,20 +617,31 @@ class TwincatTypeRecordPackage(RecordPackage):
     def records(self):
         """All records that will be created in the package"""
         records = [self.generate_input_record()]
-        if self.io_direction == 'output':
+        if self.io_direction == "output":
             records.append(self.generate_output_record())
         return records
 
 
 class BinaryRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a binary Twincat Variable"""
-    input_rtyp = 'bi'
-    output_rtyp = 'bo'
-    dtyp = 'asynInt32'
-    field_defaults = {'ZNAM': 'FALSE', 'ONAM': 'TRUE'}
-    output_only_fields = {'DOL', 'HIGH', 'IVOA', 'IVOV', 'OMSL', 'ORBV',
-                          'OUT', 'RBV', 'RPVT', 'WDPT'}
-    input_only_fields = {'SVAL'}
+
+    input_rtyp = "bi"
+    output_rtyp = "bo"
+    dtyp = "asynInt32"
+    field_defaults = {"ZNAM": "FALSE", "ONAM": "TRUE"}
+    output_only_fields = {
+        "DOL",
+        "HIGH",
+        "IVOA",
+        "IVOV",
+        "OMSL",
+        "ORBV",
+        "OUT",
+        "RBV",
+        "RPVT",
+        "WDPT",
+    }
+    input_only_fields = {"SVAL"}
 
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
@@ -643,11 +660,12 @@ class BinaryRecordPackage(TwincatTypeRecordPackage):
 
 class IntegerRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for an integer Twincat Variable"""
-    input_rtyp = 'longin'
-    output_rtyp = 'longout'
-    output_only_fields = {'DOL', 'DRVH', 'DRVL', 'IVOA', 'IVOV', 'OMSL'}
-    input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
-    dtyp = 'asynInt32'
+
+    input_rtyp = "longin"
+    output_rtyp = "longout"
+    output_only_fields = {"DOL", "DRVH", "DRVL", "IVOA", "IVOV", "OMSL"}
+    input_only_fields = {"AFTC", "AFVL", "SVAL"}
+    dtyp = "asynInt32"
 
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
@@ -684,14 +702,27 @@ class IntegerRecordPackage(TwincatTypeRecordPackage):
 
 class FloatRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a floating point Twincat Variable"""
-    input_rtyp = 'ai'
-    output_rtyp = 'ao'
-    dtyp = 'asynFloat64'
-    field_defaults = {'PREC': '3'}
-    output_only_fields = {'DOL', 'DRVH', 'DRVL', 'IVOA', 'IVOV', 'OIF',
-                          'OMOD', 'OMSL', 'ORBV', 'OROC', 'OVAL', 'PVAL',
-                          'RBV'}
-    input_only_fields = {'AFTC', 'AFVL', 'SMOO', 'SVAL'}
+
+    input_rtyp = "ai"
+    output_rtyp = "ao"
+    dtyp = "asynFloat64"
+    field_defaults = {"PREC": "3"}
+    output_only_fields = {
+        "DOL",
+        "DRVH",
+        "DRVL",
+        "IVOA",
+        "IVOV",
+        "OIF",
+        "OMOD",
+        "OMSL",
+        "ORBV",
+        "OROC",
+        "OVAL",
+        "PVAL",
+        "RBV",
+    }
+    input_only_fields = {"AFTC", "AFVL", "SMOO", "SVAL"}
 
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
@@ -763,11 +794,12 @@ class FloatRecordPackage(TwincatTypeRecordPackage):
 
 class EnumRecordPackage(TwincatTypeRecordPackage):
     """Create a set of record for a ENUM Twincat Variable"""
-    input_rtyp = 'mbbi'
-    output_rtyp = 'mbbo'
-    dtyp = 'asynInt32'
-    output_only_fields = {'DOL', 'IVOA', 'IVOV', 'OMSL', 'ORBV', 'RBV'}
-    input_only_fields = {'AFTC', 'AFVL', 'SVAL'}
+
+    input_rtyp = "mbbi"
+    output_rtyp = "mbbo"
+    dtyp = "asynInt32"
+    output_only_fields = {"DOL", "IVOA", "IVOV", "OMSL", "ORBV", "RBV"}
+    input_only_fields = {"AFTC", "AFVL", "SVAL"}
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
             # Per-state severities
@@ -815,22 +847,22 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
     )
 
     mbb_fields = [
-        ('ZRVL', 'ZRST'),
-        ('ONVL', 'ONST'),
-        ('TWVL', 'TWST'),
-        ('THVL', 'THST'),
-        ('FRVL', 'FRST'),
-        ('FVVL', 'FVST'),
-        ('SXVL', 'SXST'),
-        ('SVVL', 'SVST'),
-        ('EIVL', 'EIST'),
-        ('NIVL', 'NIST'),
-        ('TEVL', 'TEST'),
-        ('ELVL', 'ELST'),
-        ('TVVL', 'TVST'),
-        ('TTVL', 'TTST'),
-        ('FTVL', 'FTST'),
-        ('FFVL', 'FFST'),
+        ("ZRVL", "ZRST"),
+        ("ONVL", "ONST"),
+        ("TWVL", "TWST"),
+        ("THVL", "THST"),
+        ("FRVL", "FRST"),
+        ("FVVL", "FVST"),
+        ("SXVL", "SXST"),
+        ("SVVL", "SVST"),
+        ("EIVL", "EIST"),
+        ("NIVL", "NIST"),
+        ("TEVL", "TEST"),
+        ("ELVL", "ELST"),
+        ("TVVL", "TVST"),
+        ("TTVL", "TTST"),
+        ("FTVL", "FTST"),
+        ("FFVL", "FFST"),
     ]
 
     def __init__(self, *args, **kwargs):
@@ -839,19 +871,20 @@ class EnumRecordPackage(TwincatTypeRecordPackage):
 
         self.field_defaults = dict(self.field_defaults)
         for (val_field, string_field), (val, string) in zip(
-                self.mbb_fields,
-                sorted(data_type.enum_dict.items())):
+            self.mbb_fields, sorted(data_type.enum_dict.items())
+        ):
             self.field_defaults.setdefault(val_field, val)
             self.field_defaults.setdefault(string_field, string)
 
 
 class WaveformRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a Twincat Array"""
-    input_rtyp = 'waveform'
-    output_rtyp = 'waveform'
+
+    input_rtyp = "waveform"
+    output_rtyp = "waveform"
     field_defaults = {
-        'APST': 'On Change',
-        'MPST': 'On Change',
+        "APST": "On Change",
+        "MPST": "On Change",
     }
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
@@ -870,12 +903,14 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
     @property
     def ftvl(self):
         """Field type of value"""
-        ftvl = {'BOOL': 'CHAR',
-                'INT': 'SHORT',
-                'ENUM': 'SHORT',
-                'DINT': 'LONG',
-                'REAL': 'FLOAT',
-                'LREAL': 'DOUBLE'}
+        ftvl = {
+            "BOOL": "CHAR",
+            "INT": "SHORT",
+            "ENUM": "SHORT",
+            "DINT": "LONG",
+            "REAL": "FLOAT",
+            "LREAL": "DOUBLE",
+        }
         return ftvl[self.chain.data_type.name]
 
     @property
@@ -898,51 +933,51 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
         """
 
         # Assumes ArrayIn/ArrayOut will be appended
-        data_types = {'BOOL': 'asynInt8',
-                      'BYTE': 'asynInt8',
-                      'SINT': 'asynInt8',
-                      'USINT': 'asynInt8',
-
-                      'WORD': 'asynInt16',
-                      'INT': 'asynInt16',
-                      'UINT': 'asynInt16',
-
-                      'DWORD': 'asynInt32',
-                      'DINT': 'asynInt32',
-                      'UDINT': 'asynInt32',
-                      'ENUM': 'asynInt16',  # -> Int32?
-
-                      'REAL': 'asynFloat32',
-                      'LREAL': 'asynFloat64'}
+        data_types = {
+            "BOOL": "asynInt8",
+            "BYTE": "asynInt8",
+            "SINT": "asynInt8",
+            "USINT": "asynInt8",
+            "WORD": "asynInt16",
+            "INT": "asynInt16",
+            "UINT": "asynInt16",
+            "DWORD": "asynInt32",
+            "DINT": "asynInt32",
+            "UDINT": "asynInt32",
+            "ENUM": "asynInt16",  # -> Int32?
+            "REAL": "asynFloat32",
+            "LREAL": "asynFloat64",
+        }
 
         return data_types[self.chain.data_type.name]
 
     def generate_input_record(self):
         record = super().generate_input_record()
-        record.fields['DTYP'] += 'ArrayIn'
-        record.fields['FTVL'] = self.ftvl
-        record.fields['NELM'] = self.nelm
+        record.fields["DTYP"] += "ArrayIn"
+        record.fields["FTVL"] = self.ftvl
+        record.fields["NELM"] = self.nelm
         return record
 
     def generate_output_record(self):
         record = super().generate_output_record()
-        record.fields['DTYP'] += 'ArrayOut'
-        record.fields['FTVL'] = self.ftvl
-        record.fields['NELM'] = self.nelm
+        record.fields["DTYP"] += "ArrayOut"
+        record.fields["FTVL"] = self.ftvl
+        record.fields["NELM"] = self.nelm
         # Waveform records only have INP fields!
-        record.fields['INP'] = record.fields.pop('OUT')
+        record.fields["INP"] = record.fields.pop("OUT")
         return record
 
 
 class StringRecordPackage(TwincatTypeRecordPackage):
     """RecordPackage for broadcasting string values"""
-    input_rtyp = 'waveform'
-    output_rtyp = 'waveform'
-    dtyp = 'asynInt8'
+
+    input_rtyp = "waveform"
+    output_rtyp = "waveform"
+    dtyp = "asynInt8"
     field_defaults = {
-        'FTVL': 'CHAR',
-        'APST': 'On Change',
-        'MPST': 'On Change',
+        "FTVL": "CHAR",
+        "APST": "On Change",
+        "MPST": "On Change",
     }
     autosave_defaults = make_autosave_defaults(
         input_pass0=[
@@ -970,20 +1005,20 @@ class StringRecordPackage(TwincatTypeRecordPackage):
     @property
     def nelm(self):
         """Number of elements in record"""
-        return self.chain.data_type.length or '81'
+        return self.chain.data_type.length or "81"
 
     def generate_input_record(self):
         record = super().generate_input_record()
-        record.fields['DTYP'] += 'ArrayIn'
-        record.fields['NELM'] = self.nelm
+        record.fields["DTYP"] += "ArrayIn"
+        record.fields["NELM"] = self.nelm
         return record
 
     def generate_output_record(self):
         record = super().generate_output_record()
         # Waveform records only have INP fields!
-        record.fields['DTYP'] += 'ArrayOut'
-        record.fields['INP'] = record.fields.pop('OUT')
-        record.fields['NELM'] = self.nelm
+        record.fields["DTYP"] += "ArrayOut"
+        record.fields["INP"] = record.fields.pop("OUT")
+        record.fields["NELM"] = self.nelm
         return record
 
     def generate_link_record(self):
@@ -995,15 +1030,13 @@ class StringRecordPackage(TwincatTypeRecordPackage):
             package=self,
             autosave=self.autosave_defaults_for_link["output"],
         )
-        record.fields.pop('TSE', None)
-        record.fields.pop('PINI', None)
+        record.fields.pop("TSE", None)
+        record.fields.pop("PINI", None)
         record.fields["SIZV"] = self.nelm
 
         # Add our port
-        record.fields.update(
-            self._get_omsl_fields()
-        )
-        record.fields['OUT'] = f"{self.pvname} PP MS"
+        record.fields.update(self._get_omsl_fields())
+        record.fields["OUT"] = f"{self.pvname} PP MS"
         _update_description(record, f"Aux link record for {self.chain.tcname}")
         return record
 
@@ -1012,7 +1045,7 @@ class StringRecordPackage(TwincatTypeRecordPackage):
         """All records that will be created in the package"""
         records = [self.generate_input_record()]
         link_fields = self._get_omsl_fields()
-        if self.io_direction == 'output' or link_fields:
+        if self.io_direction == "output" or link_fields:
             records.append(self.generate_output_record())
             if link_fields and self.link_requires_record:
                 records.append(self.generate_link_record())
@@ -1021,29 +1054,28 @@ class StringRecordPackage(TwincatTypeRecordPackage):
 
 
 DATA_TYPES = {
-    'BOOL': BinaryRecordPackage,
-    'BYTE': IntegerRecordPackage,
-    'SINT': IntegerRecordPackage,
-    'USINT': IntegerRecordPackage,
-
-    'WORD': IntegerRecordPackage,
-    'INT': IntegerRecordPackage,
-    'UINT': IntegerRecordPackage,
-
-    'DWORD': IntegerRecordPackage,
-    'DINT': IntegerRecordPackage,
-    'UDINT': IntegerRecordPackage,
-    'ENUM': EnumRecordPackage,
-
-    'REAL': FloatRecordPackage,
-    'LREAL': FloatRecordPackage,
-
-    'STRING': StringRecordPackage,
+    "BOOL": BinaryRecordPackage,
+    "BYTE": IntegerRecordPackage,
+    "SINT": IntegerRecordPackage,
+    "USINT": IntegerRecordPackage,
+    "WORD": IntegerRecordPackage,
+    "INT": IntegerRecordPackage,
+    "UINT": IntegerRecordPackage,
+    "DWORD": IntegerRecordPackage,
+    "DINT": IntegerRecordPackage,
+    "UDINT": IntegerRecordPackage,
+    "ENUM": EnumRecordPackage,
+    "REAL": FloatRecordPackage,
+    "LREAL": FloatRecordPackage,
+    "STRING": StringRecordPackage,
 }
 
 
-def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
-                last: Optional[bool] = True) -> OrderedDict:
+def sort_fields(
+    unsorted: OrderedDict,
+    sort_lookup: Optional[dict] = None,
+    last: Optional[bool] = True,
+) -> OrderedDict:
     """
     Sort the ordered dict according to the sort_scheme given at instantiation.
     Does NOT sort in place.
@@ -1080,11 +1112,9 @@ def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
 
     # Separately sort instructed and, naively sorted entries
     instructed_sorted = sorted(
-        instructed_unsorted.items(),
-        key=lambda key: sort_lookup[key[0]])
-    naive_sorted = sorted(
-        naive_unsorted.items()
+        instructed_unsorted.items(), key=lambda key: sort_lookup[key[0]]
     )
+    naive_sorted = sorted(naive_unsorted.items())
 
     # Merge both Odicts in the order given by 'last'
     combined_sorted = OrderedDict()
@@ -1098,7 +1128,7 @@ def sort_fields(unsorted: OrderedDict, sort_lookup: Optional[dict] = None,
 
 
 def generate_archive_settings(packages):
-    '''
+    """
     Generate an archive settings given a list of record packages
 
     Parameters
@@ -1109,16 +1139,16 @@ def generate_archive_settings(packages):
     ------
     str
         One line from the archiver settings file
-    '''
+    """
     for package in packages:
         archive_settings = package.archive_settings
         if archive_settings:
             # for record in package.records:
             for record in package.records:
-                for field in sorted(archive_settings['fields']):
-                    period = archive_settings['seconds']
-                    update_rate = package.config['update']['seconds']
+                for field in sorted(archive_settings["fields"]):
+                    period = archive_settings["seconds"]
+                    update_rate = package.config["update"]["seconds"]
                     if period < update_rate:
                         period = update_rate
-                    method = archive_settings['method']
-                    yield f'{record.pvname}.{field}\t{period}\t{method}'
+                    method = archive_settings["method"]
+                    yield f"{record.pvname}.{field}\t{period}\t{method}"

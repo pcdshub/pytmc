@@ -1,17 +1,17 @@
 import logging
 
-from . import _version, linter, parser, pragmas
+from . import linter, parser, pragmas
 from .record import EPICSRecord, RecordPackage
+from .version import __version__  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
-__version__ = _version.get_versions()['version']
 
 __all__ = [
-    'EPICSRecord',
-    'RecordPackage',
-    'linter',
-    'logger',
-    'parser',
-    'pragmas',
+    "EPICSRecord",
+    "RecordPackage",
+    "linter",
+    "logger",
+    "parser",
+    "pragmas",
 ]

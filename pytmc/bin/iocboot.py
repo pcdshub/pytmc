@@ -25,57 +25,62 @@ def build_arg_parser(parser=None):
     parser.description = DESCRIPTION
     parser.formatter_class = argparse.RawTextHelpFormatter
 
+    parser.add_argument("tsproj_project", type=str, help="Path to .tsproj project")
+
     parser.add_argument(
-        'tsproj_project', type=str,
-        help='Path to .tsproj project'
+        "ioc_template_path", type=str, help="Path to IOC template directory"
     )
 
     parser.add_argument(
-        'ioc_template_path', type=str,
-        help='Path to IOC template directory'
-    )
-
-    parser.add_argument(
-        '--prefix', type=str, default='ioc-',
-        help='IOC boot directory prefix [default: ioc-]'
-    )
-
-    parser.add_argument(
-        '--makefile-name', type=str,
-        default='Makefile.ioc',
-        help='Jinja2 template for the IOC Makefile [default: Makefile.ioc]',
-    )
-
-    parser.add_argument(
-        '--overwrite', action='store_true',
-        help='Overwrite existing files'
-    )
-
-    parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Dry-run only - do not write files'
-    )
-
-    parser.add_argument(
-        '--plcs',
+        "--prefix",
         type=str,
-        action='append',
-        help='Specify one or more PLC names to generate'
+        default="ioc-",
+        help="IOC boot directory prefix [default: ioc-]",
     )
 
     parser.add_argument(
-        '--debug', '-d',
-        action='store_true',
-        help='Post-stcmd, open an interactive Python session'
+        "--makefile-name",
+        type=str,
+        default="Makefile.ioc",
+        help="Jinja2 template for the IOC Makefile [default: Makefile.ioc]",
+    )
+
+    parser.add_argument(
+        "--overwrite", action="store_true", help="Overwrite existing files"
+    )
+
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Dry-run only - do not write files"
+    )
+
+    parser.add_argument(
+        "--plcs",
+        type=str,
+        action="append",
+        help="Specify one or more PLC names to generate",
+    )
+
+    parser.add_argument(
+        "--debug",
+        "-d",
+        action="store_true",
+        help="Post-stcmd, open an interactive Python session",
     )
 
     return parser
 
 
-def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
-         overwrite=False, makefile_name='Makefile.ioc', dry_run=False,
-         plcs=None):
+def main(
+    tsproj_project,
+    ioc_template_path,
+    *,
+    prefix="ioc-",
+    debug=False,
+    overwrite=False,
+    makefile_name="Makefile.ioc",
+    dry_run=False,
+    plcs=None,
+):
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(ioc_template_path),
         trim_blocks=True,
@@ -90,7 +95,7 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
     ioc_template_path = pathlib.Path(ioc_template_path)
     makefile_template_path = ioc_template_path / makefile_name
     if not makefile_template_path.exists():
-        raise RuntimeError(f'File not found: {makefile_template_path}')
+        raise RuntimeError(f"File not found: {makefile_template_path}")
 
     template = jinja_env.get_template(makefile_name)
 
@@ -98,11 +103,11 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
         if plcs is not None and plc_name not in plcs:
             continue
 
-        ioc_name = plc_name.replace('_', '-')
-        ioc_path = pathlib.Path(f'{prefix}{ioc_name}').absolute()
+        ioc_name = plc_name.replace("_", "-")
+        ioc_path = pathlib.Path(f"{prefix}{ioc_name}").absolute()
         if not dry_run:
             os.makedirs(ioc_path, exist_ok=True)
-        makefile_path = ioc_path / 'Makefile'
+        makefile_path = ioc_path / "Makefile"
 
         plc_path = pathlib.Path(plc.filename).parent
         template_args = dict(
@@ -130,18 +135,22 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
         if not debug:
             if dry_run:
                 print()
-                print('---' * 30)
+                print("---" * 30)
                 print(makefile_path)
-                print('---' * 30)
+                print("---" * 30)
 
                 if stashed_exception is not None:
-                    print('Failed:', type(stashed_exception).__name__,
-                          stashed_exception)
+                    print(
+                        "Failed:", type(stashed_exception).__name__, stashed_exception
+                    )
                     print()
                 else:
                     if makefile_path.exists():
-                        print('** OVERWRITING **'
-                              if overwrite else '** FAIL: already exists **')
+                        print(
+                            "** OVERWRITING **"
+                            if overwrite
+                            else "** FAIL: already exists **"
+                        )
                         print()
                     print(rendered)
             else:
@@ -149,18 +158,17 @@ def main(tsproj_project, ioc_template_path, *, prefix='ioc-', debug=False,
                     raise stashed_exception
 
                 if makefile_path.exists() and not overwrite:
-                    raise RuntimeError('Must specify --overwrite to write over'
-                                       ' existing Makefiles')
-                with open(makefile_path, 'wt') as f:
+                    raise RuntimeError(
+                        "Must specify --overwrite to write over" " existing Makefiles"
+                    )
+                with open(makefile_path, "w") as f:
                     print(rendered, file=f)
 
         else:
-            message = ['Variables: project, plc, template ']
+            message = ["Variables: project, plc, template "]
             if stashed_exception is not None:
-                message.append(f'Exception: {type(stashed_exception)} '
-                               f'{stashed_exception}')
+                message.append(
+                    f"Exception: {type(stashed_exception)} " f"{stashed_exception}"
+                )
 
-            util.python_debug_session(
-                namespace=locals(),
-                message='\n'.join(message)
-            )
+            util.python_debug_session(namespace=locals(), message="\n".join(message))

@@ -1,4 +1,4 @@
-doctr
+docs-versions-menu
 sphinx
 sphinx-argparse
 sphinx-autodoc-typehints

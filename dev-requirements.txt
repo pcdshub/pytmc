@@ -1,5 +1,4 @@
-coverage
-pyqt
+PyQt5
 pytest
 pytest-qt
 qtpy

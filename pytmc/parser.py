@@ -1,6 +1,6 @@
-'''
+"""
 TMC, XTI, tsproj parsing utilities
-'''
+"""
 from __future__ import annotations
 
 import collections
@@ -11,7 +11,8 @@ import pathlib
 import re
 import types
 import typing
-from typing import Any, Dict, Generator, List, Optional, Tuple, Union
+from collections.abc import Generator
+from typing import Any, Union
 
 import lxml
 import lxml.etree
@@ -28,27 +29,22 @@ AnyPath = Union[pathlib.Path, str]
 
 logger = logging.getLogger(__name__)
 SLN_PROJECT_RE = re.compile(
-    r"^Project.*?=\s*\"(.*?)\",\s*\"(.*?)\"\s*,\s*(.*?)\"\s*$",
-    re.MULTILINE
+    r"^Project.*?=\s*\"(.*?)\",\s*\"(.*?)\"\s*,\s*(.*?)\"\s*$", re.MULTILINE
 )
-_TRUE_VALUES = {'true', '1'}
+_TRUE_VALUES = {"true", "1"}
 
 
-def parse(
-    fn: AnyPath,
-    *,
-    parent: Optional[TwincatItem] = None
-) -> TwincatItem:
-    '''
+def parse(fn: AnyPath, *, parent: TwincatItem | None = None) -> TwincatItem:
+    """
     Parse a given tsproj, xti, or tmc file.
 
     Returns
     -------
     item : TwincatItem
-    '''
+    """
     fn = case_insensitive_path(fn)
 
-    with open(fn, 'rb') as f:
+    with open(fn, "rb") as f:
         tree = lxml.etree.parse(f)
 
     root = tree.getroot()
@@ -56,7 +52,7 @@ def parse(
 
 
 def projects_from_solution(fn, *, exclude=None):
-    '''
+    """
     Find project filenames from a solution.
 
     Parameters
@@ -65,12 +61,12 @@ def projects_from_solution(fn, *, exclude=None):
         Solution filename
     exclude : list or None
         Exclude certain extensions. Defaults to excluding .tcmproj
-    '''
-    with open(fn, 'rt') as f:
+    """
+    with open(fn) as f:
         solution_text = f.read()
 
     if exclude is None:
-        exclude = ('.tcmproj', )
+        exclude = (".tcmproj",)
 
     projects = [
         pathlib.PureWindowsPath(match[1])
@@ -78,18 +74,17 @@ def projects_from_solution(fn, *, exclude=None):
     ]
 
     solution_path = pathlib.Path(fn).parent
-    return [(solution_path / pathlib.Path(project)).absolute()
-            for project in projects
-            if project.suffix not in exclude
-            ]
+    return [
+        (solution_path / pathlib.Path(project)).absolute()
+        for project in projects
+        if project.suffix not in exclude
+    ]
 
 
 def element_to_class_name(
-    element: lxml.etree.Element,
-    *,
-    parent: Optional[TwincatItem] = None
-) -> Tuple[str, typing.Type[TwincatItem]]:
-    '''
+    element: lxml.etree.Element, *, parent: TwincatItem | None = None
+) -> tuple[str, type[TwincatItem]]:
+    """
     Determine the Python class name for an element
 
     Parameters
@@ -102,7 +97,7 @@ def element_to_class_name(
     -------
     class_name : str
     base_class : class
-    '''
+    """
 
     tag = strip_namespace(element.tag)
     extension = os.path.splitext(element.base)[-1].lower()
@@ -126,34 +121,34 @@ def element_to_class_name(
     #     - Found under `TcSmProject` / `TopLevelProject` / `Safety`
     # * A give-up fallback `Project` container that is pretty much ignored in
     #   pytmc
-    if tag == 'Project':
+    if tag == "Project":
         if isinstance(parent, TcSmProject):
-            return 'TopLevelProject', TwincatItem
+            return "TopLevelProject", TwincatItem
         if isinstance(parent, Safety):
-            return 'SafetyPlc', TwincatItem
-        if 'File' in element.attrib:
+            return "SafetyPlc", TwincatItem
+        if "File" in element.attrib:
             # File to be loaded will contain PrjFilePath
-            return 'Plc', TwincatItem
-        if 'PrjFilePath' in element.attrib:
-            return 'Plc', TwincatItem
+            return "Plc", TwincatItem
+        if "PrjFilePath" in element.attrib:
+            return "Plc", TwincatItem
         if isinstance(parent, (Plc, TcSmItem)):
-            return 'PlcProject', TwincatItem
-        return 'Project', TwincatItem
-    if tag == 'Plc':
-        return 'TopLevelPlc', TwincatItem
+            return "PlcProject", TwincatItem
+        return "Project", TwincatItem
+    if tag == "Plc":
+        return "TopLevelPlc", TwincatItem
 
-    if tag == 'Symbol':
-        base_type, = element.xpath('BaseType')
-        return f'{tag}_{base_type.text}', Symbol
+    if tag == "Symbol":
+        (base_type,) = element.xpath("BaseType")
+        return f"{tag}_{base_type.text}", Symbol
 
-    if extension == '.tmc':
+    if extension == ".tmc":
         return tag, _TmcItem
 
     return tag, TwincatItem
 
 
 def _determine_path(base_path, name, class_hint):
-    '''
+    """
     Determine the path to load child XTI items from, given a base path and the
     class load path hint.
 
@@ -169,13 +164,11 @@ def _determine_path(base_path, name, class_hint):
 
     class_hint : pathlib.Path or USE_NAME_AS_PATH
         A hint path as to where to load child objects from
-    '''
+    """
     if not class_hint:
         return base_path
 
-    path = base_path / (name
-                        if class_hint is USE_NAME_AS_PATH
-                        else class_hint)
+    path = base_path / (name if class_hint is USE_NAME_AS_PATH else class_hint)
 
     if path.exists() and path.is_dir():
         return path
@@ -183,27 +176,27 @@ def _determine_path(base_path, name, class_hint):
 
 
 class TwincatItem:
-    _load_path_hint: Union[str, pathlib.Path] = ''
+    _load_path_hint: str | pathlib.Path = ""
     _lazy_load: bool = False
-    _children: List['TwincatItem']
-    attributes: Dict[str, str]
-    children: Optional[types.SimpleNamespace]
-    comments: List[str]
+    _children: list[TwincatItem]
+    attributes: dict[str, str]
+    children: types.SimpleNamespace | None
+    comments: list[str]
     filename: pathlib.Path
     name: str
-    parent: 'TwincatItem'
+    parent: TwincatItem
     tag: str
-    text: Optional[str]
+    text: str | None
 
     def __init__(
         self,
         element: lxml.etree.Element,
         *,
         filename: pathlib.Path,
-        parent: Optional[TwincatItem] = None,
-        name: Optional[str] = None,
+        parent: TwincatItem | None = None,
+        name: str | None = None,
     ):
-        '''
+        """
         Represents a single TwinCAT project XML Element, for either tsproj,
         xti, tmc, etc.
 
@@ -213,11 +206,9 @@ class TwincatItem:
         parent : TwincatItem, optional
         name : str, optional
         filename : pathlib.Path, optional
-        '''
+        """
         self.child_load_path = _determine_path(
-            filename.parent if filename else pathlib.Path(),
-            name,
-            self._load_path_hint
+            filename.parent if filename else pathlib.Path(), name, self._load_path_hint
         )
 
         self.attributes = dict(element.attrib)
@@ -238,12 +229,12 @@ class TwincatItem:
         TWINCAT_TYPES[cls.__name__] = cls
 
     def post_init(self):
-        'Hook for subclasses; called after __init__'
+        "Hook for subclasses; called after __init__"
         ...
 
     @property
     def root(self):
-        'The top-level TwincatItem (likely TcSmProject)'
+        "The top-level TwincatItem (likely TcSmProject)"
         parent = self
         while parent.parent is not None:
             parent = parent.parent
@@ -251,45 +242,40 @@ class TwincatItem:
 
     @property
     def path(self):
-        'Path of classes required to get to this instance'
+        "Path of classes required to get to this instance"
         hier = [self]
         parent = self.parent
         while parent:
             hier.append(parent)
             parent = parent.parent
-        return '/'.join(item.__class__.__name__ for item in reversed(hier))
+        return "/".join(item.__class__.__name__ for item in reversed(hier))
 
-    def find_ancestor(self, cls: typing.Type[T]) -> Optional[T]:
-        '''
+    def find_ancestor(self, cls: type[T]) -> T | None:
+        """
         Find an ancestor of this instance
 
         Parameters
         ----------
         cls : TwincatItem
-        '''
+        """
         parent = self.parent
         while parent and not isinstance(parent, cls):
             parent = parent.parent
         return parent
 
     def get_relative_path(self, path: AnyPath) -> pathlib.Path:
-        '''
+        """
         Get an absolute path relative to this item
 
         Returns
         -------
         path : pathlib.Path
-        '''
+        """
         root = pathlib.Path(self.filename).parent
         rel_path = pathlib.PureWindowsPath(path)
         return (root / rel_path).resolve()
 
-    def find(
-        self,
-        cls: typing.Type[T],
-        *,
-        recurse: bool = True
-    ) -> Generator[T, None, None]:
+    def find(self, cls: type[T], *, recurse: bool = True) -> Generator[T, None, None]:
         """
         Find any descendents that are instances of cls.
 
@@ -306,7 +292,7 @@ class TwincatItem:
             yield from child.find(cls, recurse=recurse)
 
     def _add_children(self, element):
-        'A hook for adding all children'
+        "A hook for adding all children"
         for child_element in element.iterchildren():
             if isinstance(child_element, lxml.etree._Comment):
                 self.comments.append(child_element.text)
@@ -326,12 +312,14 @@ class TwincatItem:
 
         self._children.append(child)
 
-        if not hasattr(child, '_squash_children'):
+        if not hasattr(child, "_squash_children"):
             return
 
         for grandchild in list(child._children):
-            if any(isinstance(grandchild, squashed_type)
-                   for squashed_type in child._squash_children):
+            if any(
+                isinstance(grandchild, squashed_type)
+                for squashed_type in child._squash_children
+            ):
                 self._children.append(grandchild)
                 grandchild.container = child
                 grandchild.parent = self
@@ -363,10 +351,10 @@ class TwincatItem:
     @staticmethod
     def parse(
         element: lxml.etree.Element,
-        parent: Optional[TwincatItem] = None,
-        filename: Optional[AnyPath] = None
+        parent: TwincatItem | None = None,
+        filename: AnyPath | None = None,
     ) -> TwincatItem:
-        '''
+        """
         Parse an XML element and return a TwincatItem
 
         Parameters
@@ -380,63 +368,66 @@ class TwincatItem:
         Returns
         -------
         item : TwincatItem
-        '''
+        """
         classname, base = element_to_class_name(element, parent=parent)
 
         try:
             cls = TWINCAT_TYPES[classname]
         except KeyError:
             # Dynamically create and register new TwincatItem-based types!
-            cls = type(classname, (base, ), {})
+            cls = type(classname, (base,), {})
 
-        if 'File' in element.attrib:
+        if "File" in element.attrib:
             if cls._lazy_load:
                 return _LazyLoadPlaceholder(cls, element, parent)
 
             # This is defined directly in the file. Instantiate it as-is:
-            filename = element.attrib['File']
+            filename = element.attrib["File"]
             return cls.from_file(filename, parent=parent)
 
         # Two ways for names to come in:
         # 1. a child has a tag of 'Name', with its text being our name
-        names = [child.text for child in element.iterchildren()
-                 if child.tag == 'Name' and child.text]
+        names = [
+            child.text
+            for child in element.iterchildren()
+            if child.tag == "Name" and child.text
+        ]
         name = names[0] if names else None
 
         # 2. the child has an attribute key 'Name'
         try:
-            name = element.attrib['Name'].strip()
+            name = element.attrib["Name"].strip()
         except KeyError:
             ...
 
         # A special identifier __FILENAME__ means to replace the name
-        if name == '__FILENAME__':
+        if name == "__FILENAME__":
             name = filename.stem
 
         return cls(element, parent=parent, filename=filename, name=name)
 
     def _repr_info(self):
-        '__repr__ information'
+        "__repr__ information"
         return {
-            'name': self.name,
-            'attributes': self.attributes,
-            'children': self._children,
-            'text': self.text,
+            "name": self.name,
+            "attributes": self.attributes,
+            "children": self._children,
+            "text": self.text,
         }
 
     def __repr__(self):
-        info = ' '.join(f'{key}={value!r}'
-                        for key, value in self._repr_info().items()
-                        if value)
+        info = " ".join(
+            f"{key}={value!r}" for key, value in self._repr_info().items() if value
+        )
 
-        return f'<{self.__class__.__name__} {info}>'
+        return f"<{self.__class__.__name__} {info}>"
 
     @classmethod
     def from_file(cls, filename, parent):
         base_path = _determine_path(
             base_path=parent.child_load_path,
             name=parent.name,
-            class_hint=cls._load_path_hint
+            class_hint=cls._load_path_hint,
         )
         return parse(base_path / filename, parent=parent)
 
@@ -444,12 +435,12 @@ class TwincatItem:
 class _LazyLoadPlaceholder:
     def __init__(self, cls, element, parent):
         self.cls = cls
-        self.filename = element.attrib.get('File', "").lower()
-        self.identifier = element.attrib.get('Id', "")
+        self.filename = element.attrib.get("File", "").lower()
+        self.identifier = element.attrib.get("Id", "")
         self.parent = parent
 
     def __repr__(self):
-        return f'<LazyLoadPlaceholder {self.key}>'
+        return f"<LazyLoadPlaceholder {self.key}>"
 
     def find(self, cls, *, recurse=True):
         yield from ()
@@ -460,28 +451,28 @@ class _LazyLoadPlaceholder:
 
     def load(self, file_map) -> TwincatItem:
         info = file_map[self.key]
-        obj = info['obj']
+        obj = info["obj"]
         obj._finish_lazy_loading(file_map)
         return obj
 
 
 class _TwincatProjectSubItem(TwincatItem):
-    '[XTI/TMC/...] A base class for items that appear in virtual PLC projects'
+    "[XTI/TMC/...] A base class for items that appear in virtual PLC projects"
 
     @property
-    def top_level_project(self) -> Optional[TopLevelProject]:
-        'The top-level project.'
+    def top_level_project(self) -> TopLevelProject | None:
+        "The top-level project."
         return self.find_ancestor(TopLevelProject)
 
     @property
-    def plc(self) -> Optional[Plc]:
-        'The nested project (virtual PLC project) associated with the item'
+    def plc(self) -> Plc | None:
+        "The nested project (virtual PLC project) associated with the item"
         return self.find_ancestor(Plc)
 
 
 class TcModuleClass(_TwincatProjectSubItem):
-    '[TMC] The top-level TMC file'
-    DataTypes: List['DataTypes']
+    "[TMC] The top-level TMC file"
+    DataTypes: list[DataTypes]
 
     def create_data_area(self, module_index=0):
         """
@@ -496,31 +487,31 @@ class TcModuleClass(_TwincatProjectSubItem):
         # the hierarchy, but pretends that the child has a parent. Here, we
         # actually link both child and parent.
         module = list(self.find(Module))[module_index]
-        if not hasattr(module, 'DataAreas'):
-            _make_fake_item('DataAreas', parent=module, add_as_child=True)
+        if not hasattr(module, "DataAreas"):
+            _make_fake_item("DataAreas", parent=module, add_as_child=True)
 
         data_areas = module.DataAreas[0]
-        return _make_fake_item('DataArea', parent=data_areas,
-                               add_as_child=True)
+        return _make_fake_item("DataArea", parent=data_areas, add_as_child=True)
 
 
 class OwnerA(TwincatItem):
-    '[XTI] For a Link between VarA and VarB, this is the parent of VarA'
+    "[XTI] For a Link between VarA and VarB, this is the parent of VarA"
 
 
 class OwnerB(TwincatItem):
-    '[XTI] For a Link between VarA and VarB, this is the parent of VarB'
+    "[XTI] For a Link between VarA and VarB, this is the parent of VarB"
 
 
 class Link(TwincatItem):
-    '[XTI] Links between NC/PLC/IO'
+    "[XTI] Links between NC/PLC/IO"
+
     def post_init(self):
-        self.a = (self.find_ancestor(OwnerA).name, self.attributes.get('VarA'))
-        self.b = (self.find_ancestor(OwnerB).name, self.attributes.get('VarB'))
+        self.a = (self.find_ancestor(OwnerA).name, self.attributes.get("VarA"))
+        self.b = (self.find_ancestor(OwnerB).name, self.attributes.get("VarB"))
         self.link = [self.a, self.b]
 
     def __repr__(self):
-        return f'<Link a={self.a} b={self.b}>'
+        return f"<Link a={self.a} b={self.b}>"
 
 
 class TopLevelProject(TwincatItem):
@@ -531,11 +522,11 @@ class TopLevelProject(TwincatItem):
     Found in ``.tsproj`` under ``TcSmProject``.
     """
 
-    System: List["System"]
-    TopLevelPlc: List["TopLevelPlc"]
+    System: list[System]
+    TopLevelPlc: list[TopLevelPlc]
 
     @property
-    def top_level_plc(self) -> Optional["TopLevelPlc"]:
+    def top_level_plc(self) -> TopLevelPlc | None:
         """
         The top-level PLC associated with the project.
 
@@ -548,23 +539,23 @@ class TopLevelProject(TwincatItem):
 
     @property
     def ams_id(self) -> str:
-        '''
+        """
         The AMS ID of the configured target
-        '''
-        return self.attributes.get('TargetNetId', '')
+        """
+        return self.attributes.get("TargetNetId", "")
 
     @property
     def target_ip(self) -> str:
-        '''
+        """
         A guess of the target IP, based on the AMS ID
-        '''
+        """
         ams_id = self.ams_id
-        if ams_id.endswith('.1.1'):
+        if ams_id.endswith(".1.1"):
             return ams_id[:-4]
         return ams_id
 
     @property
-    def tasks(self) -> Optional[Tasks]:
+    def tasks(self) -> Tasks | None:
         """Tasks defined in the project."""
         try:
             return self.System[0].Tasks[0]
@@ -578,8 +569,9 @@ class System(TwincatItem):
 
     ```TcSmProject/TopLevelProject/System```
     """
-    Licenses: List[TwincatItem]
-    Tasks: List[Tasks]
+
+    Licenses: list[TwincatItem]
+    Tasks: list[Tasks]
 
 
 class PlcProject(TwincatItem):
@@ -600,13 +592,13 @@ class TcSmProject(TwincatItem):
     Contains a "top_level_plc" which can contain one or more PLC projects.
     """
 
-    TopLevelProject: List[TopLevelProject]
+    TopLevelProject: list[TopLevelProject]
     top_level_project: TopLevelProject
     top_level_plc: TopLevelPlc
 
     def post_init(self):
         try:
-            self.top_level_project, = self.TopLevelProject
+            (self.top_level_project,) = self.TopLevelProject
         except (AttributeError, ValueError):
             self.top_level_project = None
             self.top_level_plc = None
@@ -615,49 +607,53 @@ class TcSmProject(TwincatItem):
 
     @property
     def plcs(self) -> Generator[Plc, None, None]:
-        'The virtual PLC projects contained in this TcSmProject'
+        "The virtual PLC projects contained in this TcSmProject"
         yield from self.top_level_plc.projects.values()
 
     @property
-    def plcs_by_name(self) -> Dict[str, Plc]:
-        'The virtual PLC projects in a dictionary keyed by name'
+    def plcs_by_name(self) -> dict[str, Plc]:
+        "The virtual PLC projects in a dictionary keyed by name"
         return {plc.name: plc for plc in self.plcs}
 
     @property
-    def plcs_by_link_name(self) -> Dict[str, Plc]:
-        'The virtual PLC projects in a dictionary keyed by link name'
+    def plcs_by_link_name(self) -> dict[str, Plc]:
+        "The virtual PLC projects in a dictionary keyed by link name"
         return {plc.link_name: plc for plc in self.plcs}
 
 
 def get_data_type_by_reference(
-        ref, data_type_holders, *,
-        fallback_to_builtin=True,
-        array_info=None, reference=None, pointer=None,
-        ):
+    ref,
+    data_type_holders,
+    *,
+    fallback_to_builtin=True,
+    array_info=None,
+    reference=None,
+    pointer=None,
+):
     """Get a data type from the project, falling back to the tmc file."""
     if isinstance(ref, str):
         search_key = ref
     else:
-        guid = getattr(ref, 'guid', None)
-        qualified_type = getattr(ref, 'qualified_type_name', None)
-        type_name = getattr(ref, 'text', None)
+        guid = getattr(ref, "guid", None)
+        qualified_type = getattr(ref, "qualified_type_name", None)
+        type_name = getattr(ref, "text", None)
         search_key = guid or qualified_type or type_name
         if search_key is None:
-            raise ValueError(f'No GUID or type name was available from: {ref}')
+            raise ValueError(f"No GUID or type name was available from: {ref}")
 
         if array_info is None:
-            array_info = getattr(ref, 'array_info', None)
+            array_info = getattr(ref, "array_info", None)
 
         if reference is None:
-            reference = getattr(ref, 'is_reference', False)
+            reference = getattr(ref, "is_reference", False)
 
         if pointer is None:
-            pointer = getattr(ref, 'is_pointer', False)
+            pointer = getattr(ref, "is_pointer", False)
 
     namespaces = []
 
     for parent in data_type_holders:
-        if hasattr(parent, 'DataTypes'):
+        if hasattr(parent, "DataTypes"):
             namespaces.append(parent.DataTypes[0].types)
 
     for namespace in namespaces:
@@ -667,17 +663,16 @@ def get_data_type_by_reference(
             ...
         else:
             return BoundDataType(
-                data_type, array_info=array_info, pointer=pointer,
-                reference=reference
+                data_type, array_info=array_info, pointer=pointer, reference=reference
             )
 
-    if search_key.startswith('{'):  # }
-        type_name = getattr(ref, 'type_name', None)
+    if search_key.startswith("{"):  # }
+        type_name = getattr(ref, "type_name", None)
         if type_name is None:
-            raise ValueError(
-                f'Type with GUID {search_key} not in TMC') from None
-        logger.debug('Reference to implicitly-defined GUID %s = %s',
-                     search_key, type_name)
+            raise ValueError(f"Type with GUID {search_key} not in TMC") from None
+        logger.debug(
+            "Reference to implicitly-defined GUID %s = %s", search_key, type_name
+        )
         # Known items:
         #   - GUID type itself
         #   - OTCID
@@ -690,12 +685,15 @@ def get_data_type_by_reference(
             type_name = ref.qualified_type_name
 
         return BoundDataType(
-            BuiltinDataType(type_name), array_info=array_info, pointer=pointer,
-            reference=reference)
+            BuiltinDataType(type_name),
+            array_info=array_info,
+            pointer=pointer,
+            reference=reference,
+        )
 
 
 class TcSmItem(TwincatItem):
-    '''
+    """
     [XTI] Top-level container for XTI files
 
     Visual Studio-level configuration changes the project layout significantly,
@@ -708,38 +706,35 @@ class TcSmItem(TwincatItem):
 
     The original container `TcSmItem` is accessible in those items through the
     `.container` attribute.
-    '''
+    """
+
     _squash_children = [TwincatItem]
 
 
 class TopLevelPlc(TwincatItem):
-    '[XTI] Top-level PLC, contains one or more projects'
+    "[XTI] Top-level PLC, contains one or more projects"
 
     PlcProjectContainer: list
 
     def post_init(self):
         # TODO: this appears to cover all bases, but perhaps it could be
         # refactored out
-        if hasattr(self, 'Plc'):
+        if hasattr(self, "Plc"):
             projects = self.Plc
-        elif hasattr(self, 'TcSmItem'):
+        elif hasattr(self, "TcSmItem"):
             projects = self.TcSmItem[0].PlcProject
         else:
-            raise RuntimeError('Unable to find project?')
+            raise RuntimeError("Unable to find project?")
 
-        self.projects = {
-            project.name: project
-            for project in projects
-        }
+        self.projects = {project.name: project for project in projects}
 
         self.projects_by_link_name = {
-            project.link_name: project
-            for project in projects
+            project.link_name: project for project in projects
         }
 
         # Fix to squash hack: squashed Mappings belong to the individual
         # projects, not this TopLevelPlc
-        for mapping in getattr(self, 'Mappings', []):
+        for mapping in getattr(self, "Mappings", []):
             for project in projects:
                 if project.filename == mapping.filename:
                     self._children.remove(mapping)
@@ -758,39 +753,37 @@ class Plc(TwincatItem):
 
     These can be found under ``TcSmProject`` / ``TopLevelProject`` / ``Plc``.
     """
-    _load_path_hint = pathlib.Path('_Config') / 'PLC'
-    instance: Optional["Instance"]
+
+    _load_path_hint = pathlib.Path("_Config") / "PLC"
+    instance: Instance | None
 
     def post_init(self):
         instances = getattr(self, "Instance", None)
         if instances is not None:
-            self.instance, = instances
+            (self.instance,) = instances
             self.link_name = self.instance.name
         else:
             self.instance = None
             self.link_name = self.name
 
         self.namespaces = {}
-        self.project_path = self.get_relative_path(
-            self.attributes['PrjFilePath'])
-        self.tmc_path = self.get_relative_path(
-            self.attributes['TmcFilePath'])
-        self.project = (parse(self.project_path, parent=self)
-                        if self.project_path.exists()
-                        else None)
-        self.tmc = (parse(self.tmc_path, parent=self)
-                    if self.tmc_path.exists()
-                    else None)
+        self.project_path = self.get_relative_path(self.attributes["PrjFilePath"])
+        self.tmc_path = self.get_relative_path(self.attributes["TmcFilePath"])
+        self.project = (
+            parse(self.project_path, parent=self)
+            if self.project_path.exists()
+            else None
+        )
+        self.tmc = parse(self.tmc_path, parent=self) if self.tmc_path.exists() else None
 
         self.source_filenames = [
-            self.project.get_relative_path(compile.attributes['Include'])
+            self.project.get_relative_path(compile.attributes["Include"])
             for compile in self.find(Compile)
-            if 'Include' in compile.attributes
+            if "Include" in compile.attributes
         ]
 
         self.source = {
-            str(fn.relative_to(self.project.filename.parent)):
-            parse(fn, parent=self)
+            str(fn.relative_to(self.project.filename.parent)): parse(fn, parent=self)
             for fn in self.source_filenames
         }
 
@@ -804,40 +797,41 @@ class Plc(TwincatItem):
                 if source_obj and source_obj.name:
                     yield (source_obj.name, source_obj)
 
-        self.pou_by_name = dict(sorted(get_source_items('POU')))
-        self.gvl_by_name = dict(sorted(get_source_items('GVL')))
-        self.dut_by_name = dict(sorted(get_source_items('DUT')))
+        self.pou_by_name = dict(sorted(get_source_items("POU")))
+        self.gvl_by_name = dict(sorted(get_source_items("GVL")))
+        self.dut_by_name = dict(sorted(get_source_items("DUT")))
 
         self.namespaces.update(self.pou_by_name)
         self.namespaces.update(self.gvl_by_name)
         self.namespaces.update(self.dut_by_name)
 
     @property
-    def links(self) -> List[Link]:
-        return [link
-                for mapping in self.Mappings
-                for link in mapping.find(Link, recurse=False)
-                ]
+    def links(self) -> list[Link]:
+        return [
+            link
+            for mapping in self.Mappings
+            for link in mapping.find(Link, recurse=False)
+        ]
 
     @property
     def port(self):
-        '''
+        """
         The ADS port for the project
-        '''
-        return self.attributes.get('AmsPort', '')
+        """
+        return self.attributes.get("AmsPort", "")
 
     @property
     def ams_id(self):
-        '''
+        """
         The AMS ID of the configured target
-        '''
+        """
         return self.find_ancestor(TopLevelProject).ams_id
 
     @property
     def target_ip(self):
-        '''
+        """
         A guess of the target IP, based on the AMS ID
-        '''
+        """
         return self.find_ancestor(TopLevelProject).target_ip
 
     def find(self, cls, *, recurse=True):
@@ -853,29 +847,30 @@ class Plc(TwincatItem):
             yield from self.tmc.find(cls, recurse=recurse)
 
     def get_source_code(self) -> str:
-        'Get the full source code, DUTs, GVLs, and then POUs'
+        "Get the full source code, DUTs, GVLs, and then POUs"
         source_items = (
-            list(self.dut_by_name.values()) +
-            list(self.gvl_by_name.values()) +
-            list(self.pou_by_name.values())
+            list(self.dut_by_name.values())
+            + list(self.gvl_by_name.values())
+            + list(self.pou_by_name.values())
         )
 
-        return '\n'.join(
+        return "\n".join(
             item.get_source_code()
             for item in source_items
-            if hasattr(item, 'get_source_code')
+            if hasattr(item, "get_source_code")
         )
 
 
 class Instance(_TwincatProjectSubItem):
     """[tsproj] PLC Instance."""
-    TaskPouOids: List[TwincatItem]
+
+    TaskPouOids: list[TwincatItem]
 
     @property
-    def task_pous(self) -> Dict[int, Tuple[str, Task]]:
+    def task_pous(self) -> dict[int, tuple[str, Task]]:
         """Index to Object ID."""
         try:
-            task_task_oids, = self.TaskPouOids
+            (task_task_oids,) = self.TaskPouOids
         except (AttributeError, ValueError):
             return {}
 
@@ -894,7 +889,7 @@ class Instance(_TwincatProjectSubItem):
 
 
 class Safety(TwincatItem):
-    '[tsproj] A container for a safety PLC project (SafetyPlc)'
+    "[tsproj] A container for a safety PLC project (SafetyPlc)"
 
 
 class SafetyPlc(TwincatItem):
@@ -903,46 +898,48 @@ class SafetyPlc(TwincatItem):
 
     Found under ``TcSmProject`` / ``TopLevelProject`` / ``Safety``.
     """
-    _load_path_hint = pathlib.Path('_Config') / 'SPLC'
+
+    _load_path_hint = pathlib.Path("_Config") / "SPLC"
 
 
 class Compile(TwincatItem):
-    '''
+    """
     [XTI] A code entry in a nested/virtual PLC project
 
     File to load is marked with 'Include'
     May be TcTTO, TcPOU, TcDUT, GVL, etc.
-    '''
+    """
 
 
 class _TmcItem(_TwincatProjectSubItem):
-    '[TMC] Any item found in a TMC file'
+    "[TMC] Any item found in a TMC file"
+
     @property
     def tmc(self):
-        'The TcModuleClass (TMC) associated with the item'
+        "The TcModuleClass (TMC) associated with the item"
         return self.find_ancestor(TcModuleClass)
 
 
 class DataTypes(_TmcItem):
-    '[TMC or TSPROJ] Container of DataType'
+    "[TMC or TSPROJ] Container of DataType"
+
     def post_init(self):
-        self.types = {
-            dtype.qualified_type_name: dtype
-            for dtype in self.find(DataType)
-        }
+        self.types = {dtype.qualified_type_name: dtype for dtype in self.find(DataType)}
 
         # Also allow access by GUID:
-        self.types.update({
-            dtype.guid: dtype
-            for dtype in self.types.values()
-            if hasattr(dtype, 'guid')
-        })
+        self.types.update(
+            {
+                dtype.guid: dtype
+                for dtype in self.types.values()
+                if hasattr(dtype, "guid")
+            }
+        )
 
-        self.types['Tc2_System.T_MaxString'] = T_MaxString()
+        self.types["Tc2_System.T_MaxString"] = T_MaxString()
 
 
 class Type(_TmcItem):
-    '[TMC] DataTypes/DataType/SubItem/Type'
+    "[TMC] DataTypes/DataType/SubItem/Type"
 
     @property
     def info(self):
@@ -973,7 +970,7 @@ class Type(_TmcItem):
     @property
     def pointer_depth(self) -> int:
         pointerto_value = self.attributes.get("PointerTo", None)
-        return int(pointerto_value or '0')
+        return int(pointerto_value or "0")
 
     @property
     def is_pointer(self) -> bool:
@@ -982,20 +979,20 @@ class Type(_TmcItem):
     @property
     def is_reference(self) -> bool:
         ref_value = self.attributes.get("ReferenceTo", None)
-        return (ref_value or '').lower() in _TRUE_VALUES
+        return (ref_value or "").lower() in _TRUE_VALUES
 
     @property
     def qualified_type_name(self):
-        'The base type, including the namespace'
+        "The base type, including the namespace"
         namespace = self.namespace
-        return f'{namespace}.{self.text}' if namespace else self.text
+        return f"{namespace}.{self.text}" if namespace else self.text
 
     # Back-compat
     qualified_type = qualified_type_name
 
 
 class EnumInfo(_TmcItem):
-    '[TMC] Enum values, strings, and associated comments'
+    "[TMC] Enum values, strings, and associated comments"
     Text: list
     Enum: list
     Comment: list
@@ -1012,35 +1009,35 @@ class EnumInfo(_TmcItem):
             ...
 
         logger.warning(
-            'Encountered a known issue with the TwinCAT-generated TMC file: '
-            '%s is missing an Enum value in section %s; this may cause '
-            'database generation errors.', self.parent.name, self.path
+            "Encountered a known issue with the TwinCAT-generated TMC file: "
+            "%s is missing an Enum value in section %s; this may cause "
+            "database generation errors.",
+            self.parent.name,
+            self.path,
         )
-        return ''
+        return ""
 
     @property
     def enum_comment(self):
-        return self.Comment[0].text if hasattr(self, 'Comment') else ''
+        return self.Comment[0].text if hasattr(self, "Comment") else ""
 
 
 class ArrayInfo(_TmcItem):
-    '[TMC] Array information for a DataType or Symbol'
-    LBound: List[_TmcItem]
-    UBound: List[_TmcItem]
-    Elements: List[_TmcItem]
+    "[TMC] Array information for a DataType or Symbol"
+    LBound: list[_TmcItem]
+    UBound: list[_TmcItem]
+    Elements: list[_TmcItem]
 
     def post_init(self):
-        lbound = (int(self.LBound[0].text)
-                  if hasattr(self, 'LBound')
-                  else 0)
+        lbound = int(self.LBound[0].text) if hasattr(self, "LBound") else 0
 
-        elements = (int(self.Elements[0].text)
-                    if hasattr(self, 'Elements')
-                    else 1)
+        elements = int(self.Elements[0].text) if hasattr(self, "Elements") else 1
 
-        ubound = (int(self.UBound[0].text)
-                  if hasattr(self, 'UBound')
-                  else lbound + elements - 1)
+        ubound = (
+            int(self.UBound[0].text)
+            if hasattr(self, "UBound")
+            else lbound + elements - 1
+        )
 
         self.bounds = (lbound, ubound)
         self.elements = elements
@@ -1048,7 +1045,7 @@ class ArrayInfo(_TmcItem):
     @property
     def is_reference(self):
         ref_value = self.attributes.get("ReferenceTo", None)
-        return (ref_value or '').lower() in _TRUE_VALUES
+        return (ref_value or "").lower() in _TRUE_VALUES
 
     @property
     def pointer_depth(self) -> int:
@@ -1057,7 +1054,7 @@ class ArrayInfo(_TmcItem):
         # 2 = POINTER TO POINTER TO
         # 3 = ...
         pointerto_value = self.attributes.get("PointerTo", None)
-        return int(pointerto_value or '0')
+        return int(pointerto_value or "0")
 
     @property
     def is_pointer(self) -> bool:
@@ -1065,19 +1062,19 @@ class ArrayInfo(_TmcItem):
 
     @property
     def level(self):
-        'ARRAY [] OF ARRAY [] level'
+        "ARRAY [] OF ARRAY [] level"
         return self.attributes.get("Level", None)
 
 
 class ExtendsType(_TmcItem):
-    '[TMC] A marker of inheritance / extension, found on DataType'
+    "[TMC] A marker of inheritance / extension, found on DataType"
 
     @property
     def namespace(self):
         """
         Namespace of the data type.
         """
-        return self.attributes.get('Namespace', None)
+        return self.attributes.get("Namespace", None)
 
     @property
     def guid(self):
@@ -1089,14 +1086,14 @@ class ExtendsType(_TmcItem):
         This is not available for all data types.
         """
         try:
-            return self.attributes['GUID']
+            return self.attributes["GUID"]
         except KeyError:
-            raise AttributeError('GUID unavailable') from None
+            raise AttributeError("GUID unavailable") from None
 
     @property
     def qualified_type_name(self):
         namespace = self.namespace
-        return f'{namespace}.{self.text}' if namespace else self.text
+        return f"{namespace}.{self.text}" if namespace else self.text
 
     @property
     def type_name(self):
@@ -1105,24 +1102,24 @@ class ExtendsType(_TmcItem):
 
 
 class BaseType(Type):
-    '[TMC] A reference to the data type of a symbol'
+    "[TMC] A reference to the data type of a symbol"
     # Inherits everything from :class:`Type`
 
 
 class DataType(_TmcItem):
-    '[TMC or TSPROJ] A DataType with SubItems, likely representing a structure'
-    Action: List[_TmcItem]
-    ArrayInfo: List['ArrayInfo']
-    BaseType: List['BaseType']
-    BitSize: List[_TmcItem]
-    EnumInfo: List['EnumInfo']
-    ExtendsType: List[ExtendsType]
-    FunctionPointer: List[_TmcItem]
-    Implements: List[_TmcItem]
-    Name: List['Name']
-    PropertyItem: List[_TmcItem]
-    SubItem: List['SubItem']
-    Unit: List[_TmcItem]
+    "[TMC or TSPROJ] A DataType with SubItems, likely representing a structure"
+    Action: list[_TmcItem]
+    ArrayInfo: list[ArrayInfo]
+    BaseType: list[BaseType]
+    BitSize: list[_TmcItem]
+    EnumInfo: list[EnumInfo]
+    ExtendsType: list[ExtendsType]
+    FunctionPointer: list[_TmcItem]
+    Implements: list[_TmcItem]
+    Name: list[Name]
+    PropertyItem: list[_TmcItem]
+    SubItem: list[SubItem]
+    Unit: list[_TmcItem]
 
     @property
     def guid(self):
@@ -1134,30 +1131,30 @@ class DataType(_TmcItem):
         This is not available for all data types.
         """
         try:
-            return self.Name[0].attributes['GUID']
+            return self.Name[0].attributes["GUID"]
         except KeyError:
-            raise AttributeError('GUID unavailable')
+            raise AttributeError("GUID unavailable")
 
     @property
-    def array_info(self) -> Optional[ArrayInfo]:
-        return getattr(self, 'ArrayInfo', [None])[0]
+    def array_info(self) -> ArrayInfo | None:
+        return getattr(self, "ArrayInfo", [None])[0]
 
     @property
-    def array_bounds(self) -> Optional[Tuple[int, int]]:
-        return getattr(self.array_info, 'array_bounds', None)
+    def array_bounds(self) -> tuple[int, int] | None:
+        return getattr(self.array_info, "array_bounds", None)
 
     @property
     def summary_type_name(self):
         summary = self.name
         array_bounds = self.array_bounds
         if array_bounds:
-            summary = 'ARRAY[{}..{}] OF '.format(*array_bounds) + summary
+            summary = "ARRAY[{}..{}] OF ".format(*array_bounds) + summary
         return summary
 
     @property
     def qualified_type_name(self):
         name_attrs = self.Name[0].attributes
-        if 'Namespace' in name_attrs:
+        if "Namespace" in name_attrs:
             return f'{name_attrs["Namespace"]}.{self.name}'
         return self.name
 
@@ -1166,13 +1163,14 @@ class DataType(_TmcItem):
 
     def _get_data_type(self, data_type, *, array_info=None):
         return get_data_type_by_reference(
-            data_type, (self.tmc, self.find_ancestor(TcSmProject)),
-            array_info=array_info
+            data_type,
+            (self.tmc, self.find_ancestor(TcSmProject)),
+            array_info=array_info,
         )
 
     @property
     def base_type(self):
-        base_type = getattr(self, 'BaseType', [None])[0]
+        base_type = getattr(self, "BaseType", [None])[0]
         if base_type is None:
             return None
 
@@ -1195,28 +1193,30 @@ class DataType(_TmcItem):
 
         extends_types = [
             self._get_data_type(ext_type)
-            for ext_type in getattr(self, 'ExtendsType', [])
+            for ext_type in getattr(self, "ExtendsType", [])
         ]
         for extend_type in extends_types:
             yield from extend_type.walk(condition=condition)
 
-        if hasattr(self, 'SubItem'):
+        if hasattr(self, "SubItem"):
             for subitem in self.SubItem:
                 for item in subitem.walk(condition=condition):
                     yield [subitem] + item
 
     @property
     def enum_dict(self):
-        return {int(item.enum_value): item.enum_text
-                for item in getattr(self, 'EnumInfo', [])}
+        return {
+            int(item.enum_value): item.enum_text
+            for item in getattr(self, "EnumInfo", [])
+        }
 
     @property
     def is_enum(self):
-        return len(getattr(self, 'EnumInfo', [])) > 0
+        return len(getattr(self, "EnumInfo", [])) > 0
 
     @property
     def is_array(self):
-        return len(getattr(self, 'ArrayInfo', [])) > 0
+        return len(getattr(self, "ArrayInfo", [])) > 0
 
     @property
     def is_string(self):
@@ -1234,12 +1234,16 @@ class DataType(_TmcItem):
 
 class BoundDataType:
     """Binds a symbol or SubItem with array/pointer/etc information."""
-    _extra_attrs = ['data_type', 'array_info', 'is_pointer', 'is_reference']
 
-    def __init__(self, data_type,
-                 array_info: ArrayInfo = None,
-                 pointer: bool = False,
-                 reference: bool = False):
+    _extra_attrs = ["data_type", "array_info", "is_pointer", "is_reference"]
+
+    def __init__(
+        self,
+        data_type,
+        array_info: ArrayInfo = None,
+        pointer: bool = False,
+        reference: bool = False,
+    ):
         self.data_type = data_type
         self.array_info = array_info
         self.is_pointer = pointer
@@ -1250,23 +1254,23 @@ class BoundDataType:
 
     def __repr__(self):
         return (
-            f'<{self.__class__.__name__} '
-            f'data_type={self.data_type.qualified_type_name!r} '
-            f'array_info={self.array_info} '
-            f'is_pointer={self.is_pointer} '
-            f'is_reference={self.is_reference}>'
+            f"<{self.__class__.__name__} "
+            f"data_type={self.data_type.qualified_type_name!r} "
+            f"array_info={self.array_info} "
+            f"is_pointer={self.is_pointer} "
+            f"is_reference={self.is_reference}>"
         )
 
     @property
     def summary_type_name(self):
         summary = self.name
         if self.is_pointer:
-            summary = 'POINTER TO ' + summary
+            summary = "POINTER TO " + summary
         if self.is_reference:
-            summary = 'REFERENCE TO ' + summary
+            summary = "REFERENCE TO " + summary
         array_bounds = self.data_type.array_bounds
         if array_bounds:
-            summary = 'ARRAY[{}..{}] OF '.format(*array_bounds) + summary
+            summary = "ARRAY[{}..{}] OF ".format(*array_bounds) + summary
         return summary
 
     def __getattr__(self, attr):
@@ -1279,42 +1283,43 @@ class BoundDataType:
 class Name(_TmcItem):
     @property
     def guid(self) -> str:
-        return self.attributes.get('GUID', None)
+        return self.attributes.get("GUID", None)
 
     @property
     def namespace(self) -> str:
-        return self.attributes.get('Namespace', None)
+        return self.attributes.get("Namespace", None)
 
     @property
-    def tc_base_type(self) -> Optional[bool]:
+    def tc_base_type(self) -> bool | None:
         try:
-            return self.attributes['TcBaseType'] in _TRUE_VALUES
+            return self.attributes["TcBaseType"] in _TRUE_VALUES
         except KeyError:
             return None
 
     @property
-    def hide_type(self) -> Optional[bool]:
+    def hide_type(self) -> bool | None:
         try:
-            return self.attributes['HideType'] in _TRUE_VALUES
+            return self.attributes["HideType"] in _TRUE_VALUES
         except KeyError:
             return None
 
     @property
-    def iec_declaration(self) -> Optional[str]:
-        return self.attributes.get('IecDeclaration', None)
+    def iec_declaration(self) -> str | None:
+        return self.attributes.get("IecDeclaration", None)
 
 
 class SubItem(_TmcItem):
-    '[TMC] One element of a DataType'
-    Type: List[Type]
-    ArrayInfo: List[ArrayInfo]
-    BitSize: List[_TmcItem]
-    BitOffs: List[_TmcItem]
+    "[TMC] One element of a DataType"
+    Type: list[Type]
+    ArrayInfo: list[ArrayInfo]
+    BitSize: list[_TmcItem]
+    BitOffs: list[_TmcItem]
 
     @property
     def data_type(self):
         return get_data_type_by_reference(
-            self.Type[0], (self.tmc, self.find_ancestor(TcSmProject)),
+            self.Type[0],
+            (self.tmc, self.find_ancestor(TcSmProject)),
             array_info=self.array_info,
         )
 
@@ -1327,25 +1332,25 @@ class SubItem(_TmcItem):
 
     @property
     def type(self):
-        'The base type'
+        "The base type"
         return self.Type[0].text
 
     @property
     def bit_size(self):
-        'The sub item size, in bits'
+        "The sub item size, in bits"
         return int(self.BitSize[0].bit_size)
 
     @property
     def bit_offset(self):
-        'The sub item offset, in bits'
+        "The sub item offset, in bits"
         return int(self.BitOffs[0].bit_offset)
 
     @property
     def qualified_type_name(self):
-        'The base type, including the namespace'
+        "The base type, including the namespace"
         type_ = self.Type[0]
         namespace = type_.attributes.get("Namespace", None)
-        return f'{namespace}.{type_.text}' if namespace else type_.text
+        return f"{namespace}.{type_.text}" if namespace else type_.text
 
     def walk(self, condition=None):
         if condition is None or condition(self):
@@ -1353,36 +1358,38 @@ class SubItem(_TmcItem):
 
 
 class Module(_TmcItem):
-    '''
+    """
     [TMC] A Module
 
     Contains generated symbols, data areas, and miscellaneous properties.
-    '''
+    """
 
     @property
     def ads_port(self):
-        'The ADS port assigned to the Virtual PLC'
+        "The ADS port assigned to the Virtual PLC"
         try:
             return self._ads_port
         except AttributeError:
-            app_prop, = [prop for prop in self.find(Property)
-                         if prop.name == 'ApplicationName']
+            (app_prop,) = (
+                prop for prop in self.find(Property) if prop.name == "ApplicationName"
+            )
             port_text = app_prop.value
-            self._ads_port = int(port_text.split('Port_')[1])
+            self._ads_port = int(port_text.split("Port_")[1])
 
         return self._ads_port
 
 
 class DataArea(_TmcItem):
-    '[TMC] Container that holds symbols'
+    "[TMC] Container that holds symbols"
 
 
 class BuiltinDataType:
-    '[TMC] A built-in data type such as STRING, INT, REAL, etc.'
+    "[TMC] A built-in data type such as STRING, INT, REAL, etc."
+
     def __init__(self, typename, *, length=1):
-        if '(' in typename:  # ')'
-            typename, length = typename.split('(')
-            length = int(length.rstrip(')'))
+        if "(" in typename:  # ')'
+            typename, length = typename.split("(")
+            length = int(length.rstrip(")"))
 
         self.name = typename
         self.length = length
@@ -1395,7 +1402,7 @@ class BuiltinDataType:
     @property
     def summary_type_name(self):
         if self.length > 1:
-            return f'{self.name}({self.length})'
+            return f"{self.name}({self.length})"
         return self.name
 
     @property
@@ -1404,16 +1411,18 @@ class BuiltinDataType:
 
     @property
     def enum_dict(self):
-        return {int(item.enum_value): item.enum_text
-                for item in getattr(self, 'EnumInfo', [])}
+        return {
+            int(item.enum_value): item.enum_text
+            for item in getattr(self, "EnumInfo", [])
+        }
 
     @property
     def is_enum(self):
-        return len(getattr(self, 'EnumInfo', [])) > 0
+        return len(getattr(self, "EnumInfo", [])) > 0
 
     @property
     def is_string(self):
-        return self.name == 'STRING'
+        return self.name == "STRING"
 
     @property
     def is_array(self):
@@ -1428,7 +1437,7 @@ class BuiltinDataType:
 
 class T_MaxString(BuiltinDataType):
     def __init__(self):
-        super().__init__(typename='STRING', length=255)
+        super().__init__(typename="STRING", length=255)
 
 
 class BitSize(_TmcItem):
@@ -1444,57 +1453,60 @@ class BitOffs(_TmcItem):
 
 
 class Symbol(_TmcItem):
-    '''
+    """
     [TMC] A basic Symbol type
 
     This is dynamically subclassed into new classes for ease of implementation
     and searching.  For example, a function block defined as `FB_MotionStage`
     will become `Symbol_FB_MotionStage`.
-    '''
+    """
 
-    ArrayInfo: List[ArrayInfo]
-    BaseType: List[BaseType]
-    BitOffs: List[_TmcItem]
-    BitSize: List[_TmcItem]
-    Properties: List[_TmcItem]
+    ArrayInfo: list[ArrayInfo]
+    BaseType: list[BaseType]
+    BitOffs: list[_TmcItem]
+    BitSize: list[_TmcItem]
+    Properties: list[_TmcItem]
 
     @property
     def base_type(self) -> BaseType:
-        'The reference used to determine the data type (BaseType)'
+        "The reference used to determine the data type (BaseType)"
         return self.BaseType[0]
 
     @property
     def type_name(self) -> str:
-        'The base type name.'
+        "The base type name."
         return self.base_type.text
 
     @property
     def qualified_type_name(self) -> str:
-        'The base type name, including the namespace'
+        "The base type name, including the namespace"
         return self.data_type.qualified_type
 
     @property
     def data_type(self) -> DataType:
         return get_data_type_by_reference(
-            self.base_type, (self.tmc, self.find_ancestor(TcSmProject)),
-            reference=self.is_reference, pointer=self.is_pointer,
+            self.base_type,
+            (self.tmc, self.find_ancestor(TcSmProject)),
+            reference=self.is_reference,
+            pointer=self.is_pointer,
         )
 
     @property
     def module(self) -> Module:
-        'The TMC Module containing the Symbol'
+        "The TMC Module containing the Symbol"
         return self.find_ancestor(Module)
 
     @property
     def info(self):
-        return dict(name=self.name,
-                    bit_size=self.BitSize[0].text,
-                    bit_offs=self.BitOffs[0].text,
-                    module=self.module.name,
-                    array_bounds=self.array_bounds,
-                    summary_type_name=self.summary_type_name,
-                    **self.base_type.info,
-                    )
+        return dict(
+            name=self.name,
+            bit_size=self.BitSize[0].text,
+            bit_offs=self.BitOffs[0].text,
+            module=self.module.name,
+            array_bounds=self.array_bounds,
+            summary_type_name=self.summary_type_name,
+            **self.base_type.info,
+        )
 
     def walk(self, condition=None):
         if condition is None or condition(self):
@@ -1503,22 +1515,27 @@ class Symbol(_TmcItem):
 
     @property
     def array_info(self):
-        return getattr(self, 'ArrayInfo', [None])[0]
+        return getattr(self, "ArrayInfo", [None])[0]
 
     @property
     def array_bounds(self):
-        return getattr(self.array_info, 'array_bounds', None)
+        return getattr(self.array_info, "array_bounds", None)
 
     def get_links(self, *, strict=False):
-        sym_name = '^' + self.name.lower()
-        dotted_name = sym_name + '.'
+        sym_name = "^" + self.name.lower()
+        dotted_name = sym_name + "."
         plc = self.plc
         plc_name = plc.link_name
         for link in plc.links:
-            if any(owner == plc_name and
-                   (var.lower().endswith(sym_name) or
-                    not strict and dotted_name in var.lower())
-                   for owner, var in link.link):
+            if any(
+                owner == plc_name
+                and (
+                    var.lower().endswith(sym_name)
+                    or not strict
+                    and dotted_name in var.lower()
+                )
+                for owner, var in link.link
+            ):
                 yield link
 
     @property
@@ -1535,129 +1552,135 @@ class Symbol(_TmcItem):
 
 
 class Symbol_DUT_MotionStage(Symbol):
-    '[TMC] A customized Symbol, representing only DUT_MotionStage'
+    "[TMC] A customized Symbol, representing only DUT_MotionStage"
+
     def _repr_info(self):
-        '__repr__ information'
+        "__repr__ information"
         repr_info = super()._repr_info()
         # Add on the NC axis name
         try:
-            repr_info['nc_axis'] = self.nc_axis.name
+            repr_info["nc_axis"] = self.nc_axis.name
         except Exception as ex:
-            repr_info['nc_axis'] = repr(ex)
+            repr_info["nc_axis"] = repr(ex)
 
         return repr_info
 
     @property
     def program_name(self):
-        '`Main` of `Main.M1`'
-        return self.name.split('.')[0]
+        "`Main` of `Main.M1`"
+        return self.name.split(".")[0]
 
     @property
     def motor_name(self):
-        '`M1` of `Main.M1`'
-        return self.name.split('.')[1]
+        "`M1` of `Main.M1`"
+        return self.name.split(".")[1]
 
     @property
-    def nc_to_plc_link(self) -> Optional[Link]:
-        '''
+    def nc_to_plc_link(self) -> Link | None:
+        """
         The Link for NcToPlc
 
         That is, how the NC axis is connected to the DUT_MotionStage
-        '''
+        """
         plc = self.plc
         if self.plc is None:
             return None
-        expected = '^' + self.name.lower() + '.axis.nctoplc'
-        links = [link
-                 for link in plc.find(Link, recurse=False)
-                 if expected in link.a[1].lower()
-                 ]
+        expected = "^" + self.name.lower() + ".axis.nctoplc"
+        links = [
+            link
+            for link in plc.find(Link, recurse=False)
+            if expected in link.a[1].lower()
+        ]
 
         if not links:
-            raise RuntimeError(f'No NC link to DUT_MotionStage found for '
-                               f'{self.name!r}')
-        link, = links
+            raise RuntimeError(
+                f"No NC link to DUT_MotionStage found for " f"{self.name!r}"
+            )
+        (link,) = links
         return link
 
     @property
     def nc_axis(self):
-        'The NC `Axis` associated with the DUT_MotionStage'
+        "The NC `Axis` associated with the DUT_MotionStage"
         link = self.nc_to_plc_link
-        parent_name = link.parent.name.split('^')
-        if parent_name[0] == 'TINC':
+        parent_name = link.parent.name.split("^")
+        if parent_name[0] == "TINC":
             parent_name = parent_name[1:]
 
         task_name, axis_section, axis_name = parent_name
 
-        nc, = list(nc for nc in self.root.find(NC, recurse=False)
-                   if nc.SafTask[0].name == task_name)
+        (nc,) = list(
+            nc
+            for nc in self.root.find(NC, recurse=False)
+            if nc.SafTask[0].name == task_name
+        )
         nc_axis = nc.axis_by_name[axis_name]
         # link nc_axis and FB_MotionStage?
         return nc_axis
 
 
 class GVL(_TwincatProjectSubItem):
-    '[TcGVL] A Global Variable List'
+    "[TcGVL] A Global Variable List"
     Declaration: list
 
     @property
     def declaration(self):
-        'The declaration code; i.e., the top portion in visual studio'
+        "The declaration code; i.e., the top portion in visual studio"
         return self.Declaration[0].text
 
     def get_source_code(self, *, close_block=True) -> str:
-        'The full source code - declaration only in the case of a GVL'
+        "The full source code - declaration only in the case of a GVL"
         return self.declaration
 
 
 class EnumerationTextList(_TwincatProjectSubItem):
-    '[TcDUT] An enumerated text list type'
+    "[TcDUT] An enumerated text list type"
     Declaration: list
 
     @property
     def declaration(self):
-        'The declaration code; i.e., the top portion in visual studio'
+        "The declaration code; i.e., the top portion in visual studio"
         return self.Declaration[0].text
 
     def get_source_code(self, *, close_block=True) -> str:
-        'The full source code - declaration only in the case of an ENUM'
+        "The full source code - declaration only in the case of an ENUM"
         return self.declaration
 
 
 class ST(_TwincatProjectSubItem):
-    '[TcDUT/TcPOU] Structured text'
+    "[TcDUT/TcPOU] Structured text"
 
 
 class Implementation(_TwincatProjectSubItem):
-    '[TcDUT/TcPOU] Code implementation'
+    "[TcDUT/TcPOU] Code implementation"
     #: Structured text code if it exists:
-    ST: List[ST]
+    ST: list[ST]
 
 
 class Declaration(_TwincatProjectSubItem):
-    '[TcDUT/TcPOU/TcGVL] Code declaration'
+    "[TcDUT/TcPOU/TcGVL] Code declaration"
 
 
 class DUT(_TwincatProjectSubItem):
-    '[TcDUT] Data unit type (DUT)'
-    Declaration: List[Declaration]
+    "[TcDUT] Data unit type (DUT)"
+    Declaration: list[Declaration]
 
     @property
     def declaration(self) -> str:
-        'The declaration code; i.e., the top portion in visual studio'
+        "The declaration code; i.e., the top portion in visual studio"
         return self.Declaration[0].text
 
     def get_source_code(self, *, close_block=True) -> str:
-        'The full source code - declaration only in the case of a DUT'
+        "The full source code - declaration only in the case of a DUT"
         return self.declaration
 
 
 class _POUMember:
-    Declaration: List[Declaration]
-    Implementation: List[Implementation]
+    Declaration: list[Declaration]
+    Implementation: list[Implementation]
 
     @property
-    def pou(self) -> Optional[POU]:
+    def pou(self) -> POU | None:
         """The associated POU."""
         return self.find_ancestor(POU)
 
@@ -1669,7 +1692,7 @@ class _POUMember:
 
     @property
     def declaration(self) -> str:
-        'The declaration code; i.e., the top portion in visual studio'
+        "The declaration code; i.e., the top portion in visual studio"
         try:
             return self.Declaration[0].text or ""
         except (IndexError, AttributeError):
@@ -1677,7 +1700,7 @@ class _POUMember:
 
     @property
     def implementation(self) -> str:
-        'The implementation code; i.e., the bottom portion in visual studio'
+        "The implementation code; i.e., the bottom portion in visual studio"
         try:
             # NOTE: only ST for now
             return self.Implementation[0].ST[0].text or ""
@@ -1720,7 +1743,7 @@ class _POUPropertyMember(_TwincatProjectSubItem, _POUMember):
     "[TcPOU] Code declaration container for function block properties."
 
     @property
-    def property_(self) -> Optional[Property]:
+    def property_(self) -> Property | None:
         return self.find_ancestor(Property)
 
     @property
@@ -1773,16 +1796,16 @@ class Property(_TmcItem, _TwincatProjectSubItem, _POUMember):
 
     @property
     def key(self):
-        'The property key name'
+        "The property key name"
         return self.name
 
     @property
     def value(self):
-        'The property value text'
-        return self.Value[0].text if hasattr(self, 'Value') else self.text
+        "The property value text"
+        return self.Value[0].text if hasattr(self, "Value") else self.text
 
     def __repr__(self):
-        return f'<Property {self.key}={self.value!r}>'
+        return f"<Property {self.key}={self.value!r}>"
 
     @property
     def source_code(self) -> str:
@@ -1802,84 +1825,87 @@ class Property(_TmcItem, _TwincatProjectSubItem, _POUMember):
 
 
 class POU(_TwincatProjectSubItem):
-    '[XTI] A Program Organization Unit'
+    "[XTI] A Program Organization Unit"
 
     # TODO: may fail when mixed with ladder logic?
     Declaration: list
     Implementation: list
 
     def get_fully_qualified_name(self, name):
-        if '.' in name:
-            first, rest = name.split('.', 1)
-            if (first == self.name or first in self.project.namespaces):
+        if "." in name:
+            first, rest = name.split(".", 1)
+            if first == self.name or first in self.project.namespaces:
                 return name
 
-        return f'{self.name}.{name}'
+        return f"{self.name}.{name}"
 
     @property
     def declaration(self) -> str:
-        'The declaration code; i.e., the top portion in visual studio'
+        "The declaration code; i.e., the top portion in visual studio"
         return self.Declaration[0].text
 
     @property
     def implementation(self) -> str:
-        'The implementation code; i.e., the bottom portion in visual studio'
+        "The implementation code; i.e., the bottom portion in visual studio"
         impl = self.Implementation[0]
-        if hasattr(impl, 'ST'):
+        if hasattr(impl, "ST"):
             return impl.ST[0].text
 
     @property
-    def actions(self) -> List[Action]:
-        'The action implementations (zero or more)'
-        return list(getattr(self, 'Action', []))
+    def actions(self) -> list[Action]:
+        "The action implementations (zero or more)"
+        return list(getattr(self, "Action", []))
 
     @property
-    def methods(self) -> List[Method]:
-        'The method implementations (zero or more)'
-        return list(getattr(self, 'Method', []))
+    def methods(self) -> list[Method]:
+        "The method implementations (zero or more)"
+        return list(getattr(self, "Method", []))
 
     @property
-    def properties(self) -> List[Property]:
-        'The property implementations (zero or more)'
-        return list(getattr(self, 'Property', []))
+    def properties(self) -> list[Property]:
+        "The property implementations (zero or more)"
+        return list(getattr(self, "Property", []))
 
     def get_source_code(self, *, close_block=True) -> str:
-        'The full source code - declaration, implementation, and actions'
-        source_code = [self.declaration or '',
-                       self.implementation or '',
-                       ]
+        "The full source code - declaration, implementation, and actions"
+        source_code = [
+            self.declaration or "",
+            self.implementation or "",
+        ]
 
         if close_block:
-            source_code.append('')
+            source_code.append("")
             closing = {
-                'function_block': 'END_FUNCTION_BLOCK',
-                'program': 'END_PROGRAM',
-                'function': 'END_FUNCTION',
-                'action': 'END_ACTION',
+                "function_block": "END_FUNCTION_BLOCK",
+                "program": "END_PROGRAM",
+                "function": "END_FUNCTION",
+                "action": "END_ACTION",
             }
             source_code.append(
-                closing.get(determine_block_type(self.declaration),
-                            '# pytmc: unknown block type')
+                closing.get(
+                    determine_block_type(self.declaration),
+                    "# pytmc: unknown block type",
+                )
             )
 
         for obj in self.actions + self.methods + self.properties:
             source_code.append(f"\n{obj.source_code}")
 
-        return '\n'.join(source_code)
+        return "\n".join(source_code)
 
     @property
     def call_blocks(self) -> dict:
-        'A dictionary of all implementation call blocks'
+        "A dictionary of all implementation call blocks"
         return get_pou_call_blocks(self.declaration, self.implementation)
 
     @property
     def program_name(self) -> str:
-        'The program name, determined from the declaration'
+        "The program name, determined from the declaration"
         return program_name_from_declaration(self.declaration)
 
     @property
     def variables(self):
-        'A dictionary of variables defined in the POU'
+        "A dictionary of variables defined in the POU"
         return variables_from_declaration(self.declaration)
 
 
@@ -1889,7 +1915,8 @@ class Task(TwincatItem):
 
     ``TcSmProject/TopLevelProject/System/Tasks/Task``
     """
-    parent: "Tasks"
+
+    parent: Tasks
 
     @property
     def array_index(self) -> int:
@@ -1910,107 +1937,99 @@ class Tasks(TwincatItem):
     ``TcSmProject/TopLevelProject/System/Tasks``
     """
 
-    Task: List[Task]
+    Task: list[Task]
     #: Unique priority to task.
-    priority_to_task: Dict[int, Task]
+    priority_to_task: dict[int, Task]
 
     def post_init(self):
-        priority_and_task = [
-            (task.priority, task)
-            for task in self.Task
-        ]
+        priority_and_task = [(task.priority, task) for task in self.Task]
         self.priority_to_task = dict(sorted(priority_and_task))
 
 
 class AxisPara(TwincatItem):
-    '''
+    """
     [XTI] Axis Parameters
 
     Has information on units, acceleration, deadband, etc.
-    '''
+    """
 
 
 class NC(TwincatItem):
-    '[tsproj or XTI] Top-level NC'
-    _load_path_hint = pathlib.Path('_Config') / 'NC'
+    "[tsproj or XTI] Top-level NC"
+    _load_path_hint = pathlib.Path("_Config") / "NC"
 
     def post_init(self):
         # Axes can be stored directly in the tsproj:
-        self.axes = getattr(self, 'Axis', [])
+        self.axes = getattr(self, "Axis", [])
 
-        self.axis_by_id = {
-            int(axis.attributes['Id']): axis
-            for axis in self.axes
-        }
+        self.axis_by_id = {int(axis.attributes["Id"]): axis for axis in self.axes}
 
-        self.axis_by_name = {
-            axis.name: axis
-            for axis in self.axes
-        }
+        self.axis_by_name = {axis.name: axis for axis in self.axes}
 
 
 class Axis(TwincatItem):
-    '[XTI] A single NC axis'
-    _load_path_hint = pathlib.Path('Axes')
+    "[XTI] A single NC axis"
+    _load_path_hint = pathlib.Path("Axes")
 
     @property
     def axis_number(self):
-        return int(self.attributes['Id'])
+        return int(self.attributes["Id"])
 
     @property
     def units(self):
         try:
-            for axis_para in getattr(self, 'AxisPara', []):
-                for general in getattr(axis_para, 'General', []):
-                    if 'UnitName' in general.attributes:
-                        return general.attributes['UnitName']
+            for axis_para in getattr(self, "AxisPara", []):
+                for general in getattr(axis_para, "General", []):
+                    if "UnitName" in general.attributes:
+                        return general.attributes["UnitName"]
         except Exception:
-            logger.exception('Unable to determine EGU for Axis %s', self)
+            logger.exception("Unable to determine EGU for Axis %s", self)
 
         # 'mm' is the default in twincat if unspecified. defaults are not saved
         # in the xti files:
-        return 'mm'
+        return "mm"
 
-    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
+    def summarize(self) -> Generator[tuple[str, Any], None, None]:
         yield from self.attributes.items()
         for param in self.find(AxisPara, recurse=False):
             yield from param.attributes.items()
             for child in param._children:
                 for key, value in child.attributes.items():
-                    yield f'{child.tag}:{key}', value
+                    yield f"{child.tag}:{key}", value
 
-        for encoder in getattr(self, 'Encoder', []):
+        for encoder in getattr(self, "Encoder", []):
             for key, value in encoder.summarize():
-                yield f'Enc:{key}', value
+                yield f"Enc:{key}", value
 
 
 class EncPara(TwincatItem):
-    '''
+    """
     [XTI] Encoder parameters
 
     Includes such parameters as ScaleFactorNumerator, ScaleFactorDenominator,
     and so on.
-    '''
+    """
 
 
 class Encoder(TwincatItem):
-    '''
+    """
     [XTI] Encoder
 
     Contains EncPara, Vars, Mappings, etc.
-    '''
-    def summarize(self) -> Generator[Tuple[str, Any], None, None]:
-        yield 'EncType', self.attributes['EncType']
+    """
+
+    def summarize(self) -> Generator[tuple[str, Any], None, None]:
+        yield "EncType", self.attributes["EncType"]
         for param in self.find(EncPara, recurse=False):
             yield from param.attributes.items()
             for child in param._children:
                 for key, value in child.attributes.items():
-                    yield f'{child.tag}:{key}', value
+                    yield f"{child.tag}:{key}", value
 
 
 class Io(TwincatItem):
-    '[XTI] Top-level IO container, which has devices'
-    _load_path_hint = pathlib.Path('_Config') / 'IO'
+    "[XTI] Top-level IO container, which has devices"
+    _load_path_hint = pathlib.Path("_Config") / "IO"
 
     @classmethod
     def _pre_load_xti_files(cls, io_dir):
@@ -2019,14 +2038,16 @@ class Io(TwincatItem):
 
         Used in the lazy loading mechanism.
         """
+
         def get_key(xti_filename, xti):
             candidates = []
             for item in xti.find(TwincatItem):
-                if item.attributes.get('Id') is not None:
-                    class_id = (type(item),
-                                item.attributes.get('Id'),
-                                xti_filename.name.lower(),
-                                )
+                if item.attributes.get("Id") is not None:
+                    class_id = (
+                        type(item),
+                        item.attributes.get("Id"),
+                        xti_filename.name.lower(),
+                    )
                     candidates.append(class_id)
                     if item._lazy_load:
                         return class_id
@@ -2034,19 +2055,20 @@ class Io(TwincatItem):
             if len(candidates) == 1:
                 return candidates[0]
 
-            raise ValueError(f'Hmm: {candidates}')
+            raise ValueError(f"Hmm: {candidates}")
 
         xti_files = {}
 
-        for xti_filename in io_dir.glob('**/*.xti'):
+        for xti_filename in io_dir.glob("**/*.xti"):
             try:
                 xti = parse(xti_filename)
             except Exception as ex:
                 logger.warning(
-                    '(Pre-loading XTI file) Failed: %s (%s). If this file is '
-                    'referenced in the project, this may cause the project to '
-                    'fail loading.  If not, this can be ignored.',
-                    xti_filename.name, ex
+                    "(Pre-loading XTI file) Failed: %s (%s). If this file is "
+                    "referenced in the project, this may cause the project to "
+                    "fail loading.  If not, this can be ignored.",
+                    xti_filename.name,
+                    ex,
                 )
                 continue
 
@@ -2054,21 +2076,24 @@ class Io(TwincatItem):
                 key = get_key(xti_filename, xti)
             except Exception as ex:
                 logger.warning(
-                    'Pytmc failed to figure out what to do with: %s',
-                    xti_filename, exc_info=ex,
+                    "Pytmc failed to figure out what to do with: %s",
+                    xti_filename,
+                    exc_info=ex,
                 )
                 continue
 
             if key in xti_files:
                 logger.warning(
-                    'Found multiple potential matches with the same key: '
-                    '%s => %s (choosing %s)', key, xti_filename,
-                    xti_files[key]['file']
+                    "Found multiple potential matches with the same key: "
+                    "%s => %s (choosing %s)",
+                    key,
+                    xti_filename,
+                    xti_files[key]["file"],
                 )
             else:
                 xti_files[key] = {
-                    'file': xti_filename,
-                    'obj': xti,
+                    "file": xti_filename,
+                    "obj": xti,
                 }
 
         return xti_files
@@ -2081,16 +2106,16 @@ class Io(TwincatItem):
 
 
 class _IoTreeItem(TwincatItem):
-    '[XTI] Base class for items contained in an IO Tree'
+    "[XTI] Base class for items contained in an IO Tree"
     _lazy_load = True
 
 
 class Device(_IoTreeItem):
-    '[XTI] Top-level IO device container'
+    "[XTI] Top-level IO device container"
 
 
 class Box(_IoTreeItem):
-    '[XTI] A box / module'
+    "[XTI] A box / module"
     _load_path_hint = USE_NAME_AS_PATH
 
 
@@ -2100,37 +2125,38 @@ class EtherCAT(TwincatItem):
 
     Contains SyncMan, Fmmu, DcMode, Pdo, etc.
     """
+
     ...
 
 
 class Pdo(TwincatItem):
     """Process data objects, part of an EtherCAT block."""
+
     ...
 
 
 class Entry(TwincatItem):
     """Pdo Entry, containing name and type information."""
-    Comment: List[TwincatItem]
+
+    Comment: list[TwincatItem]
 
     @property
-    def entry_type(self) -> Optional[Type]:
+    def entry_type(self) -> Type | None:
         """The type of the entry."""
-        return getattr(self, 'Type', [None])[0]
+        return getattr(self, "Type", [None])[0]
 
     @property
     def comment(self) -> str:
         """The comment associated with the entry."""
-        return self.Comment[0].text if hasattr(self, 'Comment') else ''
+        return self.Comment[0].text if hasattr(self, "Comment") else ""
 
 
 class RemoteConnections(TwincatItem):
-    '[StaticRoutes] Routes contained in the TwinCat configuration'
+    "[StaticRoutes] Routes contained in the TwinCat configuration"
+
     def post_init(self):
         def to_dict(child):
-            return {
-                item.tag: item.text
-                for item in child._children
-            }
+            return {item.tag: item.text for item in child._children}
 
         def keyed_on(key):
             return {
@@ -2139,13 +2165,14 @@ class RemoteConnections(TwincatItem):
                 if hasattr(child, key)
             }
 
-        self.by_name = keyed_on('Name')
-        self.by_address = keyed_on('Address')
-        self.by_ams_id = keyed_on('NetId')
+        self.by_name = keyed_on("Name")
+        self.by_address = keyed_on("Address")
+        self.by_ams_id = keyed_on("NetId")
 
 
 class Resolution(TwincatItem):
     """Library version resolution."""
+
     @property
     def resolution(self):
         if not self.text:
@@ -2155,17 +2182,17 @@ class Resolution(TwincatItem):
 
     @staticmethod
     def split_resolution(text):
-        library_name, version_and_vendor = text.split(',')
-        version, vendor = version_and_vendor.strip().split('(')
-        vendor = vendor.rstrip(')')
+        library_name, version_and_vendor = text.split(",")
+        version, vendor = version_and_vendor.strip().split("(")
+        vendor = vendor.rstrip(")")
         version = version.strip()
 
         return {
-            'name': library_name,
-            'vendor': vendor,
-            'version': version,
-            'vendor_short': vendor.split(' ')[0] if ' ' in vendor else vendor,
-         }
+            "name": library_name,
+            "vendor": vendor,
+            "version": version,
+            "vendor_short": vendor.split(" ")[0] if " " in vendor else vendor,
+        }
 
 
 class DefaultResolution(Resolution):
@@ -2178,38 +2205,36 @@ class _VersionItemMixin:
     # Namespace: List[TwincatItem]
 
     @property
-    def resolution(self) -> Optional[Union[DefaultResolution, Resolution]]:
+    def resolution(self) -> DefaultResolution | Resolution | None:
         try:
-            resolution, = self.Resolution
+            (resolution,) = self.Resolution
         except AttributeError:
             try:
-                resolution, = self.DefaultResolution
+                (resolution,) = self.DefaultResolution
             except AttributeError:
                 resolution = None
         return resolution
 
     @property
     def full_include_name(self) -> str:
-        if hasattr(self, 'Namespace'):
-            namespace, = self.Namespace
-            return f'{namespace.namespace}.{self.include_name}'
+        if hasattr(self, "Namespace"):
+            (namespace,) = self.Namespace
+            return f"{namespace.namespace}.{self.include_name}"
 
         return self.include_name
 
     @property
     def include_name(self) -> str:
-        return self.attributes['Include']
+        return self.attributes["Include"]
 
     def get_resolution_info(self):
         resolution = self.resolution
-        resolution_info = (
-            resolution.resolution if resolution is not None else {}
-        )
+        resolution_info = resolution.resolution if resolution is not None else {}
         return {
-            'resolution': resolution,
-            'name': self.include_name,
-            'full_name': self.full_include_name,
-            **resolution_info
+            "resolution": resolution,
+            "name": self.include_name,
+            "full_name": self.full_include_name,
+            **resolution_info,
         }
 
 
@@ -2225,34 +2250,35 @@ class LibraryReference(TwincatItem, _VersionItemMixin):
     """Library reference."""
 
     def get_resolution_info(self):
-        if ',' not in self.include_name:
+        if "," not in self.include_name:
             # Unknown
             return {}
 
-        name, version, vendor = self.include_name.split(',')
+        name, version, vendor = self.include_name.split(",")
         full_name = self.full_include_name
-        if ',' in full_name:
-            full_name = full_name.split(',')[0]
+        if "," in full_name:
+            full_name = full_name.split(",")[0]
 
         return {
-            'resolution': None,
-            'full_name': full_name,
-            'name': name,
-            'version': version,
-            'vendor': vendor,
-            'vendor_short': vendor.split(' ')[0] if ' ' in vendor else vendor,
+            "resolution": None,
+            "full_name": full_name,
+            "name": name,
+            "version": version,
+            "vendor": vendor,
+            "vendor_short": vendor.split(" ")[0] if " " in vendor else vendor,
         }
 
 
 class Namespace(TwincatItem):
     """Type / library namespace information."""
+
     @property
     def namespace(self) -> str:
         return self.text
 
 
 class _ArrayItemProxy:
-    '''
+    """
     A TwincatItem proxy that represents a single element of an array value.
 
     Adjusts 'name' such that access from EPICS will refer to the correct index.
@@ -2263,39 +2289,36 @@ class _ArrayItemProxy:
         The item to mirror
     index : int
         The array index to use
-    '''
+    """
 
     def __init__(self, item, index):
         self.__dict__.update(
-            name=f'{item.name}[{index}]',
+            name=f"{item.name}[{index}]",
             item=item,
             _index=index,
         )
 
     def __getattr__(self, attr):
-        return getattr(self.__dict__['item'], attr)
+        return getattr(self.__dict__["item"], attr)
 
     def __setattr__(self, attr, value):
-        return setattr(self.__dict__['item'], attr, value)
+        return setattr(self.__dict__["item"], attr, value)
 
 
-def _make_fake_item(name, parent=None, item_name=None, *, text=None,
-                    attrib=None, add_as_child=False):
+def _make_fake_item(
+    name, parent=None, item_name=None, *, text=None, attrib=None, add_as_child=False
+):
     """Make a fake TwincatItem, for debugging/testing purposes."""
     cls = TWINCAT_TYPES[name]
-    filename = (parent.filename
-                if parent is not None
-                else pathlib.Path(__file__))
+    filename = parent.filename if parent is not None else pathlib.Path(__file__)
 
     attrib = attrib or {}
-    if 'name' not in attrib:
-        attrib['name'] = item_name or name
+    if "name" not in attrib:
+        attrib["name"] = item_name or name
 
     elem = lxml.etree.Element(cls.__name__, attrib=attrib)
-    elem.text = text or ''
-    item = cls(element=elem,
-               name=attrib['name'],
-               parent=parent, filename=filename)
+    elem.text = text or ""
+    item = cls(element=elem, name=attrib["name"], parent=parent, filename=filename)
 
     if add_as_child and parent is not None:
         # The main list
@@ -2310,7 +2333,7 @@ def _make_fake_item(name, parent=None, item_name=None, *, text=None,
 
 
 def case_insensitive_path(path: AnyPath) -> pathlib.Path:
-    '''
+    """
     Match a path in a case-insensitive manner, returning the actual filename as
     it exists on the host machine
 
@@ -2331,7 +2354,7 @@ def case_insensitive_path(path: AnyPath) -> pathlib.Path:
     ------
     FileNotFoundError
         When the file can't be found
-    '''
+    """
     path = pathlib.Path(path)
     if path.exists():
         return path.resolve()
@@ -2339,25 +2362,20 @@ def case_insensitive_path(path: AnyPath) -> pathlib.Path:
     new_path = pathlib.Path(path.parts[0])
     for part in path.parts[1:]:
         if not (new_path / part).exists():
-            all_files = {fn.lower(): fn
-                         for fn in os.listdir(new_path)}
+            all_files = {fn.lower(): fn for fn in os.listdir(new_path)}
             try:
                 part = all_files[part.lower()]
             except KeyError:
                 raise FileNotFoundError(
-                    f'Path does not exist:\n'
-                    f'{path}\n'
-                    f'{new_path}/{part} missing'
+                    f"Path does not exist:\n" f"{path}\n" f"{new_path}/{part} missing"
                 ) from None
         new_path = new_path / part
 
     return new_path.resolve()
 
 
-def separate_by_classname(
-    children: List[TwincatItem]
-) -> Dict[str, List[TwincatItem]]:
-    '''
+def separate_by_classname(children: list[TwincatItem]) -> dict[str, list[TwincatItem]]:
+    """
     Take in a list of `TwincatItem`, categorize each by their class name (based
     on XML tag), and return a dictionary keyed on that.
 
@@ -2380,7 +2398,7 @@ def separate_by_classname(
     -------
     dict
         Categorized children
-    '''
+    """
     d = collections.defaultdict(list)
     for child in children:
         d[child.__class__.__name__].append(child)
@@ -2390,5 +2408,5 @@ def separate_by_classname(
 
 @functools.lru_cache(maxsize=2048)
 def strip_namespace(tag: str) -> str:
-    'Strip off {{namespace}} from: {{namespace}}tag'
+    "Strip off {{namespace}} from: {{namespace}}tag"
     return lxml.etree.QName(tag).localname

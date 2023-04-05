@@ -4,11 +4,11 @@ import pyPDB.dbd.yacc as _yacc
 import pyPDB.dbdlint as _dbdlint
 from pyPDB.dbdlint import DBSyntaxError
 
-MAX_RECORD_LENGTH = int(os.environ.get('EPICS_MAX_RECORD_LENGTH', '60'))
+MAX_RECORD_LENGTH = int(os.environ.get("EPICS_MAX_RECORD_LENGTH", "60"))
 
 
 class LinterResults(_dbdlint.Results):
-    '''
+    """
     Container for dbdlint results, with easier-to-access attributes
 
     Extends pyPDB.dbdlint.Results
@@ -23,7 +23,8 @@ class LinterResults(_dbdlint.Results):
         List of errors found
     warnings : list
         List of warnings found
-    '''
+    """
+
     def __init__(self, args):
         super().__init__(args)
         self.errors = []
@@ -31,13 +32,14 @@ class LinterResults(_dbdlint.Results):
 
     def _record_warning_or_error(self, result_list, name, msg, args):
         result_list.append(
-            {'name': name,
-             'message': msg % args,
-             'file': self.node.fname,
-             'line': self.node.lineno,
-             'raw_message': msg,
-             'format_args': args,
-             }
+            {
+                "name": name,
+                "message": msg % args,
+                "file": self.node.fname,
+                "line": self.node.lineno,
+                "raw_message": msg,
+                "format_args": args,
+            }
         )
 
     def err(self, name, msg, *args):
@@ -51,17 +53,17 @@ class LinterResults(_dbdlint.Results):
 
     @property
     def success(self):
-        '''
+        """
         Returns
         -------
         success : bool
             True if the linting process succeeded without errors
-        '''
+        """
         return not len(self.errors)
 
 
 class DbdFile:
-    '''
+    """
     An expanded EPICS dbd file
 
     Parameters
@@ -75,25 +77,33 @@ class DbdFile:
         The dbd filename
     parsed : list
         pyPDB parsed dbd nodes
-    '''
+    """
 
     def __init__(self, fn):
-        if hasattr(fn, 'read'):
-            self.filename = getattr(fn, 'name', None)
+        if hasattr(fn, "read"):
+            self.filename = getattr(fn, "name", None)
             contents = fn.read()
         else:
             self.filename = str(fn)
-            with open(fn, 'rt') as f:
+            with open(fn) as f:
                 contents = f.read()
 
         self.parsed = _yacc.parse(contents)
 
 
-def lint_db(dbd, db, *, full=True, warn_ext_links=False, warn_bad_fields=True,
-            warn_rec_append=False, warn_quoted=False, warn_varint=True,
-            warn_spec_comm=True,
-            ):
-    '''
+def lint_db(
+    dbd,
+    db,
+    *,
+    full=True,
+    warn_ext_links=False,
+    warn_bad_fields=True,
+    warn_rec_append=False,
+    warn_quoted=False,
+    warn_varint=True,
+    warn_spec_comm=True,
+):
+    """
     Lint a db (database) file using its database definition file (dbd) using
     pyPDB.
 
@@ -130,40 +140,39 @@ def lint_db(dbd, db, *, full=True, warn_ext_links=False, warn_bad_fields=True,
     Returns
     -------
     results : LinterResults
-    '''
+    """
     args = []
     if warn_ext_links:
-        args.append('-Wext-link')
+        args.append("-Wext-link")
     if warn_bad_fields:
-        args.append('-Wbad-field')
+        args.append("-Wbad-field")
     if warn_rec_append:
-        args.append('-Wrec-append')
+        args.append("-Wrec-append")
 
     if not warn_quoted:
-        args.append('-Wno-quoted')
+        args.append("-Wno-quoted")
     if not warn_varint:
-        args.append('-Wno-varint')
+        args.append("-Wno-varint")
     if not warn_spec_comm:
-        args.append('-Wno-spec-comm')
+        args.append("-Wno-spec-comm")
 
     if full:
-        args.append('-F')
+        args.append("-F")
     else:
-        args.append('-P')
+        args.append("-P")
 
-    dbd_file = (dbd if isinstance(dbd, DbdFile)
-                else DbdFile(dbd))
+    dbd_file = dbd if isinstance(dbd, DbdFile) else DbdFile(dbd)
 
     args = _dbdlint.getargs([dbd_file.filename, db, *args])
 
     results = LinterResults(args)
 
     if os.path.exists(db):
-        with open(db, 'r') as f:
+        with open(db) as f:
             db_content = f.read()
     else:
         db_content = db
-        db = '<string>'
+        db = "<string>"
 
     try:
         _dbdlint.walk(dbd_file.parsed, _dbdlint.dbdtree, results)
