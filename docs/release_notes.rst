@@ -2,7 +2,7 @@
  Release History
 =================
 
-v2.12.0 (2023-04-04)
+v2.15.0 (2023-04-04)
 ====================
 
 Python 3.9 is now the minimum supported version for pytmc.
@@ -16,6 +16,75 @@ Maintenance
 * pytmc has migrated to modern ``pyproject.toml``, replacing ``setup.py``.
 * Sphinx 6.0 now supported for documentation building.
 * ``docs-versions-menu`` is now used for documentation deployment on GitHub Actions.
+
+
+v2.14.1 (2022-09-28)
+====================
+
+This release doesn't change any behavior of the library, but it does fix an error in the test suite that causes false failures.
+
+Maintenance
+-----------
+
+* TST: test suite was using old kwarg, swap to new by @ZLLentz in #296
+
+
+v2.14.0 (2022-08-29)
+====================
+
+Fixes
+-----
+* Safety PLC files loaded from `_Config/SPLC` by @klauer in https://github.com/pcdshub/pytmc/pull/289
+
+Enhancements
+------------
+
+* Sort generated records by TwinCAT symbol name (tcname) by @klauer in https://github.com/pcdshub/pytmc/pull/293
+    * The order of records in EPICS process database (`.db`) files will change for most users after this release. After the initial rebuild, users should expect to see smaller diffs on subsequent PLC project rebuilds.
+* Add all hooks required to allow transition of pytmc stcmd -> template by @klauer in https://github.com/pcdshub/pytmc/pull/290
+  * Adds helper commands to `pytmc template`, which can be used in Jinja templates:
+      * `generate_records` (create .db and .archive files)
+      * `get_plc_by_name`
+      * `get_symbols_by_type`
+  * Adds variables to `pytmc template` environment, which can be used in Jinja templates:
+     * `pytmc_version`
+  * Adds `--macro` option to `pytmc template`
+  * Fixes some annotations + uncovered/untested functionality
+  * Allows `pytmc template` to read/write multiple templates with parsing a project only once
+
+
+v2.13.0 (2022-06-30)
+====================
+
+Enhancements
+------------
+* ENH: autosave field additions by @klauer in https://github.com/pcdshub/pytmc/pull/287
+    * Adds description field to autosave for all records, input and output
+    * Adds alarm severity and limit fields to autosave for all relevant input and output records
+    * Adds control limit (drive low/high) fields to autosave for relevant output records
+
+v2.12.0 (2022-05-27)
+====================
+
+Fixes
+-----
+* CP link instead of CPP link by @klauer in https://github.com/pcdshub/pytmc/pull/283
+
+Maintenance
+-----------
+* Address CI-related failures and update pre-commit settings by @klauer in https://github.com/pcdshub/pytmc/pull/285
+
+
+v2.11.1 (2022-03-24)
+====================
+
+Maintenance
+-----------
+
+* CLN: remove evalcontextfilter usage by @klauer in #280
+   * Jinja2 3.1 compatibility fix
+* TST: does linking work as expected? by @klauer in #279
+   * Additional tests
 
 v2.11.0 (2021-11-15)
 ====================
