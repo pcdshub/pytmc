@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command-line Usage &mdash; pytmc  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/docs-versions-menu.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Documentation" href="source_code.html" />
+    <link rel="prev" title="Annotating a TwinCAT3 project" href="pragma_usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pytmc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pragma_usage.html">Annotating a TwinCAT3 project</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Command-line Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-pytmc">Using pytmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-db">pytmc db</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-stcmd">pytmc stcmd</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-xmltranslate">pytmc xmltranslate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-debug">pytmc debug</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-pragmalint">pytmc pragmalint</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">pytmc stcmd</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-summary">pytmc summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-template">pytmc template</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc-types">pytmc types</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#templates">Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stcmd-default-cmd">stcmd_default.cmd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#asyn-standard-file-jinja2">asyn_standard_file.jinja2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#asyn-standard-record-jinja2">asyn_standard_record.jinja2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Command-line Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/terminal_usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-line-usage">
+<h1>Command-line Usage<a class="headerlink" href="#command-line-usage" title="Permalink to this heading"></a></h1>
+<section id="using-pytmc">
+<h2>Using pytmc<a class="headerlink" href="#using-pytmc" title="Permalink to this heading"></a></h2>
+<p>Once pytmc has been installed in a virtual environment the <code class="docutils literal notranslate"><span class="pre">pytmc</span></code> command
+can be called from the command line to generate .db files and more.</p>
+</section>
+<section id="pytmc-db">
+<h2>pytmc db<a class="headerlink" href="#pytmc-db" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc-db” is a command line utility for generating epics records files from
+TwinCAT3 .tmc files. This program is designed to work in conjunction with ESS’s
+m-epics-twincat-ads driver.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">db</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">error</span><span class="o">-</span><span class="n">context</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                <span class="p">[</span><span class="o">--</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span> <span class="n">ARCHIVE_FILE</span> <span class="o">|</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">archive</span><span class="o">-</span><span class="n">file</span><span class="p">]</span>
+                <span class="n">INPUT</span> <span class="p">[</span><span class="n">OUTPUT</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>INPUT</kbd></dt>
+<dd><p>Path to interpreted .tmc file, or a .tsproj project</p>
+</dd>
+<dt><kbd>OUTPUT</kbd></dt>
+<dd><p>Path to output .db file</p>
+<p>Default: &lt;_io.TextIOWrapper name=’&lt;stdout&gt;’ mode=’w’ encoding=’utf-8’&gt;</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>--dbd, -d</kbd></dt>
+<dd><p>Specify an expanded .dbd file for validating fields (requires pyPDB)</p>
+</dd>
+<dt><kbd>--allow-errors, -i</kbd></dt>
+<dd><p>Generate the .db file even if linter issues are found</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--no-error-context</kbd></dt>
+<dd><p>Do not show db file context around errors</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--plc</kbd></dt>
+<dd><p>The PLC name, if specifying a .tsproj file</p>
+</dd>
+<dt><kbd>--debug</kbd></dt>
+<dd><p>Raise exceptions immediately, such that the IPython debugger may be used</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--archive-file</kbd></dt>
+<dd><p>Save an archive configuration file. Defaults to OUTPUT.archive if specified</p>
+</dd>
+<dt><kbd>--no-archive-file</kbd></dt>
+<dd><p>Do not write the archive file, regardless of OUTPUT filename settings.</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="pytmc-stcmd">
+<h2>pytmc stcmd<a class="headerlink" href="#pytmc-stcmd" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc-stcmd” is a command line utility for generating ESS/ethercatmc-capable
+EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
+<p>Relies on the existence (and linking) of FB_MotionStage function blocks.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">stcmd</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hashbang</span> <span class="n">HASHBANG</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">binary</span> <span class="n">BINARY_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">motor</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">path</span> <span class="n">DB_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">delim</span> <span class="n">DELIM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">template</span> <span class="n">TEMPLATE_FILENAME</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">template</span><span class="o">-</span><span class="n">path</span> <span class="n">TEMPLATE_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span>
+                   <span class="n">tsproj_project</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>tsproj_project</kbd></dt>
+<dd><p>Path to .tsproj project</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>--plc</kbd></dt>
+<dd><p>PLC project name, if multiple exist</p>
+</dd>
+<dt><kbd>-p, --prefix</kbd></dt>
+<dd><p>PV prefix for the IOC</p>
+</dd>
+<dt><kbd>--hashbang</kbd></dt>
+<dd><p>Indicates to the shell which binary to use for the st.cmd script</p>
+<p>Default: “../../bin/rhel7-x86_64/adsIoc”</p>
+</dd>
+<dt><kbd>--binary</kbd></dt>
+<dd><p>IOC application binary name</p>
+<p>Default: “adsIoc”</p>
+</dd>
+<dt><kbd>-n, --name</kbd></dt>
+<dd><p>IOC name (defaults to project name)</p>
+</dd>
+<dt><kbd>--only-motor</kbd></dt>
+<dd><p>Parse the project only for motor records, skipping other variables with pytmc pragmas</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--db-path</kbd></dt>
+<dd><p>Path for db files</p>
+<p>Default: “.”</p>
+</dd>
+<dt><kbd>--dbd</kbd></dt>
+<dd><p>Path to the IOC dbd file</p>
+</dd>
+<dt><kbd>--delim</kbd></dt>
+<dd><p>Preferred PV delimiter</p>
+<p>Default: “:”</p>
+</dd>
+<dt><kbd>--debug, -d</kbd></dt>
+<dd><p>Post-stcmd, open an interactive Python session</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--template</kbd></dt>
+<dd><p>st.cmd Jinja2 template</p>
+<p>Default: “stcmd_default.cmd”</p>
+</dd>
+<dt><kbd>--template-path</kbd></dt>
+<dd><p>Location where templates are stored</p>
+<p>Default: “.”</p>
+</dd>
+<dt><kbd>--allow-errors</kbd></dt>
+<dd><p>Allow non-fatal errors to be ignored</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="pytmc-xmltranslate">
+<h2>pytmc xmltranslate<a class="headerlink" href="#pytmc-xmltranslate" title="Permalink to this heading"></a></h2>
+<p><p>Tool for making XML-formatted files human-readable</p>
+<p>Output uses the following rules:
+For a line of xml that appears as the following:
+&lt;tag attr=qual…&gt; text &lt;/tag&gt; tail</p>
+<p>Note that tail takes precedence over text.</p>
+<p>This program will output the following:
+{attrs:qual…} tag text tail</p>
+<p>Tags contained by other tags are indented and printed on the following line.</p>
+<p>This tool was created for exploring .tpy files but is well suited to reading
+any xml formatted file.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">xmltranslate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DEPTH</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">INDENT_SIZE</span><span class="p">]</span> <span class="n">input_file</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>input_file</kbd></dt>
+<dd><p>input file</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>-d, --depth</kbd></dt>
+<dd><p>Recursive limit for exploring the file</p>
+<p>Default: 7</p>
+</dd>
+<dt><kbd>-i, --indent_size</kbd></dt>
+<dd><p>Indent size for output formatting</p>
+<p>Default: 4</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="pytmc-debug">
+<h2>pytmc debug<a class="headerlink" href="#pytmc-debug" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc-debug” is a Qt interface that shows information about how pytmc
+interprets TwinCAT3 .tmc files.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">debug</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="n">INPUT</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>INPUT</kbd></dt>
+<dd><p>Path to .tmc file</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>-d, --dbd</kbd></dt>
+<dd><p>Specify an expanded .dbd file for validating fields (requires pyPDB)</p>
+</dd>
+<dt><kbd>-a, --allow-no-pragma</kbd></dt>
+<dd><p>Show all items, even those missing pragmas (warning: slow)</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="pytmc-pragmalint">
+<h2>pytmc pragmalint<a class="headerlink" href="#pytmc-pragmalint" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc pragmalint” is a command line utility for linting PyTMC pragmas in a
+given TwinCAT project or source code file</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">pragmalint</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">markdown</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="n">filename</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>filename</kbd></dt>
+<dd><p>Path to .tsproj project or source code file</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>--markdown</kbd></dt>
+<dd><p>Make output more markdown-friendly, for easier sharing</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--verbose, -v</kbd></dt>
+<dd><p>Show all pragmas, including good ones</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="id1">
+<h2>pytmc stcmd<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc-stcmd” is a command line utility for generating ESS/ethercatmc-capable
+EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
+<p>Relies on the existence (and linking) of FB_MotionStage function blocks.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">stcmd</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plc</span> <span class="n">PLC_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hashbang</span> <span class="n">HASHBANG</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">binary</span> <span class="n">BINARY_NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">NAME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only</span><span class="o">-</span><span class="n">motor</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">path</span> <span class="n">DB_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dbd</span> <span class="n">DBD</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">delim</span> <span class="n">DELIM</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">template</span> <span class="n">TEMPLATE_FILENAME</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">template</span><span class="o">-</span><span class="n">path</span> <span class="n">TEMPLATE_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">allow</span><span class="o">-</span><span class="n">errors</span><span class="p">]</span>
+                   <span class="n">tsproj_project</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>tsproj_project</kbd></dt>
+<dd><p>Path to .tsproj project</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>--plc</kbd></dt>
+<dd><p>PLC project name, if multiple exist</p>
+</dd>
+<dt><kbd>-p, --prefix</kbd></dt>
+<dd><p>PV prefix for the IOC</p>
+</dd>
+<dt><kbd>--hashbang</kbd></dt>
+<dd><p>Indicates to the shell which binary to use for the st.cmd script</p>
+<p>Default: “../../bin/rhel7-x86_64/adsIoc”</p>
+</dd>
+<dt><kbd>--binary</kbd></dt>
+<dd><p>IOC application binary name</p>
+<p>Default: “adsIoc”</p>
+</dd>
+<dt><kbd>-n, --name</kbd></dt>
+<dd><p>IOC name (defaults to project name)</p>
+</dd>
+<dt><kbd>--only-motor</kbd></dt>
+<dd><p>Parse the project only for motor records, skipping other variables with pytmc pragmas</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--db-path</kbd></dt>
+<dd><p>Path for db files</p>
+<p>Default: “.”</p>
+</dd>
+<dt><kbd>--dbd</kbd></dt>
+<dd><p>Path to the IOC dbd file</p>
+</dd>
+<dt><kbd>--delim</kbd></dt>
+<dd><p>Preferred PV delimiter</p>
+<p>Default: “:”</p>
+</dd>
+<dt><kbd>--debug, -d</kbd></dt>
+<dd><p>Post-stcmd, open an interactive Python session</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--template</kbd></dt>
+<dd><p>st.cmd Jinja2 template</p>
+<p>Default: “stcmd_default.cmd”</p>
+</dd>
+<dt><kbd>--template-path</kbd></dt>
+<dd><p>Location where templates are stored</p>
+<p>Default: “.”</p>
+</dd>
+<dt><kbd>--allow-errors</kbd></dt>
+<dd><p>Allow non-fatal errors to be ignored</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="pytmc-summary">
+<h2>pytmc summary<a class="headerlink" href="#pytmc-summary" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc-summary” is a command line utility for inspecting TwinCAT3
+.tsproj projects.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">summary</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">all</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outline</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">boxes</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">code</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plcs</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">nc</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">symbols</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">types</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="nb">filter</span><span class="o">-</span><span class="n">types</span> <span class="n">FILTER_TYPES</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">links</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">markdown</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                     <span class="n">filename</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>filename</kbd></dt>
+<dd><p>Path to project or solution (.tsproj, .sln)</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>--all, -a</kbd></dt>
+<dd><p>All possible information</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--outline</kbd></dt>
+<dd><p>Outline XML</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--boxes, -b</kbd></dt>
+<dd><p>Show boxes</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--code, -c</kbd></dt>
+<dd><p>Show code</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--plcs, -p</kbd></dt>
+<dd><p>Show plcs</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--nc, -n</kbd></dt>
+<dd><p>Show NC axes</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--symbols, -s</kbd></dt>
+<dd><p>Show symbols</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--types</kbd></dt>
+<dd><p>Show TMC types and record suffixes, if available</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--filter-types</kbd></dt>
+<dd><p>Filter the types shown by name</p>
+</dd>
+<dt><kbd>--links, -l</kbd></dt>
+<dd><p>Show links</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--markdown</kbd></dt>
+<dd><p>Make output more markdown-friendly, for easier sharing</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--debug, -d</kbd></dt>
+<dd><p>Post-summary, open an interactive Python session</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="pytmc-template">
+<h2>pytmc template<a class="headerlink" href="#pytmc-template" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc template” is a command line utility to expand a template based on a
+TwinCAT3 project (or XML-format file such as .TMC).</p>
+<p>The template file is expected to be in Jinja template format.</p>
+<p>The following dictionaries are available in the template context:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">solutions</span> <span class="o">-</span> <span class="p">{</span><span class="n">solution_filename</span><span class="p">:</span> <span class="p">[</span><span class="n">project_fn</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span><span class="p">],</span> <span class="o">...</span><span class="p">}</span>
+<span class="n">projects</span> <span class="o">-</span> <span class="p">{</span><span class="n">project_filename</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span><span class="p">}</span>
+<span class="n">others</span> <span class="o">-</span> <span class="p">{</span><span class="n">filename</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="o">...</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>If installed and available, <code class="docutils literal notranslate"><span class="pre">git_info</span></code> will be available on each project.</p>
+<p>The following helpers are available in the environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config_to_pragma</span>
+<span class="n">data_type_to_record_info</span>
+<span class="n">determine_block_type</span>
+<span class="n">element_to_class_name</span>
+<span class="n">enumerate_types</span>
+<span class="n">generate_records</span>
+<span class="n">get_boxes</span>
+<span class="n">get_data_type_by_reference</span>
+<span class="n">get_data_types</span>
+<span class="n">get_library_versions</span>
+<span class="n">get_links</span>
+<span class="n">get_linter_results</span>
+<span class="n">get_motors</span>
+<span class="n">get_nc</span>
+<span class="n">get_plc_by_name</span>
+<span class="n">get_pou_call_blocks</span>
+<span class="n">get_symbols</span>
+<span class="n">get_symbols_by_type</span>
+<span class="n">list_types</span>
+<span class="nb">max</span>
+<span class="nb">min</span>
+<span class="n">separate_by_classname</span>
+</pre></div>
+</div>
+<p>And the following filters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">epics_prefix</span>
+<span class="n">epics_suffix</span>
+<span class="n">pragma</span>
+<span class="n">title_fill</span>
+</pre></div>
+</div>
+<p>And the following variables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytmc_version</span>
+<span class="n">types</span>
+</pre></div>
+</div>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">template</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TEMPLATES</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">macro</span> <span class="n">MACROS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
+                      <span class="n">projects</span> <span class="p">[</span><span class="n">projects</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>projects</kbd></dt>
+<dd><p>Path to project or solution (.tsproj, .sln)</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>-t, --template</kbd></dt>
+<dd><p>Template filename with optional output filename. In the form <code class="docutils literal notranslate"><span class="pre">input_filename[:output_filename]</span></code>.Defaults to ‘-’ (standard input -&gt; standard output).</p>
+</dd>
+<dt><kbd>--macro, -m</kbd></dt>
+<dd><p>Define a macro for the template in the form MACRO=VALUE</p>
+</dd>
+<dt><kbd>--debug, -d</kbd></dt>
+<dd><p>Post template generation, open an interactive Python session</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="pytmc-types">
+<h2>pytmc types<a class="headerlink" href="#pytmc-types" title="Permalink to this heading"></a></h2>
+<p><p>“pytmc-types” is a Qt interface that shows DataType-related information from a
+tmc file.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">pytmc</span> <span class="n">types</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">INPUT</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>INPUT</kbd></dt>
+<dd><p>Path to .tmc file</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+<section id="templates">
+<h1>Templates<a class="headerlink" href="#templates" title="Permalink to this heading"></a></h1>
+<section id="stcmd-default-cmd">
+<h2>stcmd_default.cmd<a class="headerlink" href="#stcmd-default-cmd" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!{{hashbang}}</span>
+
+<span class="o">&lt;</span> <span class="n">envPaths</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;IOCNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;{{name}}&quot;</span> <span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;ENGINEER&quot;</span><span class="p">,</span> <span class="s2">&quot;{{user}}&quot;</span> <span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;LOCATION&quot;</span><span class="p">,</span> <span class="s2">&quot;{{prefix}}&quot;</span> <span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;IOCSH_PS1&quot;</span><span class="p">,</span> <span class="s2">&quot;$(IOCNAME)&gt; &quot;</span> <span class="p">)</span>
+
+<span class="n">cd</span> <span class="s2">&quot;$(TOP)&quot;</span>
+
+<span class="c1"># Run common startup commands for linux soft IOC&#39;s</span>
+<span class="o">&lt;</span> <span class="o">/</span><span class="n">reg</span><span class="o">/</span><span class="n">d</span><span class="o">/</span><span class="n">iocCommon</span><span class="o">/</span><span class="n">All</span><span class="o">/</span><span class="n">pre_linux</span><span class="o">.</span><span class="n">cmd</span>
+
+<span class="c1"># Register all support components</span>
+<span class="n">dbLoadDatabase</span><span class="p">(</span><span class="s2">&quot;dbd/{{binary_name}}.dbd&quot;</span><span class="p">)</span>
+<span class="p">{{</span><span class="n">binary_name</span><span class="p">}}</span><span class="n">_registerRecordDeviceDriver</span><span class="p">(</span><span class="n">pdbbase</span><span class="p">)</span>
+
+<span class="n">cd</span> <span class="s2">&quot;$(TOP)/db&quot;</span>
+
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;ASYN_PORT&quot;</span><span class="p">,</span>     <span class="s2">&quot;{{asyn_port}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;IPADDR&quot;</span><span class="p">,</span>        <span class="s2">&quot;{{plc_ip}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;AMSID&quot;</span><span class="p">,</span>         <span class="s2">&quot;{{plc_ams_id}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;IPPORT&quot;</span><span class="p">,</span>        <span class="s2">&quot;{{plc_ads_port}}&quot;</span><span class="p">)</span>
+
+<span class="n">adsAsynPortDriverConfigure</span><span class="p">(</span><span class="s2">&quot;$(ASYN_PORT)&quot;</span><span class="p">,</span><span class="s2">&quot;$(IPADDR)&quot;</span><span class="p">,</span><span class="s2">&quot;$(AMSID)&quot;</span><span class="p">,</span><span class="s2">&quot;$(IPPORT)&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">motors</span> <span class="o">%</span><span class="p">}</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;MOTOR_PORT&quot;</span><span class="p">,</span>    <span class="s2">&quot;{{motor_port}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;PREFIX&quot;</span><span class="p">,</span>        <span class="s2">&quot;{{prefix}}{{delim}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;ECM_NUMAXES&quot;</span><span class="p">,</span>   <span class="s2">&quot;{{motors|length}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;NUMAXES&quot;</span><span class="p">,</span>       <span class="s2">&quot;{{motors|length}}&quot;</span><span class="p">)</span>
+
+<span class="n">EthercatMCCreateController</span><span class="p">(</span><span class="s2">&quot;$(MOTOR_PORT)&quot;</span><span class="p">,</span> <span class="s2">&quot;$(ASYN_PORT)&quot;</span><span class="p">,</span> <span class="s2">&quot;$(NUMAXES)&quot;</span><span class="p">,</span> <span class="s2">&quot;200&quot;</span><span class="p">,</span> <span class="s2">&quot;1000&quot;</span><span class="p">)</span>
+
+<span class="c1">#define ASYN_TRACE_ERROR     0x0001</span>
+<span class="c1">#define ASYN_TRACEIO_DEVICE  0x0002</span>
+<span class="c1">#define ASYN_TRACEIO_FILTER  0x0004</span>
+<span class="c1">#define ASYN_TRACEIO_DRIVER  0x0008</span>
+<span class="c1">#define ASYN_TRACE_FLOW      0x0010</span>
+<span class="c1">#define ASYN_TRACE_WARNING   0x0020</span>
+<span class="c1">#define ASYN_TRACE_INFO      0x0040</span>
+<span class="n">asynSetTraceMask</span><span class="p">(</span><span class="s2">&quot;$(ASYN_PORT)&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x41</span><span class="p">)</span>
+
+<span class="c1">#define ASYN_TRACEIO_NODATA 0x0000</span>
+<span class="c1">#define ASYN_TRACEIO_ASCII  0x0001</span>
+<span class="c1">#define ASYN_TRACEIO_ESCAPE 0x0002</span>
+<span class="c1">#define ASYN_TRACEIO_HEX    0x0004</span>
+<span class="n">asynSetTraceIOMask</span><span class="p">(</span><span class="s2">&quot;$(ASYN_PORT)&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">#define ASYN_TRACEINFO_TIME 0x0001</span>
+<span class="c1">#define ASYN_TRACEINFO_PORT 0x0002</span>
+<span class="c1">#define ASYN_TRACEINFO_SOURCE 0x0004</span>
+<span class="c1">#define ASYN_TRACEINFO_THREAD 0x0008</span>
+<span class="n">asynSetTraceInfoMask</span><span class="p">(</span><span class="s2">&quot;$(ASYN_PORT)&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="c1">#define AMPLIFIER_ON_FLAG_CREATE_AXIS  1</span>
+<span class="c1">#define AMPLIFIER_ON_FLAG_WHEN_HOMING  2</span>
+<span class="c1">#define AMPLIFIER_ON_FLAG_USING_CNEN   4</span>
+
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">motor</span> <span class="ow">in</span> <span class="n">motors</span> <span class="o">|</span> <span class="n">sort</span><span class="p">(</span><span class="n">attribute</span><span class="o">=</span><span class="s1">&#39;nc_axis.axis_number&#39;</span><span class="p">)</span> <span class="o">%</span><span class="p">}</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;AXIS_NO&quot;</span><span class="p">,</span>         <span class="s2">&quot;{{motor.nc_axis.axis_number}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;MOTOR_PREFIX&quot;</span><span class="p">,</span>    <span class="s2">&quot;{{motor|epics_prefix}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;MOTOR_NAME&quot;</span><span class="p">,</span>      <span class="s2">&quot;{{motor|epics_suffix}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;DESC&quot;</span><span class="p">,</span>            <span class="s2">&quot;{{motor.name}} / {{motor.nc_axis.name}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;EGU&quot;</span><span class="p">,</span>             <span class="s2">&quot;{{motor.nc_axis.units}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;PREC&quot;</span><span class="p">,</span>            <span class="s2">&quot;{{motor|pragma(&#39;precision&#39;, 3) }}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;AXISCONFIG&quot;</span><span class="p">,</span>      <span class="s2">&quot;{{motor|pragma(&#39;axisconfig&#39;, &#39;&#39;)}}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;ECAXISFIELDINIT&quot;</span><span class="p">,</span> <span class="s2">&quot;{{motor|pragma(&#39;additional_fields&#39;, &#39;&#39;) }}&quot;</span><span class="p">)</span>
+<span class="n">epicsEnvSet</span><span class="p">(</span><span class="s2">&quot;AMPLIFIER_FLAGS&quot;</span><span class="p">,</span> <span class="s2">&quot;{{motor|pragma(&#39;amplifier_flags&#39;, &#39;&#39;) }}&quot;</span><span class="p">)</span>
+
+<span class="n">EthercatMCCreateAxis</span><span class="p">(</span><span class="s2">&quot;$(MOTOR_PORT)&quot;</span><span class="p">,</span> <span class="s2">&quot;$(AXIS_NO)&quot;</span><span class="p">,</span> <span class="s2">&quot;$(AMPLIFIER_FLAGS)&quot;</span><span class="p">,</span> <span class="s2">&quot;$(AXISCONFIG)&quot;</span><span class="p">)</span>
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;EthercatMC.template&quot;</span><span class="p">,</span> <span class="s2">&quot;PREFIX=$(MOTOR_PREFIX), MOTOR_NAME=$(MOTOR_NAME), R=$(MOTOR_NAME)-, MOTOR_PORT=$(MOTOR_PORT), ASYN_PORT=$(ASYN_PORT), AXIS_NO=$(AXIS_NO), DESC=$(DESC), PREC=$(PREC) $(ECAXISFIELDINIT)&quot;</span><span class="p">)</span>
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;EthercatMCreadback.template&quot;</span><span class="p">,</span> <span class="s2">&quot;PREFIX=$(MOTOR_PREFIX), MOTOR_NAME=$(MOTOR_NAME), R=$(MOTOR_NAME)-, MOTOR_PORT=$(MOTOR_PORT), ASYN_PORT=$(ASYN_PORT), AXIS_NO=$(AXIS_NO), DESC=$(DESC), PREC=$(PREC) &quot;</span><span class="p">)</span>
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;EthercatMCdebug.template&quot;</span><span class="p">,</span> <span class="s2">&quot;PREFIX=$(MOTOR_PREFIX), MOTOR_NAME=$(MOTOR_NAME), MOTOR_PORT=$(MOTOR_PORT), AXIS_NO=$(AXIS_NO), PREC=3&quot;</span><span class="p">)</span>
+
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">additional_db_files</span> <span class="o">%</span><span class="p">}</span>
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;{{ db.file }}&quot;</span><span class="p">,</span> <span class="s2">&quot;{{ db.macros }}&quot;</span><span class="p">)</span>
+
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+<span class="n">cd</span> <span class="s2">&quot;$(TOP)&quot;</span>
+
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;db/iocAdmin.db&quot;</span><span class="p">,</span> <span class="s2">&quot;P={{prefix}},IOC={{prefix}}&quot;</span> <span class="p">)</span>
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;db/save_restoreStatus.db&quot;</span><span class="p">,</span> <span class="s2">&quot;P={{prefix}},IOC={{name}}&quot;</span> <span class="p">)</span>
+
+<span class="c1"># Setup autosave</span>
+<span class="n">set_savefile_path</span><span class="p">(</span> <span class="s2">&quot;$(IOC_DATA)/$(IOC)/autosave&quot;</span> <span class="p">)</span>
+<span class="n">set_requestfile_path</span><span class="p">(</span> <span class="s2">&quot;$(TOP)/autosave&quot;</span> <span class="p">)</span>
+<span class="n">save_restoreSet_status_prefix</span><span class="p">(</span> <span class="s2">&quot;{{prefix}}:&quot;</span> <span class="p">)</span>
+<span class="n">save_restoreSet_IncompleteSetsOk</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span>
+<span class="n">save_restoreSet_DatedBackupFiles</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span>
+<span class="n">set_pass0_restoreFile</span><span class="p">(</span> <span class="s2">&quot;$(IOC).sav&quot;</span> <span class="p">)</span>
+<span class="n">set_pass1_restoreFile</span><span class="p">(</span> <span class="s2">&quot;$(IOC).sav&quot;</span> <span class="p">)</span>
+
+<span class="c1"># Initialize the IOC and start processing records</span>
+<span class="n">iocInit</span><span class="p">()</span>
+
+<span class="c1"># Start autosave backups</span>
+<span class="n">create_monitor_set</span><span class="p">(</span> <span class="s2">&quot;$(IOC).req&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span>
+
+<span class="c1"># All IOCs should dump some common info after initial startup.</span>
+<span class="o">&lt;</span> <span class="o">/</span><span class="n">reg</span><span class="o">/</span><span class="n">d</span><span class="o">/</span><span class="n">iocCommon</span><span class="o">/</span><span class="n">All</span><span class="o">/</span><span class="n">post_linux</span><span class="o">.</span><span class="n">cmd</span>
+</pre></div>
+</div>
+</section>
+<section id="asyn-standard-file-jinja2">
+<h2>asyn_standard_file.jinja2<a class="headerlink" href="#asyn-standard-file-jinja2" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="o">%</span><span class="p">}</span>
+<span class="p">{{</span><span class="n">r</span><span class="p">}}</span>
+
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="asyn-standard-record-jinja2">
+<h2>asyn_standard_record.jinja2<a class="headerlink" href="#asyn-standard-record-jinja2" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">({{</span><span class="n">record</span><span class="o">.</span><span class="n">record_type</span><span class="p">}},</span> <span class="s2">&quot;{{record.pvname}}&quot;</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">long_description</span> <span class="o">%</span><span class="p">}</span>
+  <span class="c1"># {{ record.long_description }}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">aliases</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">alias</span><span class="p">(</span><span class="s2">&quot;{{alias}}&quot;</span><span class="p">)</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">block</span> <span class="n">add_fields</span>  <span class="o">%</span><span class="p">}{</span><span class="o">%</span> <span class="n">endblock</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="o">%</span><span class="p">}</span>
+  <span class="n">field</span><span class="p">({{</span><span class="n">f</span><span class="p">}},</span> <span class="s2">&quot;{{record.fields[f]}}&quot;</span><span class="p">)</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">autosave</span><span class="p">[</span><span class="s1">&#39;pass1&#39;</span><span class="p">]</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">info</span><span class="p">(</span><span class="n">autosaveFields</span><span class="p">,</span> <span class="s2">&quot;{{ record.autosave[&#39;pass1&#39;] | sort | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">autosave</span><span class="p">[</span><span class="s1">&#39;pass0&#39;</span><span class="p">]</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">info</span><span class="p">(</span><span class="n">autosaveFields_pass0</span><span class="p">,</span> <span class="s2">&quot;{{ record.autosave[&#39;pass0&#39;] | sort | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">archive_settings</span> <span class="o">%</span><span class="p">}</span>
+  <span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">archive_settings</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;scan&#39;</span> <span class="ow">and</span> <span class="n">record</span><span class="o">.</span><span class="n">archive_settings</span><span class="p">[</span><span class="s1">&#39;seconds&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">info</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="s2">&quot;{{ record.archive_settings[&#39;fields&#39;] | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
+  <span class="p">{</span><span class="o">%</span> <span class="k">else</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">info</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="s2">&quot;{{ record.archive_settings[&#39;method&#39;] }} {{ record.archive_settings[&#39;seconds&#39;] }}: {{ record.archive_settings[&#39;fields&#39;] | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
+  <span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pragma_usage.html" class="btn btn-neutral float-left" title="Annotating a TwinCAT3 project" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="source_code.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
