@@ -35,7 +35,7 @@ def test_smoke_ams_id(project):
 
 
 def test_fb_motionstage_linking(project):
-    for inst in project.find(parser.Symbol_DUT_MotionStage):
+    for inst in project.find(parser.Symbol_ST_MotionStage):
         pprint.pprint(inst)
         print("Program name", inst.program_name)
         print("Motor name", inst.motor_name)

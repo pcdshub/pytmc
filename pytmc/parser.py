@@ -12,7 +12,7 @@ import re
 import types
 import typing
 from collections.abc import Generator
-from typing import Any, Union
+from typing import Any, ClassVar, Union
 
 import lxml
 import lxml.etree
@@ -1467,6 +1467,13 @@ class Symbol(_TmcItem):
     BitSize: list[_TmcItem]
     Properties: list[_TmcItem]
 
+    symbol_aliases: ClassVar[list[str]] = []
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        for alias in cls.symbol_aliases:
+            TWINCAT_TYPES[alias] = cls
+
     @property
     def base_type(self) -> BaseType:
         "The reference used to determine the data type (BaseType)"
@@ -1551,8 +1558,10 @@ class Symbol(_TmcItem):
         return self.data_type.summary_type_name
 
 
-class Symbol_DUT_MotionStage(Symbol):
-    "[TMC] A customized Symbol, representing only DUT_MotionStage"
+class Symbol_ST_MotionStage(Symbol):
+    "[TMC] A customized Symbol, representing only ST_MotionStage"
+    # Backwards compatibility with previous symbol name
+    symbol_aliases = ['Symbol_DUT_MotionStage']
 
     def _repr_info(self):
         "__repr__ information"
@@ -1580,7 +1589,7 @@ class Symbol_DUT_MotionStage(Symbol):
         """
         The Link for NcToPlc
 
-        That is, how the NC axis is connected to the DUT_MotionStage
+        That is, how the NC axis is connected to the ST_MotionStage
         """
         plc = self.plc
         if self.plc is None:
@@ -1594,14 +1603,14 @@ class Symbol_DUT_MotionStage(Symbol):
 
         if not links:
             raise RuntimeError(
-                f"No NC link to DUT_MotionStage found for " f"{self.name!r}"
+                f"No NC link to ST_MotionStage found for " f"{self.name!r}"
             )
         (link,) = links
         return link
 
     @property
     def nc_axis(self):
-        "The NC `Axis` associated with the DUT_MotionStage"
+        "The NC `Axis` associated with the ST_MotionStage"
         link = self.nc_to_plc_link
         parent_name = link.parent.name.split("^")
         if parent_name[0] == "TINC":

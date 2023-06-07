@@ -313,12 +313,12 @@ def get_symbols_by_type(plc: parser.Plc) -> dict[str, list[parser.Symbol]]:
 
 
 @functools.lru_cache
-def get_motors(plc: parser.Plc) -> list[parser.Symbol_DUT_MotionStage]:
-    """Get pragma'd motor symbols for the PLC (non-pointer DUT_MotionStage)."""
+def get_motors(plc: parser.Plc) -> list[parser.Symbol_ST_MotionStage]:
+    """Get pragma'd motor symbols for the PLC (non-pointer ST_MotionStage)."""
     symbols = get_symbols_by_type(plc)
     return [
         stage
-        for stage in symbols.get("Symbol_DUT_MotionStage", [])
+        for stage in symbols.get("Symbol_ST_MotionStage", [])
         if not stage.is_pointer and pragmas.has_pragma(stage)
     ]
 

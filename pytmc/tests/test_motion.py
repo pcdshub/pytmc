@@ -18,7 +18,7 @@ def test_motion_stcmd(capsys, project_filename):
     full_project = parser.parse(project_filename)
 
     for plc_name, plc_project in full_project.plcs_by_name.items():
-        motors = list(plc_project.find(parser.Symbol_DUT_MotionStage))
+        motors = list(plc_project.find(parser.Symbol_ST_MotionStage))
         # Clear captured buffer just in case
         capsys.readouterr()
         stcmd.main(
@@ -39,7 +39,7 @@ def test_axis_name_without_pragma():
 
     axis = make_mock_twincatitem(
         name="Main.my_axis",
-        data_type=make_mock_type("DUT_MotionStage", is_complex_type=True),
+        data_type=make_mock_type("ST_MotionStage", is_complex_type=True),
         # pragma='pv: OUTER',
     )
 
@@ -58,7 +58,7 @@ def test_axis_name_with_pragma():
 
     axis = make_mock_twincatitem(
         name="Main.my_axis",
-        data_type=make_mock_type("DUT_MotionStage", is_complex_type=True),
+        data_type=make_mock_type("ST_MotionStage", is_complex_type=True),
         pragma="pv: MY:STAGE",
     )
 
