@@ -28,13 +28,14 @@ class VersionProxy(UserString):
 
     def _get_version(self) -> Optional[str]:
         # Checking for directory is faster than failing out of get_version
-        repo_root = Path(__file__).resolve().parent.parent
+        here = Path(__file__).resolve()
+        repo_root = here.parent.parent
         if (repo_root / ".git").exists() or (repo_root / ".git_archival.txt").exists():
             try:
                 # Git checkout
                 from setuptools_scm import get_version
 
-                return get_version(root="..", relative_to=__file__)
+                return get_version(root="..", relative_to=here)
             except (ImportError, LookupError):
                 ...
 
