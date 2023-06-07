@@ -4,6 +4,8 @@ import pytest
 
 from pytmc import parser
 
+from .conftest import get_real_motor_symbols
+
 
 def test_load_and_repr(project):
     info = repr(project)
@@ -35,7 +37,7 @@ def test_smoke_ams_id(project):
 
 
 def test_fb_motionstage_linking(project):
-    for inst in project.find(parser.Symbol_ST_MotionStage):
+    for inst in get_real_motor_symbols(project):
         pprint.pprint(inst)
         print("Program name", inst.program_name)
         print("Motor name", inst.motor_name)

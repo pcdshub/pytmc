@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from pytmc import parser
 from pytmc.bin import stcmd
+
+from .conftest import get_real_motor_symbols
 
 
 def test_motion_stcmd(capsys, project_filename):
@@ -18,7 +22,7 @@ def test_motion_stcmd(capsys, project_filename):
     full_project = parser.parse(project_filename)
 
     for plc_name, plc_project in full_project.plcs_by_name.items():
-        motors = list(plc_project.find(parser.Symbol_ST_MotionStage))
+        motors = get_real_motor_symbols(plc_project)
         # Clear captured buffer just in case
         capsys.readouterr()
         stcmd.main(
@@ -66,3 +70,17 @@ def test_axis_name_with_pragma():
     user_config = dict(delim=":", prefix="PREFIX")
     prefix, name = stcmd.get_name(axis, user_config=user_config)
     assert (prefix, name) == ("MY:", "STAGE")
+
+
+def test_mixed_motionstage_naming():
+    """
+    Check an example tmc file with 9 ST_MotionStage and 1 DUT_MotionStage
+
+    We are expecting 10 motor symbols
+    If only 9: we only recognize ST_MotionStage
+    If only 1: we only recognize DUT_MotionStage
+    """
+    file = Path(__file__).parent / 'tmc_files' / 'tc_mot_example.tmc'
+    tmc_item = parser.parse(file)
+    motors = tmc_item.find(parser.Symbol_ST_MotionStage)
+    assert len(list(motors)) == 10
