@@ -2,6 +2,27 @@
  Release History
 =================
 
+v2.15.1 (2023-06-30)
+====================
+
+Bugfixes
+--------
+- Type aliases will now find pytmc pragmas defined on their base types.
+  Previously these were ignored.
+- ST_MotionStage is now the canonical name for the motor struct,
+  matching our twincat style guide. Backwards compatibility is retained
+  for projects using DUT_MotionStage.
+- Fix an issue where macro substitution did not load properly for
+  motor base PVs in the st.cmd file generation.
+- Fix an issue where the version could fail to load in an edge case
+  where a git clone was included via symbolic link.
+
+Maintenance
+-----------
+- Ensure workflow secrets are used properly.
+- Fix issues related to documention building on the Github actions CI.
+
+
 v2.15.0 (2023-04-04)
 ====================
 

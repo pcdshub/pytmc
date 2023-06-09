@@ -11,6 +11,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -269,11 +271,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol.type_name"><code class="docutils literal notranslate"><span class="pre">Symbol.type_name</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#pytmc.parser.Symbol_DUT_MotionStage"><code class="docutils literal notranslate"><span class="pre">Symbol_DUT_MotionStage</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_DUT_MotionStage.motor_name"><code class="docutils literal notranslate"><span class="pre">Symbol_DUT_MotionStage.motor_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_DUT_MotionStage.nc_axis"><code class="docutils literal notranslate"><span class="pre">Symbol_DUT_MotionStage.nc_axis</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_DUT_MotionStage.nc_to_plc_link"><code class="docutils literal notranslate"><span class="pre">Symbol_DUT_MotionStage.nc_to_plc_link</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_DUT_MotionStage.program_name"><code class="docutils literal notranslate"><span class="pre">Symbol_DUT_MotionStage.program_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc.parser.Symbol_DUT_MotionStage"><code class="docutils literal notranslate"><span class="pre">Symbol_DUT_MotionStage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pytmc.parser.Symbol_ST_MotionStage"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_ST_MotionStage.motor_name"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.motor_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_ST_MotionStage.nc_axis"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.nc_axis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_ST_MotionStage.nc_to_plc_link"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.nc_to_plc_link</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytmc.parser.Symbol_ST_MotionStage.program_name"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.program_name</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#pytmc.parser.System"><code class="docutils literal notranslate"><span class="pre">System</span></code></a></li>
@@ -1897,33 +1900,39 @@ will become <cite>Symbol_FB_MotionStage</cite>.</p>
 
 </dd></dl>
 
-<dl class="py class">
+<dl class="py attribute">
 <dt class="sig sig-object py" id="pytmc.parser.Symbol_DUT_MotionStage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytmc.parser.</span></span><span class="sig-name descname"><span class="pre">Symbol_DUT_MotionStage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pytmc.parser.</span></span><span class="sig-name descname"><span class="pre">Symbol_DUT_MotionStage</span></span><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#pytmc.parser.Symbol_ST_MotionStage" title="pytmc.parser.Symbol_ST_MotionStage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pytmc.parser.Symbol_ST_MotionStage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytmc.parser.</span></span><span class="sig-name descname"><span class="pre">Symbol_ST_MotionStage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pytmc.parser.Symbol_ST_MotionStage" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pytmc.parser.Symbol" title="pytmc.parser.Symbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Symbol</span></code></a></p>
-<p>[TMC] A customized Symbol, representing only DUT_MotionStage</p>
+<p>[TMC] A customized Symbol, representing only ST_MotionStage</p>
 <dl class="py property">
-<dt class="sig sig-object py" id="pytmc.parser.Symbol_DUT_MotionStage.motor_name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">motor_name</span></span><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.motor_name" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="pytmc.parser.Symbol_ST_MotionStage.motor_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">motor_name</span></span><a class="headerlink" href="#pytmc.parser.Symbol_ST_MotionStage.motor_name" title="Permalink to this definition"></a></dt>
 <dd><p><cite>M1</cite> of <cite>Main.M1</cite></p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pytmc.parser.Symbol_DUT_MotionStage.nc_axis">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nc_axis</span></span><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.nc_axis" title="Permalink to this definition"></a></dt>
-<dd><p>The NC <cite>Axis</cite> associated with the DUT_MotionStage</p>
+<dt class="sig sig-object py" id="pytmc.parser.Symbol_ST_MotionStage.nc_axis">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nc_axis</span></span><a class="headerlink" href="#pytmc.parser.Symbol_ST_MotionStage.nc_axis" title="Permalink to this definition"></a></dt>
+<dd><p>The NC <cite>Axis</cite> associated with the ST_MotionStage</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pytmc.parser.Symbol_DUT_MotionStage.nc_to_plc_link">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nc_to_plc_link</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pytmc.parser.Link" title="pytmc.parser.Link"><span class="pre">Link</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.nc_to_plc_link" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="pytmc.parser.Symbol_ST_MotionStage.nc_to_plc_link">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nc_to_plc_link</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pytmc.parser.Link" title="pytmc.parser.Link"><span class="pre">Link</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pytmc.parser.Symbol_ST_MotionStage.nc_to_plc_link" title="Permalink to this definition"></a></dt>
 <dd><p>The Link for NcToPlc</p>
-<p>That is, how the NC axis is connected to the DUT_MotionStage</p>
+<p>That is, how the NC axis is connected to the ST_MotionStage</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pytmc.parser.Symbol_DUT_MotionStage.program_name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">program_name</span></span><a class="headerlink" href="#pytmc.parser.Symbol_DUT_MotionStage.program_name" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="pytmc.parser.Symbol_ST_MotionStage.program_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">program_name</span></span><a class="headerlink" href="#pytmc.parser.Symbol_ST_MotionStage.program_name" title="Permalink to this definition"></a></dt>
 <dd><p><cite>Main</cite> of <cite>Main.M1</cite></p>
 </dd></dl>
 
