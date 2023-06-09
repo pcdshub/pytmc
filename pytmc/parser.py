@@ -1628,6 +1628,9 @@ class Symbol_ST_MotionStage(Symbol):
         return nc_axis
 
 
+Symbol_DUT_MotionStage = Symbol_ST_MotionStage
+
+
 class GVL(_TwincatProjectSubItem):
     "[TcGVL] A Global Variable List"
     Declaration: list
