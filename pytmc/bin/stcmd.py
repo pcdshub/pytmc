@@ -117,7 +117,7 @@ def get_name(obj, user_config):
     Get an EPICS prefix and record name for a given TwincatItem
 
     This function only looks at a single TwincatItem, not from an entire chain
-    of items. It allows certain special symbols (e.g., DUT_MotionStage) to
+    of items. It allows certain special symbols (e.g., ST_MotionStage) to
     optionally not have a PV pragma, as it can default to the NC axis name
     instead.
 
@@ -244,7 +244,7 @@ def main(
 
     symbols = separate_by_classname(plc.find(Symbol))
     motors = [
-        mot for mot in symbols.get("Symbol_DUT_MotionStage", []) if not mot.is_pointer
+        mot for mot in symbols.get("Symbol_ST_MotionStage", []) if not mot.is_pointer
     ]
 
     if plc.tmc is None:

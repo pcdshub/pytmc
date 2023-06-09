@@ -88,3 +88,13 @@ def lint_record(dbd_file, record):
     assert record.valid
     linted = linter.lint_db(dbd=dbd_file, db=record.render())
     assert not len(linted.errors)
+
+
+def get_real_motor_symbols(project):
+    """
+    Motor symbols minus arrays of motors
+    """
+    return [
+        motor for motor in project.find(parser.Symbol_ST_MotionStage)
+        if not hasattr(motor, 'ArrayInfo')
+    ]
