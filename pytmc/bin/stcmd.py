@@ -12,7 +12,7 @@ import pathlib
 
 import jinja2
 
-from .. import pragmas
+from .. import pragmas, record
 from ..parser import NC, Symbol, parse, separate_by_classname
 from . import db, util
 
@@ -140,18 +140,22 @@ def get_name(obj, user_config):
     prefix = user_config["prefix"]
     if item_and_config:
         item_to_config = dict(item_and_config[0])
-        config = pragmas.squash_configs(*item_to_config.values())
-        # PV name specified in the pragma - use it as-is
-        if config.get("pv"):
-            pv = delim.join(config["pv"])
-            if delim in pv:
-                pv_parts = pv.split(delim)
-                # Break the PV parts into a prefix and suffix, using all but
-                # the last section as the prefix.
-                prefix = delim.join(pv_parts[:-1]) + delim
-                suffix = pv_parts[-1]
-                return prefix, suffix
-            return "", pv
+        if item_to_config:
+            chain = pragmas.SingularChain(item_to_config=item_to_config)
+            # PV name specified in the pragma - use it as-is
+            if chain.config.get("pv"):
+                record_package = record.RecordPackage(
+                    ads_port='',
+                    chain=chain,
+                )
+                if delim in record_package.pvname:
+                    pv_parts = record_package.pvname.split(delim)
+                    # Break the PV parts into a prefix and suffix, using all but
+                    # the last section as the prefix.
+                    prefix = delim.join(pv_parts[:-1]) + delim
+                    suffix = pv_parts[-1]
+                    return prefix, suffix
+                return "", record_package.pvname
 
     if hasattr(obj, "nc_axis"):
         nc_axis = obj.nc_axis

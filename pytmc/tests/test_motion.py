@@ -2,6 +2,7 @@ from pathlib import Path
 
 from pytmc import parser
 from pytmc.bin import stcmd
+from pytmc.pragmas import get_pragma
 
 from .conftest import get_real_motor_symbols
 
@@ -84,3 +85,33 @@ def test_mixed_motionstage_naming():
     tmc_item = parser.parse(file)
     motors = tmc_item.find(parser.Symbol_ST_MotionStage)
     assert len(list(motors)) == 10
+
+
+def test_macro_in_motor_stcmd():
+    """
+    Make sure the @ -> $ substitutions happen in stcmd.
+
+    The example TMC has some @(PREFIX) substitutions on motors as well as some
+    motors with no @ substitutions.
+    """
+    file = Path(__file__).parent / 'tmc_files' / 'tc_mot_example.tmc'
+    tmc_item = parser.parse(file)
+    all_motors = list(tmc_item.find(parser.Symbol_ST_MotionStage))
+    yes_sub = [
+        motor for motor in all_motors if "@" in next(get_pragma(motor))
+    ]
+    assert len(yes_sub) > 0, "No motors found that need subs"
+    assert len(all_motors) > len(yes_sub), "No motors found that don't need subs"
+    user_config = dict(delim=":", prefix="")
+    for motor in all_motors:
+        prefix, name = stcmd.get_name(obj=motor, user_config=user_config)
+        if motor in yes_sub:
+            # All the subs here are supposed to drop in the PREFIX
+            assert "$(PREFIX)" in prefix
+        else:
+            # Make sure the non-subs don't get distorted
+            assert prefix + name in next(get_pragma(motor))
+            # Make sure we didn't miscategorize a yes_sub
+            assert "$(PREFIX)" not in prefix + name
+        assert "@" not in prefix
+        assert "@" not in name
