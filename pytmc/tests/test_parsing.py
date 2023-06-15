@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from pytmc.parser import get_pou_call_blocks, parse, variables_from_declaration
@@ -230,3 +232,21 @@ def test_route_parsing():
             "Type": "TCP_IP",
         },
     }
+
+
+def test_type_alias_parsing():
+    """
+    Type aliases should resolve to the same walk as their source
+    """
+    file = Path(__file__).parent / 'tmc_files' / 'tc_mot_example.tmc'
+    tmc_item = parse(file)
+    dut_mot = None
+    st_mot = None
+    for dtyp in tmc_item.DataTypes[0].DataType:
+        if dtyp.name == 'DUT_MotionStage':
+            dut_mot = dtyp
+        elif dtyp.name == 'ST_MotionStage':
+            st_mot = dtyp
+    assert dut_mot is not None, "Did not find DUT_MotionStage in test setup"
+    assert st_mot is not None, "Did not find ST_MotionStage in test setup"
+    assert list(dut_mot.walk()) == list(st_mot.walk())

@@ -1191,6 +1191,11 @@ class DataType(_TmcItem):
             yield []
             return
 
+        # Type alias
+        if self.base_type is not None:
+            yield from self.base_type.walk(condition=condition)
+
+        # Type subclass
         extends_types = [
             self._get_data_type(ext_type)
             for ext_type in getattr(self, "ExtendsType", [])
@@ -1198,6 +1203,7 @@ class DataType(_TmcItem):
         for extend_type in extends_types:
             yield from extend_type.walk(condition=condition)
 
+        # Types attached to our type
         if hasattr(self, "SubItem"):
             for subitem in self.SubItem:
                 for item in subitem.walk(condition=condition):
