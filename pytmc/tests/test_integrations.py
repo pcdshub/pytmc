@@ -64,7 +64,7 @@ def test_allow_no_pragma():
         allow_no_pragma=True,
     )
     good_records = 129
-    total_records = 1002
+    total_records = 1005
 
     assert good_records == len(records)
     assert good_records == len(list(x.valid for x in records if x.valid))
