@@ -11,7 +11,7 @@ jobs:
   standard:
     #uses: pcdshub/pcds-ci-helpers/.github/workflows/python-standard.yml@master
     uses: klauer/pcds-ci-helpers/.github/workflows/python-standard.yml@ref_use_pip_extras
-    secrets: inherit
+    #secrets: inherit
     with:
       # The workflow needs to know the package name.  This can be determined
       # automatically if the repository name is the same as the import name.
