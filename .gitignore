@@ -1,14 +1,16 @@
 # Custom
 *.swp
 *.swo
+*~
 pytmc/tests/tmc_files/*.db
 pytmc/tests/tmc_files/invalid/*.db
-
+./*.db
+pytmc/_version.py
 
 .DS_store
 *.pyc
 .vscode
-docs/_build/*
+docs/build/*
 .coverage
 *.cover
 .cache

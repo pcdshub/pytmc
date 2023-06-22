@@ -93,18 +93,18 @@ Templates
 stcmd_default.cmd
 -----------------
 
-.. include:: ../pytmc/templates/stcmd_default.cmd
+.. include:: ../../pytmc/templates/stcmd_default.cmd
    :literal:
 
 asyn_standard_file.jinja2
 -------------------------
 
-.. include:: ../pytmc/templates/asyn_standard_file.jinja2
+.. include:: ../../pytmc/templates/asyn_standard_file.jinja2
    :literal:
 
 
 asyn_standard_record.jinja2
 ---------------------------
 
-.. include:: ../pytmc/templates/asyn_standard_record.jinja2
+.. include:: ../../pytmc/templates/asyn_standard_record.jinja2
    :literal:
