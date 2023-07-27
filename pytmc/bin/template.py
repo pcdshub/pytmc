@@ -751,7 +751,7 @@ def main(
 
     all_rendered = {}
     for template in templates:
-        input_filename, output_filename = template.split(os.pathsep, 1)
+        input_filename, output_filename = template.rsplit(":", 1)
         if input_filename == "-":
             # Check if it's an interactive user to warn them what we're doing:
             is_tty = os.isatty(sys.stdin.fileno())
