@@ -1634,7 +1634,8 @@ class Symbol_ST_MotionStage(Symbol):
         return nc_axis
 
 
-Symbol_DUT_MotionStage = Symbol_ST_MotionStage
+class Symbol_DUT_MotionStage(Symbol_ST_MotionStage):
+    """Back-compatibility alias for previous versions of lcls-twincat-motion."""
 
 
 class GVL(_TwincatProjectSubItem):
