@@ -1615,7 +1615,7 @@ class Symbol_ST_MotionStage(Symbol):
         expected = "^" + self.name.lower() + ".axis.nctoplc"
         links = [
             link
-            for link in plc.find(Link, recurse=False)
+            for link in plc.links
             if expected in link.a[1].lower()
         ]
 
