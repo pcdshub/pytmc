@@ -2,6 +2,36 @@
  Release History
 =================
 
+v2.16.0 (2023-07-31)
+====================
+
+Changes
+-------
+
+* ``pytmc template``, which takes a TwinCAT project and jinja template source
+  code to generate project-specific output, now expects all platforms to use
+  the same delimiter (``":"``) for template filename patterns. Examples include:
+
+  * Read template from ``a.template`` and write expanded version to ``a.txt``:
+    ``pytmc template my.tsproj --template a.template:a.txt``
+  * Read template from ``a.template`` and write results to standard output:
+    ``pytmc template my.tsproj --template a.template``
+  * Read template from standard input and write results to standard output:
+    ``pytmc template my.tsproj --template -``
+  * Read template from standard input and write results to ``/path/to/a.txt``:
+    ``pytmc template my.tsproj --template -:/path/to/a.txt``
+
+* Extended support for projects not correctly configured in TwinCAT with
+  "Independent Files" for all supported options.  Generating EPICS IOCs
+  from such projects that also include NC axes should succeed with
+  a number of loud warnings to the user.
+
+Maintenance
+-----------
+
+* Fixed old release note syntax.
+
+
 v2.15.1 (2023-06-30)
 ====================
 
@@ -61,14 +91,17 @@ Enhancements
 ------------
 
 * Sort generated records by TwinCAT symbol name (tcname) by @klauer in https://github.com/pcdshub/pytmc/pull/293
-    * The order of records in EPICS process database (`.db`) files will change for most users after this release. After the initial rebuild, users should expect to see smaller diffs on subsequent PLC project rebuilds.
+* The order of records in EPICS process database (`.db`) files will change for most users after this release. After the initial rebuild, users should expect to see smaller diffs on subsequent PLC project rebuilds.
 * Add all hooks required to allow transition of pytmc stcmd -> template by @klauer in https://github.com/pcdshub/pytmc/pull/290
+
   * Adds helper commands to `pytmc template`, which can be used in Jinja templates:
-      * `generate_records` (create .db and .archive files)
-      * `get_plc_by_name`
-      * `get_symbols_by_type`
-  * Adds variables to `pytmc template` environment, which can be used in Jinja templates:
-     * `pytmc_version`
+
+    * `generate_records` (create .db and .archive files)
+    * `get_plc_by_name`
+    * `get_symbols_by_type`
+
+  * Adds variables to `pytmc template` environment, which can be used in Jinja templates: `pytmc_version`
+
   * Adds `--macro` option to `pytmc template`
   * Fixes some annotations + uncovered/untested functionality
   * Allows `pytmc template` to read/write multiple templates with parsing a project only once
