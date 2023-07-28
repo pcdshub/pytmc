@@ -24,7 +24,7 @@ requirements:
   - lxml
   - epics-pypdb >=0.1.5
   run_constrained:
-  - pyqt <5.15
+  - pyqt =5
 
 test:
   imports:
@@ -33,7 +33,7 @@ test:
   - pytest
   - pytest-qt
   - qtpy
-  - pyqt
+  - pyqt =5
 
 about:
   doc_url: https://pcdshub.github.io/pytmc/
