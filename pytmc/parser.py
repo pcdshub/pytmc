@@ -807,9 +807,21 @@ class Plc(TwincatItem):
 
     @property
     def links(self) -> list[Link]:
+        mappings = getattr(self, "Mappings", None)
+        if mappings is None:
+            # This is technically a TwinCAT misconfiguration as far as PCDS is
+            # concerned
+            # Mappings are by default stored at the tsproj level and not in the
+            # PLC (XTI) here
+            logger.warning(
+                "TwinCAT/project settings misconfiguration; no mappings in XTI file. "
+                "Please fix your environment and project."
+            )
+            return list(self.root.find(Link, recurse=False))
+
         return [
             link
-            for mapping in self.Mappings
+            for mapping in mappings
             for link in mapping.find(Link, recurse=False)
         ]
 
@@ -834,7 +846,7 @@ class Plc(TwincatItem):
         """
         return self.find_ancestor(TopLevelProject).target_ip
 
-    def find(self, cls, *, recurse=True):
+    def find(self, cls: typing.Type[T], *, recurse=True) -> Generator[T, None, None]:
         yield from super().find(cls, recurse=recurse)
         if self.project is not None:
             yield from self.project.find(cls, recurse=recurse)
@@ -1603,7 +1615,7 @@ class Symbol_ST_MotionStage(Symbol):
         expected = "^" + self.name.lower() + ".axis.nctoplc"
         links = [
             link
-            for link in plc.find(Link, recurse=False)
+            for link in plc.links
             if expected in link.a[1].lower()
         ]
 
