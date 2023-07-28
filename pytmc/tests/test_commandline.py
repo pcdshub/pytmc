@@ -142,6 +142,11 @@ def test_template_smoke(project_filename, template):
             "/tmp/:messed:up:filename",
             "/tmp/a/b:c:d",
         ),
+        pytest.param(
+            "-:output_fn",
+            "-",
+            "output_fn",
+        ),
     ],
 )
 def test_filename_split(
@@ -152,6 +157,8 @@ def test_filename_split(
 ):
 
     def exists(fn: str) -> bool:
+        if fn == "-":
+            return False
         print("Exists?", fn, fn in {input_filename, output_filename})
         return fn in {input_filename, output_filename}
 
