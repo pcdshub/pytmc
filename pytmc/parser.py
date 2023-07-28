@@ -846,7 +846,7 @@ class Plc(TwincatItem):
         """
         return self.find_ancestor(TopLevelProject).target_ip
 
-    def find(self, cls, *, recurse=True):
+    def find(self, cls: typing.Type[T], *, recurse=True) -> Generator[T, None, None]:
         yield from super().find(cls, recurse=recurse)
         if self.project is not None:
             yield from self.project.find(cls, recurse=recurse)
