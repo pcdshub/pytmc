@@ -807,9 +807,21 @@ class Plc(TwincatItem):
 
     @property
     def links(self) -> list[Link]:
+        mappings = getattr(self, "Mappings", None)
+        if mappings is None:
+            # This is technically a TwinCAT misconfiguration as far as PCDS is
+            # concerned
+            # Mappings are by default stored at the tsproj level and not in the
+            # PLC (XTI) here
+            logger.warning(
+                "TwinCAT/project settings misconfiguration; no mappings in XTI file. "
+                "Please fix your environment and project."
+            )
+            return list(self.root.find(Link, recurse=False))
+
         return [
             link
-            for mapping in self.Mappings
+            for mapping in mappings
             for link in mapping.find(Link, recurse=False)
         ]
 
