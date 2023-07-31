@@ -729,15 +729,15 @@ def split_input_output(arg: str) -> tuple[str, str]:
     input_filename : str
         The input filename.
     output_filename : str
-        The output filename.
+        The output filename.  Empty filename implies stdout.
     """
     delim = ":"
+
     num_delim = arg.count(delim)
     if num_delim == 0:
-        raise ValueError(
-            f"Invalid input: {arg!r} should be in the format "
-            f"'input_filename:output_filename'"
-        )
+        # Without a delimiter, assume the file is the template filename
+        # and the user wants to write to standard output
+        return arg, ""
 
     if num_delim == 1:
         # Our job is easy in this scenario
