@@ -122,7 +122,12 @@ def test_template_smoke(project_filename, template):
     "argument, input_filename, output_filename",
     [
         pytest.param(
-            "a", "", "", marks=pytest.mark.xfail(strict=True, reason="no delimiter")
+            "a", "a", "",
+            id="template-file-to-stdout"
+        ),
+        pytest.param(
+            "-", "-", "",
+            id="stdin-to-stdout",
         ),
         pytest.param(
             "a:b", "a", "b",
@@ -157,7 +162,7 @@ def test_filename_split(
 ):
 
     def exists(fn: str) -> bool:
-        if fn == "-":
+        if fn in {"-", ""}:
             return False
         print("Exists?", fn, fn in {input_filename, output_filename})
         return fn in {input_filename, output_filename}
