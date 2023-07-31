@@ -3,6 +3,7 @@ import sys
 
 import pytest
 
+import pytmc
 import pytmc.bin.pytmc as pytmc_main
 from pytmc.bin.code import main as code_main
 from pytmc.bin.db import main as db_main
@@ -115,3 +116,53 @@ def test_template_smoke(project_filename, template):
     )
 
     print("templated", templated)
+
+
+@pytest.mark.parametrize(
+    "argument, input_filename, output_filename",
+    [
+        pytest.param(
+            "a", "", "", marks=pytest.mark.xfail(strict=True, reason="no delimiter")
+        ),
+        pytest.param(
+            "a:b", "a", "b",
+        ),
+        pytest.param(
+            "C:/a/b/c.def:D:/d/e/f.ghi",
+            "C:/a/b/c.def",
+            "D:/d/e/f.ghi",
+        ),
+        pytest.param(
+            "//a/b/c.def:D:/d/e/f.ghi",
+            "//a/b/c.def",
+            "D:/d/e/f.ghi",
+        ),
+        pytest.param(
+            "/tmp/:messed:up:filename:/tmp/a/b:c:d",
+            "/tmp/:messed:up:filename",
+            "/tmp/a/b:c:d",
+        ),
+        pytest.param(
+            "-:output_fn",
+            "-",
+            "output_fn",
+        ),
+    ],
+)
+def test_filename_split(
+    argument: str,
+    input_filename: str,
+    output_filename: str,
+    monkeypatch,
+):
+
+    def exists(fn: str) -> bool:
+        if fn == "-":
+            return False
+        print("Exists?", fn, fn in {input_filename, output_filename})
+        return fn in {input_filename, output_filename}
+
+    monkeypatch.setattr(os.path, "exists", exists)
+    inp, outp = pytmc.bin.template.split_input_output(argument)
+    assert inp == input_filename
+    assert outp == output_filename

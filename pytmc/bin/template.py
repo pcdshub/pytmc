@@ -715,6 +715,53 @@ def _split_macro(macro: str) -> tuple[str, str]:
     return tuple(parts)
 
 
+def split_input_output(arg: str) -> tuple[str, str]:
+    """
+    Split user-specified template argument into input/output file.
+
+    Parameters
+    ----------
+    arg : str
+        The user-specified command-line argument for ``--template``.
+
+    Returns
+    -------
+    input_filename : str
+        The input filename.
+    output_filename : str
+        The output filename.
+    """
+    delim = ":"
+    num_delim = arg.count(delim)
+    if num_delim == 0:
+        raise ValueError(
+            f"Invalid input: {arg!r} should be in the format "
+            f"'input_filename:output_filename'"
+        )
+
+    if num_delim == 1:
+        # Our job is easy in this scenario
+        return tuple(arg.split(delim, 1))
+
+    input_parts = arg.split(delim)
+    if input_parts[0] == "-":
+        # Special case: - as input file means read /dev/stdin
+        return "-", delim.join(input_parts[1:])
+
+    output_parts = []
+    while input_parts:
+        input_filename = delim.join(input_parts)
+        if os.path.exists(input_filename):
+            return input_filename, delim.join(output_parts)
+        output_parts.insert(0, input_parts.pop(-1))
+
+    raise ValueError(
+        f"Invalid input: {arg!r} should be in the format "
+        f"'input_filename:output_filename' but input filenames were "
+        f"found that matched"
+    )
+
+
 def main(
     projects: list[parser.AnyPath],
     templates: Optional[Union[list[str], str]] = None,
@@ -751,7 +798,7 @@ def main(
 
     all_rendered = {}
     for template in templates:
-        input_filename, output_filename = template.split(os.pathsep, 1)
+        input_filename, output_filename = split_input_output(template)
         if input_filename == "-":
             # Check if it's an interactive user to warn them what we're doing:
             is_tty = os.isatty(sys.stdin.fileno())
