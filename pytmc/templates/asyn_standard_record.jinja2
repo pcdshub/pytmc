@@ -22,4 +22,7 @@ record({{record.record_type}}, "{{record.pvname}}") {
   info(archive, "{{ record.archive_settings['method'] }} {{ record.archive_settings['seconds'] }}: {{ record.archive_settings['fields'] | join(' ') }}")
   {% endif %}
 {% endif %}
+{% if record.direction == "input" %}
+  field(ASG, "NO_WRITE")
+{% endif %}
 }
