@@ -35,6 +35,31 @@ def test_epics_record_with_linter(dbd_file):
     assert not (linted.errors)
 
 
+def test_input_record_without_write_access():
+    kwargs = {
+        "pvname": "Tst:pv",
+        "record_type": "ai",
+        "direction": "input",
+    }
+
+    ec = EPICSRecord(**kwargs)
+    record = ec.render()
+    assert "ASG" in record
+    assert "NO_WRITE" in record
+
+
+def test_output_record_with_write_access():
+    kwargs = {
+        "pvname": "Tst:pv",
+        "record_type": "ao",
+        "direction": "output",
+    }
+
+    ec = EPICSRecord(**kwargs)
+    record = ec.render()
+    assert "ASG" not in record
+    
+
 def test_sort_fields():
     unsorted_entry = OrderedDict(
         [
