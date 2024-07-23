@@ -54,11 +54,10 @@ def test_output_record_with_write_access():
         "record_type": "ao",
         "direction": "output",
     }
-
     ec = EPICSRecord(**kwargs)
     record = ec.render()
     assert "ASG" not in record
-    
+
 
 def test_sort_fields():
     unsorted_entry = OrderedDict(
