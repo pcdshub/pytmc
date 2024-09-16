@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Release History &mdash; pytmc  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/docs-versions-menu.js?v=3d6a1aea"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API Documentation" href="source_code.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pytmc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Release History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v2-16-0-2023-07-31">v2.16.0 (2023-07-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-15-1-2023-06-30">v2.15.1 (2023-06-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-15-0-2023-04-04">v2.15.0 (2023-04-04)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-14-1-2022-09-28">v2.14.1 (2022-09-28)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-14-0-2022-08-29">v2.14.0 (2022-08-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fixes">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#enhancements">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-13-0-2022-06-30">v2.13.0 (2022-06-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-12-0-2022-05-27">v2.12.0 (2022-05-27)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-11-1-2022-03-24">v2.11.1 (2022-03-24)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id7">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-11-0-2021-11-15">v2.11.0 (2021-11-15)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-10-0-2021-08-09">v2.10.0 (2021-08-09)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id11">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-9-1-2021-04-27">v2.9.1 (2021-04-27)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-9-0-2021-04-02">v2.9.0 (2021-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id14">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-8-1-2021-02-10">v2.8.1 (2021-02-10)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id15">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id16">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-8-0-2020-12-22">v2.8.0 (2020-12-22)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id17">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id18">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-7-7-2020-11-17">v2.7.7 (2020-11-17)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id19">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id20">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-7-6-2020-10-23">v2.7.6 (2020-10-23)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id21">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id22">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-7-5-2020-08-31">v2.7.5 (2020-08-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id23">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#development">Development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-7-1-2020-08-18">v2.7.1 (2020-08-18)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id24">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id25">Development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-7-0-2020-07-16">v2.7.0 (2020-07-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-6-9-2020-07-06">v2.6.9 (2020-07-06)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-6-8-2020-07-06">v2.6.8 (2020-07-06)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-6-7-2020-07-02">v2.6.7 (2020-07-02)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-6-6-2020-06-24">v2.6.6 (2020-06-24)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-6-5-2020-06-09">v2.6.5 (2020-06-09)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-6-0-2020-02-26">v2.6.0 (2020-02-26)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-5-0-2019-12-20">v2.5.0 (2019-12-20)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id26">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-4-0-2019-12-06">v2.4.0 (2019-12-06)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id27">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id28">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id29">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pull-requests-incorporated">Pull requests incorporated</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-3-1-2019-11-08">v2.3.1 (2019-11-08)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id30">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#refactors">Refactors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-3-0-2019-10-28">v2.3.0 (2019-10-28)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prs">PRs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id31">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id32">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-2-0-2019-09-20">v2.2.0 (2019-09-20)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id33">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id34">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v2-1-0-2019-09-05">v2.1.0 (2019-09-05)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v1-1-2-2019-03-15">v1.1.2 (2019-03-15)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id35">Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v1-1-1-2019-02-14">v1.1.1 (2019-02-14)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v1-1-0-2018-10-16">v1.1.0 (2018-10-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v1-0-0-2018-09-24">v1.0.0 (2018-09-24)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-2018-03-02">v0.1 (2018-03-02)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Release History</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/release_notes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="release-history">
+<h1>Release History<a class="headerlink" href="#release-history" title="Link to this heading"></a></h1>
+<section id="v2-16-0-2023-07-31">
+<h2>v2.16.0 (2023-07-31)<a class="headerlink" href="#v2-16-0-2023-07-31" title="Link to this heading"></a></h2>
+<section id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">template</span></code>, which takes a TwinCAT project and jinja template source
+code to generate project-specific output, now expects all platforms to use
+the same delimiter (<code class="docutils literal notranslate"><span class="pre">&quot;:&quot;</span></code>) for template filename patterns. Examples include:</p>
+<ul>
+<li><p>Read template from <code class="docutils literal notranslate"><span class="pre">a.template</span></code> and write expanded version to <code class="docutils literal notranslate"><span class="pre">a.txt</span></code>:
+<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">template</span> <span class="pre">my.tsproj</span> <span class="pre">--template</span> <span class="pre">a.template:a.txt</span></code></p></li>
+<li><p>Read template from <code class="docutils literal notranslate"><span class="pre">a.template</span></code> and write results to standard output:
+<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">template</span> <span class="pre">my.tsproj</span> <span class="pre">--template</span> <span class="pre">a.template</span></code></p></li>
+<li><p>Read template from standard input and write results to standard output:
+<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">template</span> <span class="pre">my.tsproj</span> <span class="pre">--template</span> <span class="pre">-</span></code></p></li>
+<li><p>Read template from standard input and write results to <code class="docutils literal notranslate"><span class="pre">/path/to/a.txt</span></code>:
+<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">template</span> <span class="pre">my.tsproj</span> <span class="pre">--template</span> <span class="pre">-:/path/to/a.txt</span></code></p></li>
+</ul>
+</li>
+<li><p>Extended support for projects not correctly configured in TwinCAT with
+“Independent Files” for all supported options.  Generating EPICS IOCs
+from such projects that also include NC axes should succeed with
+a number of loud warnings to the user.</p></li>
+</ul>
+</section>
+<section id="maintenance">
+<h3>Maintenance<a class="headerlink" href="#maintenance" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fixed old release note syntax.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-15-1-2023-06-30">
+<h2>v2.15.1 (2023-06-30)<a class="headerlink" href="#v2-15-1-2023-06-30" title="Link to this heading"></a></h2>
+<section id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Type aliases will now find pytmc pragmas defined on their base types.
+Previously these were ignored.</p></li>
+<li><p>ST_MotionStage is now the canonical name for the motor struct,
+matching our twincat style guide. Backwards compatibility is retained
+for projects using DUT_MotionStage.</p></li>
+<li><p>Fix an issue where macro substitution did not load properly for
+motor base PVs in the st.cmd file generation.</p></li>
+<li><p>Fix an issue where the version could fail to load in an edge case
+where a git clone was included via symbolic link.</p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>Maintenance<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Ensure workflow secrets are used properly.</p></li>
+<li><p>Fix issues related to documention building on the Github actions CI.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-15-0-2023-04-04">
+<h2>v2.15.0 (2023-04-04)<a class="headerlink" href="#v2-15-0-2023-04-04" title="Link to this heading"></a></h2>
+<p>Python 3.9 is now the minimum supported version for pytmc.</p>
+<section id="id2">
+<h3>Maintenance<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fixes pre-commit repository settings for flake8.</p></li>
+<li><p>Migrates from Travis CI to GitHub Actions for continuous integration testing, and documentation deployment.</p></li>
+<li><p>Updates pytmc to use setuptools-scm, replacing versioneer, as its version-string management tool of choice.</p></li>
+<li><p>Syntax has been updated to Python 3.9+ via <code class="docutils literal notranslate"><span class="pre">pyupgrade</span></code>.</p></li>
+<li><p>pytmc has migrated to modern <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, replacing <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>.</p></li>
+<li><p>Sphinx 6.0 now supported for documentation building.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docs-versions-menu</span></code> is now used for documentation deployment on GitHub Actions.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-14-1-2022-09-28">
+<h2>v2.14.1 (2022-09-28)<a class="headerlink" href="#v2-14-1-2022-09-28" title="Link to this heading"></a></h2>
+<p>This release doesn’t change any behavior of the library, but it does fix an error in the test suite that causes false failures.</p>
+<section id="id3">
+<h3>Maintenance<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>TST: test suite was using old kwarg, swap to new by &#64;ZLLentz in #296</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-14-0-2022-08-29">
+<h2>v2.14.0 (2022-08-29)<a class="headerlink" href="#v2-14-0-2022-08-29" title="Link to this heading"></a></h2>
+<section id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Safety PLC files loaded from <cite>_Config/SPLC</cite> by &#64;klauer in <a class="reference external" href="https://github.com/pcdshub/pytmc/pull/289">https://github.com/pcdshub/pytmc/pull/289</a></p></li>
+</ul>
+</section>
+<section id="enhancements">
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Sort generated records by TwinCAT symbol name (tcname) by &#64;klauer in <a class="reference external" href="https://github.com/pcdshub/pytmc/pull/293">https://github.com/pcdshub/pytmc/pull/293</a></p></li>
+<li><p>The order of records in EPICS process database (<cite>.db</cite>) files will change for most users after this release. After the initial rebuild, users should expect to see smaller diffs on subsequent PLC project rebuilds.</p></li>
+<li><p>Add all hooks required to allow transition of pytmc stcmd -&gt; template by &#64;klauer in <a class="reference external" href="https://github.com/pcdshub/pytmc/pull/290">https://github.com/pcdshub/pytmc/pull/290</a></p>
+<ul>
+<li><p>Adds helper commands to <cite>pytmc template</cite>, which can be used in Jinja templates:</p>
+<ul>
+<li><p><cite>generate_records</cite> (create .db and .archive files)</p></li>
+<li><p><cite>get_plc_by_name</cite></p></li>
+<li><p><cite>get_symbols_by_type</cite></p></li>
+</ul>
+</li>
+<li><p>Adds variables to <cite>pytmc template</cite> environment, which can be used in Jinja templates: <cite>pytmc_version</cite></p></li>
+<li><p>Adds <cite>–macro</cite> option to <cite>pytmc template</cite></p></li>
+<li><p>Fixes some annotations + uncovered/untested functionality</p></li>
+<li><p>Allows <cite>pytmc template</cite> to read/write multiple templates with parsing a project only once</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="v2-13-0-2022-06-30">
+<h2>v2.13.0 (2022-06-30)<a class="headerlink" href="#v2-13-0-2022-06-30" title="Link to this heading"></a></h2>
+<section id="id4">
+<h3>Enhancements<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>ENH: autosave field additions by &#64;klauer in <a class="reference external" href="https://github.com/pcdshub/pytmc/pull/287">https://github.com/pcdshub/pytmc/pull/287</a></dt><dd><ul>
+<li><p>Adds description field to autosave for all records, input and output</p></li>
+<li><p>Adds alarm severity and limit fields to autosave for all relevant input and output records</p></li>
+<li><p>Adds control limit (drive low/high) fields to autosave for relevant output records</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+<section id="v2-12-0-2022-05-27">
+<h2>v2.12.0 (2022-05-27)<a class="headerlink" href="#v2-12-0-2022-05-27" title="Link to this heading"></a></h2>
+<section id="id5">
+<h3>Fixes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>CP link instead of CPP link by &#64;klauer in <a class="reference external" href="https://github.com/pcdshub/pytmc/pull/283">https://github.com/pcdshub/pytmc/pull/283</a></p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Maintenance<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Address CI-related failures and update pre-commit settings by &#64;klauer in <a class="reference external" href="https://github.com/pcdshub/pytmc/pull/285">https://github.com/pcdshub/pytmc/pull/285</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v2-11-1-2022-03-24">
+<h2>v2.11.1 (2022-03-24)<a class="headerlink" href="#v2-11-1-2022-03-24" title="Link to this heading"></a></h2>
+<section id="id7">
+<h3>Maintenance<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>CLN: remove evalcontextfilter usage by &#64;klauer in #280</dt><dd><ul>
+<li><p>Jinja2 3.1 compatibility fix</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>TST: does linking work as expected? by &#64;klauer in #279</dt><dd><ul>
+<li><p>Additional tests</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+<section id="v2-11-0-2021-11-15">
+<h2>v2.11.0 (2021-11-15)<a class="headerlink" href="#v2-11-0-2021-11-15" title="Link to this heading"></a></h2>
+<section id="id8">
+<h3>Enhancements<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">EnumerationTextList</span></code> with <code class="docutils literal notranslate"><span class="pre">get_source_code</span></code> support.
+Previously, these translatable types were missing.</p></li>
+<li><p>Add actions, methods, and properties to the <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">code</span></code> output.</p></li>
+<li><p>Allow for <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">code</span></code> to work with just a single code object,
+rather than requiring the whole project.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">pytmc.__main__</span></code> such that
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytmc</span> <span class="pre">{code,summary}</span> <span class="pre">...</span></code> works.</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>Fixes<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fix rare bug in <cite>lines_between</cite> function, probably never hit.</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Maintenance<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Type annotation cleanups and fixes</p></li>
+<li><p>Reduce memory consumption slightly by not caching the xml element
+on every <cite>TwincatItem</cite></p></li>
+</ul>
+</section>
+</section>
+<section id="v2-10-0-2021-08-09">
+<h2>v2.10.0 (2021-08-09)<a class="headerlink" href="#v2-10-0-2021-08-09" title="Link to this heading"></a></h2>
+<section id="id11">
+<h3>Enhancements<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Allow strings to be linked using the <code class="docutils literal notranslate"><span class="pre">link:</span></code> pragma key. Previously,
+this was only implemented for numeric scalar values.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-9-1-2021-04-27">
+<h2>v2.9.1 (2021-04-27)<a class="headerlink" href="#v2-9-1-2021-04-27" title="Link to this heading"></a></h2>
+<section id="id12">
+<h3>Enhancements<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">scale</span></code> and <code class="docutils literal notranslate"><span class="pre">offset</span></code> pragma keys for integer and floating point
+symbols.</p></li>
+</ul>
+</section>
+<section id="id13">
+<h3>Maintenance<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fixed remaining <code class="docutils literal notranslate"><span class="pre">slaclab</span></code> references, after the repository was moved to
+<code class="docutils literal notranslate"><span class="pre">pcdshub</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-9-0-2021-04-02">
+<h2>v2.9.0 (2021-04-02)<a class="headerlink" href="#v2-9-0-2021-04-02" title="Link to this heading"></a></h2>
+<section id="id14">
+<h3>Enhancements<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Add git information to the template tool if available.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-8-1-2021-02-10">
+<h2>v2.8.1 (2021-02-10)<a class="headerlink" href="#v2-8-1-2021-02-10" title="Link to this heading"></a></h2>
+<section id="id15">
+<h3>Fixes<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fix issues related to insufficient library dependency checking. Now,
+all possible places where library version information is stored will
+be checked.</p></li>
+</ul>
+</section>
+<section id="id16">
+<h3>Maintenance<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Refactor the dependency-related twincat items and templating tools
+to accomplish the above.</p></li>
+<li><p>Move the repository landing zone from slaclab to pcdshub to take
+advantage of our travis credits.</p></li>
+<li><p>Redeploy doctr for pcdshub.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-8-0-2020-12-22">
+<h2>v2.8.0 (2020-12-22)<a class="headerlink" href="#v2-8-0-2020-12-22" title="Link to this heading"></a></h2>
+<section id="id17">
+<h3>Enhancements<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Add support for externally adding pragmas to members of structures and
+function blocks.</p></li>
+<li><p>Add support for partial pragmas of array elements.</p></li>
+<li><p>Added text filter in <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">debug</span></code> dialog.</p></li>
+<li><p>Check maximum record length when generating the database file.  This is a
+constant defined at epics-base compile time, defaulting to 60.</p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Fixes<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Record names now displaying correctly in <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">debug</span></code> dialog.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">debug</span></code> no longer fails when it encounters types that extend
+built-in data types by way of <code class="docutils literal notranslate"><span class="pre">ExtendsType</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-7-7-2020-11-17">
+<h2>v2.7.7 (2020-11-17)<a class="headerlink" href="#v2-7-7-2020-11-17" title="Link to this heading"></a></h2>
+<section id="id19">
+<h3>Fixes<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fix issue with pass1 autosave not appropriately writing values to the PLC
+on IOC startup.</p></li>
+</ul>
+</section>
+<section id="id20">
+<h3>Maintenance<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Regenerate doctr deploy key.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-7-6-2020-10-23">
+<h2>v2.7.6 (2020-10-23)<a class="headerlink" href="#v2-7-6-2020-10-23" title="Link to this heading"></a></h2>
+<section id="id21">
+<h3>Fixes<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Added handling for case where pragma is None</p></li>
+<li><p>Lower array archive threshold to arrays with fewer than 1000 elements
+to prevent our high-rate encoder and power meter readbacks. This is a good
+threshold because it represents 1000Hz data with a 1Hz polling rate, a
+very typical parameter.</p></li>
+<li><p>Default APST and MPST fields to “On Change” for waveform PVs. These are
+special waveform fields that tell monitors and the archiver when to take an
+update, and previously they were set to “Always”, causing influxes of data
+from static char waveform strings.</p></li>
+</ul>
+</section>
+<section id="id22">
+<h3>Maintenance<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Split dev/docs requirements</p></li>
+<li><p>Fix jinja naming</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-7-5-2020-08-31">
+<h2>v2.7.5 (2020-08-31)<a class="headerlink" href="#v2-7-5-2020-08-31" title="Link to this heading"></a></h2>
+<section id="id23">
+<h3>Fixes<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Relaxed end-of-pragma-line handling (any combination of <code class="docutils literal notranslate"><span class="pre">;</span></code> and newline are
+all accepted).</p></li>
+<li><p>Reworked XTI file loading for “devices” and “boxes”.  This aims to be more
+compatible with TwinCAT, which does not always relocate XTI files to be in
+the correct hierarchical directory location.  It pre-loads all XTI files, and
+when the project is fully loaded, it dereferences XTI files based on a key
+including <code class="docutils literal notranslate"><span class="pre">class</span></code>, <code class="docutils literal notranslate"><span class="pre">filename</span></code>, and a small PLC-unique <code class="docutils literal notranslate"><span class="pre">identifier</span></code>.</p></li>
+<li><p>Better handling of data types in the project parser. Now supports data type
+GUIDs, when available, for data type disambiguation.  Note that these are not
+always present.</p></li>
+<li><p>Better handling of references, pointers, and pointer depth.</p></li>
+</ul>
+</section>
+<section id="development">
+<h3>Development<a class="headerlink" href="#development" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">db</span> <span class="pre">--debug</span></code> allows developers to more easily target exceptions
+raised when generating database files.</p></li>
+<li><p>Added more memory layout information for the benefit of other utilities such
+as <code class="docutils literal notranslate"><span class="pre">ads-async</span></code>. Its ADS server implementation in conjunction with pytmc may
+be a good source of information regarding PLC memory layout in the future.</p></li>
+<li><p>Started adding some annotations for clarity.  May retroactively add more as
+time permits.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-7-1-2020-08-18">
+<h2>v2.7.1 (2020-08-18)<a class="headerlink" href="#v2-7-1-2020-08-18" title="Link to this heading"></a></h2>
+<section id="id24">
+<h3>Fixes<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Working fix for macro expansion character replacement for linked PVs
+(<code class="docutils literal notranslate"><span class="pre">DOL</span></code> field).  This means <code class="docutils literal notranslate"><span class="pre">link:</span> <span class="pre">&#64;(MACRO)PV</span></code> now works.</p></li>
+<li><p>Tests will no longer be installed erroneously as a package on the system.</p></li>
+</ul>
+</section>
+<section id="id25">
+<h3>Development<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Tests have been moved into the pytmc package, and with it flake8 compliance.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-7-0-2020-07-16">
+<h2>v2.7.0 (2020-07-16)<a class="headerlink" href="#v2-7-0-2020-07-16" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Included an incomplete fix for macro expansion character replacement for
+linked PVs (<code class="docutils literal notranslate"><span class="pre">DOL</span></code> field)</p></li>
+</ul>
+</section>
+<section id="v2-6-9-2020-07-06">
+<h2>v2.6.9 (2020-07-06)<a class="headerlink" href="#v2-6-9-2020-07-06" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixes pragmalint bug that fails on an empty declaration section</p></li>
+</ul>
+</section>
+<section id="v2-6-8-2020-07-06">
+<h2>v2.6.8 (2020-07-06)<a class="headerlink" href="#v2-6-8-2020-07-06" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixes issue where qtpy/pyqt not being installed may cause <code class="docutils literal notranslate"><span class="pre">pytmc</span></code>
+command-line tools to fail</p></li>
+</ul>
+</section>
+<section id="v2-6-7-2020-07-02">
+<h2>v2.6.7 (2020-07-02)<a class="headerlink" href="#v2-6-7-2020-07-02" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Project-level data type summary</p></li>
+<li><p>Create DataArea for data type summary if unavailable in .tmc</p></li>
+</ul>
+</section>
+<section id="v2-6-6-2020-06-24">
+<h2>v2.6.6 (2020-06-24)<a class="headerlink" href="#v2-6-6-2020-06-24" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add –types (–filter-types) to <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">summary</span></code>
+(<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/213">#213</a>)</p></li>
+<li><p>Fix internal usage of deprecated API
+(<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/212">#212</a>)</p></li>
+</ul>
+</section>
+<section id="v2-6-5-2020-06-09">
+<h2>v2.6.5 (2020-06-09)<a class="headerlink" href="#v2-6-5-2020-06-09" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">info(archive)</span></code> nodes for ads-ioc
+(<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/188">#188</a>)</p></li>
+<li><p>Adjust defaults for binary record enum strings
+(<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/191">#191</a>)</p></li>
+<li><p>Better messages on pragma parsing failures
+(<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/200">#200</a>)</p></li>
+<li><p>Do not include fields only intended for input/output records in the
+other (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/205">#205</a>)</p></li>
+<li><p>(Development) Fix package manifest and continuous integration</p></li>
+</ul>
+</section>
+<section id="v2-6-0-2020-02-26">
+<h2>v2.6.0 (2020-02-26)<a class="headerlink" href="#v2-6-0-2020-02-26" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fix FB_MotionStage pointer-handling in st.cmd generation</p></li>
+<li><p>Fix off-by-one array bounds error</p></li>
+<li><p>Expose actions in summary + generate more readable code block output</p></li>
+<li><p>Fix autosave info node names</p></li>
+<li><p>Ensure <code class="docutils literal notranslate"><span class="pre">--allow-errors</span></code> is passed along to the database generation
+step when using <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">stcmd</span></code></p></li>
+<li><p>Allow <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">db</span></code> to work with the <code class="docutils literal notranslate"><span class="pre">.tsproj</span></code> file along with
+<code class="docutils literal notranslate"><span class="pre">.tmc</span></code> file</p></li>
+<li><p>Add initial “PV linking” functionality (to be completed + documented;
+paired with lcls-twincat-general)</p></li>
+<li><p>Fix bug where Enum info may be missing from the .tmc file</p></li>
+<li><p>Show the chain name of a failed record generation attempt</p></li>
+<li><p>Fix loading of <code class="docutils literal notranslate"><span class="pre">_Config/IO</span></code> files in certain cases, though there is
+still work to be done here
+(<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/187">#187</a></p></li>
+</ul>
+</section>
+<section id="v2-5-0-2019-12-20">
+<h2>v2.5.0 (2019-12-20)<a class="headerlink" href="#v2-5-0-2019-12-20" title="Link to this heading"></a></h2>
+<section id="features">
+<h3>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Debug tool option for showing variables which do not generate records (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/159">#159</a>) “incomplete pragmas/chains”</p></li>
+<li><p>Automatic generation of archive support files (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/162">#162</a>)</p></li>
+<li><p>Support customization of update rates via poll/notify (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/151">#151</a>), looking forward to new m-epics-twincat-ads releases</p></li>
+<li><p>Support record aliases (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/150">#150</a>)</p></li>
+<li><p>Description defaults to PLC variable path if unspecified (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/152">#152</a>)</p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Fixes<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Ordering of autosave fields (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/154">#154</a>)</p></li>
+<li><p>Box summary ordering (<a class="reference external" href="https://github.com/pcdshub/pytmc/issues/164">#164</a>)</p></li>
+<li><p>Allow alternative character for EPICS macros (default <code class="docutils literal notranslate"><span class="pre">&#64;</span></code>)</p></li>
+<li><p>Documentation updates + pragma key clarification</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-4-0-2019-12-06">
+<h2>v2.4.0 (2019-12-06)<a class="headerlink" href="#v2-4-0-2019-12-06" title="Link to this heading"></a></h2>
+<section id="id27">
+<h3>Features<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Pinned global variables are supported</p></li>
+<li><p>Autosave support</p></li>
+<li><p>Pypi integration</p></li>
+</ul>
+</section>
+<section id="id28">
+<h3>Enhancements<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Linter/Debugger improvements</p></li>
+<li><p>Debug shows relative paths</p></li>
+</ul>
+</section>
+<section id="id29">
+<h3>Fixes<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Record sorting is now deterministic</p></li>
+</ul>
+</section>
+<section id="pull-requests-incorporated">
+<h3>Pull requests incorporated<a class="headerlink" href="#pull-requests-incorporated" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/130">#130</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/135">#135</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/137">#137</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/138">#138</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/141">#141</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/142">#142</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/143">#143</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/144">#144</a></p></li>
+</ul>
+</section>
+</section>
+<section id="v2-3-1-2019-11-08">
+<h2>v2.3.1 (2019-11-08)<a class="headerlink" href="#v2-3-1-2019-11-08" title="Link to this heading"></a></h2>
+<section id="id30">
+<h3>Fixes<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fixed an issue where Enums weren’t being handled correctly</p></li>
+<li><p>pytmc now allows the declaration/implementation to be <code class="docutils literal notranslate"><span class="pre">None</span></code> allowing these
+sections to be empty without breaking</p></li>
+<li><p>Some windows file reading issues have been resolved</p></li>
+</ul>
+</section>
+<section id="refactors">
+<h3>Refactors<a class="headerlink" href="#refactors" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Move pragma checking code to from <code class="docutils literal notranslate"><span class="pre">Datatype.walk</span></code> to <code class="docutils literal notranslate"><span class="pre">SubItem.walk</span></code> for
+an implementation more consistent with <code class="docutils literal notranslate"><span class="pre">Symbol.walk</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="v2-3-0-2019-10-28">
+<h2>v2.3.0 (2019-10-28)<a class="headerlink" href="#v2-3-0-2019-10-28" title="Link to this heading"></a></h2>
+<section id="prs">
+<h3>PRs<a class="headerlink" href="#prs" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/123">#123</a>,</p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/124">#124</a>, and</p></li>
+<li><p><a class="reference external" href="https://github.com/pcdshub/pytmc/issues/125">#125</a> to an official release.</p></li>
+</ul>
+</section>
+<section id="id31">
+<h3>Features<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Add Support For NC axis parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.sln</span></code> files may now be passed to <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">summary</span></code></p></li>
+</ul>
+</section>
+<section id="id32">
+<h3>Fixes<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pytmc</span></code> now identifies and handles T_MaxString</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-2-0-2019-09-20">
+<h2>v2.2.0 (2019-09-20)<a class="headerlink" href="#v2-2-0-2019-09-20" title="Link to this heading"></a></h2>
+<section id="id33">
+<h3>Enhancements<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Adds support for arrays of complex datatypes.</p></li>
+<li><p>Replaces FB_MotionStage support with DUT_MotionStage.</p></li>
+<li><p>Converts ’_’ in project name in TC3 to ‘-’ in ioc name following convention.</p></li>
+</ul>
+</section>
+<section id="id34">
+<h3>Fixes<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">stcmd</span></code> generation updated to match changes to <code class="docutils literal notranslate"><span class="pre">pragmas</span></code> functionality solving some incompatibilites</p></li>
+<li><p>Switch to DUT_MotionStage namespace allows motors above 0-9 range.</p></li>
+</ul>
+</section>
+</section>
+<section id="v2-1-0-2019-09-05">
+<h2>v2.1.0 (2019-09-05)<a class="headerlink" href="#v2-1-0-2019-09-05" title="Link to this heading"></a></h2>
+<p>This tag includes the new pragma linting features for assessing whether
+TwinCAT3 projects are PyTMC compatible.</p>
+<p>This feature can be accessed using this command:
+<code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">pragmalint</span> <span class="pre">[-h]</span> <span class="pre">[--markdown]</span> <span class="pre">[--verbose]</span> <span class="pre">filename</span></code></p>
+</section>
+<section id="v1-1-2-2019-03-15">
+<h2>v1.1.2 (2019-03-15)<a class="headerlink" href="#v1-1-2-2019-03-15" title="Link to this heading"></a></h2>
+<section id="id35">
+<h3>Features<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Pragmas can now be delimited with semicolons # Bugfixes</p></li>
+<li><p>Spaces after the first semicolon in a pragma no longer break pragmas</p></li>
+<li><p>Blank PV strings no longer lead to the creation of multiple colons in
+a PV name</p></li>
+<li><p>Single line pragmas are properly recognized now</p></li>
+</ul>
+</section>
+</section>
+<section id="v1-1-1-2019-02-14">
+<h2>v1.1.1 (2019-02-14)<a class="headerlink" href="#v1-1-1-2019-02-14" title="Link to this heading"></a></h2>
+<p>This release rectifies several issues with the command line interface.
+The primary command is now <code class="docutils literal notranslate"><span class="pre">pytmc</span></code> replacing the old <code class="docutils literal notranslate"><span class="pre">makerecord</span></code>.</p>
+<p>Tests for python 3.7 have been implemented.</p>
+</section>
+<section id="v1-1-0-2018-10-16">
+<h2>v1.1.0 (2018-10-16)<a class="headerlink" href="#v1-1-0-2018-10-16" title="Link to this heading"></a></h2>
+<p>Incorporate support for a greater set of TwinCAT Datatypes.</p>
+</section>
+<section id="v1-0-0-2018-09-24">
+<h2>v1.0.0 (2018-09-24)<a class="headerlink" href="#v1-0-0-2018-09-24" title="Link to this heading"></a></h2>
+<p>First major release.</p>
+</section>
+<section id="v0-1-2018-03-02">
+<h2>v0.1 (2018-03-02)<a class="headerlink" href="#v0-1-2018-03-02" title="Link to this heading"></a></h2>
+<p>Primary features of .db and .proto file creation have been implemented.
+Compatibility with enums, aliases, waveforms/arrays, field guessing
+tools, and a user guide have not been implemented.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="source_code.html" class="btn btn-neutral float-left" title="API Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, SLAC National Accelerator Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
