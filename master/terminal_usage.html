@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Command-line Usage &mdash; pytmc  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/docs-versions-menu.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/docs-versions-menu.js?v=3d6a1aea"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -135,14 +137,14 @@
            <div itemprop="articleBody">
              
   <section id="command-line-usage">
-<h1>Command-line Usage<a class="headerlink" href="#command-line-usage" title="Permalink to this heading"></a></h1>
+<h1>Command-line Usage<a class="headerlink" href="#command-line-usage" title="Link to this heading"></a></h1>
 <section id="using-pytmc">
-<h2>Using pytmc<a class="headerlink" href="#using-pytmc" title="Permalink to this heading"></a></h2>
+<h2>Using pytmc<a class="headerlink" href="#using-pytmc" title="Link to this heading"></a></h2>
 <p>Once pytmc has been installed in a virtual environment the <code class="docutils literal notranslate"><span class="pre">pytmc</span></code> command
 can be called from the command line to generate .db files and more.</p>
 </section>
 <section id="pytmc-db">
-<h2>pytmc db<a class="headerlink" href="#pytmc-db" title="Permalink to this heading"></a></h2>
+<h2>pytmc db<a class="headerlink" href="#pytmc-db" title="Link to this heading"></a></h2>
 <p><p>“pytmc-db” is a command line utility for generating epics records files from
 TwinCAT3 .tmc files. This program is designed to work in conjunction with ESS’s
 m-epics-twincat-ads driver.</p>
@@ -154,7 +156,7 @@ m-epics-twincat-ads driver.</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>INPUT</kbd></dt>
 <dd><p>Path to interpreted .tmc file, or a .tsproj project</p>
@@ -166,7 +168,7 @@ m-epics-twincat-ads driver.</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--dbd, -d</kbd></dt>
 <dd><p>Specify an expanded .dbd file for validating fields (requires pyPDB)</p>
@@ -197,7 +199,7 @@ m-epics-twincat-ads driver.</p>
 </section>
 </section>
 <section id="pytmc-stcmd">
-<h2>pytmc stcmd<a class="headerlink" href="#pytmc-stcmd" title="Permalink to this heading"></a></h2>
+<h2>pytmc stcmd<a class="headerlink" href="#pytmc-stcmd" title="Link to this heading"></a></h2>
 <p><p>“pytmc-stcmd” is a command line utility for generating ESS/ethercatmc-capable
 EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <p>Relies on the existence (and linking) of FB_MotionStage function blocks.</p>
@@ -211,7 +213,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>tsproj_project</kbd></dt>
 <dd><p>Path to .tsproj project</p>
@@ -219,7 +221,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--plc</kbd></dt>
 <dd><p>PLC project name, if multiple exist</p>
@@ -273,7 +275,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </section>
 </section>
 <section id="pytmc-xmltranslate">
-<h2>pytmc xmltranslate<a class="headerlink" href="#pytmc-xmltranslate" title="Permalink to this heading"></a></h2>
+<h2>pytmc xmltranslate<a class="headerlink" href="#pytmc-xmltranslate" title="Link to this heading"></a></h2>
 <p><p>Tool for making XML-formatted files human-readable</p>
 <p>Output uses the following rules:
 For a line of xml that appears as the following:
@@ -289,7 +291,7 @@ any xml formatted file.</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>input_file</kbd></dt>
 <dd><p>input file</p>
@@ -297,7 +299,7 @@ any xml formatted file.</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>-d, --depth</kbd></dt>
 <dd><p>Recursive limit for exploring the file</p>
@@ -311,7 +313,7 @@ any xml formatted file.</p>
 </section>
 </section>
 <section id="pytmc-debug">
-<h2>pytmc debug<a class="headerlink" href="#pytmc-debug" title="Permalink to this heading"></a></h2>
+<h2>pytmc debug<a class="headerlink" href="#pytmc-debug" title="Link to this heading"></a></h2>
 <p><p>“pytmc-debug” is a Qt interface that shows information about how pytmc
 interprets TwinCAT3 .tmc files.</p>
 </p>
@@ -319,7 +321,7 @@ interprets TwinCAT3 .tmc files.</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>INPUT</kbd></dt>
 <dd><p>Path to .tmc file</p>
@@ -327,7 +329,7 @@ interprets TwinCAT3 .tmc files.</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>-d, --dbd</kbd></dt>
 <dd><p>Specify an expanded .dbd file for validating fields (requires pyPDB)</p>
@@ -340,7 +342,7 @@ interprets TwinCAT3 .tmc files.</p>
 </section>
 </section>
 <section id="pytmc-pragmalint">
-<h2>pytmc pragmalint<a class="headerlink" href="#pytmc-pragmalint" title="Permalink to this heading"></a></h2>
+<h2>pytmc pragmalint<a class="headerlink" href="#pytmc-pragmalint" title="Link to this heading"></a></h2>
 <p><p>“pytmc pragmalint” is a command line utility for linting PyTMC pragmas in a
 given TwinCAT project or source code file</p>
 </p>
@@ -348,7 +350,7 @@ given TwinCAT project or source code file</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>filename</kbd></dt>
 <dd><p>Path to .tsproj project or source code file</p>
@@ -356,7 +358,7 @@ given TwinCAT project or source code file</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--markdown</kbd></dt>
 <dd><p>Make output more markdown-friendly, for easier sharing</p>
@@ -370,7 +372,7 @@ given TwinCAT project or source code file</p>
 </section>
 </section>
 <section id="id1">
-<h2>pytmc stcmd<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<h2>pytmc stcmd<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <p><p>“pytmc-stcmd” is a command line utility for generating ESS/ethercatmc-capable
 EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 <p>Relies on the existence (and linking) of FB_MotionStage function blocks.</p>
@@ -384,7 +386,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>tsproj_project</kbd></dt>
 <dd><p>Path to .tsproj project</p>
@@ -392,7 +394,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--plc</kbd></dt>
 <dd><p>PLC project name, if multiple exist</p>
@@ -446,7 +448,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </section>
 </section>
 <section id="pytmc-summary">
-<h2>pytmc summary<a class="headerlink" href="#pytmc-summary" title="Permalink to this heading"></a></h2>
+<h2>pytmc summary<a class="headerlink" href="#pytmc-summary" title="Link to this heading"></a></h2>
 <p><p>“pytmc-summary” is a command line utility for inspecting TwinCAT3
 .tsproj projects.</p>
 </p>
@@ -458,7 +460,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>filename</kbd></dt>
 <dd><p>Path to project or solution (.tsproj, .sln)</p>
@@ -466,7 +468,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>--all, -a</kbd></dt>
 <dd><p>All possible information</p>
@@ -519,7 +521,7 @@ EPICS startup st.cmd files directly from TwinCAT3 .tsproj projects.</p>
 </section>
 </section>
 <section id="pytmc-template">
-<h2>pytmc template<a class="headerlink" href="#pytmc-template" title="Permalink to this heading"></a></h2>
+<h2>pytmc template<a class="headerlink" href="#pytmc-template" title="Link to this heading"></a></h2>
 <p><p>“pytmc template” is a command line utility to expand a template based on a
 TwinCAT3 project (or XML-format file such as .TMC).</p>
 <p>The template file is expected to be in Jinja template format.</p>
@@ -573,7 +575,7 @@ TwinCAT3 project (or XML-format file such as .TMC).</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>projects</kbd></dt>
 <dd><p>Path to project or solution (.tsproj, .sln)</p>
@@ -581,7 +583,7 @@ TwinCAT3 project (or XML-format file such as .TMC).</p>
 </dl>
 </section>
 <section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h3>
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>-t, --template</kbd></dt>
 <dd><p>Template filename with optional output filename. In the form <code class="docutils literal notranslate"><span class="pre">input_filename[:output_filename]</span></code>.Defaults to ‘-’ (standard input -&gt; standard output).</p>
@@ -597,7 +599,7 @@ TwinCAT3 project (or XML-format file such as .TMC).</p>
 </section>
 </section>
 <section id="pytmc-types">
-<h2>pytmc types<a class="headerlink" href="#pytmc-types" title="Permalink to this heading"></a></h2>
+<h2>pytmc types<a class="headerlink" href="#pytmc-types" title="Link to this heading"></a></h2>
 <p><p>“pytmc-types” is a Qt interface that shows DataType-related information from a
 tmc file.</p>
 </p>
@@ -605,7 +607,7 @@ tmc file.</p>
 </pre></div>
 </div>
 <section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h3>
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>INPUT</kbd></dt>
 <dd><p>Path to .tmc file</p>
@@ -615,9 +617,9 @@ tmc file.</p>
 </section>
 </section>
 <section id="templates">
-<h1>Templates<a class="headerlink" href="#templates" title="Permalink to this heading"></a></h1>
+<h1>Templates<a class="headerlink" href="#templates" title="Link to this heading"></a></h1>
 <section id="stcmd-default-cmd">
-<h2>stcmd_default.cmd<a class="headerlink" href="#stcmd-default-cmd" title="Permalink to this heading"></a></h2>
+<h2>stcmd_default.cmd<a class="headerlink" href="#stcmd-default-cmd" title="Link to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!{{hashbang}}</span>
 
 <span class="o">&lt;</span> <span class="n">envPaths</span>
@@ -725,7 +727,7 @@ tmc file.</p>
 </div>
 </section>
 <section id="asyn-standard-file-jinja2">
-<h2>asyn_standard_file.jinja2<a class="headerlink" href="#asyn-standard-file-jinja2" title="Permalink to this heading"></a></h2>
+<h2>asyn_standard_file.jinja2<a class="headerlink" href="#asyn-standard-file-jinja2" title="Link to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="o">%</span><span class="p">}</span>
 <span class="p">{{</span><span class="n">r</span><span class="p">}}</span>
 
@@ -734,7 +736,7 @@ tmc file.</p>
 </div>
 </section>
 <section id="asyn-standard-record-jinja2">
-<h2>asyn_standard_record.jinja2<a class="headerlink" href="#asyn-standard-record-jinja2" title="Permalink to this heading"></a></h2>
+<h2>asyn_standard_record.jinja2<a class="headerlink" href="#asyn-standard-record-jinja2" title="Link to this heading"></a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">({{</span><span class="n">record</span><span class="o">.</span><span class="n">record_type</span><span class="p">}},</span> <span class="s2">&quot;{{record.pvname}}&quot;</span><span class="p">)</span> <span class="p">{</span>
 <span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">long_description</span> <span class="o">%</span><span class="p">}</span>
   <span class="c1"># {{ record.long_description }}</span>
@@ -759,6 +761,9 @@ tmc file.</p>
   <span class="n">info</span><span class="p">(</span><span class="n">archive</span><span class="p">,</span> <span class="s2">&quot;{{ record.archive_settings[&#39;method&#39;] }} {{ record.archive_settings[&#39;seconds&#39;] }}: {{ record.archive_settings[&#39;fields&#39;] | join(&#39; &#39;) }}&quot;</span><span class="p">)</span>
   <span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
 <span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;input&quot;</span> <span class="o">%</span><span class="p">}</span>
+  <span class="n">field</span><span class="p">(</span><span class="n">ASG</span><span class="p">,</span> <span class="s2">&quot;NO_WRITE&quot;</span><span class="p">)</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -776,7 +781,7 @@ tmc file.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+    <p>&#169; Copyright 2024, SLAC National Accelerator Laboratory.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

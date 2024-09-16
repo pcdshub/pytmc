@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Annotating a TwinCAT3 project &mdash; pytmc  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/docs-versions-menu.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/docs-versions-menu.js?v=3d6a1aea"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -103,13 +105,13 @@
            <div itemprop="articleBody">
              
   <section id="annotating-a-twincat3-project">
-<h1>Annotating a TwinCAT3 project<a class="headerlink" href="#annotating-a-twincat3-project" title="Permalink to this heading"></a></h1>
+<h1>Annotating a TwinCAT3 project<a class="headerlink" href="#annotating-a-twincat3-project" title="Link to this heading"></a></h1>
 <p>Pytmc is capable of generating most of the DB file but some settings require
 human direction. Developers set this configuration by adding an attribute
 pragma to TwinCAT3 variables when they’re declared. These pragmas can be
 appended to variables in project files and library files.</p>
 <section id="data-and-record-types">
-<h2>Data and Record Types<a class="headerlink" href="#data-and-record-types" title="Permalink to this heading"></a></h2>
+<h2>Data and Record Types<a class="headerlink" href="#data-and-record-types" title="Link to this heading"></a></h2>
 <p>TwinCAT data types and their corresponding record types are as follows:</p>
 <table class="docutils align-default">
 <thead>
@@ -264,7 +266,7 @@ appended to variables in project files and library files.</p>
 <p>Lines marked as N/A are not supported by pytmc.</p>
 </section>
 <section id="pragma-syntax">
-<h2>Pragma syntax<a class="headerlink" href="#pragma-syntax" title="Permalink to this heading"></a></h2>
+<h2>Pragma syntax<a class="headerlink" href="#pragma-syntax" title="Link to this heading"></a></h2>
 <p>At a minimum, developers must specify a PV. Specifying an IO direction for each
 field is recommended but not required. This would look like the following:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
@@ -296,7 +298,7 @@ scale : LREAL := 0.0;
 </div>
 </section>
 <section id="declaring-top-level-variables">
-<h2>Declaring top level variables<a class="headerlink" href="#declaring-top-level-variables" title="Permalink to this heading"></a></h2>
+<h2>Declaring top level variables<a class="headerlink" href="#declaring-top-level-variables" title="Link to this heading"></a></h2>
 <p>This is an example of the simplest configuration a developer can provide to
 instantiate a variable.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
@@ -314,7 +316,7 @@ default settings manually. For information on all the pragma fields, consult
 the <a class="reference internal" href="#pragma-fields">Pragma fields</a> section.</p>
 </section>
 <section id="declaring-encapsulated-variables">
-<h2>Declaring encapsulated variables<a class="headerlink" href="#declaring-encapsulated-variables" title="Permalink to this heading"></a></h2>
+<h2>Declaring encapsulated variables<a class="headerlink" href="#declaring-encapsulated-variables" title="Link to this heading"></a></h2>
 <p>Variables declared inside of data structures can be processed by pytmc so long
 as each level of encapsulation, all the way down to the first level, is marked
 for pytmc.</p>
@@ -365,7 +367,7 @@ value_d : DINT;
 </div>
 </section>
 <section id="declaring-bidirectional-pvs">
-<h2>Declaring bidirectional PVs<a class="headerlink" href="#declaring-bidirectional-pvs" title="Permalink to this heading"></a></h2>
+<h2>Declaring bidirectional PVs<a class="headerlink" href="#declaring-bidirectional-pvs" title="Link to this heading"></a></h2>
 <p>In instances where a single TwinCAT variable should be able to be both written
 and read, multiple PVs can be specified. This allows multiple EPICS records to
 be tied to a single TwinCAT variable.</p>
@@ -380,7 +382,7 @@ upper_limit : DINT := 5000;
 <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT_RBV</span></code>.</p>
 </section>
 <section id="arrays">
-<h2>Arrays<a class="headerlink" href="#arrays" title="Permalink to this heading"></a></h2>
+<h2>Arrays<a class="headerlink" href="#arrays" title="Link to this heading"></a></h2>
 <p>By default, structures with a pragma will generate PVs for each array index,
 including all encapsulated sub-elements that also have an associated pragma.</p>
 <p>Depending on the number of elements in the array, the PV name will be
@@ -442,12 +444,12 @@ myStructure : ARRAY [0..100] of DUT_MyStructure
 </table>
 </section>
 <section id="pragma-fields">
-<h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Permalink to this heading"></a></h2>
+<h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Link to this heading"></a></h2>
 <p>Format: <code class="docutils literal notranslate"><span class="pre">{field}:</span> <span class="pre">[value]</span></code></p>
 <p>A pragma key or field (before the <code class="docutils literal notranslate"><span class="pre">:</span></code>) and the value after the <code class="docutils literal notranslate"><span class="pre">:</span></code> are used
 to generate records in EPICS.</p>
 <section id="pv">
-<h3>pv<a class="headerlink" href="#pv" title="Permalink to this heading"></a></h3>
+<h3>pv<a class="headerlink" href="#pv" title="Link to this heading"></a></h3>
 <p>This constructs the PV name that will represent this variable in EPICS. It is
 the only mandatory configuration line. This line can be used on specific
 variables as well as the instantiations of data types.</p>
@@ -460,7 +462,7 @@ key.</p>
 </div>
 </section>
 <section id="io">
-<h3>io<a class="headerlink" href="#io" title="Permalink to this heading"></a></h3>
+<h3>io<a class="headerlink" href="#io" title="Link to this heading"></a></h3>
 <p>This is a field that defaults to <cite>‘io’</cite>.  Specify the whether the IOC can only
 read or also write the value. Values being sent from the PLC to the IOC should
 be marked as input with <code class="docutils literal notranslate"><span class="pre">input</span></code> (or equivalently <code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">ro</span></code>) and values
@@ -475,7 +477,7 @@ and <code class="docutils literal notranslate"><span class="pre">ro</span></code
 </div>
 </section>
 <section id="update-rate">
-<h3>Update rate<a class="headerlink" href="#update-rate" title="Permalink to this heading"></a></h3>
+<h3>Update rate<a class="headerlink" href="#update-rate" title="Link to this heading"></a></h3>
 <p>Format: <code class="docutils literal notranslate"><span class="pre">update:</span> <span class="pre">{rate}{s|Hz}</span> <span class="pre">[{poll|notify}]</span></code></p>
 <p>Example: <code class="docutils literal notranslate"><span class="pre">1s</span></code>, <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">poll</span></code>, <code class="docutils literal notranslate"><span class="pre">2Hz</span> <span class="pre">notify</span></code></p>
 <p>By default, any given PLC variable will be polled at a rate of T=1s (1Hz).
@@ -517,7 +519,7 @@ sparingly.</p>
 records will be processed at a rate of 1 Hz/the IOC-configured poll rate.</p>
 </section>
 <section id="scale-and-offset">
-<h3>Scale and Offset<a class="headerlink" href="#scale-and-offset" title="Permalink to this heading"></a></h3>
+<h3>Scale and Offset<a class="headerlink" href="#scale-and-offset" title="Link to this heading"></a></h3>
 <p>Integer and floating point values may have an EPICS-side scaling applied.</p>
 <p>Example:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>scale: 3.0
@@ -539,7 +541,7 @@ record but rather change to an analog input/output record.</p>
 <p>If unspecified, <code class="docutils literal notranslate"><span class="pre">scale</span></code> will be assumed to be 1.0 and <code class="docutils literal notranslate"><span class="pre">offset</span></code> 0.0.</p>
 </section>
 <section id="archiver-settings">
-<h3>Archiver settings<a class="headerlink" href="#archiver-settings" title="Permalink to this heading"></a></h3>
+<h3>Archiver settings<a class="headerlink" href="#archiver-settings" title="Link to this heading"></a></h3>
 <p>Format: <code class="docutils literal notranslate"><span class="pre">archive:</span> <span class="pre">{rate}{s|Hz}</span> <span class="pre">[{scan|monitor}]</span></code></p>
 <p>Example: <code class="docutils literal notranslate"><span class="pre">1s</span></code>, <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">scan</span></code>, <code class="docutils literal notranslate"><span class="pre">2Hz</span> <span class="pre">monitor</span></code></p>
 <p>Using the database-generating tool <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">db</span></code> along with the pragma key
@@ -569,7 +571,7 @@ key, which is a space-delimited list of field names.</p>
 </div>
 </section>
 <section id="record-fields">
-<h3>Record fields<a class="headerlink" href="#record-fields" title="Permalink to this heading"></a></h3>
+<h3>Record fields<a class="headerlink" href="#record-fields" title="Link to this heading"></a></h3>
 <p>This specifies additional field(s) to be set on the generated EPICS record(s).
 Multiple field lines are allowed. These lines determine the PV’s behaviors such
 as alarm limits and scanning frequency.</p>
@@ -586,13 +588,13 @@ as alarm limits and scanning frequency.</p>
 </div>
 </section>
 <section id="scan">
-<h3>SCAN<a class="headerlink" href="#scan" title="Permalink to this heading"></a></h3>
+<h3>SCAN<a class="headerlink" href="#scan" title="Link to this heading"></a></h3>
 <p>While the <code class="docutils literal notranslate"><span class="pre">SCAN</span></code> field is special in EPICS to specify the rate at which
 records should be updated, pytmc requires that such configuration be done
 through the <code class="docutils literal notranslate"><span class="pre">update</span></code> pragma key (see <a class="reference internal" href="#update-rate">Update rate</a>).</p>
 </section>
 <section id="autosave">
-<h3>Autosave<a class="headerlink" href="#autosave" title="Permalink to this heading"></a></h3>
+<h3>Autosave<a class="headerlink" href="#autosave" title="Link to this heading"></a></h3>
 <p>Autosave fields for individual EPICS records are configured by default with
 pytmc. It is possible to customize this behavior with additional pragmas,
 optionally specifying different fields for input or output records.</p>
@@ -626,7 +628,7 @@ record(ao, &quot;my:record&quot;) {
 </div>
 </section>
 <section id="sub-items">
-<h3>Sub-Items<a class="headerlink" href="#sub-items" title="Permalink to this heading"></a></h3>
+<h3>Sub-Items<a class="headerlink" href="#sub-items" title="Link to this heading"></a></h3>
 <p>There is a special syntax to pragma a member of a structure differently
 depending on the instance.</p>
 <p>Given this example function block:</p>
@@ -683,7 +685,7 @@ instances generated with hard-coded upper bounds on encapsulated structures.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+    <p>&#169; Copyright 2024, SLAC National Accelerator Laboratory.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

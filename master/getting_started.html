@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Getting Started &mdash; pytmc  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/docs-versions-menu.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/docs-versions-menu.js?v=3d6a1aea"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -89,9 +91,9 @@
            <div itemprop="articleBody">
              
   <section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <section id="general-usage">
-<h2>General Usage<a class="headerlink" href="#general-usage" title="Permalink to this heading"></a></h2>
+<h2>General Usage<a class="headerlink" href="#general-usage" title="Link to this heading"></a></h2>
 <p>pytmc has various capabilities that can be accessed using the top-level <code class="docutils literal notranslate"><span class="pre">pytmc</span></code> program:</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -107,7 +109,7 @@ libraries require annotation. The resulting IOC depends upon EPICS ADS driver. T
 driver is provided by the <a class="reference external" href="https://europeanspallationsource.se/">European Spallation Source</a> and is hosted on their <a class="reference external" href="https://bitbucket.org/europeanspallationsource/m-epics-twincat-ads">bitbucket page</a>.</p>
 </section>
 <section id="marking-the-twincat-project">
-<h2>Marking the TwinCAT project<a class="headerlink" href="#marking-the-twincat-project" title="Permalink to this heading"></a></h2>
+<h2>Marking the TwinCAT project<a class="headerlink" href="#marking-the-twincat-project" title="Link to this heading"></a></h2>
 <p>Marking the TwinCAT project determines how the EPICS record will be generated.
 The marking process uses custom attribute pragmas to designate variables for
 pytmc to process. The pragma should be applied just above the declaration of
@@ -118,13 +120,13 @@ system <a class="reference external" href="https://infosys.beckhoff.com/english.
 rules</a>.</p>
 </section>
 <section id="python-usage">
-<h2>Python Usage<a class="headerlink" href="#python-usage" title="Permalink to this heading"></a></h2>
+<h2>Python Usage<a class="headerlink" href="#python-usage" title="Link to this heading"></a></h2>
 <p>Once installed pytmc and its components can be imported into a python program
 or shell like any normal python package. Consult the source code documentation
 for specifics.</p>
 </section>
 <section id="full-ioc-creation">
-<h2>Full IOC Creation<a class="headerlink" href="#full-ioc-creation" title="Permalink to this heading"></a></h2>
+<h2>Full IOC Creation<a class="headerlink" href="#full-ioc-creation" title="Link to this heading"></a></h2>
 <p>PCDS has recently focused its efforts on <a class="reference external" href="https://github.com/pcdshub/ads-deploy">ads-deploy</a>, for seamless development and
 deployment of IOCs directly from the TwinCAT IDE. Behind the scenes, ads-deploy
 takes care of the following steps using a docker container:</p>
@@ -159,7 +161,7 @@ $<span class="w"> </span>./st.cmd
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+    <p>&#169; Copyright 2024, SLAC National Accelerator Laboratory.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
