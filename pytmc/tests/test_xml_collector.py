@@ -107,6 +107,7 @@ def chain():
         ("LREAL", False, FloatRecordPackage),
         ("LREAL", True, WaveformRecordPackage),
         ("STRING", False, StringRecordPackage),
+        ("STRING", True, StringRecordPackage),
     ],
 )
 def test_record_package_from_chain(chain, tc_type, is_array, final_type, monkeypatch):
@@ -144,6 +145,8 @@ def test_record_package_from_chain(chain, tc_type, is_array, final_type, monkeyp
         ("ENUM", "io", True, "asynInt16ArrayOut"),
         ("STRING", "i", False, "asynInt8ArrayIn"),
         ("STRING", "io", False, "asynInt8ArrayOut"),
+        ("STRING", "i", True, "asynInt8ArrayIn"),
+        ("STRING", "io", True, "asynInt8ArrayOut"),
     ],
 )
 def test_dtype(chain, tc_type, io, is_array, final_DTYP):
@@ -604,6 +607,33 @@ def test_enum_array():
     assert enum01.field_defaults["ZRST"] == "ONE"
     assert enum01.field_defaults["ONVL"] == 2
     assert enum01.field_defaults["ONST"] == "TWO"
+
+
+def test_string_array():
+    array = make_mock_twincatitem(
+        name="Main.string_array",
+        data_type=make_mock_type("MY_STRING", is_string=True),
+        pragma="pv: STRINGS",
+        array_info=(2, 5),
+    )
+
+    records = {
+        record.pvname: record for record in pragmas.record_packages_from_symbol(array)
+    }
+
+    assert set(records) == {
+        "STRINGS:02",
+        "STRINGS:03",
+        "STRINGS:04",
+        "STRINGS:05",
+    }
+
+    print(records)
+    string02 = records["STRINGS:02"]
+    assert isinstance(string02, StringRecordPackage)
+    assert string02.field_defaults["FTVL"] == "CHAR"
+    assert string02.field_defaults["APST"] == "On Change"
+    assert string02.field_defaults["MPST"] == "On Change"
 
 
 def test_unroll_formatting():
