@@ -147,7 +147,7 @@ def element_to_class_name(
     return tag, TwincatItem
 
 
-def _determine_path(base_path, name, class_hint):
+def _determine_path(base_path, name, class_hint) -> pathlib.Path:
     """
     Determine the path to load child XTI items from, given a base path and the
     class load path hint.
@@ -430,6 +430,19 @@ class TwincatItem:
             class_hint=cls._load_path_hint,
         )
         return parse(base_path / filename, parent=parent)
+        try:
+            return parse(base_path / filename, parent=parent)
+        except FileNotFoundError as exc:
+            original_error = exc
+        # TwinCAT is weird, let's do a best-effort glob through directories parallel to base_path
+        for try_dir in base_path.parent.glob("*"):
+            if try_dir.is_dir():
+                try:
+                    return parse(try_dir / filename, parent=parent)
+                except FileNotFoundError:
+                    ...
+        # We tried I guess
+        raise original_error
 
 
 class _LazyLoadPlaceholder:
