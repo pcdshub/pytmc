@@ -7,7 +7,10 @@ v2.18.0 (2024-12-19)
 
 Changes
 -------
-- Adds support for arrays of strings
+- Adds support for arrays of strings. Previously, using a pv pragma on an array of
+  strings would result in pytmc attempting and failing to create waveform record with
+  FTVL set to STRING, which was specifically disallowed. Now it will create a separate
+  string pv for each element of the array, similar to arrays of enums or complex types
 
 Maintenance
 -----------
