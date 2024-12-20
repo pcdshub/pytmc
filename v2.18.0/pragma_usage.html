@@ -1,0 +1,706 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annotating a TwinCAT3 project &mdash; pytmc  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/docs-versions-menu.js?v=3d6a1aea"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Command-line Usage" href="terminal_usage.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pytmc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Annotating a TwinCAT3 project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-and-record-types">Data and Record Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pragma-syntax">Pragma syntax</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declaring-top-level-variables">Declaring top level variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#declaring-bidirectional-pvs">Declaring bidirectional PVs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arrays">Arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pragma-fields">Pragma fields</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pv">pv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#io">io</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update-rate">Update rate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scale-and-offset">Scale and Offset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#archiver-settings">Archiver settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#record-fields">Record fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scan">SCAN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autosave">Autosave</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sub-items">Sub-Items</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Command-line Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html#templates">Templates</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytmc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Annotating a TwinCAT3 project</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pragma_usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="annotating-a-twincat3-project">
+<h1>Annotating a TwinCAT3 project<a class="headerlink" href="#annotating-a-twincat3-project" title="Link to this heading"></a></h1>
+<p>Pytmc is capable of generating most of the DB file but some settings require
+human direction. Developers set this configuration by adding an attribute
+pragma to TwinCAT3 variables when they’re declared. These pragmas can be
+appended to variables in project files and library files.</p>
+<section id="data-and-record-types">
+<h2>Data and Record Types<a class="headerlink" href="#data-and-record-types" title="Link to this heading"></a></h2>
+<p>TwinCAT data types and their corresponding record types are as follows:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Data type</p></th>
+<th class="head"><p>Lower bound</p></th>
+<th class="head"><p>Upper bound</p></th>
+<th class="head"><p>Memory space</p></th>
+<th class="head"><p>Record Type</p></th>
+<th class="head"><p>Scalar DTYP</p></th>
+<th class="head"><p>Waveform DTYP</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>BOOL</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>8 bit</p></td>
+<td><p>bi, bo</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt8ArrayIn, asynInt8ArrayOut</p></td>
+</tr>
+<tr class="row-odd"><td><p>BYTE</p></td>
+<td><p>0</p></td>
+<td><p>255</p></td>
+<td><p>8 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt8ArrayIn, asynInt8ArrayOut</p></td>
+</tr>
+<tr class="row-even"><td><p>SINT</p></td>
+<td><p>-128</p></td>
+<td><p>127</p></td>
+<td><p>8 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt8ArrayIn, asynInt8ArrayOut</p></td>
+</tr>
+<tr class="row-odd"><td><p>USINT</p></td>
+<td><p>0</p></td>
+<td><p>255</p></td>
+<td><p>8 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt8ArrayIn, asynInt8ArrayOut</p></td>
+</tr>
+<tr class="row-even"><td><p>WORD</p></td>
+<td><p>0</p></td>
+<td><p>65535</p></td>
+<td><p>16 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt16ArrayIn, asynInt16ArrayOut</p></td>
+</tr>
+<tr class="row-odd"><td><p>INT</p></td>
+<td><p>-32768</p></td>
+<td><p>32767</p></td>
+<td><p>16 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt16ArrayIn, asynInt16ArrayOut</p></td>
+</tr>
+<tr class="row-even"><td><p>UINT</p></td>
+<td><p>0</p></td>
+<td><p>65535</p></td>
+<td><p>16 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt16ArrayIn, asynInt16ArrayOut</p></td>
+</tr>
+<tr class="row-odd"><td><p>ENUM</p></td>
+<td><p>0</p></td>
+<td><p>4294967295</p></td>
+<td><p>32 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt16ArrayIn, asynInt16ArrayOut</p></td>
+</tr>
+<tr class="row-even"><td><p>DWORD</p></td>
+<td><p>0</p></td>
+<td><p>4294967295</p></td>
+<td><p>32 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt32ArrayIn, asynInt32ArrayOut</p></td>
+</tr>
+<tr class="row-odd"><td><p>DINT</p></td>
+<td><p>-2147483648</p></td>
+<td><p>2147483647</p></td>
+<td><p>32 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt32ArrayIn, asynInt32ArrayOut</p></td>
+</tr>
+<tr class="row-even"><td><p>UDINT</p></td>
+<td><p>0</p></td>
+<td><p>4294967295</p></td>
+<td><p>32 bit</p></td>
+<td><p>longin, longout</p></td>
+<td><p>asynInt32</p></td>
+<td><p>asynInt32ArrayIn, asynInt32ArrayOut</p></td>
+</tr>
+<tr class="row-odd"><td><p>LWORD</p></td>
+<td><p>0</p></td>
+<td><p>2**64-1</p></td>
+<td><p>64 bit</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>LINT</p></td>
+<td><p>-2**63</p></td>
+<td><p>2**63-1</p></td>
+<td><p>64 bit</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>ULINT</p></td>
+<td><p>0</p></td>
+<td><p>2**64-1</p></td>
+<td><p>64 bit</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>REAL</p></td>
+<td><p>-3.4E+38</p></td>
+<td><p>3.4E+38</p></td>
+<td><p>32 bit</p></td>
+<td><p>ai, ao</p></td>
+<td><p>asynFloat64</p></td>
+<td><p>asynFloat32ArrayIn, AsynFloat32ArrayOut</p></td>
+</tr>
+<tr class="row-odd"><td><p>LREAL</p></td>
+<td><p>-1.797693134862316e+308</p></td>
+<td><p>1.797693134862358e+308</p></td>
+<td><p>64 bit</p></td>
+<td><p>ai, ao</p></td>
+<td><p>asynFloat64</p></td>
+<td><p>asynFloat64ArrayIn, AsynFloat64ArrayOut</p></td>
+</tr>
+<tr class="row-even"><td><p>STRING</p></td>
+<td></td>
+<td></td>
+<td><p>Varies</p></td>
+<td><p>waveform</p></td>
+<td><p>asynFloat64</p></td>
+<td><p>asynInt8ArrayIn, asynInt8ArrayOut</p></td>
+</tr>
+</tbody>
+</table>
+<p>Lines marked as N/A are not supported by pytmc.</p>
+</section>
+<section id="pragma-syntax">
+<h2>Pragma syntax<a class="headerlink" href="#pragma-syntax" title="Link to this heading"></a></h2>
+<p>At a minimum, developers must specify a PV. Specifying an IO direction for each
+field is recommended but not required. This would look like the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:SCALE
+    io: i
+&#39;}
+scale : LREAL := 0.0;
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">{attribute</span> <span class="pre">'pytmc'</span> <span class="pre">:=</span> <span class="pre">'</span></code> and <code class="docutils literal notranslate"><span class="pre">'}</span></code> specify the beginning and end of the
+pragma that pytmc will recognize. The middle two lines specify the
+configuration for this variable.</p>
+<p>Pytmc uses a custom system of configuration where newlines and white space in
+a line is important. All lines begin with a title and the title ends before the
+colon. All parts thereafter are the ‘tag’ or the configuration state for this
+setting. Some title types such as <code class="docutils literal notranslate"><span class="pre">field</span></code> can have multiple settings for a
+single PV.</p>
+<p>A pragma could have multiple fields specified. For example, an <code class="docutils literal notranslate"><span class="pre">ai</span></code> record
+<code class="docutils literal notranslate"><span class="pre">TEST:MAIN:SCALE</span></code> would be generated from the following, with a slope of
+2.0 and an offset of 1.0, updating only at a rate of once per second:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:SCALE
+    io: i
+    field: AOFF 1.0
+    field: ASLO 2.0
+&#39;}
+scale : LREAL := 0.0;
+</pre></div>
+</div>
+</section>
+<section id="declaring-top-level-variables">
+<h2>Declaring top level variables<a class="headerlink" href="#declaring-top-level-variables" title="Link to this heading"></a></h2>
+<p>This is an example of the simplest configuration a developer can provide to
+instantiate a variable.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:SCALE
+    io: i
+&#39;}
+scale : LREAL := 0.0;
+</pre></div>
+</div>
+<p>The developer must specify the PV name (<code class="docutils literal notranslate"><span class="pre">pv:</span></code> line). All other fields are
+optional. We recommend that the user specify the direction of the
+data (<code class="docutils literal notranslate"><span class="pre">io:</span></code> line) however.</p>
+<p>Pytmc needs no additional information but users have the option to override
+default settings manually. For information on all the pragma fields, consult
+the <a class="reference internal" href="#pragma-fields">Pragma fields</a> section.</p>
+</section>
+<section id="declaring-encapsulated-variables">
+<h2>Declaring encapsulated variables<a class="headerlink" href="#declaring-encapsulated-variables" title="Link to this heading"></a></h2>
+<p>Variables declared inside of data structures can be processed by pytmc so long
+as each level of encapsulation, all the way down to the first level, is marked
+for pytmc.</p>
+<p>The instantiation of encapsulating data types only needs the <code class="docutils literal notranslate"><span class="pre">pv:</span></code> line. The
+instantiation of a function block could resemble the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:COUNTER_B
+&#39;}
+counter_b : counter;
+</pre></div>
+</div>
+<p>A variable declared within the <code class="docutils literal notranslate"><span class="pre">counter</span></code> function block could resemble the
+following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: VALUE
+    io: i
+&#39;}
+value_d : DINT;
+</pre></div>
+</div>
+<p>When combined, the PV specified at the instantiation of the user-defined data
+type will be appended to the beginning of the PV for all data types defined
+within. Each step further into a data structure can add an additional section
+to the PV. In the example above the final PV will be
+<code class="docutils literal notranslate"><span class="pre">TEST:MAIN:COUNTER_B:VALUE</span></code>. The colons are automatically included.</p>
+<p>This can be recursively applied to data types containing data types.</p>
+<p>Information other than the PV name name can be specified at the datatype
+instantiation if you wish to make generalizations about the variables
+contained inside. These generalizations are overridden if the same field is
+specified either on a contained datatype or variable.</p>
+<p>For example the following code block will assign a <code class="docutils literal notranslate"><span class="pre">field:</span></code> of <code class="docutils literal notranslate"><span class="pre">DESC</span> <span class="pre">test</span></code>
+to all the variables and datatypes that it contains unless they
+specify their own setting for <code class="docutils literal notranslate"><span class="pre">DESC</span></code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: BASE
+    field: DESC test
+&#39;}
+counter_b : counter;
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: VALUE_F_R
+    field: DESC test
+    io: i
+&#39;}
+value_d : DINT;
+</pre></div>
+</div>
+</section>
+<section id="declaring-bidirectional-pvs">
+<h2>Declaring bidirectional PVs<a class="headerlink" href="#declaring-bidirectional-pvs" title="Link to this heading"></a></h2>
+<p>In instances where a single TwinCAT variable should be able to be both written
+and read, multiple PVs can be specified. This allows multiple EPICS records to
+be tied to a single TwinCAT variable.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:MAIN:ULIMIT
+    io: io
+&#39;}
+upper_limit : DINT := 5000;
+</pre></div>
+</div>
+<p>In this case, two records will be generated: <code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT</span></code> and
+<code class="docutils literal notranslate"><span class="pre">TEST:MAIN:ULIMIT_RBV</span></code>.</p>
+</section>
+<section id="arrays">
+<h2>Arrays<a class="headerlink" href="#arrays" title="Link to this heading"></a></h2>
+<p>By default, structures with a pragma will generate PVs for each array index,
+including all encapsulated sub-elements that also have an associated pragma.</p>
+<p>Depending on the number of elements in the array, the PV name will be
+zero-padded to aid in future expansion. Reminding ourselves that array bounds
+are inclusive in TwinCAT, the following pragma:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: MY:ARRAY
+&#39;}
+myStructure : ARRAY [0..5] of DUT_MyStructure
+</pre></div>
+</div>
+<p>would generate these prefixes:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>MY:ARRAY:00:
+MY:ARRAY:01:
+MY:ARRAY:02:
+MY:ARRAY:03:
+MY:ARRAY:04:
+MY:ARRAY:05:
+</pre></div>
+</div>
+<p>The formatting of this may be customized, but it is not recommended to do so
+in general. Adding <code class="docutils literal notranslate"><span class="pre">expand:</span> <span class="pre">:%.3d</span></code> would extend the zero-padding to 3 digits,
+regardless of the number of array elements.</p>
+<p>It is also possible to select individual elements or a range of elements from
+a large array by way of the <code class="docutils literal notranslate"><span class="pre">array</span></code> pragma.</p>
+<p>To include only the first 2 elements (0 and 1) of this large 101 element array,
+the following pragma could be used:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: MY:ARRAY
+    array: 0..1
+&#39;}
+myStructure : ARRAY [0..100] of DUT_MyStructure
+</pre></div>
+</div>
+<p>The array pragma is flexible, allowing for the following:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Array Pragma</p></th>
+<th class="head"><p>Elements Selected</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0, 1, 2</p></td>
+<td><p>0, 1, 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>0..2</p></td>
+<td><p>0, 1, 2</p></td>
+</tr>
+<tr class="row-even"><td><p>99..</p></td>
+<td><p>99, 100</p></td>
+</tr>
+<tr class="row-odd"><td><p>..5</p></td>
+<td><p>0, 1, 2, 3, 4, 5</p></td>
+</tr>
+<tr class="row-even"><td><p>..5, 99</p></td>
+<td><p>0, 1, 2, 3, 4, 5, 99</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pragma-fields">
+<h2>Pragma fields<a class="headerlink" href="#pragma-fields" title="Link to this heading"></a></h2>
+<p>Format: <code class="docutils literal notranslate"><span class="pre">{field}:</span> <span class="pre">[value]</span></code></p>
+<p>A pragma key or field (before the <code class="docutils literal notranslate"><span class="pre">:</span></code>) and the value after the <code class="docutils literal notranslate"><span class="pre">:</span></code> are used
+to generate records in EPICS.</p>
+<section id="pv">
+<h3>pv<a class="headerlink" href="#pv" title="Link to this heading"></a></h3>
+<p>This constructs the PV name that will represent this variable in EPICS. It is
+the only mandatory configuration line. This line can be used on specific
+variables as well as the instantiations of data types.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">$</span></code> may not be used in pragmas due to some TwinCAT limitations as of
+version 4024.  An alternative character <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> may be used in its place for
+pv names.  This can also be customized using the <code class="docutils literal notranslate"><span class="pre">macro_character</span></code> pragma
+key.</p>
+</div>
+</section>
+<section id="io">
+<h3>io<a class="headerlink" href="#io" title="Link to this heading"></a></h3>
+<p>This is a field that defaults to <cite>‘io’</cite>.  Specify the whether the IOC can only
+read or also write the value. Values being sent from the PLC to the IOC should
+be marked as input with <code class="docutils literal notranslate"><span class="pre">input</span></code> (or equivalently <code class="docutils literal notranslate"><span class="pre">i</span></code>, <code class="docutils literal notranslate"><span class="pre">ro</span></code>) and values
+being sent to the PLC from the IOC should be marked <code class="docutils literal notranslate"><span class="pre">output</span></code> (or equivalently
+<code class="docutils literal notranslate"><span class="pre">o</span></code>, <code class="docutils literal notranslate"><span class="pre">rw</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following are valid for input-only (read-only) pragmas: <code class="docutils literal notranslate"><span class="pre">input</span></code>, <code class="docutils literal notranslate"><span class="pre">i</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">ro</span></code>.</p>
+<p>The following are valid for input-output (read-write) pragmas: <code class="docutils literal notranslate"><span class="pre">output</span></code>, <code class="docutils literal notranslate"><span class="pre">io</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rw</span></code>, and <code class="docutils literal notranslate"><span class="pre">o</span></code>.</p>
+</div>
+</section>
+<section id="update-rate">
+<h3>Update rate<a class="headerlink" href="#update-rate" title="Link to this heading"></a></h3>
+<p>Format: <code class="docutils literal notranslate"><span class="pre">update:</span> <span class="pre">{rate}{s|Hz}</span> <span class="pre">[{poll|notify}]</span></code></p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">1s</span></code>, <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">poll</span></code>, <code class="docutils literal notranslate"><span class="pre">2Hz</span> <span class="pre">notify</span></code></p>
+<p>By default, any given PLC variable will be polled at a rate of T=1s (1Hz).
+Other poll rates planned to be available by default may be selected on a
+per-record (*) basis: T=.5s (2Hz), T=1s (1Hz), T=2s (.5hz), T=10s (.1Hz), and
+T=50s (.02Hz), or as configured by the IOC startup script.</p>
+<p>By default, any given PLC variable will be bundled together to be polled at a
+fixed rate. This is the recommend means of using the ADS IOC.  Using one of the
+default polling rates is the only supported method currently, though these
+might be configurable in the future in the IOC startup script.  New poll rates
+cannot be created in the TwinCAT code.</p>
+<p>To customize the polling rate, specify the desired rate in either seconds or
+hertz in an <code class="docutils literal notranslate"><span class="pre">update</span></code> pragma key. For example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>update: 1Hz
+update: 1s
+update: 0.5s
+update: 2Hz
+</pre></div>
+</div>
+<p>The keyword <code class="docutils literal notranslate"><span class="pre">poll</span></code> can also be used to explicitly mark it for polling:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>update: 1s poll
+</pre></div>
+</div>
+<p>For faster rates, an ADS concept of <cite>notifications</cite>, can be used. These are
+conceptually similar to callback-on-change in Python or <code class="docutils literal notranslate"><span class="pre">camonitor</span></code> in the
+context of EPICS.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">notify</span></code> keyword in the <code class="docutils literal notranslate"><span class="pre">update</span></code> setting to enable this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>update: 10Hz notify
+update: 0.1s notify
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Adding too many of these notifications can significantly slow down a PLC,
+even when specified at slow rates. As such, <code class="docutils literal notranslate"><span class="pre">notify</span></code> should be used
+sparingly.</p>
+</div>
+<p>(*) This is on the wishlist for ads-ioc. As of December 2019, all polled
+records will be processed at a rate of 1 Hz/the IOC-configured poll rate.</p>
+</section>
+<section id="scale-and-offset">
+<h3>Scale and Offset<a class="headerlink" href="#scale-and-offset" title="Link to this heading"></a></h3>
+<p>Integer and floating point values may have an EPICS-side scaling applied.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>scale: 3.0
+offset: 1.0
+</pre></div>
+</div>
+<p>Values will be scaled according to the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>readback_value = raw_value * scale + offset
+setpoint_value = (user_value - offset) / scale
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If either <code class="docutils literal notranslate"><span class="pre">scale</span></code> or <code class="docutils literal notranslate"><span class="pre">offset</span></code> are applied to an integer symbol, the
+generated EPICS record type will no longer be a “long” integer input/output
+record but rather change to an analog input/output record.</p>
+<p>Keep this in mind if using advanced “field” directives in your pragmas.</p>
+</div>
+<p>If unspecified, <code class="docutils literal notranslate"><span class="pre">scale</span></code> will be assumed to be 1.0 and <code class="docutils literal notranslate"><span class="pre">offset</span></code> 0.0.</p>
+</section>
+<section id="archiver-settings">
+<h3>Archiver settings<a class="headerlink" href="#archiver-settings" title="Link to this heading"></a></h3>
+<p>Format: <code class="docutils literal notranslate"><span class="pre">archive:</span> <span class="pre">{rate}{s|Hz}</span> <span class="pre">[{scan|monitor}]</span></code></p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">1s</span></code>, <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">scan</span></code>, <code class="docutils literal notranslate"><span class="pre">2Hz</span> <span class="pre">monitor</span></code></p>
+<p>Using the database-generating tool <code class="docutils literal notranslate"><span class="pre">pytmc</span> <span class="pre">db</span></code> along with the pragma key
+<code class="docutils literal notranslate"><span class="pre">archive</span></code> will automatically generate archiver appliance cron-job compatible
+<code class="docutils literal notranslate"><span class="pre">.archive</span></code> files (i.e., those in <code class="docutils literal notranslate"><span class="pre">$IOC_DATA/$IOC/archive/*.archive</span></code>).
+The cron job will read these files and automatically configure the archiver
+to archive the listed PVs.</p>
+<p>Without an <code class="docutils literal notranslate"><span class="pre">archive</span></code> pragma key, the default setting is <code class="docutils literal notranslate"><span class="pre">1s</span> <span class="pre">scan</span></code>. This
+means that your PVs will be archived at a rate of once per second, using the
+<code class="docutils literal notranslate"><span class="pre">scan</span></code> method.</p>
+<p>For more information on the two methods, see the <a class="reference external" href="https://slacmshankar.github.io/epicsarchiver_docs/faq.html">EPICS Archiver Appliance
+documentation</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the update frequency is slower than the specified archive frequency, the
+archive frequency will be reduced.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Large arrays will not be archived, regardless of pragma settings.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Additional fields can be specified for archiving through the <code class="docutils literal notranslate"><span class="pre">archive_fields</span></code>
+key, which is a space-delimited list of field names.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">archive_fields:</span> <span class="pre">DESC</span> <span class="pre">PREC</span></code></p>
+</div>
+</section>
+<section id="record-fields">
+<h3>Record fields<a class="headerlink" href="#record-fields" title="Link to this heading"></a></h3>
+<p>This specifies additional field(s) to be set on the generated EPICS record(s).
+Multiple field lines are allowed. These lines determine the PV’s behaviors such
+as alarm limits and scanning frequency.</p>
+<p>The format is as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>field: FIELD_NAME field value
+</pre></div>
+</div>
+<p>This would correspond to a field in the record being generated as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>record(ai, &quot;my_record&quot;) {
+   ...
+   field(FIELD_NAME, &quot;field value&quot;)
+}
+</pre></div>
+</div>
+</section>
+<section id="scan">
+<h3>SCAN<a class="headerlink" href="#scan" title="Link to this heading"></a></h3>
+<p>While the <code class="docutils literal notranslate"><span class="pre">SCAN</span></code> field is special in EPICS to specify the rate at which
+records should be updated, pytmc requires that such configuration be done
+through the <code class="docutils literal notranslate"><span class="pre">update</span></code> pragma key (see <a class="reference internal" href="#update-rate">Update rate</a>).</p>
+</section>
+<section id="autosave">
+<h3>Autosave<a class="headerlink" href="#autosave" title="Link to this heading"></a></h3>
+<p>Autosave fields for individual EPICS records are configured by default with
+pytmc. It is possible to customize this behavior with additional pragmas,
+optionally specifying different fields for input or output records.</p>
+<p>Pass 0 indicates restoring information prior to record initialization on IOC
+initialization, whereas pass 1 indicates restoring information after record
+initialization. Pass 0 is generally safe and does not cause record processing,
+whereas pass 1 is just as if one were to <code class="docutils literal notranslate"><span class="pre">caput</span></code> to the record after starting
+the IOC. When in doubt, use pass 0 and/or ask an EPICS expert.</p>
+<p>To apply to either input or output records, pragma keys <code class="docutils literal notranslate"><span class="pre">autosave_pass0</span></code> or
+<code class="docutils literal notranslate"><span class="pre">autosave_pass1</span></code> can be used.</p>
+<p>To only apply to input records, pragma keys <code class="docutils literal notranslate"><span class="pre">autosave_input_pass0</span></code>
+<code class="docutils literal notranslate"><span class="pre">autosave_input_pass1</span></code> can be used.</p>
+<p>To only apply to output records, pragma keys <code class="docutils literal notranslate"><span class="pre">autosave_output_pass0</span></code>
+<code class="docutils literal notranslate"><span class="pre">autosave_output_pass1</span></code> can be used.</p>
+<p>For example, a pragma like the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>autosave_pass0: VAL DESC
+</pre></div>
+</div>
+<p>Would result in both input and output records having these fields marked for
+autosaving:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>record(ai, &quot;my:record_RBV&quot;) {
+   ...
+   info(autosaveFields_pass0, &quot;VAL DESC&quot;)
+}
+
+record(ao, &quot;my:record&quot;) {
+   ...
+   info(autosaveFields_pass0, &quot;VAL DESC&quot;)
+}
+</pre></div>
+</div>
+</section>
+<section id="sub-items">
+<h3>Sub-Items<a class="headerlink" href="#sub-items" title="Link to this heading"></a></h3>
+<p>There is a special syntax to pragma a member of a structure differently
+depending on the instance.</p>
+<p>Given this example function block:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>FUNCTION_BLOCK FB_Test
+VAR
+    {attribute &#39;pytmc&#39; := &#39;pv: variable1&#39;}
+    variable1 : LREAL := 0.0;
+
+    {attribute &#39;pytmc&#39; := &#39;pv: variable2&#39;}
+    variable2 : LREAL := 0.0;
+END_VAR
+END_FUNCTION_BLOCK
+</pre></div>
+</div>
+<p>Adding these pragmas to two instances:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:A
+    variable1.io: i
+    variable2.io: i
+&#39;}
+fbTestA : FB_Test;
+
+{attribute &#39;pytmc&#39; := &#39;
+    pv: TEST:B
+    variable1.io: io
+    variable2.io: io
+&#39;}
+fbTestB : FB_Test;
+</pre></div>
+</div>
+<p>The above would result in two different <code class="docutils literal notranslate"><span class="pre">io</span></code> settings for
+<code class="docutils literal notranslate"><span class="pre">fbTestA.variable1</span></code> and <code class="docutils literal notranslate"><span class="pre">fbTestB.variable1</span></code>.</p>
+<p>There are some limitations on this preliminary feature. You may not add or
+change the following fields for now:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pv
+link
+field
+</pre></div>
+</div>
+<p>The primary use case is expected to be <code class="docutils literal notranslate"><span class="pre">array</span></code>, to limit the number of array
+instances generated with hard-coded upper bounds on encapsulated structures.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="terminal_usage.html" class="btn btn-neutral float-right" title="Command-line Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, SLAC National Accelerator Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
