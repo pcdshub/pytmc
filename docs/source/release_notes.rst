@@ -2,6 +2,33 @@
  Release History
 =================
 
+v2.17.0 (2024-12-19)
+====================
+
+Changes
+-------
+- Adds support for arrays of strings
+
+Maintenance
+-----------
+- Add `setuptools_scm` to conda recipe build section
+
+
+v2.17.0 (2024-09-16)
+====================
+
+This version fixes an issue where there was no way for `ads-ioc` to enforce
+read-only behavior on the `_RBV` variants. This led to confusing behavior
+because the IOC will accept these writes and not respond to them in an
+intuitive way.
+
+`pytmc` will now generate input/rbv records as having the `NO_WRITE` ASG.
+This will affect all PVs that represent data read from the PLC code. It will not affect the setpoints.
+
+`ads-ioc` can now implement a `NO_WRITE` ASG and it will be applied to all of these PVs.
+This is expected in `ads-ioc` at `R0.7.0`.
+
+
 v2.16.0 (2023-07-31)
 ====================
 
