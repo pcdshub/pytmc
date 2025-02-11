@@ -320,7 +320,7 @@ def _expand_configurations_from_chain(
             return []
 
         if item.array_info and (
-            item.data_type.is_complex_type or item.data_type.is_enum
+            item.data_type.is_complex_type or item.data_type.is_enum or item.data_type.is_string
         ):
             options = get_all_options(subitems, handle_array_complex, pragmas)
         else:

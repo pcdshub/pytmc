@@ -298,10 +298,10 @@ class RecordPackage:
             spec = RecordPackage
         elif data_type.is_enum:
             spec = EnumRecordPackage
-        elif data_type.is_array or chain.last.array_info:
-            spec = WaveformRecordPackage
         elif data_type.is_string:
             spec = StringRecordPackage
+        elif data_type.is_array or chain.last.array_info:
+            spec = WaveformRecordPackage
         else:
             try:
                 spec = DATA_TYPES[data_type.name]
