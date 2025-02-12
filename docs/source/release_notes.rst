@@ -2,6 +2,21 @@
  Release History
 =================
 
+v2.18.2 (2025-02-12)
+====================
+
+Changes
+-------
+- Add support for TwinCAT 4026 structures that store certain xti files in folders
+  adjacent to their locations in 4024.
+
+
+v2.18.1 (2025-02-11)
+====================
+
+Due to an error, no functional changes in this tag. Please use the next tag instead.
+
+
 v2.18.0 (2024-12-19)
 ====================
 
