@@ -1,0 +1,661 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to pytmc’s documentation! &mdash; pytmc  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/docs-versions-menu.js?v=3d6a1aea"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="user_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            pytmc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">pytmc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to pytmc’s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-pytmc-s-documentation">
+<h1>Welcome to pytmc’s documentation!<a class="headerlink" href="#welcome-to-pytmc-s-documentation" title="Link to this heading"></a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/pcdshub/pytmc"><img alt="https://travis-ci.org/pcdshub/pytmc.svg?branch=master" src="https://travis-ci.org/pcdshub/pytmc.svg?branch=master" />
+</a>
+<p>Pytmc helps developers automatically generate ADS based Epics records files
+from Beckhoff’s TwinCAT3 projects.</p>
+<p>Pytmc is developed with these <a class="reference external" href="https://pcdshub.github.io/development.html">guidelines</a> in mind.</p>
+<p>The source code is hosted on <a class="reference external" href="https://github.com/pcdshub/pytmc">github</a>.</p>
+<p>Issues and requests can be posted on the <a class="reference external" href="https://github.com/pcdshub/pytmc/issues">github issue tracker</a>. Use the <code class="docutils literal notranslate"><span class="pre">bug</span></code> tag for issues
+with intended features and the <code class="docutils literal notranslate"><span class="pre">enhancement</span></code> tag can be used for feature
+requests. The <code class="docutils literal notranslate"><span class="pre">question</span></code> tag will be treated like an ‘enhancements’ tag for
+the documentation but regular questions can be posted there as well.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#general-usage">General Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#marking-the-twincat-project">Marking the TwinCAT project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#python-usage">Python Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#full-ioc-creation">Full IOC Creation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#obtaining-the-code">Obtaining the code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#installing-in-an-environment">Installing in an environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#testing-the-installation">Testing the installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="installation.html#installing-for-development">Installing for development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pragma_usage.html">Annotating a TwinCAT3 project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#data-and-record-types">Data and Record Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#pragma-syntax">Pragma syntax</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#declaring-top-level-variables">Declaring top level variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#declaring-encapsulated-variables">Declaring encapsulated variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#declaring-bidirectional-pvs">Declaring bidirectional PVs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#arrays">Arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pragma_usage.html#pragma-fields">Pragma fields</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#pv">pv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#io">io</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#update-rate">Update rate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#scale-and-offset">Scale and Offset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#archiver-settings">Archiver settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#record-fields">Record fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#scan">SCAN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#autosave">Autosave</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pragma_usage.html#sub-items">Sub-Items</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html">Command-line Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#using-pytmc">Using pytmc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-db">pytmc db</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-stcmd">pytmc stcmd</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-xmltranslate">pytmc xmltranslate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-debug">pytmc debug</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-pragmalint">pytmc pragmalint</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#id1">pytmc stcmd</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-summary">pytmc summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-template">pytmc template</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#pytmc-types">pytmc types</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terminal_usage.html#positional-arguments">Positional Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terminal_usage.html#templates">Templates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#stcmd-default-cmd">stcmd_default.cmd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#asyn-standard-file-jinja2">asyn_standard_file.jinja2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terminal_usage.html#asyn-standard-record-jinja2">asyn_standard_record.jinja2</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source_code.html#module-pytmc.pragmas">pytmc.pragmas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain"><code class="docutils literal notranslate"><span class="pre">SingularChain</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain.item_to_config"><code class="docutils literal notranslate"><span class="pre">SingularChain.item_to_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain.chain"><code class="docutils literal notranslate"><span class="pre">SingularChain.chain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain.tcname"><code class="docutils literal notranslate"><span class="pre">SingularChain.tcname</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain.pvname"><code class="docutils literal notranslate"><span class="pre">SingularChain.pvname</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain.last"><code class="docutils literal notranslate"><span class="pre">SingularChain.last</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain.data_type"><code class="docutils literal notranslate"><span class="pre">SingularChain.data_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.pragmas.SingularChain.config"><code class="docutils literal notranslate"><span class="pre">SingularChain.config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.chains_from_symbol"><code class="docutils literal notranslate"><span class="pre">chains_from_symbol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.dictify_config"><code class="docutils literal notranslate"><span class="pre">dictify_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.expand_configurations_from_chain"><code class="docutils literal notranslate"><span class="pre">expand_configurations_from_chain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.find_pytmc_symbols"><code class="docutils literal notranslate"><span class="pre">find_pytmc_symbols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.get_array_suffix"><code class="docutils literal notranslate"><span class="pre">get_array_suffix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.get_pragma"><code class="docutils literal notranslate"><span class="pre">get_pragma()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.has_pragma"><code class="docutils literal notranslate"><span class="pre">has_pragma()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.make_fake_symbol_from_data_type"><code class="docutils literal notranslate"><span class="pre">make_fake_symbol_from_data_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.normalize_config"><code class="docutils literal notranslate"><span class="pre">normalize_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.normalize_io"><code class="docutils literal notranslate"><span class="pre">normalize_io()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.parse_archive_settings"><code class="docutils literal notranslate"><span class="pre">parse_archive_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.parse_array_settings"><code class="docutils literal notranslate"><span class="pre">parse_array_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.parse_update_rate"><code class="docutils literal notranslate"><span class="pre">parse_update_rate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.record_packages_from_symbol"><code class="docutils literal notranslate"><span class="pre">record_packages_from_symbol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.separate_configs_by_pv"><code class="docutils literal notranslate"><span class="pre">separate_configs_by_pv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.split_field"><code class="docutils literal notranslate"><span class="pre">split_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.split_pytmc_pragma"><code class="docutils literal notranslate"><span class="pre">split_pytmc_pragma()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.pragmas.squash_configs"><code class="docutils literal notranslate"><span class="pre">squash_configs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="source_code.html#module-pytmc.record">pytmc.record</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.BinaryRecordPackage"><code class="docutils literal notranslate"><span class="pre">BinaryRecordPackage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.EPICSRecord"><code class="docutils literal notranslate"><span class="pre">EPICSRecord</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.EPICSRecord.render"><code class="docutils literal notranslate"><span class="pre">EPICSRecord.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.EPICSRecord.update_autosave_from_pragma"><code class="docutils literal notranslate"><span class="pre">EPICSRecord.update_autosave_from_pragma()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.EPICSRecord.update_pini_for_autosave"><code class="docutils literal notranslate"><span class="pre">EPICSRecord.update_pini_for_autosave()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.EnumRecordPackage"><code class="docutils literal notranslate"><span class="pre">EnumRecordPackage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.FloatRecordPackage"><code class="docutils literal notranslate"><span class="pre">FloatRecordPackage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.FloatRecordPackage.generate_input_record"><code class="docutils literal notranslate"><span class="pre">FloatRecordPackage.generate_input_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.FloatRecordPackage.generate_output_record"><code class="docutils literal notranslate"><span class="pre">FloatRecordPackage.generate_output_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.FloatRecordPackage.get_scale_offset"><code class="docutils literal notranslate"><span class="pre">FloatRecordPackage.get_scale_offset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.IntegerRecordPackage"><code class="docutils literal notranslate"><span class="pre">IntegerRecordPackage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.RecordPackage"><code class="docutils literal notranslate"><span class="pre">RecordPackage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.RecordPackage.from_chain"><code class="docutils literal notranslate"><span class="pre">RecordPackage.from_chain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.RecordPackage.records"><code class="docutils literal notranslate"><span class="pre">RecordPackage.records</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.RecordPackage.render"><code class="docutils literal notranslate"><span class="pre">RecordPackage.render()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.RecordPackage.valid"><code class="docutils literal notranslate"><span class="pre">RecordPackage.valid</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.StringRecordPackage"><code class="docutils literal notranslate"><span class="pre">StringRecordPackage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.StringRecordPackage.generate_input_record"><code class="docutils literal notranslate"><span class="pre">StringRecordPackage.generate_input_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.StringRecordPackage.generate_link_record"><code class="docutils literal notranslate"><span class="pre">StringRecordPackage.generate_link_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.StringRecordPackage.generate_output_record"><code class="docutils literal notranslate"><span class="pre">StringRecordPackage.generate_output_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.StringRecordPackage.nelm"><code class="docutils literal notranslate"><span class="pre">StringRecordPackage.nelm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.StringRecordPackage.records"><code class="docutils literal notranslate"><span class="pre">StringRecordPackage.records</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage.asyn_input_port_spec"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage.asyn_input_port_spec</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage.asyn_output_port_spec"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage.asyn_output_port_spec</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage.asyn_update_options"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage.asyn_update_options</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage.generate_input_record"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage.generate_input_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage.generate_output_record"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage.generate_output_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage.io_direction"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage.io_direction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.TwincatTypeRecordPackage.records"><code class="docutils literal notranslate"><span class="pre">TwincatTypeRecordPackage.records</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.WaveformRecordPackage"><code class="docutils literal notranslate"><span class="pre">WaveformRecordPackage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.WaveformRecordPackage.dtyp"><code class="docutils literal notranslate"><span class="pre">WaveformRecordPackage.dtyp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.WaveformRecordPackage.ftvl"><code class="docutils literal notranslate"><span class="pre">WaveformRecordPackage.ftvl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.WaveformRecordPackage.generate_input_record"><code class="docutils literal notranslate"><span class="pre">WaveformRecordPackage.generate_input_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.WaveformRecordPackage.generate_output_record"><code class="docutils literal notranslate"><span class="pre">WaveformRecordPackage.generate_output_record()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.record.WaveformRecordPackage.nelm"><code class="docutils literal notranslate"><span class="pre">WaveformRecordPackage.nelm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.generate_archive_settings"><code class="docutils literal notranslate"><span class="pre">generate_archive_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.make_autosave_defaults"><code class="docutils literal notranslate"><span class="pre">make_autosave_defaults()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.record.sort_fields"><code class="docutils literal notranslate"><span class="pre">sort_fields()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="source_code.html#module-pytmc.parser">pytmc.parser</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Action"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.ArrayInfo"><code class="docutils literal notranslate"><span class="pre">ArrayInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.ArrayInfo.level"><code class="docutils literal notranslate"><span class="pre">ArrayInfo.level</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.ArrayInfo.post_init"><code class="docutils literal notranslate"><span class="pre">ArrayInfo.post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Axis"><code class="docutils literal notranslate"><span class="pre">Axis</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.AxisPara"><code class="docutils literal notranslate"><span class="pre">AxisPara</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.BaseType"><code class="docutils literal notranslate"><span class="pre">BaseType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.BitOffs"><code class="docutils literal notranslate"><span class="pre">BitOffs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.BitSize"><code class="docutils literal notranslate"><span class="pre">BitSize</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.BoundDataType"><code class="docutils literal notranslate"><span class="pre">BoundDataType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.BuiltinDataType"><code class="docutils literal notranslate"><span class="pre">BuiltinDataType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Compile"><code class="docutils literal notranslate"><span class="pre">Compile</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.DUT"><code class="docutils literal notranslate"><span class="pre">DUT</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.DUT.declaration"><code class="docutils literal notranslate"><span class="pre">DUT.declaration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.DUT.get_source_code"><code class="docutils literal notranslate"><span class="pre">DUT.get_source_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.DataArea"><code class="docutils literal notranslate"><span class="pre">DataArea</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.DataType.guid"><code class="docutils literal notranslate"><span class="pre">DataType.guid</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.DataTypes.post_init"><code class="docutils literal notranslate"><span class="pre">DataTypes.post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Declaration"><code class="docutils literal notranslate"><span class="pre">Declaration</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.DefaultResolution"><code class="docutils literal notranslate"><span class="pre">DefaultResolution</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Device"><code class="docutils literal notranslate"><span class="pre">Device</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.EncPara"><code class="docutils literal notranslate"><span class="pre">EncPara</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Encoder"><code class="docutils literal notranslate"><span class="pre">Encoder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Entry"><code class="docutils literal notranslate"><span class="pre">Entry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Entry.comment"><code class="docutils literal notranslate"><span class="pre">Entry.comment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Entry.entry_type"><code class="docutils literal notranslate"><span class="pre">Entry.entry_type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.EnumInfo"><code class="docutils literal notranslate"><span class="pre">EnumInfo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.EnumerationTextList"><code class="docutils literal notranslate"><span class="pre">EnumerationTextList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.EnumerationTextList.declaration"><code class="docutils literal notranslate"><span class="pre">EnumerationTextList.declaration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.EnumerationTextList.get_source_code"><code class="docutils literal notranslate"><span class="pre">EnumerationTextList.get_source_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.EtherCAT"><code class="docutils literal notranslate"><span class="pre">EtherCAT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.ExtendsType"><code class="docutils literal notranslate"><span class="pre">ExtendsType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.ExtendsType.guid"><code class="docutils literal notranslate"><span class="pre">ExtendsType.guid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.ExtendsType.namespace"><code class="docutils literal notranslate"><span class="pre">ExtendsType.namespace</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.ExtendsType.type_name"><code class="docutils literal notranslate"><span class="pre">ExtendsType.type_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.GVL"><code class="docutils literal notranslate"><span class="pre">GVL</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.GVL.declaration"><code class="docutils literal notranslate"><span class="pre">GVL.declaration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.GVL.get_source_code"><code class="docutils literal notranslate"><span class="pre">GVL.get_source_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Get"><code class="docutils literal notranslate"><span class="pre">Get</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Implementation"><code class="docutils literal notranslate"><span class="pre">Implementation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Implementation.ST"><code class="docutils literal notranslate"><span class="pre">Implementation.ST</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Instance"><code class="docutils literal notranslate"><span class="pre">Instance</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Instance.task_pous"><code class="docutils literal notranslate"><span class="pre">Instance.task_pous</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Io"><code class="docutils literal notranslate"><span class="pre">Io</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.LibraryReference"><code class="docutils literal notranslate"><span class="pre">LibraryReference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Link"><code class="docutils literal notranslate"><span class="pre">Link</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Link.post_init"><code class="docutils literal notranslate"><span class="pre">Link.post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Method"><code class="docutils literal notranslate"><span class="pre">Method</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Module"><code class="docutils literal notranslate"><span class="pre">Module</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Module.ads_port"><code class="docutils literal notranslate"><span class="pre">Module.ads_port</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.NC"><code class="docutils literal notranslate"><span class="pre">NC</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.NC.post_init"><code class="docutils literal notranslate"><span class="pre">NC.post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Name"><code class="docutils literal notranslate"><span class="pre">Name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Namespace"><code class="docutils literal notranslate"><span class="pre">Namespace</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.OwnerA"><code class="docutils literal notranslate"><span class="pre">OwnerA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.OwnerB"><code class="docutils literal notranslate"><span class="pre">OwnerB</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.POU"><code class="docutils literal notranslate"><span class="pre">POU</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.actions"><code class="docutils literal notranslate"><span class="pre">POU.actions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.call_blocks"><code class="docutils literal notranslate"><span class="pre">POU.call_blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.declaration"><code class="docutils literal notranslate"><span class="pre">POU.declaration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.get_source_code"><code class="docutils literal notranslate"><span class="pre">POU.get_source_code()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.implementation"><code class="docutils literal notranslate"><span class="pre">POU.implementation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.methods"><code class="docutils literal notranslate"><span class="pre">POU.methods</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.program_name"><code class="docutils literal notranslate"><span class="pre">POU.program_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.properties"><code class="docutils literal notranslate"><span class="pre">POU.properties</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.POU.variables"><code class="docutils literal notranslate"><span class="pre">POU.variables</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Pdo"><code class="docutils literal notranslate"><span class="pre">Pdo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.PlaceholderReference"><code class="docutils literal notranslate"><span class="pre">PlaceholderReference</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.PlaceholderResolution"><code class="docutils literal notranslate"><span class="pre">PlaceholderResolution</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Plc"><code class="docutils literal notranslate"><span class="pre">Plc</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Plc.ams_id"><code class="docutils literal notranslate"><span class="pre">Plc.ams_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Plc.find"><code class="docutils literal notranslate"><span class="pre">Plc.find()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Plc.get_source_code"><code class="docutils literal notranslate"><span class="pre">Plc.get_source_code()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Plc.port"><code class="docutils literal notranslate"><span class="pre">Plc.port</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Plc.post_init"><code class="docutils literal notranslate"><span class="pre">Plc.post_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Plc.target_ip"><code class="docutils literal notranslate"><span class="pre">Plc.target_ip</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.PlcProject"><code class="docutils literal notranslate"><span class="pre">PlcProject</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Property"><code class="docutils literal notranslate"><span class="pre">Property</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Property.key"><code class="docutils literal notranslate"><span class="pre">Property.key</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Property.value"><code class="docutils literal notranslate"><span class="pre">Property.value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.RemoteConnections"><code class="docutils literal notranslate"><span class="pre">RemoteConnections</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.RemoteConnections.post_init"><code class="docutils literal notranslate"><span class="pre">RemoteConnections.post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Resolution"><code class="docutils literal notranslate"><span class="pre">Resolution</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.ST"><code class="docutils literal notranslate"><span class="pre">ST</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Safety"><code class="docutils literal notranslate"><span class="pre">Safety</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.SafetyPlc"><code class="docutils literal notranslate"><span class="pre">SafetyPlc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Set"><code class="docutils literal notranslate"><span class="pre">Set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.SubItem"><code class="docutils literal notranslate"><span class="pre">SubItem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.SubItem.bit_offset"><code class="docutils literal notranslate"><span class="pre">SubItem.bit_offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.SubItem.bit_size"><code class="docutils literal notranslate"><span class="pre">SubItem.bit_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.SubItem.qualified_type_name"><code class="docutils literal notranslate"><span class="pre">SubItem.qualified_type_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.SubItem.type"><code class="docutils literal notranslate"><span class="pre">SubItem.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol"><code class="docutils literal notranslate"><span class="pre">Symbol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol.base_type"><code class="docutils literal notranslate"><span class="pre">Symbol.base_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol.module"><code class="docutils literal notranslate"><span class="pre">Symbol.module</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol.qualified_type_name"><code class="docutils literal notranslate"><span class="pre">Symbol.qualified_type_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol.type_name"><code class="docutils literal notranslate"><span class="pre">Symbol.type_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol_DUT_MotionStage"><code class="docutils literal notranslate"><span class="pre">Symbol_DUT_MotionStage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol_ST_MotionStage"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol_ST_MotionStage.motor_name"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.motor_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol_ST_MotionStage.nc_axis"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.nc_axis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol_ST_MotionStage.nc_to_plc_link"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.nc_to_plc_link</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Symbol_ST_MotionStage.program_name"><code class="docutils literal notranslate"><span class="pre">Symbol_ST_MotionStage.program_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.System"><code class="docutils literal notranslate"><span class="pre">System</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.T_MaxString"><code class="docutils literal notranslate"><span class="pre">T_MaxString</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Task"><code class="docutils literal notranslate"><span class="pre">Task</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Task.array_index"><code class="docutils literal notranslate"><span class="pre">Task.array_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Task.priority"><code class="docutils literal notranslate"><span class="pre">Task.priority</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Tasks"><code class="docutils literal notranslate"><span class="pre">Tasks</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Tasks.post_init"><code class="docutils literal notranslate"><span class="pre">Tasks.post_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Tasks.priority_to_task"><code class="docutils literal notranslate"><span class="pre">Tasks.priority_to_task</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.TcModuleClass"><code class="docutils literal notranslate"><span class="pre">TcModuleClass</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TcModuleClass.create_data_area"><code class="docutils literal notranslate"><span class="pre">TcModuleClass.create_data_area()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.TcSmItem"><code class="docutils literal notranslate"><span class="pre">TcSmItem</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.TcSmProject"><code class="docutils literal notranslate"><span class="pre">TcSmProject</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TcSmProject.plcs"><code class="docutils literal notranslate"><span class="pre">TcSmProject.plcs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TcSmProject.plcs_by_link_name"><code class="docutils literal notranslate"><span class="pre">TcSmProject.plcs_by_link_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TcSmProject.plcs_by_name"><code class="docutils literal notranslate"><span class="pre">TcSmProject.plcs_by_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TcSmProject.post_init"><code class="docutils literal notranslate"><span class="pre">TcSmProject.post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.TopLevelPlc"><code class="docutils literal notranslate"><span class="pre">TopLevelPlc</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TopLevelPlc.post_init"><code class="docutils literal notranslate"><span class="pre">TopLevelPlc.post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.TopLevelProject"><code class="docutils literal notranslate"><span class="pre">TopLevelProject</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TopLevelProject.ams_id"><code class="docutils literal notranslate"><span class="pre">TopLevelProject.ams_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TopLevelProject.target_ip"><code class="docutils literal notranslate"><span class="pre">TopLevelProject.target_ip</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TopLevelProject.tasks"><code class="docutils literal notranslate"><span class="pre">TopLevelProject.tasks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.TopLevelProject.top_level_plc"><code class="docutils literal notranslate"><span class="pre">TopLevelProject.top_level_plc</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.Type"><code class="docutils literal notranslate"><span class="pre">Type</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Type.guid"><code class="docutils literal notranslate"><span class="pre">Type.guid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Type.qualified_type"><code class="docutils literal notranslate"><span class="pre">Type.qualified_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Type.qualified_type_name"><code class="docutils literal notranslate"><span class="pre">Type.qualified_type_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.parser.Type.type_name"><code class="docutils literal notranslate"><span class="pre">Type.type_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.case_insensitive_path"><code class="docutils literal notranslate"><span class="pre">case_insensitive_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.element_to_class_name"><code class="docutils literal notranslate"><span class="pre">element_to_class_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.get_data_type_by_reference"><code class="docutils literal notranslate"><span class="pre">get_data_type_by_reference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.parse"><code class="docutils literal notranslate"><span class="pre">parse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.projects_from_solution"><code class="docutils literal notranslate"><span class="pre">projects_from_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.separate_by_classname"><code class="docutils literal notranslate"><span class="pre">separate_by_classname()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.parser.strip_namespace"><code class="docutils literal notranslate"><span class="pre">strip_namespace()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="source_code.html#module-pytmc.linter">pytmc.linter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.linter.DbdFile"><code class="docutils literal notranslate"><span class="pre">DbdFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.linter.DbdFile.filename"><code class="docutils literal notranslate"><span class="pre">DbdFile.filename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.linter.DbdFile.parsed"><code class="docutils literal notranslate"><span class="pre">DbdFile.parsed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.linter.LinterResults"><code class="docutils literal notranslate"><span class="pre">LinterResults</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.linter.LinterResults.errors"><code class="docutils literal notranslate"><span class="pre">LinterResults.errors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.linter.LinterResults.warnings"><code class="docutils literal notranslate"><span class="pre">LinterResults.warnings</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="source_code.html#pytmc.linter.LinterResults.success"><code class="docutils literal notranslate"><span class="pre">LinterResults.success</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="source_code.html#pytmc.linter.lint_db"><code class="docutils literal notranslate"><span class="pre">lint_db()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-18-2-2025-02-12">v2.18.2 (2025-02-12)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#changes">Changes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-18-1-2025-02-11">v2.18.1 (2025-02-11)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-18-0-2024-12-19">v2.18.0 (2024-12-19)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id1">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#maintenance">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-17-0-2024-09-16">v2.17.0 (2024-09-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-16-0-2023-07-31">v2.16.0 (2023-07-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id2">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id3">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-15-1-2023-06-30">v2.15.1 (2023-06-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#bugfixes">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id4">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-15-0-2023-04-04">v2.15.0 (2023-04-04)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id5">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-14-1-2022-09-28">v2.14.1 (2022-09-28)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id6">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-14-0-2022-08-29">v2.14.0 (2022-08-29)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#fixes">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#enhancements">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-13-0-2022-06-30">v2.13.0 (2022-06-30)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id7">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-12-0-2022-05-27">v2.12.0 (2022-05-27)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id8">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id9">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-11-1-2022-03-24">v2.11.1 (2022-03-24)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id10">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-11-0-2021-11-15">v2.11.0 (2021-11-15)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id11">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id12">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id13">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-10-0-2021-08-09">v2.10.0 (2021-08-09)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id14">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-9-1-2021-04-27">v2.9.1 (2021-04-27)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id15">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id16">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-9-0-2021-04-02">v2.9.0 (2021-04-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id17">Enhancements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-8-1-2021-02-10">v2.8.1 (2021-02-10)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id18">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id19">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-8-0-2020-12-22">v2.8.0 (2020-12-22)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id20">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id21">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-7-7-2020-11-17">v2.7.7 (2020-11-17)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id22">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id23">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-7-6-2020-10-23">v2.7.6 (2020-10-23)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id24">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id25">Maintenance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-7-5-2020-08-31">v2.7.5 (2020-08-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id26">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#development">Development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-7-1-2020-08-18">v2.7.1 (2020-08-18)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id27">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id28">Development</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-7-0-2020-07-16">v2.7.0 (2020-07-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-6-9-2020-07-06">v2.6.9 (2020-07-06)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-6-8-2020-07-06">v2.6.8 (2020-07-06)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-6-7-2020-07-02">v2.6.7 (2020-07-02)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-6-6-2020-06-24">v2.6.6 (2020-06-24)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-6-5-2020-06-09">v2.6.5 (2020-06-09)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-6-0-2020-02-26">v2.6.0 (2020-02-26)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-5-0-2019-12-20">v2.5.0 (2019-12-20)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id29">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-4-0-2019-12-06">v2.4.0 (2019-12-06)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id30">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id31">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id32">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#pull-requests-incorporated">Pull requests incorporated</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-3-1-2019-11-08">v2.3.1 (2019-11-08)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id33">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#refactors">Refactors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-3-0-2019-10-28">v2.3.0 (2019-10-28)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#prs">PRs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id34">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id35">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-2-0-2019-09-20">v2.2.0 (2019-09-20)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id36">Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id37">Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v2-1-0-2019-09-05">v2.1.0 (2019-09-05)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v1-1-2-2019-03-15">v1.1.2 (2019-03-15)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release_notes.html#id38">Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v1-1-1-2019-02-14">v1.1.1 (2019-02-14)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v1-1-0-2018-10-16">v1.1.0 (2018-10-16)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v1-0-0-2018-09-24">v1.0.0 (2018-09-24)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes.html#v0-1-2018-03-02">v0.1 (2018-03-02)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_guide.html" class="btn btn-neutral float-right" title="User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, SLAC National Accelerator Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
