@@ -429,7 +429,6 @@ class TwincatItem:
             name=parent.name,
             class_hint=cls._load_path_hint,
         )
-        return parse(base_path / filename, parent=parent)
         try:
             return parse(base_path / filename, parent=parent)
         except FileNotFoundError as exc:
