@@ -1,0 +1,27 @@
+# default group
+* @pcdshub/python-reviewers @pcdshub/twincat-reviewers
+
+# language-specific group(s)
+## PYTHON files
+*.py @pcdshub/python-reviewers
+*.pyi @pcdshub/python-reviewers
+*.pyc @pcdshub/python-reviewers
+*.pyw @pcdshub/python-reviewers
+*.pyx @pcdshub/python-reviewers
+*.pyd @pcdshub/python-reviewers
+## TWINCAT files
+*.tsproj @pcdshub/twincat-reviewers
+*.plcproj @pcdshub/twincat-reviewers
+*.tmc @pcdshub/twincat-reviewers
+*.tpr @pcdshub/twincat-reviewers
+*.xti @pcdshub/twincat-reviewers
+*.TcTTO @pcdshub/twincat-reviewers
+*.TcPOU @pcdshub/twincat-reviewers
+*.TcDUT @pcdshub/twincat-reviewers
+*.TcGVL @pcdshub/twincat-reviewers
+*.TcVis @pcdshub/twincat-reviewers
+*.TcVMO @pcdshub/twincat-reviewers
+*.TcGTLO @pcdshub/twincat-reviewers
+
+# github folder holds administrative files
+.github/** @pcdshub/software-admin
