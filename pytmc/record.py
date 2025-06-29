@@ -905,6 +905,7 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
         """Field type of value"""
         ftvl = {
             "BOOL": "CHAR",
+            "BYTE": "CHAR",
             "INT": "SHORT",
             "ENUM": "SHORT",
             "DINT": "LONG",
