@@ -26,7 +26,8 @@ The following helpers are available in the environment::
     get_library_versions
     get_links
     get_linter_results
-    get_motors
+    get_legacy_motors
+    get_stream_motors
     get_nc
     get_plc_by_name
     get_pou_call_blocks
@@ -312,15 +313,68 @@ def get_symbols_by_type(plc: parser.Plc) -> dict[str, list[parser.Symbol]]:
     return parser.separate_by_classname(symbols)
 
 
+def has_axis_link(stage):
+    """
+    Check for axis-link pragma if the symbol is of FB_MotionStage type,
+    either by class or by alias.
+    """
+    require_axis_link = False
+
+    # Check direct type
+    if isinstance(stage, parser.Symbol_FB_MotionStage):
+        require_axis_link = True
+
+    # Check aliases if symbol_aliases exist
+    aliases = getattr(stage, "symbol_aliases", [])
+    required_aliases = {'Symbol_FB_MotionStageNC', 'Symbol_FB_MotionStageNCDS402'}
+    if set(aliases) & required_aliases:
+        require_axis_link = True
+
+    if not require_axis_link:
+        return True
+
+    for pragma in pragmas.get_pragma(stage, name="pytmc"):
+        for line in pragma.splitlines():
+            if line.strip().startswith("axis-link:"):
+                return True
+    return False
+
+def ensure_list(val):
+    if isinstance(val, list):
+        return val
+    elif val is None:
+        return []
+    else:
+        return [val]
+
 @functools.lru_cache
-def get_motors(plc: parser.Plc) -> list[parser.Symbol_ST_MotionStage]:
-    """Get pragma'd motor symbols for the PLC (non-pointer ST_MotionStage)."""
+def get_legacy_motors(plc: parser.Plc) -> list:
     symbols = get_symbols_by_type(plc)
-    return [
-        stage
-        for stage in symbols.get("Symbol_ST_MotionStage", [])
-        if not stage.is_pointer and pragmas.has_pragma(stage)
-    ]
+    st_motors = ensure_list(symbols.get("Symbol_ST_MotionStage", []))
+    legacy = []
+    for stage in st_motors:
+        if (
+            not getattr(stage, "is_pointer", False)
+            and pragmas.has_pragma(stage)
+        ):
+            setattr(stage, "is_legacy_motor", True)
+            legacy.append(stage)
+    return legacy
+    
+@functools.lru_cache
+def get_stream_motors(plc: parser.Plc) -> list:
+    symbols = get_symbols_by_type(plc)
+    fb_motors = ensure_list(symbols.get("Symbol_FB_MotionStage", []))
+    stream = []
+    for stage in fb_motors:
+        if (
+            not getattr(stage, "is_pointer", False)
+            and pragmas.has_pragma(stage)
+            and has_axis_link(stage)
+        ):
+            setattr(stage, "is_legacy_motor", False)
+            stream.append(stage)
+    return stream
 
 
 def get_plc_by_name(
@@ -669,7 +723,8 @@ helpers = [
     get_library_versions,
     get_links,
     get_linter_results,
-    get_motors,
+    get_legacy_motors,
+    get_stream_motors,
     get_nc,
     get_plc_by_name,
     get_symbols,
@@ -785,7 +840,6 @@ def main(
     debug : bool, optional
         Open a debug session after rendering with IPython.
     """
-
     macros = macros or {}
     if not isinstance(macros, dict):
         macros = dict(_split_macro(macro) for macro in macros)
@@ -820,6 +874,43 @@ def main(
             template_args = get_render_context()
             template_args.update(projects_to_dict(*projects))
             template_args.update(**macros)
+            
+            # Extract PLC name from macros:
+            plc_name = template_args.get("plc", None)
+            if plc_name is None:
+                # Default/fallback selection (single-PLC project logic):
+                projects_dict = template_args["projects"]
+                all_plcs = []
+                for proj in projects_dict.values():
+                    all_plcs += proj.plcs
+                if len(all_plcs) == 1:
+                    project = list(projects_dict.values())[0]
+                    plc = all_plcs[0]
+                else:
+                    raise RuntimeError("No PLC name passed and multiple PLCs found. Please specify with --macro plc=<name>.")
+            else:
+                projects_dict = template_args["projects"]
+                project, plc = get_plc_by_name(projects_dict, plc_name)
+    
+            # Prepare motor lists once, via helper functions:
+            legacy_motors = get_legacy_motors(plc)
+            stream_motors = get_stream_motors(plc)
+    
+            # Check for invalid (mixed) case:
+            if legacy_motors and stream_motors:
+                raise RuntimeError(
+                    f"Both legacy (ST_MotionStage) motors and stream (FB_MotionStage) motors are present. "
+                    f"Not allowed! Legacy: {[m.name for m in legacy_motors]}, Stream motors: {[m.name for m in stream_motors]}"
+                )
+            
+            # Set main motor list for template (one or the other, or empty):
+            motors = legacy_motors if legacy_motors else stream_motors
+            template_args.update({
+                "legacy_motors": legacy_motors,
+                "stream_motors": stream_motors,
+                "motors": motors,
+            })
+            
             rendered = render_template(template_text, template_args)
         except Exception as ex:
             stashed_exception = ex
