@@ -21,4 +21,4 @@
 	url = https://github.com/pcdshub/lcls-plc-motion-abstraction-sample.git
 [submodule "pytmc/tests/projects/lcls-plc-motion-abstraction-sample"]
 	path = pytmc/tests/projects/lcls-plc-motion-abstraction-sample
-	url = git@github.com:pcdshub/lcls-plc-motion-abstraction-sample.git
+	url = https://github.com/pcdshub/lcls-plc-motion-abstraction-sample.git
