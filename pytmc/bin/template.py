@@ -26,6 +26,7 @@ The following helpers are available in the environment::
     get_library_versions
     get_links
     get_linter_results
+    get_motors
     get_legacy_motors
     get_stream_motors
     get_nc
@@ -315,23 +316,13 @@ def get_symbols_by_type(plc: parser.Plc) -> dict[str, list[parser.Symbol]]:
 
 def has_axis_link(stage):
     """
-    Check for axis-link pragma if the symbol is of FB_MotionStage type,
-    either by class or by alias.
+    Only valid for Symbol_FB_MotionStage (or alias); checks for axis-link pragma.
+    Returns True if an 'axis-link:' pragma is found, else False.
     """
-    require_axis_link = False
-
-    # Check direct type
-    if isinstance(stage, parser.Symbol_FB_MotionStage):
-        require_axis_link = True
-
-    # Check aliases if symbol_aliases exist
-    aliases = getattr(stage, "symbol_aliases", [])
-    required_aliases = {'Symbol_FB_MotionStageNC', 'Symbol_FB_MotionStageNCDS402'}
-    if set(aliases) & required_aliases:
-        require_axis_link = True
-
-    if not require_axis_link:
-        return True
+    # Accept both direct class and known aliases for compatibility:
+    if not (isinstance(stage, parser.Symbol_FB_MotionStage) or
+            set(getattr(stage, "symbol_aliases", [])) & {'Symbol_FB_MotionStageNC', 'Symbol_FB_MotionStageNCDS402'}):
+        return False  # Not a supported FB_MotionStage type; skip
 
     for pragma in pragmas.get_pragma(stage, name="pytmc"):
         for line in pragma.splitlines():
@@ -339,18 +330,10 @@ def has_axis_link(stage):
                 return True
     return False
 
-def ensure_list(val):
-    if isinstance(val, list):
-        return val
-    elif val is None:
-        return []
-    else:
-        return [val]
-
 @functools.lru_cache
 def get_legacy_motors(plc: parser.Plc) -> list:
     symbols = get_symbols_by_type(plc)
-    st_motors = ensure_list(symbols.get("Symbol_ST_MotionStage", []))
+    st_motors = symbols.get("Symbol_ST_MotionStage", [])
     legacy = []
     for stage in st_motors:
         if (
@@ -364,7 +347,7 @@ def get_legacy_motors(plc: parser.Plc) -> list:
 @functools.lru_cache
 def get_stream_motors(plc: parser.Plc) -> list:
     symbols = get_symbols_by_type(plc)
-    fb_motors = ensure_list(symbols.get("Symbol_FB_MotionStage", []))
+    fb_motors = symbols.get("Symbol_FB_MotionStage", [])
     stream = []
     for stage in fb_motors:
         if (
@@ -376,6 +359,13 @@ def get_stream_motors(plc: parser.Plc) -> list:
             stream.append(stage)
     return stream
 
+@functools.lru_cache
+def get_motors(plc):
+    """
+    Return all valid motors for the PLC by concatenating legacy and stream (FB) motors.
+    Each entry is tagged via is_fb_motionstage.
+    """
+    return get_legacy_motors(plc) + get_stream_motors(plc)
 
 def get_plc_by_name(
     projects: dict[parser.AnyPath, parser.TcSmProject], plc_name: str
@@ -723,6 +713,7 @@ helpers = [
     get_library_versions,
     get_links,
     get_linter_results,
+    get_motors,
     get_legacy_motors,
     get_stream_motors,
     get_nc,
@@ -816,7 +807,6 @@ def split_input_output(arg: str) -> tuple[str, str]:
         f"found that matched"
     )
 
-
 def main(
     projects: list[parser.AnyPath],
     templates: Optional[Union[list[str], str]] = None,
@@ -824,21 +814,16 @@ def main(
     debug: bool = False,
 ) -> dict[str, str]:
     """
-    Render template(s) based on a TwinCAT3 project, or XML-format file such as
-    TMC.
+    Render template(s) based on a TwinCAT3 project, or XML-format file such as TMC.
 
-    Parameters
-    ----------
-    projects : list
-        List of projects or TwinCAT project files (.sln, .tsproj, .tmc, etc.)
+    Args:
+        projects: List of project paths (.sln, .tsproj, .tmc, ...)
+        templates: Input template(s) (default: stdin; can be list or single string with [:] for output)
+        macros: Dict or list of "MACRO=VALUE" items, e.g., "plc=MyPLC"
+        debug: Interactive Python debug after render
 
-    templates : str or list of str, optional
-        Template filename (default: standard input) to output filename
-        in the form ``input_filename[{os.pathsep}output_filename]``
-        Defaults to '-' (standard input -> standard output)
-
-    debug : bool, optional
-        Open a debug session after rendering with IPython.
+    Returns:
+        all_rendered: Dict mapping input template to rendered output (string)
     """
     macros = macros or {}
     if not isinstance(macros, dict):
@@ -851,66 +836,63 @@ def main(
         templates = [templates]
 
     all_rendered = {}
+
     for template in templates:
         input_filename, output_filename = split_input_output(template)
         if input_filename == "-":
-            # Check if it's an interactive user to warn them what we're doing:
             is_tty = os.isatty(sys.stdin.fileno())
             if is_tty:
                 logger.warning("Reading template from standard input...")
                 logger.warning("Press ^D on a blank line when done.")
-
             template_text = sys.stdin.read()
             if is_tty:
-                logger.warning(
-                    "Read template from standard input (len=%d)", len(template_text)
-                )
+                logger.warning("Read template from standard input (len=%d)", len(template_text))
         else:
             with open(input_filename) as fp:
                 template_text = fp.read()
 
         stashed_exception = None
         try:
+            # ---- Build Jinja2 template context ----
             template_args = get_render_context()
             template_args.update(projects_to_dict(*projects))
             template_args.update(**macros)
-            
-            # Extract PLC name from macros:
+
+            # ------------------ PLC/project selection ------------------
             plc_name = template_args.get("plc", None)
-            if plc_name is None:
-                # Default/fallback selection (single-PLC project logic):
-                projects_dict = template_args["projects"]
-                all_plcs = []
-                for proj in projects_dict.values():
-                    all_plcs += proj.plcs
-                if len(all_plcs) == 1:
-                    project = list(projects_dict.values())[0]
-                    plc = all_plcs[0]
-                else:
-                    raise RuntimeError("No PLC name passed and multiple PLCs found. Please specify with --macro plc=<name>.")
-            else:
-                projects_dict = template_args["projects"]
+            projects_dict = template_args["projects"]
+            if plc_name is not None:
                 project, plc = get_plc_by_name(projects_dict, plc_name)
-    
-            # Prepare motor lists once, via helper functions:
+                if plc is None:
+                    raise RuntimeError(f"PLC '{plc_name}' not found in loaded projects!")
+            else:
+                # Pick the first PLC from the first project found (safe for tests and for single-PLC production)
+                project = next(iter(projects_dict.values()))
+                plcs = list(project.plcs)
+                plc = plcs[0]
+
+            # --------------- Motor family logic ----------------
             legacy_motors = get_legacy_motors(plc)
             stream_motors = get_stream_motors(plc)
-    
-            # Check for invalid (mixed) case:
+
             if legacy_motors and stream_motors:
                 raise RuntimeError(
                     f"Both legacy (ST_MotionStage) motors and stream (FB_MotionStage) motors are present. "
-                    f"Not allowed! Legacy: {[m.name for m in legacy_motors]}, Stream motors: {[m.name for m in stream_motors]}"
+                    f"Not allowed! Legacy: {[m.name for m in legacy_motors]}, Stream: {[m.name for m in stream_motors]}"
                 )
-            
-            # Set main motor list for template (one or the other, or empty):
+
             motors = legacy_motors if legacy_motors else stream_motors
+
+            # ------ Add to template context -------
             template_args.update({
                 "legacy_motors": legacy_motors,
                 "stream_motors": stream_motors,
                 "motors": motors,
             })
-            
+
+            # (Optional: debug print)
+            # print("TEMPLATE ARGS:", list(template_args.keys()))
+
             rendered = render_template(template_text, template_args)
         except Exception as ex:
             stashed_exception = ex
@@ -919,7 +901,6 @@ def main(
         if not debug:
             if stashed_exception is not None:
                 raise stashed_exception
-
             if output_filename:
                 with open(output_filename, "w") as fp:
                     print(rendered, file=fp)
@@ -928,10 +909,7 @@ def main(
         else:
             message = ["Variables: projects, template_text, rendered, template_args. "]
             if stashed_exception is not None:
-                message.append(
-                    f"Exception: {type(stashed_exception)} " f"{stashed_exception}"
-                )
-
+                message.append(f"Exception: {type(stashed_exception)} {stashed_exception}")
             util.python_debug_session(namespace=locals(), message="\n".join(message))
         all_rendered[input_filename] = rendered
 
