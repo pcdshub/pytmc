@@ -16,3 +16,6 @@
 [submodule "pytmc/tests/projects/lcls-plc-lfe-motion"]
 	path = pytmc/tests/projects/lcls-plc-lfe-motion
 	url = https://github.com/pcdshub/lcls-plc-lfe-motion
+[submodule "tests/projects/lcls-plc-motion-abstraction-sample"]
+	path = tests/projects/lcls-plc-motion-abstraction-sample
+	url = git@github.com:pcdshub/lcls-plc-motion-abstraction-sample.git
