@@ -13,7 +13,7 @@ import types
 import typing
 from collections.abc import Generator
 from typing import Any, ClassVar, Union
-import re
+
 import lxml
 import lxml.etree
 
@@ -1661,9 +1661,8 @@ class Symbol_ST_MotionStage(Symbol):
 Symbol_DUT_MotionStage = Symbol_ST_MotionStage
 
 
-
 class Symbol_FB_MotionStage(Symbol):
-    """[TMC] Customized Symbol representing only ST_MotionStage.
+    """[TMC] Customized Symbol representing only FB_MotionStage.
 
     Variants:
     - Symbol_FB_MotionStageNC
@@ -1715,11 +1714,11 @@ class Symbol_FB_MotionStage(Symbol):
     def nc_to_plc_link(self):
         """
         Returns the Link whose 'a[1]' contains the axis-link (and '.NcToPlc').
-        Raises RuntimeError for mismatches.
+        Raises RuntimeError for mismatches or missing self.plc.
         """
         plc = getattr(self, "plc", None)
         if plc is None:
-            return None
+            raise RuntimeError(f"Symbol {self.name!r} has no associated PLC (plc attribute is None)")
         axis_link = self.get_axis_link()  # e.g. 'GVL_Axes.Axes[2]'
         axis_link_lc = axis_link.lower()
         for link in getattr(plc, "links", []):
@@ -1765,6 +1764,7 @@ class Symbol_FB_MotionStage(Symbol):
             raise RuntimeError(f"No NC axis named {axis_name!r} found in NC {task_name!r}.")
 
         return nc_axis
+
 
 class GVL(_TwincatProjectSubItem):
     "[TcGVL] A Global Variable List"

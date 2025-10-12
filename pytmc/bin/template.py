@@ -330,6 +330,7 @@ def has_axis_link(stage):
                 return True
     return False
 
+
 @functools.lru_cache
 def get_legacy_motors(plc: parser.Plc) -> list:
     symbols = get_symbols_by_type(plc)
@@ -343,7 +344,8 @@ def get_legacy_motors(plc: parser.Plc) -> list:
             setattr(stage, "is_legacy_motor", True)
             legacy.append(stage)
     return legacy
-    
+
+
 @functools.lru_cache
 def get_stream_motors(plc: parser.Plc) -> list:
     symbols = get_symbols_by_type(plc)
@@ -359,6 +361,7 @@ def get_stream_motors(plc: parser.Plc) -> list:
             stream.append(stage)
     return stream
 
+
 @functools.lru_cache
 def get_motors(plc):
     """
@@ -366,6 +369,7 @@ def get_motors(plc):
     Each entry is tagged via is_fb_motionstage.
     """
     return get_legacy_motors(plc) + get_stream_motors(plc)
+
 
 def get_plc_by_name(
     projects: dict[parser.AnyPath, parser.TcSmProject], plc_name: str
@@ -807,6 +811,7 @@ def split_input_output(arg: str) -> tuple[str, str]:
         f"found that matched"
     )
 
+
 def main(
     projects: list[parser.AnyPath],
     templates: Optional[Union[list[str], str]] = None,
@@ -853,12 +858,10 @@ def main(
 
         stashed_exception = None
         try:
-            # ---- Build Jinja2 template context ----
             template_args = get_render_context()
             template_args.update(projects_to_dict(*projects))
             template_args.update(**macros)
 
-            # ------------------ PLC/project selection ------------------
             plc_name = template_args.get("plc", None)
             projects_dict = template_args["projects"]
             if plc_name is not None:
@@ -871,7 +874,6 @@ def main(
                 plcs = list(project.plcs)
                 plc = plcs[0]
 
-            # --------------- Motor family logic ----------------
             legacy_motors = get_legacy_motors(plc)
             stream_motors = get_stream_motors(plc)
 
@@ -883,15 +885,11 @@ def main(
 
             motors = legacy_motors if legacy_motors else stream_motors
 
-            # ------ Add to template context -------
             template_args.update({
                 "legacy_motors": legacy_motors,
                 "stream_motors": stream_motors,
                 "motors": motors,
             })
-
-            # (Optional: debug print)
-            # print("TEMPLATE ARGS:", list(template_args.keys()))
 
             rendered = render_template(template_text, template_args)
         except Exception as ex:
