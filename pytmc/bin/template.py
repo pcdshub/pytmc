@@ -60,6 +60,7 @@ import pathlib
 import sys
 from collections.abc import Generator
 from typing import Any, Optional, Union
+from typing import List, Union
 
 import jinja2
 
@@ -331,7 +332,7 @@ def has_axis_link(stage: parser.Symbol_FB_MotionStage) -> bool:
 
 
 @functools.lru_cache
-def get_legacy_motors(plc: parser.Plc) -> list:
+def get_legacy_motors(plc: parser.Plc) -> list[parser.Symbol_ST_MotionStage]:
     symbols = get_symbols_by_type(plc)
     st_motors = symbols.get("Symbol_ST_MotionStage", [])
     legacy = []
@@ -346,7 +347,7 @@ def get_legacy_motors(plc: parser.Plc) -> list:
 
 
 @functools.lru_cache
-def get_stream_motors(plc: parser.Plc) -> list:
+def get_stream_motors(plc: parser.Plc) -> list[parser.Symbol_FB_MotionStage]:
     symbols = get_symbols_by_type(plc)
     fb_motors = symbols.get("Symbol_FB_MotionStage", [])
     stream = []
@@ -362,7 +363,7 @@ def get_stream_motors(plc: parser.Plc) -> list:
 
 
 @functools.lru_cache
-def get_motors(plc):
+def get_motors(plc: parser.Plc) -> List[Union[parser.Symbol_ST_MotionStage, parser.Symbol_FB_MotionStage]]:
     """
     Return all valid motors for the PLC by concatenating legacy and stream (FB) motors.
     Each entry is tagged via is_legacy_motor.
