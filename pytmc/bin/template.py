@@ -313,15 +313,14 @@ def get_symbols_by_type(plc: parser.Plc) -> dict[str, list[parser.Symbol]]:
     symbols = plc.find(parser.Symbol, recurse=False)
     return parser.separate_by_classname(symbols)
 
-
-def has_axis_link(stage):
+def has_axis_link(stage: parser.Symbol_FB_MotionStage) -> bool:
     """
     Only valid for Symbol_FB_MotionStage (or alias); checks for axis-link pragma.
     Returns True if an 'axis-link:' pragma is found, else False.
     """
     # Accept both direct class and known aliases for compatibility:
     if not (isinstance(stage, parser.Symbol_FB_MotionStage) or
-            set(getattr(stage, "symbol_aliases", [])) & {'Symbol_FB_MotionStageNC', 'Symbol_FB_MotionStageNCDS402'}):
+            set(getattr(stage, "symbol_aliases", [])) & {'Symbol_FB_MotionStageNC', 'Symbol_FB_MotionStageNCDS402', 'Symbol_FB_MotionStageMCS2'}):
         return False  # Not a supported FB_MotionStage type; skip
 
     for pragma in pragmas.get_pragma(stage, name="pytmc"):
@@ -366,7 +365,7 @@ def get_stream_motors(plc: parser.Plc) -> list:
 def get_motors(plc):
     """
     Return all valid motors for the PLC by concatenating legacy and stream (FB) motors.
-    Each entry is tagged via is_fb_motionstage.
+    Each entry is tagged via is_legacy_motor.
     """
     return get_legacy_motors(plc) + get_stream_motors(plc)
 
