@@ -59,8 +59,7 @@ import os
 import pathlib
 import sys
 from collections.abc import Generator
-from typing import Any, Optional, Union
-from typing import List, Union
+from typing import Any, List, Optional, Union
 
 import jinja2
 
@@ -313,6 +312,7 @@ def get_symbols_by_type(plc: parser.Plc) -> dict[str, list[parser.Symbol]]:
     """Get symbols for the PLC."""
     symbols = plc.find(parser.Symbol, recurse=False)
     return parser.separate_by_classname(symbols)
+
 
 def has_axis_link(stage: parser.Symbol_FB_MotionStage) -> bool:
     """
