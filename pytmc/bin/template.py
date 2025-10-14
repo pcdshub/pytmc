@@ -333,31 +333,71 @@ def has_axis_link(stage: parser.Symbol_FB_MotionStage) -> bool:
 
 @functools.lru_cache
 def get_legacy_motors(plc: parser.Plc) -> list[parser.Symbol_ST_MotionStage]:
+    """
+    Find all valid legacy motors (ST_MotionStage) in the provided PLC.
+
+    Criteria:
+        - The symbol is of type Symbol_ST_MotionStage.
+        - The symbol is not a pointer (i.e., is_pointer is False).
+        - The symbol has a pytmc pragma (pragmas.has_pragma is True).
+
+    For each returned motor, a dynamic attribute 'is_legacy_motor' is set to True,
+    enabling template logic or further processing to easily distinguish legacy motors.
+
+    Args:
+        plc (parser.Plc): The parsed PLC object to examine.
+
+    Returns:
+        list[parser.Symbol_ST_MotionStage]:
+            List of all valid legacy motor symbols from this PLC.
+    """
     symbols = get_symbols_by_type(plc)
     st_motors = symbols.get("Symbol_ST_MotionStage", [])
     legacy = []
     for stage in st_motors:
         if (
-            not getattr(stage, "is_pointer", False)
+            not stage.is_pointer
             and pragmas.has_pragma(stage)
         ):
-            setattr(stage, "is_legacy_motor", True)
+            stage.is_legacy_motor = True
             legacy.append(stage)
     return legacy
 
 
 @functools.lru_cache
 def get_stream_motors(plc: parser.Plc) -> list[parser.Symbol_FB_MotionStage]:
+    """
+    Find all valid stream (FB_MotionStage) motors in the given PLC.
+
+    Criteria for inclusion:
+        - The symbol is of type Symbol_FB_MotionStage.
+        - The symbol is not a pointer (i.e., 'is_pointer' is False).
+        - The symbol has a pytmc pragma (pragmas.has_pragma is True).
+        - The symbol has a valid axis-link pragma (checked with has_axis_link(stage)),
+          ensuring it maps to a real NC axis and is suitable for EPICS motor creation.
+
+    For each returned motor symbol, a dynamic attribute 'is_legacy_motor' is set to False,
+    distinguishing them from legacy motors during template generation or further logic.
+
+    Args:
+        plc (parser.Plc):
+            The parsed TwinCAT PLC object to search for motors.
+
+    Returns:
+        list[parser.Symbol_FB_MotionStage]:
+            A list of all valid stream (modern/FB_MotionStage) motor symbols
+            in this PLC, ready for StreamDevice-style and per-axis record creation.
+    """
     symbols = get_symbols_by_type(plc)
     fb_motors = symbols.get("Symbol_FB_MotionStage", [])
     stream = []
     for stage in fb_motors:
         if (
-            not getattr(stage, "is_pointer", False)
+            not stage.is_pointer
             and pragmas.has_pragma(stage)
             and has_axis_link(stage)
         ):
-            setattr(stage, "is_legacy_motor", False)
+            stage.is_legacy_motor = False
             stream.append(stage)
     return stream
 
