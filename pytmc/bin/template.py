@@ -852,6 +852,43 @@ def split_input_output(arg: str) -> tuple[str, str]:
     )
 
 
+def resolve_motors(template_args: dict) -> dict[str, Any]:
+    """
+    Given template_args (with macros and 'projects'), resolve the correct motors lists
+    for legacy and FB_MotionStage, enforcing that only one family is present.
+    Returns a context dict for updating template_args.
+    """
+    plc_name = template_args.get("plc", None)
+    projects_dict = template_args["projects"]
+
+    if plc_name is not None:
+        project, plc = get_plc_by_name(projects_dict, plc_name)
+        if plc is None:
+            raise RuntimeError(f"PLC '{plc_name}' not found in loaded projects!")
+    else:
+        # Default: take first PLC from the first project found (safe for single-PLC projects)
+        project = next(iter(projects_dict.values()))
+        plcs = list(project.plcs)
+        plc = plcs[0]
+
+    legacy_motors = get_legacy_motors(plc)
+    stream_motors = get_stream_motors(plc)
+
+    if legacy_motors and stream_motors:
+        raise RuntimeError(
+            f"Both legacy (ST_MotionStage) motors and stream (FB_MotionStage) motors are present. "
+            f"Not allowed! Legacy: {[m.name for m in legacy_motors]}, Stream: {[m.name for m in stream_motors]}"
+        )
+
+    motors = legacy_motors if legacy_motors else stream_motors
+
+    return {
+        "legacy_motors": legacy_motors,
+        "stream_motors": stream_motors,
+        "motors": motors,
+    }
+
+
 def main(
     projects: list[parser.AnyPath],
     templates: Optional[Union[list[str], str]] = None,
@@ -902,34 +939,8 @@ def main(
             template_args.update(projects_to_dict(*projects))
             template_args.update(**macros)
 
-            plc_name = template_args.get("plc", None)
-            projects_dict = template_args["projects"]
-            if plc_name is not None:
-                project, plc = get_plc_by_name(projects_dict, plc_name)
-                if plc is None:
-                    raise RuntimeError(f"PLC '{plc_name}' not found in loaded projects!")
-            else:
-                # Pick the first PLC from the first project found (safe for tests and for single-PLC production)
-                project = next(iter(projects_dict.values()))
-                plcs = list(project.plcs)
-                plc = plcs[0]
-
-            legacy_motors = get_legacy_motors(plc)
-            stream_motors = get_stream_motors(plc)
-
-            if legacy_motors and stream_motors:
-                raise RuntimeError(
-                    f"Both legacy (ST_MotionStage) motors and stream (FB_MotionStage) motors are present. "
-                    f"Not allowed! Legacy: {[m.name for m in legacy_motors]}, Stream: {[m.name for m in stream_motors]}"
-                )
-
-            motors = legacy_motors if legacy_motors else stream_motors
-
-            template_args.update({
-                "legacy_motors": legacy_motors,
-                "stream_motors": stream_motors,
-                "motors": motors,
-            })
+            # updating template_args with motors
+            template_args.update(resolve_motors(template_args))
 
             rendered = render_template(template_text, template_args)
         except Exception as ex:
