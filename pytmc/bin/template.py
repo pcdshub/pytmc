@@ -324,7 +324,7 @@ def has_axis_link(stage: parser.Symbol_FB_MotionStage) -> bool:
             set(getattr(stage, "symbol_aliases", [])) & {'Symbol_FB_MotionStageNC', 'Symbol_FB_MotionStageNCDS402', 'Symbol_FB_MotionStageMCS2'}):
         return False  # Not a supported FB_MotionStage type; skip
 
-    for pragma in pragmas.get_pragma(stage, name="pytmc"):
+    for pragma in parser.get_pragma(stage, name="pytmc"):
         for line in pragma.splitlines():
             if line.strip().startswith("axis-link:"):
                 return True
@@ -339,7 +339,7 @@ def get_legacy_motors(plc: parser.Plc) -> list[parser.Symbol_ST_MotionStage]:
     Criteria:
         - The symbol is of type Symbol_ST_MotionStage.
         - The symbol is not a pointer (i.e., is_pointer is False).
-        - The symbol has a pytmc pragma (pragmas.has_pragma is True).
+        - The symbol has a pytmc pragma (parser.has_pragma is True).
 
     For each returned motor, a dynamic attribute 'is_legacy_motor' is set to True,
     enabling template logic or further processing to easily distinguish legacy motors.
@@ -357,7 +357,7 @@ def get_legacy_motors(plc: parser.Plc) -> list[parser.Symbol_ST_MotionStage]:
     for stage in st_motors:
         if (
             not stage.is_pointer
-            and pragmas.has_pragma(stage)
+            and parser.has_pragma(stage)
         ):
             stage.is_legacy_motor = True
             legacy.append(stage)
@@ -372,7 +372,7 @@ def get_stream_motors(plc: parser.Plc) -> list[parser.Symbol_FB_MotionStage]:
     Criteria for inclusion:
         - The symbol is of type Symbol_FB_MotionStage.
         - The symbol is not a pointer (i.e., 'is_pointer' is False).
-        - The symbol has a pytmc pragma (pragmas.has_pragma is True).
+        - The symbol has a pytmc pragma (parser.has_pragma is True).
         - The symbol has a valid axis-link pragma (checked with has_axis_link(stage)),
           ensuring it maps to a real NC axis and is suitable for EPICS motor creation.
 
@@ -394,7 +394,7 @@ def get_stream_motors(plc: parser.Plc) -> list[parser.Symbol_FB_MotionStage]:
     for stage in fb_motors:
         if (
             not stage.is_pointer
-            and pragmas.has_pragma(stage)
+            and parser.has_pragma(stage)
             and has_axis_link(stage)
         ):
             stage.is_legacy_motor = False

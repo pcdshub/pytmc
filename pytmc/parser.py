@@ -1661,6 +1661,40 @@ class Symbol_ST_MotionStage(Symbol):
 Symbol_DUT_MotionStage = Symbol_ST_MotionStage
 
 
+def has_pragma(item, *, name: str = "pytmc"):
+    "Does `item` have a pragma titled `name`?"
+
+    return any(True for pragma in get_pragma(item, name=name) if pragma is not None)
+
+
+def get_pragma(
+    item: Union[SubItem, type[Symbol]], *, name: str = "pytmc"
+) -> Generator[str, None, None]:
+    """
+    Get all pragmas with a certain tag.
+
+    Parameters
+    ----------
+    item : parser.SubItem, parser.Symbol, parser.Symbol subclass
+        Representation of beckhoff variable or data structure
+
+    name : str, optional
+        Accept tmc entries where the <Name> field equals the passed string
+
+    Yields
+    ------
+    str
+
+    """
+    name_list = [name, f"plcAttribute_{name}"]
+    if hasattr(item, "Properties"):
+        properties = item.Properties[0]
+        for prop in getattr(properties, "Property", []):
+            # Return true if any of the names searched for are found
+            if any(indiv_name == prop.name for indiv_name in name_list):
+                yield prop.value
+
+
 class Symbol_FB_MotionStage(Symbol):
     """[TMC] Customized Symbol representing only FB_MotionStage.
 
@@ -1681,17 +1715,23 @@ class Symbol_FB_MotionStage(Symbol):
 
     def get_axis_link(self):
         """
-        Returns the first axis-link value from a pytmc pragma (e.g. 'GVL_Axes.Axes[2]')
-        Raises RuntimeError if not found.
+        Returns the first axis-link value from a pytmc pragma (e.g. 'GVL_Axes.Axes[2]').
+        If no pytmc pragma is found, returns None (treat symbol as ignored/simulation-only).
+        Raises RuntimeError if pragma is present but axis-link is missing or blank.
         """
-        from .pragmas import get_pragma
+        has_any_pytmc = False
         for pragma_entry in get_pragma(self, name='pytmc'):
+            has_any_pytmc = True
             for line in pragma_entry.splitlines():
                 line = line.strip()
                 if line.lower().startswith("axis-link:"):
                     value = line.partition(":")[2].strip()
                     if value:
                         return value
+        if not has_any_pytmc:
+            # No pytmc pragma at all: not an EPICS-exported axis, just skip/return None
+            return None
+        # Had a pytmc pragma but no axis-link: this is a config error
         raise RuntimeError(f"No valid axis-link pragma found for symbol '{self.name}'")
 
     @property
