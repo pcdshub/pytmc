@@ -1661,6 +1661,151 @@ class Symbol_ST_MotionStage(Symbol):
 Symbol_DUT_MotionStage = Symbol_ST_MotionStage
 
 
+def has_pragma(item, *, name: str = "pytmc"):
+    "Does `item` have a pragma titled `name`?"
+
+    return any(True for pragma in get_pragma(item, name=name) if pragma is not None)
+
+
+def get_pragma(
+    item: Union[SubItem, type[Symbol]], *, name: str = "pytmc"
+) -> Generator[str, None, None]:
+    """
+    Get all pragmas with a certain tag.
+
+    Parameters
+    ----------
+    item : parser.SubItem, parser.Symbol, parser.Symbol subclass
+        Representation of beckhoff variable or data structure
+
+    name : str, optional
+        Accept tmc entries where the <Name> field equals the passed string
+
+    Yields
+    ------
+    str
+
+    """
+    name_list = [name, f"plcAttribute_{name}"]
+    if hasattr(item, "Properties"):
+        properties = item.Properties[0]
+        for prop in getattr(properties, "Property", []):
+            # Return true if any of the names searched for are found
+            if any(indiv_name == prop.name for indiv_name in name_list):
+                yield prop.value
+
+
+class Symbol_FB_MotionStage(Symbol):
+    """[TMC] Customized Symbol representing only FB_MotionStage.
+
+    Variants:
+    - Symbol_FB_MotionStageNC
+    - Symbol_FB_MotionStageNCDS402
+    - Symbol_FB_MotionStageMCS2
+    """
+    symbol_aliases = ['Symbol_FB_MotionStageNC', 'Symbol_FB_MotionStageMCS2', 'Symbol_FB_MotionStageNCDS402']
+
+    def _repr_info(self):
+        repr_info = super()._repr_info()
+        try:
+            repr_info["nc_axis"] = self.nc_axis.name
+        except Exception as ex:
+            repr_info["nc_axis"] = repr(ex)
+        return repr_info
+
+    def get_axis_link(self):
+        """
+        Returns the first axis-link value from a pytmc pragma (e.g. 'GVL_Axes.Axes[2]').
+        If no pytmc pragma is found, returns None (treat symbol as ignored/simulation-only).
+        Raises RuntimeError if pragma is present but axis-link is missing or blank.
+        """
+        has_any_pytmc = False
+        for pragma_entry in get_pragma(self, name='pytmc'):
+            has_any_pytmc = True
+            for line in pragma_entry.splitlines():
+                line = line.strip()
+                if line.lower().startswith("axis-link:"):
+                    value = line.partition(":")[2].strip()
+                    if value:
+                        return value
+        if not has_any_pytmc:
+            # No pytmc pragma at all: not an EPICS-exported axis, just skip/return None
+            return None
+        # Had a pytmc pragma but no axis-link: this is a config error
+        raise RuntimeError(f"No valid axis-link pragma found for symbol '{self.name}'")
+
+    @property
+    def ncAxis(self):
+        """Returns the axis link value, e.g. 'gvl_axes.axes[2]'."""
+        # Note: GVL_Axes.Axes[n] in PLC is usually gvl_axes.axes[n] in NC
+        return self.get_axis_link().lower()
+
+    @property
+    def program_name(self):
+        """'Main' from 'Main.M1'"""
+        return self.name.split(".")[0]
+
+    @property
+    def motor_name(self):
+        """'M1' from 'Main.M1'"""
+        return self.name.split(".")[1]
+
+    @property
+    def nc_to_plc_link(self):
+        """
+        Returns the Link whose 'a[1]' contains the axis-link (and '.NcToPlc').
+        Raises RuntimeError for mismatches or missing self.plc.
+        """
+        plc = getattr(self, "plc", None)
+        if plc is None:
+            raise RuntimeError(f"Symbol {self.name!r} has no associated PLC (plc attribute is None)")
+        axis_link = self.get_axis_link()  # e.g. 'GVL_Axes.Axes[2]'
+        axis_link_lc = axis_link.lower()
+        for link in getattr(plc, "links", []):
+            a1_lc = link.a[1].lower()
+            # Look for axis-link pattern and NcToPlc ending
+            if axis_link_lc in a1_lc and a1_lc.endswith(".nctoplc"):
+                return link
+        # If not found, raise error with details
+        raise RuntimeError(
+            f"No NC-to-PLC link found for axis-link '{axis_link}' ({self.name!r})"
+        )
+
+    @property
+    def nc_axis(self):
+        """
+        The NC Axis object associated with this FB_MotionStage.
+        """
+        link = self.nc_to_plc_link
+        if link is None:
+            raise RuntimeError(f"No NC-to-PLC link found for {self.name}")
+
+        parent_name = link.parent.name.split("^")
+        if parent_name[0] == "TINC":
+            parent_name = parent_name[1:]
+
+        if len(parent_name) != 3:
+            raise RuntimeError(f"Unexpected link parent name format: {link.parent.name}")
+
+        task_name, axis_section, axis_name = parent_name
+
+        # Find correct NC from root
+        ncs = [
+            nc for nc in self.root.find(NC, recurse=False)
+            if hasattr(nc, 'SafTask') and nc.SafTask[0].name == task_name
+        ]
+        if not ncs:
+            raise RuntimeError(f"No NC with SafTask name {task_name!r} found.")
+
+        nc = ncs[0]
+        try:
+            nc_axis = nc.axis_by_name[axis_name]
+        except KeyError:
+            raise RuntimeError(f"No NC axis named {axis_name!r} found in NC {task_name!r}.")
+
+        return nc_axis
+
+
 class GVL(_TwincatProjectSubItem):
     "[TcGVL] A Global Variable List"
     Declaration: list

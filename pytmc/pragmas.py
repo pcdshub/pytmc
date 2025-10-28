@@ -7,11 +7,13 @@ import itertools
 import logging
 import math
 import re
-from collections.abc import Generator
-from typing import Union
 
 from . import parser
 from .record import RecordPackage
+
+# from collections.abc import Generator
+# from typing import Union
+
 
 logger = logging.getLogger(__name__)
 
@@ -308,7 +310,7 @@ def _expand_configurations_from_chain(
     for item in chain:
         subitems = subitems.get(item.name, {})
         pragmas = list(
-            pragma for pragma in get_pragma(item, name=pragma) if pragma is not None
+            pragma for pragma in parser.get_pragma(item, name=pragma) if pragma is not None
         )
         if not pragmas:
             if allow_no_pragma:
@@ -712,43 +714,9 @@ class SingularChain:
 def find_pytmc_symbols(tmc, allow_no_pragma=False):
     "Find all symbols in a tmc file that contain pragmas"
     for symbol in tmc.find(parser.Symbol):
-        if has_pragma(symbol) or allow_no_pragma:
+        if parser.has_pragma(symbol) or allow_no_pragma:
             if symbol.name.count(".") == 1:
                 yield symbol
-
-
-def get_pragma(
-    item: Union[parser.SubItem, type[parser.Symbol]], *, name: str = "pytmc"
-) -> Generator[str, None, None]:
-    """
-    Get all pragmas with a certain tag.
-
-    Parameters
-    ----------
-    item : parser.SubItem, parser.Symbol, parser.Symbol subclass
-        Representation of beckhoff variable or data structure
-
-    name : str, optional
-        Accept tmc entries where the <Name> field equals the passed string
-
-    Yields
-    ------
-    str
-
-    """
-    name_list = [name, f"plcAttribute_{name}"]
-    if hasattr(item, "Properties"):
-        properties = item.Properties[0]
-        for prop in getattr(properties, "Property", []):
-            # Return true if any of the names searched for are found
-            if any(indiv_name == prop.name for indiv_name in name_list):
-                yield prop.value
-
-
-def has_pragma(item, *, name: str = "pytmc"):
-    "Does `item` have a pragma titled `name`?"
-
-    return any(True for pragma in get_pragma(item, name=name) if pragma is not None)
 
 
 def always_true(*a, **kwargs):
@@ -760,7 +728,7 @@ def chains_from_symbol(symbol, *, pragma: str = "pytmc", allow_no_pragma=False):
     if allow_no_pragma:
         condition = always_true
     else:
-        condition = has_pragma
+        condition = parser.has_pragma
     for full_chain in symbol.walk(condition=condition):
         configs = itertools.product(
             *_expand_configurations_from_chain(
