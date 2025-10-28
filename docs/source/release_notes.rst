@@ -10,7 +10,7 @@ Changes
 - Add support for non-EtherCATMC type motors.
   This is part of an PLC/IOC motion improvement project to improve the reliability
   of our motion devices by avoiding custom motor record builds and related issues.
- 
+
 
 v2.18.2 (2025-02-12)
 ====================
