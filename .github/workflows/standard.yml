@@ -23,3 +23,4 @@ jobs:
       pip-testing-extras: ""
       # Set if using setuptools-scm for the conda-build workflow
       use-setuptools-scm: true
+      checkout_token: ${{ secrets.SUBMODULE_READ_TOKEN }}
