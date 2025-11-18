@@ -66,7 +66,7 @@ def projects_from_solution(fn, *, exclude=None):
         solution_text = f.read()
 
     if exclude is None:
-        exclude = (".tcmproj",)
+        exclude = (".tcmproj", ".tcdmproj")
 
     projects = [
         pathlib.PureWindowsPath(match[1])

@@ -2,6 +2,16 @@
  Release History
 =================
 
+v2.19.1 (2025-11-18)
+====================
+
+Bugfixes
+--------
+- Ignore drive manager projects by default in ``projects_from_solution`` because
+  their contents are not relevant to ``pytmc`` and the inclusion of these projects
+  breaks various CI jobs and scripts.
+
+
 v2.19.0 (2025-10-28)
 ====================
 
