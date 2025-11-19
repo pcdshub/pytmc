@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: "checkout"
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: "pcdshub/lcls-plc-kfe-xgmd-vac"
         token: ${{ secrets.CHECKOUT_TOKEN }}
