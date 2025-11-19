@@ -24,7 +24,9 @@ jobs:
       # Set if using setuptools-scm for the conda-build workflow
       use-setuptools-scm: true
   test:
-    uses: actions/checkout@v4
-    with:
-      repository: "pcdshub/lcls-plc-kfe-xgmd-vac.git/"
-      token: ${{ secrets.CHECKOUT_TOKEN }}
+    steps:
+      name: test_checkout
+      uses: actions/checkout@v4
+      with:
+        repository: "pcdshub/lcls-plc-kfe-xgmd-vac.git/"
+        token: ${{ secrets.CHECKOUT_TOKEN }}
