@@ -31,5 +31,5 @@ jobs:
     - name: test
       uses: actions/checkout@v4
       with:
-        repository: "pcdshub/lcls-plc-kfe-xgmd-vac.git/"
+        repository: "pcdshub/lcls-plc-kfe-xgmd-vac"
         token: ${{ secrets.CHECKOUT_TOKEN }}
