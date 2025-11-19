@@ -26,6 +26,7 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    secrets: inherit
 
     steps:
     - name: test
