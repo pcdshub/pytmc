@@ -25,8 +25,8 @@ jobs:
       use-setuptools-scm: true
   test:
     steps:
-      name: test_checkout
-      uses: actions/checkout@v4
-      with:
-        repository: "pcdshub/lcls-plc-kfe-xgmd-vac.git/"
-        token: ${{ secrets.CHECKOUT_TOKEN }}
+      - name: test_checkout
+        uses: actions/checkout@v4
+        with:
+          repository: "pcdshub/lcls-plc-kfe-xgmd-vac.git/"
+          token: ${{ secrets.CHECKOUT_TOKEN }}
