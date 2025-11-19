@@ -26,11 +26,11 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    secrets: inherit
 
     steps:
     - name: test
       uses: actions/checkout@v5
+      secrets: inherit
       with:
         repository: "pcdshub/lcls-plc-kfe-xgmd-vac"
         token: ${{ secrets.CHECKOUT_TOKEN }}
