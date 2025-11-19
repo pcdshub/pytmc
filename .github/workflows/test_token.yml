@@ -1,0 +1,19 @@
+name: PCDS Standard Testing
+
+on:
+  push:
+  pull_request:
+  release:
+    types:
+      - published
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "checkout"
+      uses: actions/checkout@v4
+      with:
+        repository: "pcdshub/lcls-plc-kfe-xgmd-vac"
+        token: ${{ secrets.CHECKOUT_TOKEN }}
