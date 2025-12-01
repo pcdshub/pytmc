@@ -86,3 +86,50 @@ def test_sort_fields():
     )
     output = sort_fields(unsorted_entry)
     assert output == correct_entry
+
+
+def test_epics_int64_record_render():
+    # Input record
+    input_kwargs = {
+        "pvname": "Tst:pv64",
+        "record_type": "int64in",
+        "fields": {"DTYP": "asynInt64", "DESC": "Input 64-bit value"},
+        "direction": "input",
+    }
+    ec_in = EPICSRecord(**input_kwargs)
+    record_in = ec_in.render()
+    print(record_in)  # For debug purposes
+    assert input_kwargs["pvname"] in record_in
+    assert "int64in" in record_in
+    assert "asynInt64" in record_in
+    assert "DESC" in record_in
+    assert "Input 64-bit value" in record_in
+
+    # Output record
+    output_kwargs = {
+        "pvname": "Tst:pv64",
+        "record_type": "int64out",
+        "fields": {"DTYP": "asynInt64", "DESC": "Output 64-bit value"},
+        "direction": "output",
+    }
+    ec_out = EPICSRecord(**output_kwargs)
+    record_out = ec_out.render()
+    print(record_out)  # For debug purposes
+    assert output_kwargs["pvname"] in record_out
+    assert "int64out" in record_out
+    assert "asynInt64" in record_out
+    assert "DESC" in record_out
+    assert "Output 64-bit value" in record_out
+
+
+def test_epics_int64_record_with_linter(dbd64_file):
+    kwargs = {
+        "pvname": "Tst:pv64",
+        "record_type": "int64in",
+        "fields": {"DTYP": "asynInt64", "DESC": "Input 64-bit value"},
+        "direction": "input",
+    }
+    ec = EPICSRecord(**kwargs)
+    record = ec.render()
+    linted = lint_db(dbd=dbd64_file, db=record)
+    assert not linted.errors
