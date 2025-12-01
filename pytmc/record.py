@@ -700,6 +700,50 @@ class IntegerRecordPackage(TwincatTypeRecordPackage):
     )
 
 
+class Int64RecordPackage(TwincatTypeRecordPackage):
+    """
+    Create a set of records for a 64-bit integer Twincat Variable (LINT, ULINT, LWORD).
+    """
+    input_rtyp = "int64in"
+    output_rtyp = "int64out"
+    dtyp = "asynInt64"
+    output_only_fields = {"DOL", "DRVH", "DRVL", "IVOA", "IVOV", "OMSL"}
+    input_only_fields = {"AFTC", "AFVL", "SVAL"}
+    field_defaults = {}  # Use base pin/tse
+
+    autosave_defaults = make_autosave_defaults(
+        input_pass0=[
+            # Alarm severities
+            "HHSV",  # Hihi Severity
+            "HSV",   # High Severity
+            "LLSV",  # Lolo Severity
+            "LSV",   # Low Severity
+            "SIMS",  # Simulation Mode Severity
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",   # Low Alarm Limit
+        ],
+        output_pass0=[
+            # Alarm severities
+            "HHSV",  # Hihi Severity
+            "HSV",   # High Severity
+            "LLSV",  # Lolo Severity
+            "LSV",   # Low Severity
+            "SIMS",  # Simulation Mode Severity
+            # Control limits
+            "DRVH",  # Drive High Limit
+            "DRVL",  # Drive Low Limit
+            # Alarm limits
+            "HIHI",  # Hihi Alarm Limit
+            "LOLO",  # Lolo Alarm Limit
+            "HIGH",  # High Alarm Limit
+            "LOW",   # Low Alarm Limit
+        ],
+    )
+
+
 class FloatRecordPackage(TwincatTypeRecordPackage):
     """Create a set of records for a floating point Twincat Variable"""
 
@@ -905,11 +949,21 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
         """Field type of value"""
         ftvl = {
             "BOOL": "CHAR",
+            "BYTE": "CHAR",
+            "SINT": "CHAR",
+            "USINT": "CHAR",
+            "WORD": "SHORT",
             "INT": "SHORT",
-            "ENUM": "SHORT",
+            "UINT": "SHORT",
+            "DWORD": "LONG",
             "DINT": "LONG",
+            "UDINT": "LONG",
+            "ENUM": "SHORT",
             "REAL": "FLOAT",
             "LREAL": "DOUBLE",
+            "LINT": "INT64",
+            "ULINT": "UINT64",
+            "LWORD": "UINT64"
         }
         return ftvl[self.chain.data_type.name]
 
@@ -947,6 +1001,10 @@ class WaveformRecordPackage(TwincatTypeRecordPackage):
             "ENUM": "asynInt16",  # -> Int32?
             "REAL": "asynFloat32",
             "LREAL": "asynFloat64",
+            # Use asynInt64 for all 64bit, since asyn only supports signed int64_t
+            "LINT": "asynInt64",
+            "ULINT": "asynInt64",
+            "LWORD": "asynInt64",
         }
 
         return data_types[self.chain.data_type.name]
@@ -1068,6 +1126,9 @@ DATA_TYPES = {
     "REAL": FloatRecordPackage,
     "LREAL": FloatRecordPackage,
     "STRING": StringRecordPackage,
+    "LINT": Int64RecordPackage,
+    "LWORD": Int64RecordPackage,
+    "ULINT": Int64RecordPackage,
 }
 
 
